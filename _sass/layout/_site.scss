@@ -20,12 +20,19 @@
   border-left: 1px solid $border-color;
 }
 
+.l-comments {
+  margin-top: 3em;
+  padding-top: 3em;
+  border-top: 1px solid $border-color;
+}
+
 .l-footer {
   margin: 2em 0;
   border-top: 1px solid $border-color;
   clear: both;
   font-size: .85em;
 }
+
 
 @media (max-width: 38em) {
 

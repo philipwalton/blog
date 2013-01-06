@@ -42,4 +42,8 @@ layout: default
 
   {{ content }}
 
+  {% unless page.comments == false %}
+    {% include disqus.html %}
+  {% endunless %}
+
 </article>

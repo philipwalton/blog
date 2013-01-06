@@ -40,17 +40,12 @@
 
     <div class="l-container">
 
-      {% include aside.html %}
-
       <section class="l-content" role="main">
         {{ content }}
       </section>
 
-      <footer class="l-footer" role="contentinfo">
-        <p>
-          &copy; {{ site.time | date: "%Y" }}, <a href="http://twitter.com/philwalton">Philip Walton</a>. Built with <a href="https://github.com/mojombo/jekyll">Jekyll</a>
-        </p>
-      </footer>
+      {% include aside.html %}
+      {% include footer.html %}
 
     </div>
 

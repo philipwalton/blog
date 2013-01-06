@@ -1,4 +1,4 @@
-root: http://philipwalton.github.com
+root: http://philipwalton.github.com/blog
 devroot: http://localhost
 permalink: /articles/:title
 auto: true

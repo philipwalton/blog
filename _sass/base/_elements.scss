@@ -45,3 +45,9 @@ pre {
   white-space: pre-wrap;
   word-wrap: break-word;
 }
+
+ol, ul {
+  margin: 1em 0;
+  padding-left: 1.1em;
+  list-style-type: square;
+}

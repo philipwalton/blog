@@ -1,0 +1,44 @@
+.nav {
+  @extend %list-unstyled;
+  font: normal normal 1.6em/1 BebasNeueRegular;
+  letter-spacing: .05em;
+  text-align: right;
+  text-shadow: 0 1px 0 rgba(255,255,255,.5);
+
+  li {
+    display: inline;
+  }
+  a {
+    @include transition(background-color .3s linear, color .1s ease);
+    background-color: $background-color;
+    color: inherit;
+    display: inline-block;
+    padding: 3.5em 1em 1em;
+    &:hover {
+      color: $accent-color;
+      background-color: blacken($background-color, 3%);
+    }
+    &.is-selected {
+      background-color: blacken($background-color, 6%);
+    }
+  }
+  @media (max-width: 46em) {
+    text-align: left;
+    a {
+      @include transition(none);
+      margin-right: .5em;
+      padding: 0;
+      background-color: transparent;
+      line-height: 3em;
+      &:hover {
+        color: $accent-color;
+        background-color: transparent;
+      }
+      &.is-selected {
+        @include box-shadow(0 -2px 0 #f04040 inset);
+        background-color: transparent;
+
+      }
+    }
+  }
+}

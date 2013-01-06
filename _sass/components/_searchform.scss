@@ -1,0 +1,22 @@
+.searchform {
+  margin: 1em 0 2em;
+}
+
+.searchform__field {
+  @include border-radius(1em);
+  @include box-shadow(0 0 3px rgba(0,0,0,.1) inset);
+  @include transition(all .5s ease);
+  border: 1px solid #d0d0d0;
+  padding: .4em .8em .4em;
+  width: 9em;
+  max-width: 100%;
+  &:focus {
+    outline: none;
+    border-color: #808080;
+    width: 100%;
+  }
+}
+
+.searchform__submit {
+  display: none;
+}

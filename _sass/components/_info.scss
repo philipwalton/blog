@@ -1,0 +1,5 @@
+.info {
+  @include border-radius(.3em);
+  background-color: $background-color;
+  padding: 1em 1.5em;
+}

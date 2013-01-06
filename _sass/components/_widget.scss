@@ -1,0 +1,15 @@
+.widget {
+  margin: 2em 0;
+  ul {
+    margin: 0;
+    padding: 0 0 0 1.25em;
+    list-style-type: square;
+  }
+  &:first-child {
+    margin-top: 0;
+  }
+}
+
+.widget__title {
+  margin: 0 0 .5em;
+}

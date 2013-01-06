@@ -1,0 +1,16 @@
+<h2 class="entry-title"><a href="{{ post.url | absolute }}">{{ post.title }}</a></h2>
+
+<ul class="entry-meta">
+  <li>
+    <a href="{{ post.url | absolute }}"><time datetime="{{post.date | date: '%Y-%m-%d'}}">{{post.date | date: "%B %d, %Y"}}</time></a>
+  </li>
+  <li>Tagged as:
+  {% assign tags = post.tags | sort_by_keys %}
+  {% for tag in tags %}
+    {% capture tag_path %}/tags/{{ tag | downcase }}{% endcapture %}
+    <a href="{{ tag_path | absolute }}">{{ tag }}</a>{% unless forloop.last %},{% endunless %}
+  {% endfor %}
+  </li>
+</ul>
+
+<p>{{ post | excerpt }} &hellip; <a rel="full-article" href="{{ post.url | absolute }}">[more]</a>

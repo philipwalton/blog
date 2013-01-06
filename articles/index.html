@@ -1,0 +1,29 @@
+---
+layout: page
+title: Articles
+---
+
+<div id="blog-archives">
+  {% for post in site.posts reverse %}
+
+    {% capture this_year %}{{ post.date | date: "%Y" }}{% endcapture %}
+
+    {% if forloop.first %}
+      <h3>{{ this_year }}</h3>
+      <ul>
+    {% elsif this_year != prev_year %}
+      </ul>
+      <h3>{{ this_year }}</h3>
+      <ul>
+    {% endif %}
+
+    <li>
+      <a href="{{ post.url | absolute }}">{{post.title}}</a>
+      (<time datetime="{{ post.date | datetime | date_to_xmlschema }}" pubdate>{{ post.date | date: "%m-%d-%Y"}}</time>)
+    </li>
+
+    {% assign prev_year = this_year %}
+
+  {% endfor %}
+  </ul>
+</div>

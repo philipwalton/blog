@@ -1,0 +1,28 @@
+<aside class="l-widgets" role="complementary">
+
+  <div class="widget">
+    <h3 class="widget__title">Recent Articles</h3>
+    <ul>
+      {% for post in site.posts limit: 5 %}
+        <li class="post">
+          <a href="{{ post.url | absolute }}">{{ post.title }}</a>
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+
+  <div class="widget">
+    <h3 class="widget__title">Topics</h3>
+    <ul>
+    {% assign tags = site.tags | sort_by_keys %}
+    {% for tag in tags %}
+      <li>
+        {% capture tag_path %}/tags/{{ tag[0] | downcase }}{% endcapture %}
+        <a href="{{ tag_path | absolute }}">{{ tag[0] }}</a>
+        ({{ tag[1] | size }})
+      </li>
+    {% endfor %}
+    </ul>
+  </div>
+
+</aside>

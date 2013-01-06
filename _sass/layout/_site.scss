@@ -1,0 +1,39 @@
+.l-container {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 0 2em;
+}
+
+.l-content {
+  @include box-shadow(1px 0 0 $border-color);
+  margin: 3em 30% 3em 0;
+  padding-right: 3em;
+
+}
+
+.l-widgets {
+  width: 30%;
+  margin-left: 3em;
+  padding-left: 3em;
+  float: right;
+}
+
+.l-footer {
+  margin: 2em 0;
+  border-top: 1px solid $border-color;
+  clear: both;
+  font-size: .85em;
+}
+
+@media (max-width: 38em) {
+
+  .l-content {
+    @include box-shadow(none);
+    margin: 2em 0;
+    padding-right: 0;
+  }
+
+  .l-widgets {
+    display: none;
+  }
+}

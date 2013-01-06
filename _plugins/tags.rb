@@ -18,6 +18,7 @@ module Jekyll
       if site.layouts.key? 'tag'
         dir = site.config['tag_dir'] || 'tags'
         site.tags.keys.each do |tag|
+          tag = tag.downcase
           write_tag_index(site, File.join(dir, tag), tag)
         end
       end

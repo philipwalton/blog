@@ -1,0 +1,10 @@
+root: http://philipwalton.github.com
+devroot: http://localhost
+permalink: /articles/:title
+auto: true
+server: false
+markdown: rdiscount
+pygments: true
+
+# Vendor Settings
+google_analytics_tracking_id: UA-21292978-1

@@ -1,0 +1,14 @@
+---
+layout: default
+---
+<h1>{{ page.title }}</h1>
+
+{% for post in site.posts %}
+  {% for tag in post.tags %}
+    {% if tag == page.tag %}
+      <article class="entry">
+        {% include excerpt.html %}
+      </article>
+    {% endif %}
+  {% endfor %}
+{% endfor %}

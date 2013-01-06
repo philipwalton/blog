@@ -1,0 +1,22 @@
+---
+layout: default
+title: Home
+---
+
+<div class="blog-index">
+
+  <h1>Recent Articles</h1>
+
+  {% assign index = true %}
+  {% for post in site.posts %}
+    {% assign content = post.content %}
+    <article class="entry">
+      {% include excerpt.html %}
+    </article>
+  {% endfor %}
+
+  <p class="info">
+    <a href="/articles">Articles Archive &rarr;</a>
+  </p>
+
+</div>

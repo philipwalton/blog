@@ -1,0 +1,17 @@
+{% case page.title  %}
+  {% when 'Home' %}
+    {% assign selected-tab = 'home' %}
+  {% when 'About' %}
+    {% assign selected-tab = 'about' %}
+  {% else %}
+    {% assign selected-tab = 'articles' %}
+{% endcase %}
+{% assign selected-class = 'class="is-selected"' %}
+<nav class="l-header-nav"
+ role="navigation">
+  <ul class="nav"-tab>
+    <li><a {% if selected-tab == 'home' %}{{ selected-class }}{% endif %} href="/">Home</a></li>
+    <li><a {% if selected-tab == 'articles' %}{{ selected-class }}{% endif %} href="/articles">Articles</a></li>
+    <li><a {% if selected-tab == 'about' %}{{ selected-class }}{% endif %} href="/about">About</a></li>
+  </ul>
+</nav>

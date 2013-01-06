@@ -1,0 +1,38 @@
+.entry-header {
+  margin-bottom: 2em;
+}
+
+.entry-title {
+  margin: 0;
+  a {
+    color: inherit;
+    &:hover {
+      color: $accent-color;
+    }
+  }
+}
+
+.entry-meta {
+  margin: 0;
+  padding: 0;
+  font-size: .833em;
+  li {
+    position: relative;
+    display: inline-block;
+    padding: 2px .2em 2px .9em;
+    border-left: 1px solid $border-color;
+    &:first-child {
+      padding-left:0;
+      border:0;
+    }
+    &:after {
+      content: "\00a0";
+    }
+  }
+}
+
+.entry-meta__twitter-share-button > iframe {
+  position: absolute;
+  top: 0;
+  left: 1.1em;
+}

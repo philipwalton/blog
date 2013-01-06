@@ -5,17 +5,19 @@
 }
 
 .l-content {
-  @include box-shadow(1px 0 0 $border-color);
-  margin: 3em 30% 3em 0;
+  float: left;
+  width: 70%;
+  margin: 3em 0;
   padding-right: 3em;
-
+  border-right: 1px solid $border-color;
 }
 
 .l-widgets {
+  float: left;
   width: 30%;
-  margin-left: 3em;
+  margin: 3em 0 3em -1px;
   padding-left: 3em;
-  float: right;
+  border-left: 1px solid $border-color;
 }
 
 .l-footer {
@@ -28,9 +30,11 @@
 @media (max-width: 38em) {
 
   .l-content {
-    @include box-shadow(none);
+    float: none;
+    width: auto;
     margin: 2em 0;
     padding-right: 0;
+    border: none;
   }
 
   .l-widgets {

@@ -1,5 +1,7 @@
 module Jekyll
+
   class TagIndex < Page
+
     def initialize(site, base, dir, tag)
       @site = site
       @base = base
@@ -10,24 +12,22 @@ module Jekyll
       self.data['tag'] = tag
       self.data['title'] = tag
     end
-  end
-  class TagGenerator < Generator
-    safe true
-    def generate(site)
 
+  end
+
+  class TagGenerator < Generator
+
+    safe true
+
+    def generate(site)
       if site.layouts.key? 'tag'
         dir = site.config['tag_dir'] || 'tags'
         site.tags.keys.each do |tag|
-          tag = tag.downcase
-          write_tag_index(site, File.join(dir, tag), tag)
+          site.pages << TagIndex.new(site, site.source, File.join(dir, tag.downcase), tag)
         end
       end
     end
-    def write_tag_index(site, dir, tag)
-      index = TagIndex.new(site, site.source, dir, tag)
-      index.render(site.layouts, site.site_payload)
-      index.write(site.dest)
-      site.pages << index
-    end
+
   end
+
 end

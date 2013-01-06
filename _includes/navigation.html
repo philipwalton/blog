@@ -10,8 +10,8 @@
 <nav class="l-header-nav"
  role="navigation">
   <ul class="nav"-tab>
-    <li><a {% if selected-tab == 'home' %}{{ selected-class }}{% endif %} href="/">Home</a></li>
-    <li><a {% if selected-tab == 'articles' %}{{ selected-class }}{% endif %} href="/articles">Articles</a></li>
-    <li><a {% if selected-tab == 'about' %}{{ selected-class }}{% endif %} href="/about">About</a></li>
+    <li><a {% if selected-tab == 'home' %}{{ selected-class }}{% endif %} href="{{ '/' | absolute }}">Home</a></li>
+    <li><a {% if selected-tab == 'articles' %}{{ selected-class }}{% endif %} href="{{ '/articles' | absolute }}">Articles</a></li>
+    <li><a {% if selected-tab == 'about' %}{{ selected-class }}{% endif %} href="{{ '/about' | absolute }}">About</a></li>
   </ul>
 </nav>

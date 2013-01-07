@@ -9,7 +9,7 @@
   font: 400 5em/1 BebasNeueRegular;
   line-height: 1;
   text-shadow: 0 1px 0 white;
-  @media (max-width: 23em) {
+  @include breakpoint(small) {
     font-size:4em;
   }
   a {
@@ -26,7 +26,7 @@
   letter-spacing: .2em;
   text-shadow: 0 1px 0 white;
   text-transform: uppercase;
-  @media (max-width: 23em) {
+  @include breakpoint(small) {
     font-size:.8em;
   }
 }

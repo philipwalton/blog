@@ -8,3 +8,4 @@ pygments: true
 
 # Vendor Settings
 google_analytics_tracking_id: UA-21292978-1
+disqus_shortname: philipwalton

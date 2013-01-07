@@ -44,7 +44,7 @@ Here's the HTML and (simplified) CSS as well as a visual example:
 }
 {% endhighlightjs %}
 
-<div class="box">
+<div class="codepen-wrapper">
   <pre class="codepen" data-height="280" data-type="result" data-href="ksBaI" data-user="philipwalton"><code></code></pre>
 </div>
 
@@ -62,7 +62,7 @@ div:first-child {
 
 Here's a live demonstration the previous example with the opacity rule added so you can see that it does in fact force the red box behind the others.
 
-<div class="box">
+<div class="codepen-wrapper">
   <pre class="codepen" data-height="280" data-type="result" data-href="dfCtb" data-user="philipwalton" data-safe="true"><code></code></pre>
 </div>
 
@@ -207,3 +207,5 @@ When we add the opacity rule to the first div, the stacking order changes like s
 {% endhighlightjs %}
 
 Hopefully it's now more clear why adding opacity to the first div in the example above causes the red box to appear behind the other boxes. Previously, the example contained only two stacking contexts, the root one and the one formed on `p.three` because it was given a position value and a z-index. When we added opacity to the parent element of `p.three` we formed a new stacking context and, as a result, the z-index value on `p.three` only applied within that new context. Because the first div (the one we applied opacity to) and its sibling elements do not have position or z-index values set, their stacking order is determined by their source order in the HTML, which means the first div, and all the elements contained within its stacking context, are rendered behind the second div.
+
+<script async src="http://codepen.io/assets/embed/ei.js"></script>

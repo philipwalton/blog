@@ -6,5 +6,6 @@
 }
 
 .widget__title {
-  margin: 0 0 .5em;
+  @extend %bebas-neue-subheading;
+  margin: 0;
 }

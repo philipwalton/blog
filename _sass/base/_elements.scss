@@ -12,6 +12,9 @@ html {
 a {
   color: $accent-color;
   text-decoration: none;
+  &:hover, &:active {
+    text-decoration: underline;
+  }
 }
 
 h1 {

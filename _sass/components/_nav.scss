@@ -13,9 +13,10 @@
     color: inherit;
     display: inline-block;
     padding: 3.5em 1em 1em;
-    &:hover {
+    &:hover, &:active {
       color: $accent-color;
       background-color: blacken($background-color, 3%);
+      text-decoration: none;
     }
     &.is-selected {
       background-color: blacken($background-color, 6%);
@@ -29,14 +30,14 @@
       padding: 0;
       background-color: transparent;
       line-height: 3em;
-      &:hover {
+      &:hover, &:active {
         color: $accent-color;
         background-color: transparent;
+        text-decoration: none;
       }
       &.is-selected {
         @include box-shadow(0 -2px 0 #f04040 inset);
         background-color: transparent;
-
       }
     }
   }

@@ -5,19 +5,15 @@
 }
 
 .l-content {
-  float: left;
-  width: 70%;
-  margin: 3em 0;
+  margin: 3em 30% 3em 0;
   padding-right: 3em;
-  border-right: 1px solid $border-color;
 }
 
 .l-widgets {
-  float: left;
+  float: right;
   width: 30%;
-  margin: 3em 0 3em -1px;
+  margin: 3em 0;
   padding-left: 3em;
-  border-left: 1px solid $border-color;
 }
 
 .l-comments {
@@ -37,11 +33,8 @@
 @media (max-width: 38em) {
 
   .l-content {
-    float: none;
-    width: auto;
     margin: 2em 0;
     padding-right: 0;
-    border: none;
   }
 
   .l-widgets {

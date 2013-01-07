@@ -1,0 +1,17 @@
+<ul class="article-meta">
+  <li>
+    {% capture date %}<time datetime="{{post.date | date: '%Y-%m-%d'}}">{{post.date | date: "%B %d, %Y"}}</time>{% endcapture %}
+    {% if page.url == post.url %}
+      {{ date }}
+    {% else %}
+      <a href="{{ post.url | absolute }}">{{ date }}</a>
+    {% endif %}
+  </li>
+  <li>Tagged as:
+  {% assign tags = post.tags | sort_by_keys %}
+  {% for tag in tags %}
+    {% capture tag_path %}/tags/{{ tag | downcase }}{% endcapture %}
+    <a href="{{ tag_path | absolute }}">{{ tag }}</a>{% unless forloop.last %},{% endunless %}
+  {% endfor %}
+  </li>
+</ul>

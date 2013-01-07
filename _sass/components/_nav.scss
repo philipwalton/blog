@@ -22,7 +22,8 @@
       background-color: blacken($background-color, 6%);
     }
   }
-  @media (max-width: 46em) {
+
+  @include breakpoint(medium) {
     text-align: left;
     a {
       @include transition(none);

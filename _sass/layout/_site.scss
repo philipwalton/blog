@@ -1,19 +1,33 @@
 .l-container {
-  max-width: 980px;
+  max-width: 70em;
   margin: 0 auto;
   padding: 0 2em;
 }
 
 .l-content {
-  margin: 3em 30% 3em 0;
-  padding-right: 3em;
+  float: left;
+  width: 70%;
+  min-height: 29em; // *hack* approx sidebar height
+  margin: 3em 0;
+  padding-right: 4%;
+  border-right: 1px solid $border-color;
+  @include breakpoint(medium) {
+    float: none;
+    width: auto;
+    margin: 2em 0;
+    padding: 0;
+    border: 0;
+  }
 }
 
 .l-widgets {
-  float: right;
+  float: left;
   width: 30%;
-  margin-bottom: 3em;
-  padding-left: 3em;
+  margin: 3em 0;
+  padding-left: 4%;
+  @include breakpoint(medium) {
+    display: none;
+  }
 }
 
 .l-comments {
@@ -27,17 +41,4 @@
   border-top: 1px solid $border-color;
   clear: both;
   font-size: .85em;
-}
-
-
-@media (max-width: 38em) {
-
-  .l-content {
-    margin: 2em 0;
-    padding-right: 0;
-  }
-
-  .l-widgets {
-    display: none;
-  }
 }

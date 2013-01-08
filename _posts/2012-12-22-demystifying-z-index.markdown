@@ -131,6 +131,8 @@ Even though each of the highlighted elements above are nested at a different lev
 
 Within the same stacking context, the stacking order of elements is determined almost exactly the same way it is determined when no z-indexes are involved. We already know that positioned elements appear in front of non-positioned elements. Z-indexes simply determine the place in the stacking order that they appear with higher z-indexes appearing in front of lower ones. And as soon as a z-index is assigned on an element, a new stacking context is formed, and all of the child elements of that new context are determined in the same way (and so on and so forth).
 
+The only exception to the above rule is negative z-indexes. I said above that positioned elements always appeared in front of non-positioned element, and that is true except when the z-index is negative. Positioned elements with a negative z-index appear behind all other elements within the same stacking context. That includes non-positioned elements; it even includes an element's own parents. Negative z-indexes are the only way for an element to appear behind its own parent. (Note that the parent element cannot form a stacking context itself or it won't work.)
+
 ## Calculating an Element's Position in the Stacking Order
 
 With a firm understanding of when new stacking contexts are formed as well as an understanding of the stacking order within a stacking context, calucating the global stacking order of an element is simple (though sometimes time consuming for pages with a large number of elements).

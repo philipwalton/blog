@@ -50,7 +50,11 @@
     </div>
 
     <script src="{{ '/assets/javascripts/highlight.js' | absolute }}"></script>
-    <script>hljs.initHighlightingOnLoad();</script>
+    <script>
+      if (typeof hljs.initHighlightingOnLoad == "function") {
+        hljs.initHighlightingOnLoad()
+      };
+    </script>
 
   </body>
 </html>

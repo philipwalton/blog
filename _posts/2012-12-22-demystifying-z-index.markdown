@@ -6,7 +6,7 @@ tags:
 - CSS
 ---
 
-The problem with z-index is that almost nobody understand how it really works. It's not complicated (quite the opposite), but it if you've never taken the time to read its specification, there are almost certainly crucial aspects about z-index that you're completely unware of.
+The problem with z-index is that almost nobody understand how it really works. It's not complicated (quite the opposite), but it if you've never taken the time to read its specification, there are almost certainly crucial aspects about z-index that you're completely unaware of.
 
 Don't believe me? Well, see if you can solve this problem:
 
@@ -50,9 +50,17 @@ Here's the HTML and (simplified) CSS as well as a visual example:
 
 Here's the challenge: Can you make the red element go behind the blue and green elements without altering the markup or changing the z-index of any element?
 
+To see if you can figure it out, click the *edit on Codepen* link and play around with it for a big. If you've succeeded, it should look like the example below.
+
+**Spoiler alert:** don't click the CSS tab for the example below or it will give away the answer.
+
+<div class="codepen-wrapper">
+  <pre class="codepen" data-height="280" data-type="result" data-href="dfCtb" data-user="philipwalton" data-safe="true"><code></code></pre>
+</div>
+
 ## The solution
 
-The solution is to add an opacity value other than one to the parent of the red div. If it doesn't make sense why that works, keep reading. If you already knew that, please send me your resume!
+The solution is to add an opacity value less than one to the parent of the red div.
 
 {% highlightjs %}
 div:first-child {
@@ -60,31 +68,29 @@ div:first-child {
 }
 {% endhighlightjs %}
 
-Here's a live demonstration the previous example with the opacity rule added so you can see that it does in fact force the red box behind the others.
+If you're scratching your head right now in shock and disbelief that opacity would have any affect on which elements were stacked in front of which, welcome to the club. I was similarly shocked when I first stumbled upon this issue.
 
-<div class="codepen-wrapper">
-  <pre class="codepen" data-height="280" data-type="result" data-href="dfCtb" data-user="philipwalton" data-safe="true"><code></code></pre>
-</div>
-
-The above example is meant to be confusing. If you're surprised that opacity would have any affect on which elements were stacked in front of which, welcome to the club. I was similiarly shocked when I first stumbled upon this issue.
-
-Z-index seems so simple: elements with a higher z-index are stacked in front of ones with a lower z-index, right? But this is the problem. It appears so simple, so most developers don't take the time to read the rules.
-
-Hopefully this article will make things more clear.
+If you already knew the answer without looking, congratulations. Send me your resume! If you're still a little bit confused, keep reading. Hopefully this article will make things more clear.
 
 ## Stacking Order
 
-Every element in an HTML document is either in front of or behind every other element in the document. This is known as the stacking order. The rules to deterine this order are pretty clearly defined in the spec, but as I've already stated, they're not fully understood by most developers.
+Z-index seems so simple: elements with a higher z-index are stacked in front of ones with a lower z-index, right?
 
-When there's no z-index involved, the rules are very simple: Basically, the stacking order is the same as the order of appearance in the HTML, with child element always being in front of their parents and positioned elements always being in front of non-positioned elements.
+This is the problem with z-index. It appears so simple, so most developers don't take the time to read the rules.
 
-When you add z-index into the mix, things get a little trickier. At first it's natural to assume elements with higher z-indexes are in front of elements with lower z-indexes, and any element with a z-index is in front of any elemenet without a z-index, but it's not that simple, and for good reason.
+Every element in an HTML document is either in front of or behind every other element in the document. This is known as the stacking order. The rules to determine this order are pretty clearly defined in the spec, but as I've already stated, they're not fully understood by most developers.
 
-If it were solely up to the z-index value, what would happen if an element had a z-index of 10, and its child element had a z-index of 9 or no z-index at all. It wouldn't make sense for a child element to be able to appear behind its parent. There must be additional factors other than z-index value that determine stacking order.
+When there's no z-index involved, the rules are very simple: basically, the stacking order is the same as the order of appearance in the HTML, with child element always being in front of their parents and positioned elements always being in front of non-positioned elements.
+
+When you add z-index into the mix, things get a little trickier. At first it's natural to assume elements with higher z-indexes are in front of elements with lower z-indexes, and any element with a z-index is in front of any element without a z-index, but it's not that simple, and for good reason.
+
+If it were solely up to the z-index value, what would happen if an element had a z-index of 10, and its child element had a z-index of 9 or no z-index at all. You'd end up having to specify a z-index on every single element otherwise parents would end up visually in front of their children and mass chaos would ensue.
+
+There must be factors other than z-index that determine stacking order.
 
 ## Stacking Contexts
 
-When you set a high z-index on an element you expect it to move to the front of the stacking order, and you expect all of it's children to move with it. And this is exactly what happens.
+When you set a high z-index on an element you expect it to move to the front of the stacking order. You also likely expect that element's children to move with it. Fortunately, this is what happens.
 
 Groups of elements with a common parent that move forward or backward together in the stacking order make up what is known as a stacking context.
 
@@ -92,9 +98,9 @@ A full understanding of stacking contexts is key to really grasping how z-index 
 
 The first step in knowing how to deal with stacking contexts is understanding what causes them for form. A new stacking context is formed whenever an element has a position value other than `static` and a z-index value other than `auto`. It can also be formed when an elements has an opacity value less than `1`.
 
-The first way is relatively intuitave. Even someone who's never heard the term stacking context expects z-index to work this way. The second way is much less intuative and is rarely mentioned outside of the w3c specification.
+The first way is relatively intuitive. Even someone who's never heard the term stacking context expects z-index to work this way. The second way is much less intuitive and is rarely mentioned outside of the w3c specification documents.
 
-The position, z-index, and opacity properties can be set on any element including child elements of elements that already have these properties. That means stacking contexts are nestable and can be contained inside of other stacking contexts.
+The properties that can form new stacking contexts (position, z-index, and opacity) may be set on any element including child elements of elements that already have these properties. That means stacking contexts are nestable and can be contained inside of other stacking contexts.
 
 In fact, all stacking contexts are contained within one main stacking context formed by the `<html>` element.
 
@@ -129,19 +135,37 @@ Stacking contexts contain all of their children at the same place in the stackin
 
 Even though each of the highlighted elements above are nested at a different level in the DOM tree, they're all members of the same stacking context. That means the rules that determine their stacking order apply equally to all of them. If you assign a z-index of 1 to the `<a>` tag it will appear visually in front of the `<article>` tag even though it is a great-great-great-grandchild of the root `<div>` and the `<article>` tag is only a child of the `<div>`. The fact that the `<a>` tag is nested deep in the HTML tree structure is only important if one of its ancestors forms a stacking context.
 
-Within the same stacking context, the stacking order of elements is determined almost exactly the same way it is determined when no z-indexes are involved. We already know that positioned elements appear in front of non-positioned elements. Z-indexes simply determine the place in the stacking order that they appear with higher z-indexes appearing in front of lower ones. And as soon as a z-index is assigned on an element, a new stacking context is formed, and all of the child elements of that new context are determined in the same way (and so on and so forth).
-
-The only exception to the above rule is negative z-indexes. I said above that positioned elements always appeared in front of non-positioned element, and that is true except when the z-index is negative. Positioned elements with a negative z-index appear behind all other elements within the same stacking context. That includes non-positioned elements; it even includes an element's own parents. Negative z-indexes are the only way for an element to appear behind its own parent. (Note that the parent element cannot form a stacking context itself or it won't work.)
-
 ## Calculating an Element's Position in the Stacking Order
 
-With a firm understanding of when new stacking contexts are formed as well as an understanding of the stacking order within a stacking context, calucating the global stacking order of an element is simple (though sometimes time consuming for pages with a large number of elements).
+### Stacking Order Within the Same Stacking Context
+
+
+
+We already discussed the stacking order of elements when the z-index property isn't used. Here are the rules that determine the order (from back to front):
+
+1.  Non-positioned element (ordered by appearance in the HTML)
+2.  Positioned elements (ordered by appearance in the HTML)
+
+When you add z-index into the mix, it's not much more complicated. Basically setting a z-index value either puts the element behind all other elements (with negative values) or in front of all other elements (with positive values).
+
+Here are the rules to determine stacking order within a single stacking context (from back to front):
+
+1.  Positioned elements with a negative z-index value (ordered by z-index value)
+2.  Non-positioned elements (ordered by appearance in the HTML)
+3.  Positioned elements with a z-index of `auto`, `0`, or no z-index value (ordered by appearance in the HTML)
+4.  Positioned elements with a positive z-index value (ordered by z-index)
+
+**Note:** positioned elements with negative z-indexes are ordered first within a stacking context, which means they appear behind all other elements. Because of this, it becomes possible for an element to appear behind its own parent, which is normally not possible. This will only work if the element's parent is in the same stacking context and is not the root element of that stacking context.
+
+### Global Stacking Order
+
+With a firm understanding of when new stacking contexts are formed as well as an understanding of the stacking order within a stacking context, calculating the global stacking order of an element is simple (though sometimes time consuming for pages with a large number of elements).
 
 The global stacking order of an element can be represented by a dot-delimited string similar to a version number. The dots delimit different stacking contexts and the numbers represent the order of an element within that particular context.
 
-A stacking order position of "5.12.3" would mean an element is stacked third from the bottom in the stacking contexts it's currently in. That stacking context is ordered twelveth from the bottom of its current stacking context, and that context is ordered fifth from the bottom in the global stacking context.
+A stacking order position of `5.12.3` would mean an element is stacked third from the bottom of its nearest parent stacking context (the one it's currently in). That stacking context is ordered twelveth from the bottom of its nearest parent stacking context, and that context is ordered fifth from the bottom of the global stacking context.
 
-To find the position in the stacking order of any element in a document, simply determine the element's stacking order within its current stacking context. Then travel recursively up the DOM tree deterining the order of each stacking context in its parent context until you arrive at the root element. The process is simple, but for a large document, it's probably not worth doing it by hand.
+To find the position in the stacking order of any element in a document, simply determine the element's stacking order within its current stacking context. Then travel recursively up the DOM tree determining the order of each stacking context in its parent context until you arrive at the root element. The process is simple, but for a large document, it's probably not worth doing it by hand.
 
 The follow is an example of some CSS and associated HTML where I've indicated the stacking order of each element with an HTML comment:
 
@@ -178,6 +202,8 @@ h1 {
   </aside>
 </body>
 {% endhighlightjs %}
+
+## Wrapping Up
 
 Getting back to the original problem, I've recreated the HTML structure adding comments within each tag indicating its stacking order. This order is assuming the original CSS.
 

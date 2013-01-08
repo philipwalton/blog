@@ -419,7 +419,7 @@ These are obviously just suggestions, but they’re intended to get you thinking
 
 ### HTML Inspector
 
-Earlier I suggested that it would be easy to search your HTML classes and all linked stylesheets and warn if a class was used in the HTML but not defined in any stylesheet. I’m currently developing a tool called the HTML Inspector (I’ll be releasing the source soon) to make this process easier.
+Earlier I suggested that it would be easy to search your HTML classes and all linked stylesheets and warn if a class was used in the HTML but not defined in any stylesheet. I’m currently developing a tool called the [HTML Inspector](https://github.com/philipwalton/html-inspector) to make this process easier.
 
 HTML Inspector traverses your HTML and (much like CSS Lint) allows you to write your own rules that throw errors and warnings when some convention is being broken. I currently use the following rules:
 

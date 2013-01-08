@@ -58,7 +58,7 @@ To see if you can figure it out, click the *edit on Codepen* link and play aroun
   <pre class="codepen" data-height="280" data-type="result" data-href="dfCtb" data-user="philipwalton" data-safe="true"><code></code></pre>
 </div>
 
-## The solution
+## The Solution
 
 The solution is to add an opacity value less than one to the parent of the red div.
 

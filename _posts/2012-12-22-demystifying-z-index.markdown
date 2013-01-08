@@ -6,13 +6,13 @@ tags:
 - CSS
 ---
 
-The problem with z-index is that almost nobody understand how it really works. It's not complicated (quite the opposite), but it if you've never taken the time to read its specification, there are almost certainly crucial aspects about z-index that you're completely unaware of.
+The problem with z-index is that almost nobody understands how it really works. It's not complicated (quite the opposite), but it if you've never taken the time to read its specification, there are almost certainly crucial aspects about z-index that you're completely unaware of.
 
 Don't believe me? Well, see if you can solve this problem:
 
 ## The Problem
 
-In the following HTML you have three divs that each contain a single paragraph element. Each paragraph is absolutely positioned near the top left of the document, and they're overlapping so you can see which paragraph is stacked in front of which. Right now, the first paragraph (the red one) has a z-index of 1, so it's stacked on top.
+In the following HTML you have three divs that each contain a single paragraph element. Each paragraph is absolutely positioned near the top left of the document, and they're overlapping so you can see which paragraph is stacked in front of which. Right now, the first paragraph (the red one) has a z-index of `1`, so it's stacked on top.
 
 Here's the HTML and (simplified) CSS as well as a visual example:
 
@@ -50,9 +50,9 @@ Here's the HTML and (simplified) CSS as well as a visual example:
 
 Here's the challenge: Can you make the red element go behind the blue and green elements without altering the markup or changing the z-index of any element?
 
-To see if you can figure it out, click the *edit on Codepen* link and play around with it for a big. If you've succeeded, it should look like the example below.
+To see if you can figure it out, click the *edit on Codepen* link and play around with it for a bit. If you've succeeded, it should look like the example below.
 
-**Spoiler alert:** don't click the CSS tab for the example below or it will give away the answer.
+**Spoiler alert:** don't click the CSS tab on the example below or it will give away the answer.
 
 <div class="codepen-wrapper">
   <pre class="codepen" data-height="280" data-type="result" data-href="dfCtb" data-user="philipwalton" data-safe="true"><code></code></pre>
@@ -68,7 +68,7 @@ div:first-child {
 }
 {% endhighlightjs %}
 
-If you're scratching your head right now in shock and disbelief that opacity would have any affect on which elements were stacked in front of which, welcome to the club. I was similarly shocked when I first stumbled upon this issue.
+If you're scratching your head right now in shock and disbelief that opacity would have any effect on which elements were stacked in front of which, welcome to the club. I was similarly shocked when I first stumbled upon this issue.
 
 If you already knew the answer without looking, congratulations. Send me your resume! If you're still a little bit confused, keep reading. Hopefully this article will make things more clear.
 
@@ -82,11 +82,11 @@ Every element in an HTML document is either in front of or behind every other el
 
 When there's no z-index involved, the rules are very simple: basically, the stacking order is the same as the order of appearance in the HTML, with child element always being in front of their parents and positioned elements always being in front of non-positioned elements.
 
-When you add z-index into the mix, things get a little trickier. At first it's natural to assume elements with higher z-indexes are in front of elements with lower z-indexes, and any element with a z-index is in front of any element without a z-index, but it's not that simple, and for good reason.
+When you add z-index into the mix, things get a little trickier. At first it's natural to assume elements with higher z-index values are in front of elements with lower z-index values, and any element with a z-index is in front of any element without a z-index, but it's not that simple, and for good reason.
 
-If it were solely up to the z-index value, what would happen if an element had a z-index of 10, and its child element had a z-index of 9 or no z-index at all. You'd end up having to specify a z-index on every single element otherwise parents would end up visually in front of their children and mass chaos would ensue.
+If it were solely up to the z-index value, what would happen if an element had a z-index of `10`, and its child element had a z-index of `9` or no z-index at all. You'd end up having to specify a z-index on every single element otherwise parents would end up visually in front of their children and mass chaos would ensue.
 
-There must be factors other than z-index that determine stacking order.
+Clearly there are factors other than z-index that determine stacking order.
 
 ## Stacking Contexts
 
@@ -96,7 +96,7 @@ Groups of elements with a common parent that move forward or backward together i
 
 A full understanding of stacking contexts is key to really grasping how z-index and the stacking order work. Stacking contexts confine their children to a particular place in the stacking order. This means that if an element is in a stacking context at the back of the document, even a z-index value of a billion won't bring it to the front. And this can be really confusing if you don't understand what's going on.
 
-The first step in knowing how to deal with stacking contexts is understanding what causes them for form. A new stacking context is formed whenever an element has a position value other than `static` and a z-index value other than `auto`. It can also be formed when an elements has an opacity value less than `1`.
+The first step in knowing how to deal with stacking contexts is understanding what causes them to form. A new stacking context is formed whenever an element has a position value other than `static` and a z-index value other than `auto`. It can also be formed when an elements has an opacity value less than `1`.
 
 The first way is relatively intuitive. Even someone who's never heard the term stacking context expects z-index to work this way. The second way is much less intuitive and is rarely mentioned outside of the w3c specification documents.
 
@@ -107,10 +107,10 @@ In fact, all stacking contexts are contained within one main stacking context fo
 To summarize, there are three ways new stacking contexts are formed:
 
 *   When an element has a position value other than `static` and a z-index value other than `auto`
-*   When an elements has an opacity value less than `1`
+*   When an element has an opacity value less than `1`
 *   When an element is the root element of a document (the `<html>` element)
 
-## Points of Confusion
+### Points of Confusion
 
 Stacking contexts contain all of their children at the same place in the stacking order. But to those who don't know what stacking contexts are, it can appear as if it's actually the HTML elements themselves that are containing their children. Consider the following HTML:
 
@@ -133,15 +133,13 @@ Stacking contexts contain all of their children at the same place in the stackin
 </div>
 {% endhighlightjs %}
 
-Even though each of the highlighted elements above are nested at a different level in the DOM tree, they're all members of the same stacking context. That means the rules that determine their stacking order apply equally to all of them. If you assign a z-index of 1 to the `<a>` tag it will appear visually in front of the `<article>` tag even though it is a great-great-great-grandchild of the root `<div>` and the `<article>` tag is only a child of the `<div>`. The fact that the `<a>` tag is nested deep in the HTML tree structure is only important if one of its ancestors forms a stacking context.
+Even though each of the highlighted elements above are nested at a different level in the DOM tree, they're all members of the same stacking context. That means the rules that determine their stacking order apply equally to all of them. If you assign a z-index value of `1` to the `<a>` tag it will appear visually in front of the `<article>` tag even though it is a great-great-great-grandchild of the root `<div>` and the `<article>` tag is only a child of the `<div>`. The fact that the `<a>` tag is nested deep in the HTML tree structure is only important if one of its ancestors forms a stacking context.
 
 ## Calculating an Element's Position in the Stacking Order
 
 ### Stacking Order Within the Same Stacking Context
 
-
-
-We already discussed the stacking order of elements when the z-index property isn't used. Here are the rules that determine the order (from back to front):
+We already discussed the stacking order of elements when the z-index property isn't used. As a refresher, here are the rules that determine the order (from back to front):
 
 1.  Non-positioned element (ordered by appearance in the HTML)
 2.  Positioned elements (ordered by appearance in the HTML)
@@ -152,7 +150,7 @@ Here are the rules to determine stacking order within a single stacking context 
 
 1.  Positioned elements with a negative z-index value (ordered by z-index value)
 2.  Non-positioned elements (ordered by appearance in the HTML)
-3.  Positioned elements with a z-index of `auto`, `0`, or no z-index value (ordered by appearance in the HTML)
+3.  Positioned elements with a z-index value of `auto` (ordered by appearance in the HTML)
 4.  Positioned elements with a positive z-index value (ordered by z-index)
 
 **Note:** positioned elements with negative z-indexes are ordered first within a stacking context, which means they appear behind all other elements. Because of this, it becomes possible for an element to appear behind its own parent, which is normally not possible. This will only work if the element's parent is in the same stacking context and is not the root element of that stacking context.
@@ -220,7 +218,7 @@ Getting back to the original problem, I've recreated the HTML structure adding c
 {% endhighlightjs %}
 
 
-When we add the opacity rule to the first div, the stacking order changes like so:
+When we add the opacity rule to the first `<div>`, the stacking order changes like so:
 
 {% highlightjs %}
 <div><!-- 1 -->
@@ -234,6 +232,6 @@ When we add the opacity rule to the first div, the stacking order changes like s
 </div>
 {% endhighlightjs %}
 
-Hopefully it's now more clear why adding opacity to the first div in the example above causes the red box to appear behind the other boxes. Previously, the example contained only two stacking contexts, the root one and the one formed on `p.three` because it was given a position value and a z-index. When we added opacity to the parent element of `p.three` we formed a new stacking context and, as a result, the z-index value on `p.three` only applied within that new context. Because the first div (the one we applied opacity to) and its sibling elements do not have position or z-index values set, their stacking order is determined by their source order in the HTML, which means the first div, and all the elements contained within its stacking context, are rendered behind the second div.
+Hopefully it's now more clear why adding opacity to the first `<div>` in the example above causes the red box to appear behind the other boxes. Previously, the example contained only two stacking contexts, the root one and the one formed on `p.three` because it was given a position value and a z-index. When we added opacity to the parent element of `p.three` we formed a new stacking context and, as a result, the z-index value on `p.three` only applied within that new context. Because the first `<div>` (the one we applied opacity to) and its sibling elements do not have position or z-index values set, their stacking order is determined by their source order in the HTML, which means the first div, and all the elements contained within its stacking context, are rendered behind the second div.
 
 <script async src="http://codepen.io/assets/embed/ei.js"></script>

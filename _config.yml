@@ -5,6 +5,11 @@ auto: true
 server: false
 markdown: rdiscount
 pygments: true
+exclude:
+- .sass-cache/
+- config.rb
+- README.md
+- Rakefile
 
 # Vendor Settings
 google_analytics_tracking_id: UA-21292978-1

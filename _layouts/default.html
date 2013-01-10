@@ -15,7 +15,9 @@
     <link href="{{ '/assets/stylesheets/application.css' | absolute }}" rel="stylesheet" type="text/css">
     <link href="{{ '/atom.xml' | absolute }}" rel="alternate" title="{{ site.title }}" type="application/atom+xml">
 
+    <!--[if lt IE 9]>
     <script src="{{ '/assets/javascripts/modernizr.custom.js' | absolute }}"></script>
+    <![endif]-->
 
     {% if site.google_analytics_tracking_id %}
       <script type="text/javascript">
@@ -51,12 +53,10 @@
 
     </div>
 
+    <!--[if gte IE 9]><!-->
     <script src="{{ '/assets/javascripts/highlight.js' | absolute }}"></script>
-    <script>
-      if (typeof hljs.initHighlightingOnLoad == "function") {
-        hljs.initHighlightingOnLoad()
-      };
-    </script>
+    <script>hljs.initHighlightingOnLoad()</script>
+    <!--<![endif]-->
 
   </body>
 </html>

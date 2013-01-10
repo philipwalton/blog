@@ -12,7 +12,7 @@ Don't believe me? Well, see if you can solve this problem:
 
 ## The Problem
 
-In the following HTML you have three `<div>` elements, and each `<div>` contain a single `<span>` element. Each `<span>` is given a background color &mdash; red, green, and blue respectively. Each `<span>` is also positioned absolutely near the top left of the document, slightly overlapping the other `<span>` elements so you can see which ones are stacked in front of which. The first `<span>` has a z-index value of `1`, while the other two do not have any z-index set.
+In the following HTML you have three `<div>` elements, and each `<div>` contains a single `<span>` element. Each `<span>` is given a background color &mdash; red, green, and blue respectively. Each `<span>` is also positioned absolutely near the top left of the document, slightly overlapping the other `<span>` elements so you can see which ones are stacked in front of which. The first `<span>` has a z-index value of `1`, while the other two do not have any z-index set.
 
 Here's what the HTML and basic CSS look like. There's also a visual demo (via [Codepen](http://codepen.io)) with the full CSS below:
 
@@ -54,7 +54,7 @@ Here's what the HTML and basic CSS look like. There's also a visual demo (via [C
 * Do not add/change the `z-index` property of any element
 * Do not add/change the `position` property of any element
 
-To see if you can figure it out, click the *edit on Codepen* link and play around with it for a bit. If you've succeeded, it should look like the example below. *(Don't click the CSS tab on the example below or it will give away the answer.)*
+To see if you can figure it out, click the *edit on Codepen* link and play around with it for a bit. If you've succeeded, it should look like the example below. *(Don't click the CSS tab on the Copepen below or it will give away the answer.)*
 
 <div class="codepen-wrapper">
   <spanre class="codepen" data-height="240" data-type="result" data-href="dfCtb" data-user="philipwalton" data-safe="true"><code></code></pre>
@@ -80,9 +80,9 @@ Z-index seems so simple: elements with a higher z-index are stacked in front of 
 
 Every element in an HTML document can be either in front of or behind other element in the document. This is known as the stacking order. The rules to determine this order are pretty clearly defined in the spec, but as I've already stated, they're not fully understood by most developers.
 
-When the z-index and position properties aren't involved, the rules are pretty simple: basically, the stacking order is the same as the order of appearance in the HTML. (OK,it's actually a [little more complicated](http://www.w3.org/TR/CSS2/zindex.html) than that, but 99% of the time elements that appear later in the HTML appear high in the stacking order.)
+When the z-index and position properties aren't involved, the rules are pretty simple: basically, the stacking order is the same as the order of appearance in the HTML. (OK,it's actually a [little more complicated](http://www.w3.org/TR/CSS2/zindex.html) than that, but 99% of the time elements that appear later in the HTML are high in the stacking order.)
 
-When you introduce the `position` property, any element within a position other than `static` is displayed in front of any non-positioned element. (Saying an element is "positioned" means that it has a position value other than `static`, e.g., `relative`, `absolute`, etc.) Also, when a positioned element moves forward in the stacking order, it also brings its children forward with it.
+When you introduce the `position` property, any element with a position other than `static` is displayed in front of any non-positioned element. (Saying an element is "positioned" means that it has a position value other than `static`, e.g., `relative`, `absolute`, etc.) Also, when a positioned element moves forward in the stacking order, it also brings its children forward with it.
 
 Finally, when you add z-index into the mix, things get a little trickier. At first it's natural to assume elements with higher z-index values are in front of elements with lower z-index values, and any element with a z-index is in front of any element without a z-index, but it's not that simple. First of all, z-index only works on positioned elements. If you try to set a z-index on an element with no position specified, it will do nothing. Secondly, z-index values can create stacking contexts, and now suddenly what seemed simple just got a lot more complicated.
 
@@ -90,7 +90,7 @@ Finally, when you add z-index into the mix, things get a little trickier. At fir
 
 Groups of elements with a common parent that move forward or backward together in the stacking order make up what is known as a stacking context.
 
-A full understanding of stacking contexts is key to really grasping how z-index and the stacking order work. Stacking contexts confine their children to a particular place in the stacking order. That means that if an element is in a stacking context at the bottom of the stacking order, there is no way to get it to appear front of an element at the top of the stacking order, even with a z-index of a billion!
+A full understanding of stacking contexts is key to really grasping how z-index and the stacking order work. Stacking contexts confine their children to a particular place in the stacking order. That means that if an element is a child in a stacking context at the bottom of the stacking order, there is no way to get it to appear in front of an element at the top of the stacking order, even with a z-index of a billion!
 
 Stacking contexts can be formed in one of three ways:
 
@@ -115,7 +115,7 @@ Here are the basic rules to determine stacking order within a single stacking co
 1.  The stacking context's root element
 2.  Positioned elements (and their children) with negative z-index values (higher values in front of lower ones)
 3.  Non-positioned elements (ordered by appearance in the HTML)
-4.  Positioned elements (and their children) with a z-index value of `0` or `auto` (ordered by appearance in the HTML)
+4.  Positioned elements (and their children) with a z-index value of `auto` (ordered by appearance in the HTML)
 5.  Positioned elements (and their children) with positive z-index values (higher values in front of lower ones)
 
 **Note:** positioned elements with negative z-indexes are ordered first within a stacking context, which means they appear behind all other elements. Because of this, it becomes possible for an element to appear behind its own parent, which is normally not possible. This will only work if the element's parent is in the same stacking context and is not the root element of that stacking context. A great example of this is Nicolas Gallagher's [CSS drop-shadows without images](http://nicolasgallagher.com/css-drop-shadows-without-images/demo/).
@@ -159,5 +159,11 @@ When we add the opacity rule to the first `<div>`, the stacking order changes li
 `span.red` used to be `6` but it's changed to `1.1`. I've used dot notation to show that a new stacking context was formed and `span.red` is now the first element within that new context.
 
 Hopefully it's now a little more clear why the red box moved behind the other boxes. The original example contained only two stacking contexts, the root one and the one formed on `span.red`. When we added opacity to the parent element of `span.red` we formed a third stacking context and, as a result, the z-index value on `span.red` only applied within that new context. Because the first `<div>` (the one we applied opacity to) and its sibling elements do not have position or z-index values set, their stacking order is determined by their source order in the HTML, which means the first `<div>`, and all the elements contained within its stacking context, are rendered behind the second and third `<div>` elements.
+
+## Additional Resources
+
+* [Elaborate description of Stacking Contexts](http://www.w3.org/TR/CSS2/zindex.html)
+* [The stacking context](https://developer.mozilla.org/en-US/docs/CSS/Understanding_z-index/The_stacking_context)
+* [The Z-Index CSS Property: A Comprehensive Look](http://coding.smashingmagazine.com/2009/09/15/the-z-index-css-property-a-comprehensive-look/)
 
 <script async src="http://codepen.io/assets/embed/ei.js"></script>

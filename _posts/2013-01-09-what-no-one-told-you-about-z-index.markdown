@@ -80,9 +80,9 @@ Z-index seems so simple: elements with a higher z-index are stacked in front of 
 
 Every element in an HTML document can be either in front of or behind other element in the document. This is known as the stacking order. The rules to determine this order are pretty clearly defined in the spec, but as I've already stated, they're not fully understood by most developers.
 
-When the z-index and position properties aren't involved, the rules are pretty simple: basically, the stacking order is the same as the order of appearance in the HTML. (OK,it's actually a [little more complicated](http://www.w3.org/TR/CSS2/zindex.html) than that, but 99% of the time elements that appear later in the HTML are high in the stacking order.)
+When the z-index and position properties aren't involved, the rules are pretty simple: basically, the stacking order is the same as the order of appearance in the HTML. (OK, it's actually a [little more complicated](http://www.w3.org/TR/CSS2/zindex.html) than that, but as long as you're not using negative margins to overlap inline elements, you won't encounter the edge cases.)
 
-When you introduce the `position` property, any element with a position other than `static` is displayed in front of any non-positioned element. (Saying an element is "positioned" means that it has a position value other than `static`, e.g., `relative`, `absolute`, etc.) Also, when a positioned element moves forward in the stacking order, it also brings its children forward with it.
+When you introduce the `position` property, any element with a position other than `static` is displayed in front of any non-positioned element. (Saying an element is "positioned" means that it has a position value other than `static`, e.g., `relative`, `absolute`, etc.) Also, when a positioned element moves forward in the stacking order, it brings its children forward with it.
 
 Finally, when you add z-index into the mix, things get a little trickier. At first it's natural to assume elements with higher z-index values are in front of elements with lower z-index values, and any element with a z-index is in front of any element without a z-index, but it's not that simple. First of all, z-index only works on positioned elements. If you try to set a z-index on an element with no position specified, it will do nothing. Secondly, z-index values can create stacking contexts, and now suddenly what seemed simple just got a lot more complicated.
 
@@ -113,10 +113,10 @@ But for most intents and purposes, a basic understanding of the order can go a l
 Here are the basic rules to determine stacking order within a single stacking context (from back to front):
 
 1.  The stacking context's root element
-2.  Positioned elements (and their children) with negative z-index values (higher values in front of lower ones)
+2.  Positioned elements (and their children) with negative z-index values (higher values in front of lower ones, otherwise ordered by appearance in the HTML)
 3.  Non-positioned elements (ordered by appearance in the HTML)
 4.  Positioned elements (and their children) with a z-index value of `auto` (ordered by appearance in the HTML)
-5.  Positioned elements (and their children) with positive z-index values (higher values in front of lower ones)
+5.  Positioned elements (and their children) with positive z-index values (higher values in front of lower ones, otherwise ordered by appearance in the HTML)
 
 **Note:** positioned elements with negative z-indexes are ordered first within a stacking context, which means they appear behind all other elements. Because of this, it becomes possible for an element to appear behind its own parent, which is normally not possible. This will only work if the element's parent is in the same stacking context and is not the root element of that stacking context. A great example of this is Nicolas Gallagher's [CSS drop-shadows without images](http://nicolasgallagher.com/css-drop-shadows-without-images/demo/).
 

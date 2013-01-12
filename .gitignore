@@ -17,3 +17,6 @@ Thumbs.db
 
 # Static site output
 _site
+
+# Don't track the main CSS file
+assets/stylesheets/application.css

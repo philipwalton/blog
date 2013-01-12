@@ -20,3 +20,6 @@ _site
 
 # Don't track the main CSS file
 assets/stylesheets/application.css
+
+# Temporarily ignore Rakefile
+Rakefile

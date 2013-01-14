@@ -226,12 +226,12 @@ A native solution to class inheritance wouldn't have this problem because it wou
 
 CSS should have it's own way to declare class inheritance. It should be simple and declarative, like CSS, and since it's just CSS, it would be natively supported by the browser and therefore accessible to JavaScript APIs.
 
-Any native solution should meet a couple of minimum requirements, and I think the above list of `@extend`'s shortcomings is a good start.
+Any native solution should meet a couple of minimum requirements, and I think the above list of `@extend`'s shortcomings is a good place to start.
 
 * It should expose the inheritance chain to JavaScript APIs
 * It should not be affected by specificity or source order
 * It should work no matter where it's defined (including media queries)
-* It should easily handle complex selectors
+* It should easily handle descendants, nested elements, and other complex selectors
 * It should allow for multiple levels of inheritance
 
 My proposal for native OOCSS introduces two new features: a new kind of simple selector and a new `@` rule.
@@ -284,16 +284,18 @@ element.matchesSelector("%base-class")
 
 The abstract class selector would have a specificity less than a class selector but greater than a type selector. This would allow for all normally defined class selectors to override all abstract class selectors, which solves both the source order and specificity issues at the same time.
 
-### Complex Selectors
+### Descendants, Nested Elements, and Other Complex Selectors
 
-With native support, we wouldn't have to work about more complex selectors. Currently Sass has to preemptively anticipate all possible scenarios, but with native support the browser would only have to match the instances it finds. This is far easier to manage.
+Each of these three cases are only a problem if you have to preemptively anticipate all possible scenarios. With native support, you only have to address them reactively, so it becomes much easier.
 
-Imagine how confused Sass would get with the following selector:
+The abstract class selector acts exactly like the class selector with just one additional step. The the browser encounters it, it simply has to lookup in the inheritance table to see if it finds any match.
+
+The following classes would drive Sass crazy, but with native support they'd be easily managable:
 
 {% highlightjs %}
-.flexbox %widget %widget-body:nth-of-type(2n) {
-  /* crazy styles go here... */
-}
+.flexbox %widget %widget-body:nth-of-type(2n) { }
+%medida %media %media { }
+form %button + %button { }
 {% endhighlightjs %}
 
 ### Multiple Levels of Inheritance
@@ -306,3 +308,95 @@ Abstract class selectors should be able to extend other abstract class selectors
 {% endhighlightjs %}
 
 For `@extend` declarations, the object on the left can be either a class selector or an abstract class selector, but the object on the right must be an abstract class selector. Non-abstract classes should never be able to extend other non-abstract classes or we'd end up with the same problems we already have with specificity and source order in Sass.
+
+## A Simple Example: Building a Grid
+
+To demonstrate how abstract class selectors could be used in a real project, consider a grid system. Grid systems are quite useful but often come under fire for the presentational nature of the class names. With the help of abstract class selectors, this problem can be solved.
+
+Here is the CSS for the grid skeleton:
+
+{% highlightjs %}
+/* define a clearfix abstract class */
+%clearfix {
+  /* clearfix implementation */
+}
+
+/* grid rows extend clearfix so their cells are contained */
+@extend %grid-row < %clearfix
+%grid-row {
+  margin-left: 2em; /* contain leftmost gutter */
+}
+
+/* base grid-cell abstract class */
+%grid-cell {
+  float: left;
+  margin-left: 2em; /* gutter */
+}
+
+@extend %grid-cell-1-2 < %grid-cell;
+%grid-cell-1-2 {
+  width: calc(50% - 2em);
+}
+
+@extend %grid-cell-1-3 < %grid-cell;
+%grid-cell-1-3 {
+  width: calc(33.333% - 2em);
+}
+
+@extend %grid-cell-1-4 < %grid-cell;
+%grid-cell-1-4 {
+  width: calc(25% - 2em);
+}
+{% endhighlightjs %}
+
+Now that we have our abstract grid system, we can extend from it to build a basic site layout. Let's build a site with a header, footer, and content area with three column. The left and right colums are 25% and the center column is 50%.
+
+{% highlightjs %}
+<header></header>
+<div class="main">
+  <nav class="menu"></nav>
+  <article class="content"></article>
+  <aside class="promotional"></aside>
+</div>
+<footer></footer>
+{% endhighlightjs %}
+
+We could easily use our abstract grid to layout the above markup by just extending a few of the abstract classes.
+
+{% highlightjs %}
+@extend .main < %grid-row;
+@extend .menu < %grid-col-1-4;
+@extend .content < %grid-col-1-2;
+@extend .promotional < %grid-col-1-4;
+
+.menu {
+  /* menu styles */
+}
+.content {
+  /* content styles */
+}
+.promotional {
+  /* promotional styles */
+}
+{% endhighlightjs %}
+
+Finally, if we want our grid system to be responsive, we can use a media query to make each cell full width when the screen is smaller than `30em`. Notice that we're only modifying the abstract class selectors in this media query, which the `.menu`, `.content`, and `.promotional` class selectors will automatically inherit.
+
+{% highlightjs %}
+@media (max-width: 30em) {
+  %grid-row {
+    margin-left: 0;
+  }
+  %grid-cell {
+    float: none;
+    width: auto;
+    margin-left: 0;
+  }
+}
+{% endhighlightjs %}
+
+
+
+## Summary
+
+CSS needs it own way to declare an inherited component  heirarchy. Sass offers temporary assistance, but it can't provide all that a native solution could.

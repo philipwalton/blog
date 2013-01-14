@@ -7,15 +7,15 @@ tags:
 - JavaScript
 ---
 
-The idea of object oriented CSS has been around for a while. Although it's widely excepted as a good approach to building CSS for large scale websites, it seems to be under constant attack from those who claim it dirties up the HTML (citation needed). Most developers who don't like OOCSS prefer their markup to be extremely "clean". To them more classes in the HTML is harder to maintain than their CSS.
+The idea of object oriented CSS has been around for a while. Although it's widely accepted as a sound approach to architecting CSS for large scale websites, it seems to be under constant attack. Most developers who don't like OOCSS oppose the shear number of classes that must go in the HTML; they prefer their markup to be as "clean" and minimal as possible.
 
-If you've read anything else I've written you probably know where I stand on this issue, but where I stand isn't the focus of this article. Instead I want to acknowledge that both sides of the debate have valid concerns, and I think we can find a solution to appeases everyone. The problem is that with the current state of CSS, a holy grail solution just doesn't exist.
+If you've read anything else I've written you probably know where I stand on this issue, but where I stand isn't the focus of this article. Instead I want to acknowledge that both sides of the debate have valid concerns, and don't think we should stop looking until we have a solution that appeases everyone. Unfortunately, given the current state of HTML and CSS, I don't think such a solution exsits.
 
-Some claim that Sass and other CSS preprocessors have solved this issue, but that simply isn't true. Preprocessors certainly help fill in some of the gaps and do a great job illuminating where the needs are, but there are things preprocessors just can not do.
+Some claim that Sass and other CSS preprocessors are the answer. While I love Sass and use it on every project, I don't think it solves the problem. Preprocessors help fill in some of the gaps and do a great job illuminating where the needs are, but there are things preprocessors just simply can not do.
 
 ## Where Preprocessors Fall Short
 
-The most commonly proposed solution to the OOCSS debate is Sass's `@extend` directive. With `@extend` you define a simple selector and then within another selector you declare that you're extending the simple selector. Here's an example:
+The most commonly proposed solution to the OOCSS debate is Sass's `@extend` feature. With `@extend` you define a simple selector and then within another selector you extend it. Here's an example:
 
 {% highlightjs %}
 .button {

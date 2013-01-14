@@ -4,8 +4,9 @@
   font-size: .833em;
   li {
     position: relative;
-    display: inline-block;
-    padding: 0 .7em 0 .9em;
+    display: inline;
+    padding-right: .7em;
+    padding-left: .9em;
     border-left: 1px solid #909090;
     &:first-child {
       padding-left:0;

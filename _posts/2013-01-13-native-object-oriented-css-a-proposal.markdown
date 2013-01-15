@@ -27,7 +27,7 @@ The most commonly proposed solution to the OOCSS debate is Sass's `@extend` feat
   border: thin solid black;
 }
 .button-primary {
-  @extend .button;
+  **@extend .button;**
   background-color: blue;
 }
 {% endhighlightjs %}
@@ -297,10 +297,10 @@ There could also be additional methods added to the DOM API to make determining 
 element.classList;
 
 // we could get the inheritance chain this way
-element.baseClassList
+element.baseClassList;
 
 // And we could detect type like so
-element.matchesSelector("%base-class")
+element.matchesSelector("%base-class");
 {% endhighlightjs %}
 
 ### The Specificity Value of an Abstract Class Selector

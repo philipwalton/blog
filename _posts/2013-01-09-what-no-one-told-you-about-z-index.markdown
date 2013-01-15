@@ -50,11 +50,11 @@ Here's what the HTML and basic CSS look like. I've also included a visual demo (
 
 **Here's the challenge:** try to see if you can make the red `<span>` element stack behind the blue and green `<span>` elements without breaking any of the following rules:
 
-* Do not alter the HTML markup in any way
-* Do not add/change the z-index property of any element
-* Do not add/change the position property of any element
+* Do not alter the HTML markup in any way.
+* Do not add/change the z-index property of any element.
+* Do not add/change the position property of any element.
 
-To see if you can figure it out, click the *edit on Codepen* link and play around with it for a bit. If you've succeeded, it should look like the example below.
+To see if you can figure it out, click the *edit on Codepen* link above and play around with it for a bit. If you've succeeded, it should look like the example below.
 
 *Warning: Don't click on the CSS tab of the example below or it will give away the answer.*
 
@@ -64,7 +64,7 @@ To see if you can figure it out, click the *edit on Codepen* link and play aroun
 
 ## The Solution
 
-The solution is to add an opacity value less than `1` to the first `<div>`, the one that's the parent of the red `<span>`. Here is the CSS that was added to the Codepen above:
+The solution is to add an opacity value less than `1` to the first `<div>` (the parent of the red `<span>`). Here is the CSS that was added to the Codepen above:
 
 {% highlightjs %}
 div:first-child {
@@ -82,7 +82,7 @@ Z-index seems so simple: elements with a higher z-index are stacked in front of 
 
 Every element in an HTML document can be either in front of or behind other element in the document. This is known as the stacking order. The rules to determine this order are pretty clearly defined in the spec, but as I've already stated, they're not fully understood by most developers.
 
-When the z-index and position properties aren't involved, the rules are pretty simple: basically, the stacking order is the same as the order of appearance in the HTML. (OK, it's actually a [little more complicated](http://www.w3.org/TR/CSS2/zindex.html) than that, but as long as you're not using negative margins to overlap inline elements, you won't encounter the edge cases.)
+When the z-index and position properties aren't involved, the rules are pretty simple: basically, the stacking order is the same as the order of appearance in the HTML. (OK, it's actually a [little more complicated](http://www.w3.org/TR/CSS2/zindex.html) than that, but as long as you're not using negative margins to overlap inline elements, you probably won't encounter the edge cases.)
 
 When you introduce the position property into the mix, any positioned elements (and their children) are displayed in front of any non-positioned elements. (To say an element is "positioned" means that it has a position value other than `static`, e.g., `relative`, `absolute`, etc.)
 
@@ -92,7 +92,7 @@ Finally, when z-index is involved, things get a little trickier. At first it's n
 
 Groups of elements with a common parent that move forward or backward together in the stacking order make up what is known as a stacking context. A full understanding of stacking contexts is key to really grasping how z-index and the stacking order work.
 
-Every stacking context has a single HTML element as its root element. When a new stacking context is formed on an element, that stacking context confines all of its child elements to a particular place in the stacking order. That means that if an element is contained in a stacking context at the bottom of the stacking order, there is no way to get it to appear in front of an element in a different stacking context higher in the stacking order, even with a z-index of a billion!
+Every stacking context has a single HTML element as its root element. When a new stacking context is formed on an element, that stacking context confines all of its child elements to a particular place in the stacking order. That means that if an element is contained in a stacking context at the bottom of the stacking order, there is no way to get it to appear in front of another element in a different stacking context that is higher in the stacking order, even with a z-index of a billion!
 
 New stacking contexts can be formed on an element in one of three ways:
 

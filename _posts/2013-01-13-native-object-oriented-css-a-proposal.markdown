@@ -7,15 +7,17 @@ tags:
 - JavaScript
 ---
 
-The idea of object oriented CSS has been around for a while. Although it's widely accepted as a sound approach to architecting CSS for large scale websites, it seems to be under constant attack. Most developers who don't like OOCSS oppose the shear number of classes that must go in the HTML; they prefer their markup to be as "clean" and minimal as possible.
+The concept of [Object Oriented CSS](https://github.com/stubbornella/oocss/wiki) (OOCSS) has been around for a while. Although it's widely accepted as a sound approach to architecting CSS for large scale websites, it seems to be under constant attack. Most developers who don't like OOCSS oppose the shear number of classes that must go in the HTML; they prefer their markup to be as "clean" and minimal as possible.
 
-If you've read anything else I've written you probably know where I stand on this issue, but where I stand isn't the focus of this article. Instead I want to acknowledge that both sides of the debate have valid concerns, and don't think we should stop looking until we have a solution that appeases everyone. Unfortunately, given the current state of HTML and CSS, I don't think such a solution exsits.
+If you've read any of my other articles on CSS, you probably know where I stand on this issue, but where I stand isn't important right now. Instead I want to acknowledge that both sides of the debate have valid concerns. Hopefully we can find a way to address those concerns instead of just taking sides.
 
-Some claim that Sass and other CSS preprocessors are the answer. While I love Sass and use it on every project, I don't think it solves the problem. Preprocessors help fill in some of the gaps and do a great job illuminating where the needs are, but there are things preprocessors just simply can not do.
+What if there were a way create a rich hierarchy of inherited CSS components that didn't require listing each class in the HTML every single time? And what if you could programmatically determine whether a particular component inherited from another one?
+
+Some claim that Sass and other CSS preprocessors are the answer, but for all the reasons I list below, I think they fall short. I believe any real solution to this problem will require adding to the CSS language itself. Luckily with the recent speed of browser development, such a solution may not be too much to ask.
 
 ## Where Preprocessors Fall Short
 
-The most commonly proposed solution to the OOCSS debate is Sass's `@extend` feature. With `@extend` you define a simple selector and then within another selector you extend it. Here's an example:
+The most commonly proposed solution to the OOCSS debate is Sass's `@extend` feature. With `@extend` you define a simple selector and then within another selector you declare that you're extending it. Here's an example:
 
 {% highlightjs %}
 .button {
@@ -44,26 +46,26 @@ In classical, object oriented programming, to say one classes extends another im
 
 If you look at the compiled CSS, you see that Sass tries to accomplish this by adding `.button-primary` to the `.button` definition. In fact, Sass will look through the entire stylesheet and everywhere `.button` is mentioned, it will append `.button-primary` to the selector so it gets those properties as well.
 
-In traditional OOCSS you put your base classeses directly in the HTML, but with `@extend` you don't have to. Sass makes sure that `.button-primary` gets all of the properties defined on `.button` so including the class `button` in the markup is unnecessary.
+In traditional OOCSS you put your base classes directly in the HTML, but with `@extend` you don't have to. Sass makes sure that `.button-primary` gets all of the properties defined on `.button` so including the class `button` in the markup is unnecessary.
 
-Hurray, everyone's happy, right?
+Hurray! Everyone's happy, right?
 
 While this is a very powerful tool and a great time saver, it's not the answer. There are several ways this solution falls short.
 
 ### You Lose the Inheritance Chain
 
-When you don't put classes in the markup, you have no way of knowing what a particular class or element "is". In traditional OOP, you can inspect an object to determine what class or classes it inherits from, but that's not possible here.
+When you don't put classes in the markup, you have no way of knowing what a particular class or element *is*. In traditional OOP, you can inspect an object to determine what class or classes it inherits from, but that's not possible here.
 
-Returning to the `.button` example, suppose you define several subclasses of `.button` and use `@extend` for all of them. Then you start to implement a feature and you need to temporarily disable all buttons on the page for whatever reason. Without the base classes in the markup, it's not possible.
+Returning to the `.button` example, suppose you define several subclasses of `.button` and use `@extend` for all of them. Then you start to implement a feature and you need to temporarily disable all buttons on the page for whatever reason. Without the base class in the markup, it's impossible.
 
 {% highlightjs %}
 // This won't work!
 document.querySelectorAll(".button")
 {% endhighlightjs %}
 
-Any native class inheritance in CSS must allow for inspection of the inheritance chain. Obviously a CSS processor can't solve this problem.
+Any native class inheritance in CSS must allow for dynamic inspection of the inheritance chain. Obviously a CSS processor can't solve this problem.
 
-### It can't account for specificity
+### It Can't Account for Specificity
 
 Sass does its best to make all occurrences of a base class include the extending selector, but it's not magic. It can't account for developer error. Ultimately Sass produces raw CSS, so the rules that govern CSS also apply to Sass.
 
@@ -92,11 +94,11 @@ a {
 }
 {% endhighlightjs %}
 
-The above code tries turn all links into buttons but with a background color of `blue`. However, this won't work. The selector `.button` has a higher specificity than the selector `a` and even though Sass will properly append `a` to all `.button` declarations, normal CSS rules will prevent this `@extend` form working like you'd expect.
+The above code tries turn all links into buttons but with a background color of `blue`. However, this won't work. The selector `.button` has a higher [specificity](http://www.w3.org/TR/CSS21/cascade.html#specificity) than the selector `a` and even though Sass will properly append `a` to all `.button` declarations, the normal CSS cascade will prevent this from working like you'd expect.
 
 Any native inheritance in CSS must account for specificity.
 
-### It can't account for source order
+### It Can't Account for Source Order
 
 Similar to the example above, the following code is valid Sass, but it won't work as expected:
 
@@ -123,13 +125,13 @@ Similar to the example above, the following code is valid Sass, but it won't wor
 }
 {% endhighlightjs %}
 
-Source order also matters in CSS, so if you `@extend` components before you define them, you'll end up overriding yourself.
+Source order also matters in CSS, so if you `@extend` components before you define them, you'll end up overriding yourself. The cascade strikes again!
 
 Any native inheritance in CSS must account for source order.
 
-### It can't be used inside media querries
+### It Doesn't Work Inside Media Queries
 
-"Why doesn't `@extend` work inside of media queries?" This is probably the most common complaint I hear about Sass's `@extend` feature.
+"Why doesn't `@extend` work inside of media queries?" is probably the most common complaint I hear about Sass's `@extend` feature.
 
 The answer is pretty simple. It would be far too complicated to account for all possible situations. Consider the following example:
 
@@ -149,7 +151,7 @@ The answer is pretty simple. It would be far too complicated to account for all 
 }
 {% endhighlightjs %}
 
-The `.button` selector above is defined to look a certain way when the page is wider than `10em`. At the same time, `.button-primary` is defined to look a certain way when the page is narrower than `20em`. If `.button-primary` is expect to inherit the properties of `.button`, it should only do so when the page is between 10 and 20 ems wide. In order for Sass to implement this, it would have to parse the media queries and create a brand new media query that combines the two cases. This would be extremely difficult to implement and it's one of the most straight-forward cases. Other more complicated mixings of media queries would be nearly impossible.
+The `.button` selector above is defined to look a certain way when the page is wider than `10em`. At the same time, `.button-primary` is defined to look a certain way when the page is narrower than `20em`. If `.button-primary` is expect to inherit the properties of `.button`, it should only do so when the page is between 10 and 20 ems wide. In order for Sass to implement this, it would have to parse the media queries and create a brand new media query that combined the two cases. Sometimes this is possible, but sometimes it's not. And even when it would be theoretically possible it would be extremely complicated and error prone.
 
 ### It Doesn't Handle Descendants or Nested Elements Well
 
@@ -169,7 +171,7 @@ Then, later in the stylehsheet we decide that we want to make `.button` instance
 #footer .button { }
 {% endhighlightjs %}
 
-Now Sass is very confused. Since there are any number of ways all of this could occur, it must include selector combinations for all of them. To the developer it's obvious that the Modernizr class `.boxshadow` should always be first in the selector sequence; it's also obvious that a button that's inside a modal dialog will also never be in the footer at the same time, but Sass can't know these things. It must account for all the possibilities:
+Now Sass is very confused. Since there are any number of ways all of this could occur, it must include selector combinations for all of them. To the developer it's obvious that the Modernizr class `.boxshadow` should always be first in the selector sequence; it's also obvious that a button that's inside a modal dialog will never also be in the footer, but Sass can't know these things. It must account for all the possibilities:
 
 {% highlightjs %}
 #footer .boxshadow .modal .button-fancy,
@@ -179,10 +181,10 @@ Now Sass is very confused. Since there are any number of ways all of this could 
 
 And this is just two selectors. Obviously things becomes quite a bit more complicated as the numbers get higher.
 
-The same is true when the class you extend from can be nested inside itself.
+The same is true when the class you extend can be nested inside itself.
 In OOCSS the classic exmaple of this is the media object which can be nested multiple levels deep without breaking.
 
-Nestable components aren't an uncommon requirement in CSS, but when you try to `@extend` components you're also nesting in selectors you get some pretty ugly generated CSS. Consider the following:
+Nestable components aren't an uncommon requirement in CSS, but when you try to `@extend` components that you're also nesting in selectors, you get some pretty ugly generated CSS. Consider the following:
 
 {% highlightjs %}
 /* The Sass */
@@ -220,11 +222,11 @@ Nestable components aren't an uncommon requirement in CSS, but when you try to `
 
 Again, the problem is that Sass must account for every possible combination these elements might occur in the HTML.
 
-A native solution to class inheritance wouldn't have this problem because it wouldn't have to generate CSS selectors. It would be up to the browser to determine when the selectors matched.
+A native solution to class inheritance wouldn't have this problem because it wouldn't have to generate CSS selectors at compile time. The browser would do the matching at runtime.
 
 ## The Proposal
 
-CSS should have it's own way to declare class inheritance. It should be simple and declarative, like CSS, and since it's just CSS, it would be natively supported by the browser and therefore accessible to JavaScript APIs.
+CSS should have its own way to define class inheritance. It should be simple and declarative, and since it's just CSS, it would be natively supported by the browser and therefore accessible to JavaScript APIs.
 
 Any native solution should meet a couple of minimum requirements, and I think the above list of `@extend`'s shortcomings is a good place to start.
 
@@ -253,9 +255,26 @@ The new simple selector would be called the "abstract class selector". It would 
 
 This code defines how any class that extends from button would look. It then declares that the class selectors `.button` and `.button-primary` both inherit from `%button`.
 
+### Using Abstract Class Selectors
+
+Since an abstract class selector would be just another simple selector, it could be used in any way a simple selector can be used today. You could apply pseudo classes to it, have it nested inside other selectors, or put it in media queries.
+
+All of the following would be valid uses of the abstract class selector:
+
+{% highlightjs %}
+%foo { }
+%foo %bar { }
+%baz:first-of-type { }
+#sidebar %foo { }
+a:not(%button) { }
+@media (max-width: 30em) {
+  %foo { }
+}
+{% endhighlightjs %}
+
 ### The Inheritence Chain
 
-How you write the markup would be unchanged. You'd never put an abstract class on an HTML element (nor would it have to) because JavaScript APIs could leveredge the abstract class selector. Here's an example:
+How you write the markup would remain unchanged. You'd never put an abstract class on an HTML element (nor would it have to) because JavaScript APIs could leveredge the abstract class selector. Here's an example:
 
 {% highlightjs %}
 <button class="button">Click Me</button>
@@ -269,34 +288,24 @@ These elements could be targeted via JavaScript like so:
 document.querySelectorAll("%button");
 {% endhighlightjs %}
 
-There should also be additional methods added to the DOM API to make determining inheritance easier. Here are a few suggestions:
+There could also be additional methods added to the DOM API to make determining inheritance easier. Here are a few suggestions, but I'd anticipate many more:
 
 {% highlightjs %}
 // we currently get the class list this way
 element.classList;
 
-// we could get the inheritance chain one of the following ways
+// we could get the inheritance chain this way
 element.baseClassList
+
+// And we could detect type like so
 element.matchesSelector("%base-class")
 {% endhighlightjs %}
 
-### Specificity and Source Order
+### The Specificity Value of an Abstract Class Selector
 
-The abstract class selector would have a specificity less than a class selector but greater than a type selector. This would allow for all normally defined class selectors to override all abstract class selectors, which solves both the source order and specificity issues at the same time.
+The abstract class selector would have a specificity less than a [class selector](http://www.w3.org/TR/selectors/#class-html) but greater than a [type selector](http://www.w3.org/TR/selectors/#type-selectors). This would allow for all normally defined class selectors to override all abstract class selectors, which solves both the source order and specificity issues at the same time.
 
-### Descendants, Nested Elements, and Other Complex Selectors
-
-Each of these three cases are only a problem if you have to preemptively anticipate all possible scenarios. With native support, you only have to address them reactively, so it becomes much easier.
-
-The abstract class selector acts exactly like the class selector with just one additional step. The the browser encounters it, it simply has to lookup in the inheritance table to see if it finds any match.
-
-The following classes would drive Sass crazy, but with native support they'd be easily managable:
-
-{% highlightjs %}
-.flexbox %widget %widget-body:nth-of-type(2n) { }
-%medida %media %media { }
-form %button + %button { }
-{% endhighlightjs %}
+All other rules of specificity would apply normally. And you could use `!important` to override a property value in a class selector the same way a class selector can currently override a property definition in an [id selector](http://www.w3.org/TR/selectors/#id-selectors).
 
 ### Multiple Levels of Inheritance
 
@@ -322,7 +331,7 @@ Here is the CSS for the grid skeleton:
 }
 
 /* grid rows extend clearfix so their cells are contained */
-@extend %grid-row < %clearfix
+@extend %grid-row < %clearfix;
 %grid-row {
   margin-left: 2em; /* contain leftmost gutter */
 }
@@ -349,7 +358,7 @@ Here is the CSS for the grid skeleton:
 }
 {% endhighlightjs %}
 
-Now that we have our abstract grid system, we can extend from it to build a basic site layout. Let's build a site with a header, footer, and content area with three column. The left and right colums are 25% and the center column is 50%.
+Now that we have our abstract grid system, we can extend from it to build a basic site layout. Let's build a site with a header, footer, and content area with three columns. The left and right columns are 25% and the center column is 50%.
 
 {% highlightjs %}
 <header></header>
@@ -395,8 +404,14 @@ Finally, if we want our grid system to be responsive, we can use a media query t
 }
 {% endhighlightjs %}
 
+And if we wanted to make the columns sortable via a jQuery plugin, we could easily target them:
 
+{% highlightjs %}
+$("%grid-cell").sortable();
+{% endhighlightjs %}
 
 ## Summary
 
-CSS needs it own way to declare an inherited component  heirarchy. Sass offers temporary assistance, but it can't provide all that a native solution could.
+Hopefully this article has helped show just how useful native support for class inheritance in CSS would be.
+
+Obviously this is just my opinion and one possible implementation. I'm very interested in feedback of other who have also struggled with solving this issue.

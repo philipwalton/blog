@@ -4,6 +4,8 @@ title: "Native Object Oriented CSS: A Proposal"
 date: 2013-01-13
 tags:
 - CSS
+- OOCSS
+- Sass
 - JavaScript
 ---
 

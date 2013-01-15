@@ -2,6 +2,7 @@
 layout: post
 title: What No One Told You About Z-Index
 date: 2012-12-22
+hacker_news_link: http://news.ycombinator.com/item?id=5062761
 tags:
 - CSS
 ---

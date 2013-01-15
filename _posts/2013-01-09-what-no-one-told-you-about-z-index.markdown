@@ -2,8 +2,6 @@
 layout: post
 title: What No One Told You About Z-Index
 date: 2012-12-22
-short_url: http://wp.me/p2O3uo-j
-hacker_news_link: http://news.ycombinator.com/item?id=5060690
 tags:
 - CSS
 ---

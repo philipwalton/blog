@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Native Object Oriented CSS: A Proposal"
+title: "The Future of OOCSS: A Proposal"
 date: 2013-01-13
 tags:
 - CSS
@@ -11,21 +11,21 @@ tags:
 
 In CSS we code the same visual components over and over again &mdash; often within the same project. It's embarrassing how many separate times in my career I've coded a two-column layout, or tabbed navigation, or a dropdown menu, or a popup, or an icon next to some text (and the list goes on).
 
-To deal with this problem [Nicole Sullivan](http://stubbornella.org) created the [Object Oriented CSS](https://github.com/stubbornella/oocss/wiki) (OOCSS) project. She suggests we find the patterns we use over and over again and define them once in CSS as a class selector. Then we can use that class in the HTML each time we encounter that visual pattern.
+To deal with this problem [Nicole Sullivan](http://stubbornella.org) created the [Object Oriented CSS](https://github.com/stubbornella/oocss/wiki) (OOCSS) project. She suggests we find the patterns we use over and over again and define them once in CSS as a class selector. Then we can use that class in the HTML each time we encounter that visual pattern. Essentially, we're creating a base class that other classes can extend from.
 
-OOCSS has been around for a while, and it's widely accepted as a sound approach to building websites. Yet, it always seems to be under attack. Most developers who don't like OOCSS oppose the shear number of classes that must go in the HTML. To them it's unmanageable.
+OOCSS has been around for a while, and it's widely accepted as a sound approach to building websites. Yet, it always seems to be under attack from developers who don't want a lot of classes in their HTML. To them it's ugly and unmanageable.
 
 If you've read anything I've written about OOCSS, you probably know where I stand on this issue, but where I stand isn't important. Instead I want to acknowledge that both sides of the debate have valid concerns, and hopefully we can find a way to address those concerns instead of just taking sides.
 
 What if CSS had object oriented functionality built in? What if there were a way to create a rich hierarchy of inherited CSS components that didn't require listing each class in the HTML every single time?
 
-There have already been [attempts to do](http://ianstormtaylor.com/oocss-plus-sass-is-the-best-way-to-css/) this with preprocessors, but I think we need to think bigger. Preprocessors can't solve all the problems, and CSS should definitely be able to do this on its own.
+There have been [attempts to do this](http://ianstormtaylor.com/oocss-plus-sass-is-the-best-way-to-css/) with preprocessors, but I think we need to think bigger. Preprocessors can't solve all the problems, and CSS should definitely be able to do this on its own.
 
 Luckily with the recent speed of browser development, my wish might actually be possible.
 
 ## Where Preprocessors Fall Short
 
-Sass's `@extend` feature is often suggested as a solution to the issues with OOCSS. With `@extend` you can define a simple selector and then within another selector declare that you're extending it. Here's an example:
+Sass's `@extend` feature is often suggested as a solution to the OOCSS debate. With `@extend` you can define a simple selector and then within another selector declare that you're extending it. Here's an example:
 
 {% highlightjs %}
 .button {
@@ -64,7 +64,7 @@ While this is a very powerful tool and a great timesaver, it's not the answer. T
 
 When you don't put classes in the markup, you have no way of knowing what a particular class or element *is*. In traditional OOP, you can inspect an object to determine what class or classes it inherits from, but that's not possible here.
 
-Imagine you create many different types of widgets that all `@extend` the `widget` base class. Then, as a result of some user interaction, you need to temporarily disable all of them via JavaScript. If the `widget` class isn't in the HTML it's going to be very difficult!
+Imagine you've created many different types of widgets that all `@extend` the `widget` base class. Then, as a result of some user interaction, you need to temporarily disable all of them via JavaScript. If the `widget` class isn't in the HTML it's going to be very difficult!
 
 {% highlightjs %}
 // This won't work!
@@ -77,7 +77,7 @@ Any native class inheritance in CSS must allow for dynamic inspection of the inh
 
 Sass does its best to make all occurrences of a base class include the extending selector, but it's not magic: it can't account for developer error. Ultimately, Sass produces raw CSS, so the rules that govern CSS also apply to Sass.
 
-Consider what happens when a selector tries to extend a selector with a higher [specificity](http://www.w3.org/TR/CSS21/cascade.html#specificity):
+Consider what happens when a selector tries to extend a selector with a higher specificity:
 
 {% highlightjs %}
 /* The Sass */
@@ -189,7 +189,7 @@ Now, Sass is very confused. Since there are any number of ways all of this could
 
 And that's just two selectors. Obviously, things become quite a bit more complicated as the numbers get higher.
 
-The same is true when the class you extend can be nested inside itself. In OOCSS, the classic example of this is the media object which can be nested multiple levels deep without breaking.
+The same is true when the class you extend can be nested inside itself. In OOCSS, the classic example of this is [the media object](http://www.stubbornella.org/content/2010/06/25/the-media-object-saves-hundreds-of-lines-of-code/) which can be nested multiple levels deep without breaking.
 
 Nestable components aren't an uncommon requirement in CSS, but when you try to `@extend` components that you're also nesting in selectors, you get some pretty ugly generated CSS. Consider the following:
 
@@ -291,7 +291,7 @@ How you write the markup would remain unchanged. You'd never put an abstract cla
 These elements could be targeted via JavaScript like so:
 
 {% highlightjs %}
-// Matches all button instances
+// Matches both elements above
 document.querySelectorAll("%button");
 {% endhighlightjs %}
 
@@ -310,9 +310,9 @@ element.matchesSelector("%base-class");
 
 ### The Specificity Value of an Abstract Class Selector
 
-The abstract class selector would have a specificity less than a [class selector](http://www.w3.org/TR/selectors/#class-html) but greater than a [type selector](http://www.w3.org/TR/selectors/#type-selectors). This would allow for all normally defined class selectors to override all abstract class selectors, which solves both the source order and specificity issues at the same time.
+The abstract class selector would have a specificity less than a class selector but greater than a type selector. This would allow for all normally defined class selectors to override all abstract class selectors, which solves both the source order and specificity issues at the same time.
 
-All other rules of specificity would apply normally. And you could use `!important` to override a property value in a class selector the same way a class selector can currently override a property definition in an [id selector](http://www.w3.org/TR/selectors/#id-selectors).
+All other rules of specificity would apply normally. And you could use `!important` to override a property value in a class selector the same way a class selector can currently override a property definition in an id selector.
 
 ### Multiple Levels of Inheritance
 
@@ -420,6 +420,12 @@ $("%grid-cell").sortable();
 
 ## Summary
 
-Hopefully this article has helped show just how useful native support for class inheritance in CSS would be.
+Hopefully this article has helped show just how powerful native class inheritance in CSS would be. Obviously, this is just my opinion and one possible implementation. I'm very interested in the feedback of others who have also struggled with these problems.
 
-Obviously, this is just my opinion and one possible implementation. I'm very interested in the feedback of others who have also struggled with solving this issue.
+While tools are great, I think we as a community should be pushing the boundaries of our core technologies. Tools bridge the gap, but native support is the future.
+
+## Additional Resources
+
+* [OOCSS](https://github.com/stubbornella/oocss/wiki)
+* [Sass's @extend feature](http://sass-lang.com/docs/yardoc/file.SASS_REFERENCE.html#extend)
+* [CSS Specificity](http://www.w3.org/TR/CSS21/cascade.html#specificity)

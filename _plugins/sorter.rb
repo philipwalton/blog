@@ -2,7 +2,7 @@ module Jekyll
   module KeySorter
     def sort_by_keys(input)
       # sort the collection alphabetically based on the key of the first item
-      input.sort{ |a,b| a.first <=> b.first }
+      input.sort{ |a,b| a <=> b }
     end
   end
 end

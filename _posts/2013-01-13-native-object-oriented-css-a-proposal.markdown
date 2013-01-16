@@ -9,9 +9,9 @@ tags:
 - JavaScript
 ---
 
-In CSS we code the same visual components over and over again &mdash; often within the same project. It's embarrassing how many separate times in my career I've coded a two-column layout, or tabbed navigation, or a dropdown menu, or a popup, or an icon next to some text (and the list goes on).
+In CSS we code the same visual components over and over again &mdash; even within the same project. It's embarrassing how many separate times in my career I've coded a two-column layout, or tabbed navigation, or a dropdown menu, or a popup, or an icon next to some text (and the list goes on).
 
-To deal with this problem [Nicole Sullivan](http://stubbornella.org) created the [Object Oriented CSS](https://github.com/stubbornella/oocss/wiki) (OOCSS) project. She suggests we find the patterns we use over and over again and define them once in CSS as a class selector. Then we can use that class in the HTML each time we encounter that visual pattern. Essentially, we're creating a base class that other classes can extend from.
+To deal with this problem [Nicole Sullivan](http://stubbornella.org) created the [Object Oriented CSS](https://github.com/stubbornella/oocss/wiki) (OOCSS) project. She suggests we find these patterns that we use over and over again and then define them once in the CSS with a class. Then we can use that class in the HTML each time we encounter that visual pattern. Essentially, we're creating a base class that other classes can extend from.
 
 OOCSS has been around for a while, and it's widely accepted as a sound approach to building websites. Yet, it always seems to be under attack from developers who don't want a lot of classes in their HTML. To them it's ugly and unmanageable.
 
@@ -50,7 +50,7 @@ That Sass compiles into the following CSS:
 }
 {% endhighlightjs %}
 
-In classical object-oriented programming, when one class extends another, the extending class inherits all of the properties and methods of that class.
+In classical object-oriented programming, when one class extends another, the extending class inherits all of the properties and methods of the base class.
 
 If you look at the compiled CSS, you can see that Sass tries to accomplish this by adding `.button-primary` to the `.button` definition. In fact, Sass will look through the entire stylesheet and every selector that mentions `.button` will get `.button-primary` appended to the end, making sure it gets those properties as well.
 
@@ -60,11 +60,37 @@ Hurray! Everyone's happy, right?
 
 While this is a very powerful tool and a great timesaver, it's not the answer. There are several ways this solution falls short.
 
+### It Doesn't Work Inside Media Queries
+
+"Why doesn't `@extend` work inside of media queries?" is probably the most common complaint I hear about Sass's `@extend` feature.
+
+The answer is pretty simple. It would be far too complicated to account for all possible situations. Consider the following example:
+
+{% highlightjs %}
+@media (min-width: 10em) {
+  .button {
+    background-color: gray;
+    border: thin solid black;
+  }
+}
+
+@media (max-width: 20em) {
+  .button-primary {
+    @extend .button;
+    background-color: blue;
+  }
+}
+{% endhighlightjs %}
+
+The `.button` selector above is defined to look a certain way when the page is wider than `10em`. At the same time, `.button-primary` is defined to look a certain way when the page is narrower than `20em`. If `.button-primary` is expected to inherit the properties of `.button`, it should only do so when the page is between 10 and 20 ems wide. In order for Sass to implement this, it would have to parse the two media queries and create a brand new one that combined the two cases.
+
+Sometimes this might be possible, but often it's not. And even when it would be theoretically possible, it would be extremely complicated and error prone.
+
 ### You Lose the Inheritance Chain
 
-When you don't put classes in the markup, you have no way of knowing what a particular class or element *is*. In traditional OOP, you can inspect an object to determine what class or classes it inherits from, but that's not possible here.
+When you don't put a component's base class in the markup, you have no way of knowing what a particular class or element *is*. In traditional OOP, you can inspect an object to determine what classes it inherits from, but that's not possible here.
 
-Imagine you've created many different types of widgets that all `@extend` the `widget` base class. Then, as a result of some user interaction, you need to temporarily disable all of them via JavaScript. If the `widget` class isn't in the HTML it's going to be very difficult!
+Imagine you've created many different types of widgets that all `@extend` the `.widget` base class. Then, as a result of some user interaction, you need to temporarily disable all of them via JavaScript. If the `widget` class isn't in the HTML it's going to be very difficult!
 
 {% highlightjs %}
 // This won't work!
@@ -136,30 +162,6 @@ Similar to the example above, the following code is valid Sass, but it won't wor
 Source order also matters in CSS, so if you `@extend` components before you define them, you'll end up overriding yourself. The cascade strikes again!
 
 Any native inheritance in CSS must account for source order.
-
-### It Doesn't Work Inside Media Queries
-
-"Why doesn't `@extend` work inside of media queries?" is probably the most common complaint I hear about Sass's `@extend` feature.
-
-The answer is pretty simple. It would be far too complicated to account for all possible situations. Consider the following example:
-
-{% highlightjs %}
-@media (min-width: 10em) {
-  .button {
-    background-color: gray;
-    border: thin solid black;
-  }
-}
-
-@media (max-width: 20em) {
-  .button-primary {
-    @extend .button;
-    background-color: blue;
-  }
-}
-{% endhighlightjs %}
-
-The `.button` selector above is defined to look a certain way when the page is wider than `10em`. At the same time, `.button-primary` is defined to look a certain way when the page is narrower than `20em`. If `.button-primary` is expected to inherit the properties of `.button`, it should only do so when the page is between 10 and 20 ems wide. In order for Sass to implement this, it would have to parse the two media queries and create a brand new one that combined the two cases. Sometimes this is possible, but sometimes it's not. And even when it would be theoretically possible, it would be extremely complicated and error prone.
 
 ### It Doesn't Handle Descendants or Nested Elements Well
 
@@ -237,9 +239,9 @@ CSS should have its own way to define class inheritance. It should be simple and
 
 Any native solution should meet some minimum requirements, and I think the above list of `@extend`'s shortcomings is a good place to start.
 
+* It should work no matter where it's defined (including media queries)
 * It should expose the inheritance chain to JavaScript APIs
 * It should not be affected by specificity or source order
-* It should work no matter where it's defined (including media queries)
 * It should easily handle descendants, nested elements, and other complex selectors
 * It should allow for multiple levels of inheritance
 
@@ -281,7 +283,7 @@ a:not(%button) { }
 
 ### The Inheritence Chain
 
-How you write the markup would remain unchanged. You'd never put an abstract class on an HTML element (nor would it have to) because JavaScript APIs could leverage the abstract class selector. Here's an example:
+How you write the markup would remain unchanged. You wouldn't put an abstract class on an HTML element because JavaScript APIs could leverage the abstract class selector. Here's an example:
 
 {% highlightjs %}
 <button class="button">Click Me</button>
@@ -302,7 +304,7 @@ There could also be additional methods added to the DOM API to make determining 
 element.classList;
 
 // we could get the inheritance chain this way
-element.baseClassList;
+element.abstractClassList;
 
 // And we could detect type like so
 element.matchesSelector("%base-class");
@@ -310,9 +312,9 @@ element.matchesSelector("%base-class");
 
 ### The Specificity Value of an Abstract Class Selector
 
-The abstract class selector would have a specificity less than a class selector but greater than a type selector. This would allow for all normally defined class selectors to override all abstract class selectors, which solves both the source order and specificity issues at the same time.
+The abstract class selector would have a specificity less than a class selector but greater than a type selector (a single tag). This would allow for all normally defined class selectors to override all abstract class selectors, which solves both the source order and specificity issues at the same time.
 
-All other rules of specificity would apply normally. And you could use `!important` to override a property value in a class selector the same way a class selector can currently override a property definition in an id selector.
+All other rules of specificity would apply normally, including the use of `!important` to override a property value in a class selector the same way a class selector can currently override a property value in an id selector.
 
 ### Multiple Levels of Inheritance
 
@@ -327,7 +329,7 @@ For `@extend` declarations, the object on the left can be either a class selecto
 
 ## A Simple Example: Building a Grid
 
-To demonstrate how abstract class selectors could be used in a real project, consider a grid system. Grid systems are quite useful but often come under fire for the presentational nature of their class names. With the help of abstract class selectors, this problem can be solved.
+To demonstrate how abstract class selectors could be used in a real project, let's build a simple grid system. Grid systems are quite useful but often come under fire for the presentational nature of their class names. With the help of abstract class selectors, this problem can be solved.
 
 Here is the CSS for the skeleton grid system:
 
@@ -365,7 +367,7 @@ Here is the CSS for the skeleton grid system:
 }
 {% endhighlightjs %}
 
-Now that we have our abstract grid system, we can extend from it to build a basic site layout. Let's build a site with a header, footer, and content area with three columns. The left and right columns are 25% of the width and the center column is 50% of the width.
+Now that we have our base grid system, we can extend from it to build a basic site layout. Let's build a site with a header, footer, and content area with three columns, the center column being half the width and the left and right columns each being a quarter.
 
 {% highlightjs %}
 <header>...</header>
@@ -377,7 +379,7 @@ Now that we have our abstract grid system, we can extend from it to build a basi
 <footer>...</footer>
 {% endhighlightjs %}
 
-We could easily use our abstract grid to layout the above markup by simply extending a few of the abstract classes.
+We can easily use our base grid to style the above markup by simply extending a few of the abstract classes.
 
 {% highlightjs %}
 @extend .main < %grid-row;
@@ -396,7 +398,7 @@ We could easily use our abstract grid to layout the above markup by simply exten
 }
 {% endhighlightjs %}
 
-Finally, if we want our grid system to be responsive, we can use a media query to make each cell full width when the screen is smaller than `30em`. Notice that we're only modifying the abstract class selectors in this media query, which the `.menu`, `.content`, and `.promotional` class selectors will automatically inherit.
+If we want our grid system to be responsive, we can use a media query to make each cell full width when the screen is smaller than `30em`. Notice that we're only modifying the abstract class selectors in this media query (which the `.menu`, `.content`, and `.promotional` class selectors will automatically inherit).
 
 {% highlightjs %}
 @media (max-width: 30em) {
@@ -411,7 +413,7 @@ Finally, if we want our grid system to be responsive, we can use a media query t
 }
 {% endhighlightjs %}
 
-And if we wanted to make the columns sortable via a jQuery plugin, we could easily target them:
+Lastly, if we wanted to make the columns sortable with some jQuery plugin, we could easily target them via the abstract class selector:
 
 {% highlightjs %}
 // select all elements that inherit from %grid-cell
@@ -420,9 +422,9 @@ $("%grid-cell").sortable();
 
 ## Summary
 
-Hopefully this article has helped show just how powerful native class inheritance in CSS would be. Obviously, this is just my opinion and one possible implementation. I'm very interested in the feedback of others who have also struggled with these problems.
+Hopefully this article has helped show just how powerful native class inheritance in CSS could be. Obviously, this is just my opinion and one possible implementation. I'm very interested to hear feedback from others who have also struggled with these problems.
 
-While tools are great, I think we as a community should be pushing the boundaries of our core technologies. Tools bridge the gap, but native support is the future.
+I think we as a community should be pushing the boundaries of our core technologies. Tools help bridge the gaps, but native support is the future.
 
 ## Additional Resources
 

@@ -9,13 +9,19 @@ tags:
 - JavaScript
 ---
 
-The concept of [Object Oriented CSS](https://github.com/stubbornella/oocss/wiki) (OOCSS) has been around for a while. Although it's widely accepted as a sound approach to architecting CSS for large scale websites, it seems to be under constant attack. Most developers who don't like OOCSS oppose the shear number of classes that must go in the HTML; they prefer their markup to be as "clean" and minimal as possible.
+In CSS we code the same visual components over and over again &mdash; often within the same project. It's embarrassing how many separate times in my career I've coded a two-column layout, or tabbed navigation, or a dropdown menu, or a popup, or an icon next to some text (and the list goes on).
 
-If you've read any of my other articles on CSS, you probably know where I stand on this issue, but where I stand isn't important right now. Instead I want to acknowledge that both sides of the debate have valid concerns. Hopefully we can find a way to address those concerns instead of just taking sides.
+To deal with this problem [Nicole Sullivan](http://stubbornella.org) created the [Object Oriented CSS](https://github.com/stubbornella/oocss/wiki) (OOCSS) project. She suggests we find the patterns we use over and over again and define them once in CSS as a class selector. Then we can use that class in the HTML each time we encounter that visual pattern.
 
-What if there were a way to create a rich hierarchy of inherited CSS components that didn't require listing each class in the HTML every single time? And what if you could programmatically determine whether one particular component inherited from another?
+OOCSS has been around for a while, and it's widely accepted as a sound approach to building websites. Yet, it always seems to be under attack. Most developers who don't like OOCSS oppose the shear number of classes that must go in the HTML. To them it's unmanageable.
 
-Some claim that Sass and other CSS preprocessors are the answer, but for all the reasons I list below, I think they fall short. I believe any real solution to this problem will require adding to the CSS language itself. Luckily with the recent speed of browser development, such a solution may not be too much to ask.
+If you've read anything I've written about OOCSS, you probably know where I stand on this issue, but where I stand isn't important. Instead I want to acknowledge that both sides of the debate have valid concerns, and hopefully we can find a way to address those concerns instead of just taking sides.
+
+What if CSS had object oriented functionality built in? What if there were a way to create a rich hierarchy of inherited CSS components that didn't require listing each class in the HTML every single time?
+
+There have already been [attempts to do](http://ianstormtaylor.com/oocss-plus-sass-is-the-best-way-to-css/) this with preprocessors, but I think we need to think bigger. Preprocessors can't solve all the problems, and CSS should definitely be able to do this on its own.
+
+Luckily with the recent speed of browser development, my wish might actually be possible.
 
 ## Where Preprocessors Fall Short
 

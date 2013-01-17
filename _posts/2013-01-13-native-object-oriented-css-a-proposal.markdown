@@ -11,9 +11,9 @@ tags:
 
 In CSS we often code the same visual components over and over again &mdash; even within the same project. It's embarrassing how many separate times in my career I've coded a two-column layout, or tabbed navigation, or a dropdown menu, or a popup (and the list goes on).
 
-To deal with this problem [Nicole Sullivan](http://stubbornella.org) created the [Object Oriented CSS](https://github.com/stubbornella/oocss/wiki) (OOCSS) project. She suggests developers identify the visual patterns they use over and over again and break them down into their reuseable parts; defining each part as a separate class. Those classes can then be used together in the HTML to build complex UI components.
+To deal with this problem [Nicole Sullivan](http://stubbornella.org) created the [Object Oriented CSS](https://github.com/stubbornella/oocss/wiki) (OOCSS) project. She suggests that instead of defining entire components in a single selector, developers should identify the visual patterns that appear over and over again and break them down into their reusable parts, defining each part as a separate class. Those classes can then be used and reused together in the HTML to build a variety of complex UI components.
 
-OOCSS has been imlemented on many large projects and is widely accepted as a sound approach to building websites. Yet, it always seems to be under attack from developers who don't want a lot of classes in their HTML. To them it's ugly and unmanageable.
+OOCSS has been implemented on many large projects and is widely accepted as a sound approach to building websites. Yet, it always seems to be under attack from developers who don't want a lot of classes in their HTML. To them it's ugly and unmanageable.
 
 If you've read anything I've written about OOCSS, you probably know where I stand on this issue, but where I stand isn't important. Instead I want to acknowledge that both sides of the debate have valid concerns, and hopefully we can find a way to address those concerns instead of just taking sides.
 
@@ -82,7 +82,7 @@ The answer is pretty simple. It would be far too complicated to account for all 
 }
 {% endhighlightjs %}
 
-The `.button` selector above is defined to look a certain way when the page is wider than `10em`. At the same time, `.button-primary` is defined to look a certain way when the page is narrower than `20em`. If `.button-primary` is expected to inherit the properties of `.button`, it should only do so when the page is between 10 and 20 ems wide. In order for Sass to implement this, it would have to parse the two media queries and create a brand new one that combined the two cases.
+The `.button` selector above is defined to look a certain way, but only when the page is wider than `10em`. At the same time, `.button-primary` is defined to look a certain way, but only when the page is narrower than `20em`. If `.button-primary` is expected to inherit the properties of `.button`, it should only do so when the page is between 10 and 20 ems wide. In order for Sass to implement this, it would have to parse the two media queries and create a brand new one that combined the two cases.
 
 Sometimes this is possible, but often it's not. And even in cases when it could be done, it would be extremely complicated and error prone.
 
@@ -266,7 +266,7 @@ This code defines how any class that extends from button would look. It then dec
 
 ### Using Abstract Class Selectors
 
-Since an abstract class selector would be just another simple selector, it could be used in any way a simple selector can be used today. You could apply pseudo classes to it, have it nested inside other selectors, or put it in media queries.
+Since an abstract class selector would be just another simple selector, it could be used in any way a simple selector can be used today. You could apply pseudo classes to it, have it nested between other selectors, or put it in media queries.
 
 All of the following would be valid uses of the abstract class selector:
 

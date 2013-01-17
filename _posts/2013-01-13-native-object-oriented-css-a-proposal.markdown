@@ -9,11 +9,11 @@ tags:
 - JavaScript
 ---
 
-In CSS we code the same visual components over and over again &mdash; even within the same project. It's embarrassing how many separate times in my career I've coded a two-column layout, or tabbed navigation, or a dropdown menu, or a popup, or an icon next to some text (and the list goes on).
+In CSS we often code the same visual components over and over again &mdash; even within the same project. It's embarrassing how many separate times in my career I've coded a two-column layout, or tabbed navigation, or a dropdown menu, or a popup (and the list goes on).
 
-To deal with this problem [Nicole Sullivan](http://stubbornella.org) created the [Object Oriented CSS](https://github.com/stubbornella/oocss/wiki) (OOCSS) project. She suggests we find these patterns that we use over and over again and then define them once in the CSS with a class. Then we can use that class in the HTML each time we encounter that visual pattern. Essentially, we're creating a base class that other classes can extend from.
+To deal with this problem [Nicole Sullivan](http://stubbornella.org) created the [Object Oriented CSS](https://github.com/stubbornella/oocss/wiki) (OOCSS) project. She suggests developers identify the visual patterns they use over and over again and break them down into their reuseable parts; defining each part as a separate class. Those classes can then be used together in the HTML to build complex UI components.
 
-OOCSS has been around for a while, and it's widely accepted as a sound approach to building websites. Yet, it always seems to be under attack from developers who don't want a lot of classes in their HTML. To them it's ugly and unmanageable.
+OOCSS has been imlemented on many large projects and is widely accepted as a sound approach to building websites. Yet, it always seems to be under attack from developers who don't want a lot of classes in their HTML. To them it's ugly and unmanageable.
 
 If you've read anything I've written about OOCSS, you probably know where I stand on this issue, but where I stand isn't important. Instead I want to acknowledge that both sides of the debate have valid concerns, and hopefully we can find a way to address those concerns instead of just taking sides.
 
@@ -84,7 +84,7 @@ The answer is pretty simple. It would be far too complicated to account for all 
 
 The `.button` selector above is defined to look a certain way when the page is wider than `10em`. At the same time, `.button-primary` is defined to look a certain way when the page is narrower than `20em`. If `.button-primary` is expected to inherit the properties of `.button`, it should only do so when the page is between 10 and 20 ems wide. In order for Sass to implement this, it would have to parse the two media queries and create a brand new one that combined the two cases.
 
-Sometimes this might be possible, but often it's not. And even when it would be theoretically possible, it would be extremely complicated and error prone.
+Sometimes this is possible, but often it's not. And even in cases when it could be done, it would be extremely complicated and error prone.
 
 ### You Lose the Inheritance Chain
 
@@ -342,7 +342,7 @@ Here is the CSS for the skeleton grid system:
 /* grid rows extend clearfix so their cells are contained */
 @extend %grid-row < %clearfix;
 %grid-row {
-  margin-left: 2em; /* contain leftmost gutter */
+  margin-left: -2em; /* contain leftmost gutter */
 }
 
 /* base grid-cell abstract class */
@@ -413,7 +413,7 @@ If we want our grid system to be responsive, we can use a media query to make ea
 }
 {% endhighlightjs %}
 
-Lastly, if we wanted to make the columns sortable with some jQuery plugin, we could easily target them via the abstract class selector:
+Lastly, if we wanted to make the columns sortable with some jQuery plugin, we could easily target them the same way in JavaScript:
 
 {% highlightjs %}
 // select all elements that inherit from %grid-cell

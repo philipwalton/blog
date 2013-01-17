@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "The Future of OOCSS: A Proposal"
-date: 2013-01-13
+date: 2013-01-17
 tags:
 - CSS
 - OOCSS
@@ -22,6 +22,7 @@ What if CSS had object oriented functionality built in? What if there were a way
 There have been [attempts to do this](http://ianstormtaylor.com/oocss-plus-sass-is-the-best-way-to-css/) with preprocessors, but I think we need to think bigger. Preprocessors can't solve all the problems, and CSS should definitely be able to do this on its own.
 
 Luckily with the recent speed of browser development, my wish might actually be possible.
+
 
 ## Where Preprocessors Fall Short
 

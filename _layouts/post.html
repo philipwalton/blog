@@ -9,11 +9,9 @@ layout: default
 
   {{ content }}
 
-
   {% capture share_url %}{% if post.short_url %}{{ post.short_url }}{% else %}{{ post.url | absolute }}{% endif %}{% endcapture %}
   {% capture twitter_share_link %}http://twitter.com/intent/tweet?text={{ post.title | url_encode }}&url={{ share_url | url_encode }}&via=philwalton{% endcapture %}
-  <p class="callout">
-    <span class="twitter-icon"></span> If you liked this article, please consider <a href="{{ twitter_share_link }}">sharing it on Twitter</a>{% if post.hacker_news_link %} or <a href="{{ post.hacker_news_link }}">Hacker News</a>{% endif %}.
+  <p class="callout">If you liked this article and think others should read it, please <a href="{{ twitter_share_link }}">share it on Twitter</a>{% if post.hacker_news_link %} or <a href="{{ post.hacker_news_link }}">upvote it on Hacker News</a>{% endif %}.
   </p>
 
   {% unless page.comments == false %}

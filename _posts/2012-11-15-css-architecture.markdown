@@ -1,7 +1,7 @@
 ---
 layout: post
 title: CSS Architecture
-date: 2012-11-16
+date: 2012-11-16 18:04:25
 canonical: http://engineering.appfolio.com/2012/11/16/css-architecture
 tags:
 - Architecture

@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "The Future of OOCSS: A Proposal"
-date: 2013-01-17
+date: 2013-01-17 11:02:16
 tags:
 - CSS
 - OOCSS

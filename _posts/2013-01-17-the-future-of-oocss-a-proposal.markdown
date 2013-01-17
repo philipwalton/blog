@@ -282,7 +282,7 @@ a:not(%button) { }
 }
 {% endhighlightjs %}
 
-### The Inheritence Chain
+### The Inheritance Chain
 
 How you write the markup would remain unchanged. You wouldn't put an abstract class on an HTML element because JavaScript APIs could leverage the abstract class selector. Here's an example:
 

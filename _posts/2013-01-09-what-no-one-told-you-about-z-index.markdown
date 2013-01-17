@@ -116,10 +116,10 @@ But for most intents and purposes, a basic understanding of the order can go a l
 Here are the basic rules to determine stacking order within a single stacking context (from back to front):
 
 1.  The stacking context's root element
-2.  Positioned elements (and their children) with negative z-index values (higher values in front of lower ones, otherwise ordered by appearance in the HTML)
+2.  Positioned elements (and their children) with negative z-index values (higher values are stacked in front of lower values; elements with the same value are stacked according to appearance in the HTML)
 3.  Non-positioned elements (ordered by appearance in the HTML)
 4.  Positioned elements (and their children) with a z-index value of `auto` (ordered by appearance in the HTML)
-5.  Positioned elements (and their children) with positive z-index values (higher values in front of lower ones, otherwise ordered by appearance in the HTML)
+5.  Positioned elements (and their children) with positive z-index values (higher values are stacked in front of lower values; elements with the same value are stacked according to appearance in the HTML)
 
 **Note:** positioned elements with negative z-indexes are ordered first within a stacking context, which means they appear behind all other elements. Because of this, it becomes possible for an element to appear behind its own parent, which is normally not possible. This will only work if the element's parent is in the same stacking context and is not the root element of that stacking context. A great example of this is Nicolas Gallagher's [CSS drop-shadows without images](http://nicolasgallagher.com/css-drop-shadows-without-images/demo/).
 

@@ -1,6 +1,6 @@
 module Jekyll
   module Excerpt
-    def excerpt(post, count = 30)
+    def excerpt(post, count = 50)
       if post["excerpt"]
         excerpt = post["excerpt"]
       else

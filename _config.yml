@@ -10,6 +10,12 @@ exclude:
 - README.md
 - Rakefile
 
+jekyll-press:
+  exclude: 'atom.xml' # Exclude files from processing - file name, glob pattern or array of file names and glob patterns
+  js_options: {}      # js minifier options
+  css_options: {}     # css minifier options
+  html_options: {}    # html minifier options
+
 # Vendor Settings
 google_analytics_tracking_id: UA-21292978-1
 disqus_shortname: philipwalton

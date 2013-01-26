@@ -12,6 +12,11 @@
 
     <link href="{{ '/assets/stylesheets/application.css' | absolute }}" rel="stylesheet" type="text/css">
     <link href="http://feeds.feedburner.com/philipwalton" rel="alternate" title="{{ site.title }}" type="application/atom+xml">
+    {% if page.canonical %}
+      <link rel="canonical" href="{{ page.canonical }}">
+    {% else %}
+      <link rel="canonical" href="{{ page.url | absolute }}">
+    {% endif %}
 
     <meta name="description" content="Thoughts on front-end development, architecture, and the future of the web.">
 

@@ -9,7 +9,7 @@
 {% assign selected-class = 'class="is-selected"' %}
 <nav class="l-header-nav" role="navigation">
   <ul class="nav">
-    <li><a {% if selected-tab == 'home' %}{{ selected-class }}{% endif %} href="{{ '/' | absolute }}">Home</a></li>
+    <li><a {% if selected-tab == 'home' %}{{ selected-class }}{% endif %} href="{{ '' | absolute }}">Home</a></li>
     <li><a {% if selected-tab == 'articles' %}{{ selected-class }}{% endif %} href="{{ '/articles' | absolute }}">Articles</a></li>
     <li><a {% if selected-tab == 'about' %}{{ selected-class }}{% endif %} href="{{ '/about' | absolute }}">About</a></li>
   </ul>

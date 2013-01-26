@@ -21,7 +21,7 @@ module Jekyll
 
     def generate(site)
       if site.layouts.key? 'tag'
-        dir = site.config['tag_dir'] || 'tags'
+        dir = '/tags'
         site.tags.keys.each do |tag|
           site.pages << TagIndex.new(site, site.source, File.join(dir, tag.downcase), tag)
         end

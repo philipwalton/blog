@@ -1,0 +1,56 @@
+*, *:before, *:after {
+  @include box-sizing(border-box);
+}
+
+html {
+  color: #303030;
+  font-family: "Open Sans", sans-serif;
+  font-weight: 300;
+}
+
+a {
+  color: $link-color;
+  text-decoration: none;
+  &:hover, &:active {
+    text-decoration: underline;
+  }
+}
+
+address {
+  font-style: normal;
+}
+
+h1 {
+  margin: 0 0 .333em;
+  font: 400 3.5em/1 serif;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+h2 {
+  margin: 0 0 1.333em;
+  font: 400 1.5em serif;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+h3 {
+  margin: 0 0 1em;
+  font-size: 1em;
+}
+
+ul {
+  padding: 0 0 0 1.5em;
+  list-style: square;
+}
+
+li {
+  margin-bottom: .5em;
+}
+
+i {
+  text-transform: lowercase;
+  font-style: italic;
+  letter-spacing: 0;
+  padding: 0 .2em;
+}

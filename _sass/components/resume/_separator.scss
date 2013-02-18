@@ -1,0 +1,12 @@
+.separator {
+  &:after {
+    content: "\000a0";
+    display: inline-block;
+    margin: 0 .7em 0 1em;
+    border-left: 1px solid $border-color;
+    width: 1px;
+  }
+  & + br {
+    display: none;
+  }
+}

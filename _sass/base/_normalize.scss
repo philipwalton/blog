@@ -38,10 +38,12 @@ video {
  * Remove excess height in iOS 5 devices.
  */
 
+/*
 audio:not([controls]) {
     display: none;
     height: 0;
 }
+*/
 
 /*
  * Addresses styling for `hidden` attribute not present in IE 8/9.

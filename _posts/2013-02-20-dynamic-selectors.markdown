@@ -34,7 +34,7 @@ The convention I use is to give each component a name and add that name to the r
 
 Here's a basic example of a messagebox component taken from an imaginary library called Flux:
 
-{% highlightjs %}
+{% highlightjs xml %}
 <!-- the markup for the messagebox component -->
 <div class="messagebox">
   <h1 class="messagebox-title">...</h1>
@@ -42,7 +42,7 @@ Here's a basic example of a messagebox component taken from an imaginary library
 </div>
 {% endhighlightjs %}
 
-{% highlightjs %}
+{% highlightjs css %}
 /* and the corresponding styles */
 .messagebox { }
 .messagebox-title { }
@@ -78,7 +78,7 @@ Since components typically expose a defaults object, the class name variable cou
 
 For example, if messagebox is a jQuery plugin, you might use code like this to dynamically change the class name:
 
-{% highlightjs %}
+{% highlightjs javascript %}
 $.fn.messagebox.defaults.className = "some-other-name";
 {% endhighlightjs %}
 

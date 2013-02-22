@@ -2,6 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 
     <title>{% if page.title %}{{ page.title }} &mdash; {% endif %}Philip Walton</title>
 
@@ -21,7 +22,8 @@
     <meta name="description" content="Thoughts on front-end development, architecture, and the future of the web.">
 
     <!--[if lt IE 9]>
-    <script src="{{ '/assets/javascripts/modernizr.custom.js' | absolute }}"></script>
+    <script src="{{ '/assets/javascripts/html5shiv.js' | absolute }}"></script>
+    <script src="{{ '/assets/javascripts/respond.js' | absolute }}"></script>
     <![endif]-->
 
     {% include google-analytics.html %}

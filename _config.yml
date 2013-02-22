@@ -1,5 +1,5 @@
 root: http://philipwalton.com
-devroot: http://localhost
+devroot: http://192.168.1.118
 permalink: /articles/:title
 auto: true
 server: false

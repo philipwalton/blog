@@ -1,5 +1,5 @@
 .sub-section {
-  margin-bottom: 2em;
+  margin-bottom: 1.5em;
 }
 
 .sub-section__items {
@@ -15,7 +15,7 @@
   @include breakpoint(medium) {
     float: right;
     width: 25%;
-    padding-left: 3em;
+    padding-left: 2em;
     text-align: right;
     margin: 0;
   }

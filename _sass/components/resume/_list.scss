@@ -2,6 +2,11 @@
   width: 75%;
   border-right: 1px solid $border-color;
   padding-right: 3em;
+  @include breakpoint(medium) {
+    width: auto;
+    border: 0;
+    padding: 0;
+  }
 }
 
 .sub-section-meta {
@@ -10,6 +15,13 @@
   padding-left: 3em;
   text-align: right;
   margin: 0;
+  @include breakpoint(medium) {
+    float: none;
+    width: auto;
+    padding: 0;
+    margin: 0;
+    text-align: left;
+  }
 }
 
 .section {
@@ -24,6 +36,7 @@
 }
 
 .column {
-  display: inline-block;
   width: 33%;
+  display: inline-block;
+  vertical-align: top;
 }

@@ -4,8 +4,8 @@
 
 html {
   color: #303030;
-  font-family: "Open Sans", sans-serif;
-  font-weight: 300;
+  font: 300 .9375em/1.4 "Open Sans", sans-serif;
+
 }
 
 a {
@@ -20,11 +20,19 @@ address {
   font-style: normal;
 }
 
+h1, h2 {
+  @include experimental(font-kerning, normal);
+}
+
 h1 {
-  margin: 0 0 .333em;
-  font: 400 3.5em/1 serif;
+  margin: 0 0 0.667em;
+  font: 400 3em/1 serif;
   letter-spacing: 0.1em;
   text-transform: uppercase;
+  @include breakpoint(medium) {
+    font-size: 4em;
+    margin-bottom: .333em;
+  }
 }
 
 h2 {
@@ -35,22 +43,22 @@ h2 {
 }
 
 h3 {
-  margin: 0 0 1em;
-  font-size: 1em;
+  margin: 0 0 0.9em;
+  font-size: 1.111em;
 }
 
 ul {
-  padding: 0 0 0 1.5em;
+  margin: 0;
+  padding: 0 0 0 1.2em;
   list-style: square;
 }
 
 li {
-  margin-bottom: .5em;
+  margin-bottom: 0.5em;
 }
 
 i {
   text-transform: lowercase;
   font-style: italic;
   letter-spacing: 0;
-  padding: 0 .2em;
 }

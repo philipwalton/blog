@@ -1,23 +1,24 @@
 .l-background {
-  padding: 2em;
-  background-color: #e0e0e0;
   @include breakpoint(small) {
-    padding: 0;
+    padding: 2em;
+    background-color: #e0e0e0;
   }
 }
 
 .l-page {
-  @include box-shadow(0 0 1em rgba(0,0,0,.3));
-  background-color: white;
-  max-width: 1140px;
-  margin: 0 auto;
-  padding: 5em 7em;
-  @include breakpoint(medium) {
-    padding: 4em 5em;
-  }
+  margin: 2em;
   @include breakpoint(small) {
-    @include box-shadow(none);
-    padding: 3em;
+    @include box-shadow(0 0 1em rgba(0,0,0,.3));
+    background-color: white;
+    max-width: 70em;
+    margin: 0 auto;
+    padding: 3em 4em 1em;
+  }
+  @include breakpoint(medium) {
+    padding: 4em 5em 2em;
+  }
+  @include breakpoint(large) {
+    padding: 5em 6em 3em;
   }
 }
 

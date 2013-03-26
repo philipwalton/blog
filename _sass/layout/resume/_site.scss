@@ -6,6 +6,7 @@
 }
 
 .l-page {
+  @include transition(padding 0.2s);
   margin: 2em;
   @include breakpoint(small) {
     @include box-shadow(0 0 1em rgba(0,0,0,.3));

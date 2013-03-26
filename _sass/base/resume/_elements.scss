@@ -25,6 +25,7 @@ h1, h2 {
 }
 
 h1 {
+  @include transition(all 0.2s);
   margin: 0 0 0.667em;
   font: 400 3em/1 serif;
   letter-spacing: 0.1em;

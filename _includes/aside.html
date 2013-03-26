@@ -17,7 +17,7 @@
   <div class="widget">
     <h3 class="widget__title">Recent Articles</h3>
     <ul>
-      {% for post in site.posts limit: 5 %}
+      {% for post in site.posts limit: 3 %}
         <li class="post">
           <a href="{{ post.url | absolute }}">{{ post.title }}</a>
         </li>

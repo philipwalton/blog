@@ -15,7 +15,7 @@ module Jekyll
       root_url.gsub!(/\/index.html$/, "")
 
       # add trailing slash if the url is a directory and not a file
-      unless root_url =~ /(\.(html|css|js)$|\/$)/
+      unless root_url =~ /(\.(html|css|js|png|jpg|gif)$|\/$)/
         root_url += "/"
       end
 

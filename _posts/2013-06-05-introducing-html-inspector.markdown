@@ -19,13 +19,13 @@ Good HTML is good because it provides meaning to your content and structure to y
 
 In this article I'll try to answer some basic questions you may be asking: How does HTML Inspector work? Why should I use it? And how is it different than what's already out there?
 
-If you want to learn more about [configuring HTML Inspector](https://github.com/philipwalton/html-inspector#configuring-html-inspector) or how to [write you own rules](https://github.com/philipwalton/html-inspector#writing-your-own-rules), please check out the [Github repo](http://philipwalton.github.io/html-inspector).
+If you want to learn more about [configuring HTML Inspector](https://github.com/philipwalton/html-inspector#configuring-html-inspector) or how to [write your own rules](https://github.com/philipwalton/html-inspector#writing-your-own-rules), please check out the [Github repo](http://philipwalton.github.io/html-inspector).
 
 ## How it Works?
 
 HTML Inspector traverses the DOM and emits events as it goes. Developers can then write rules that listen for those events, test for certain conditions, and report errors when something unexpected is found.
 
-The simplest way to see HTML Inspector in action is to download the source code and run it on one of your pages. HTML Inspector's only dependency is jQuery, so if you're not already loading that, you'll need to.
+The simplest way to see HTML Inspector in action is to download the [source code](https://raw.github.com/philipwalton/html-inspector/master/dist/html-inspector.js) and run it on one of your pages. HTML Inspector's only dependency is jQuery, so if you're not already loading that, you'll need to.
 
 To add HTML Inspector to a page and run it with the default rules and configurations, simply add the following lines right before the closing `</body>` tag, and check out the warnings in the console:
 
@@ -47,9 +47,9 @@ Though they may seem similar, HTML Inpsector and the [W3C validator](http://vali
 
 The W3C validator is uncompromisingly strict, and none of its warnings can be customized or surpressed. Maybe you're intentionally writing invalid markup, or maybe you only want the build to go red for particular errors. With the W3C validator, that's just not possible.
 
-Moreover, the W3C validator cannot be extended. It allows for testing HTML against the specification an no more. If you want to enforce your conventions or markup style with a test, the W3C validator isn't for you.
+Moreover, the W3C validator cannot be extended. It allows for testing HTML against the specification an nothing more. If you want to enforce your conventions or markup style with a test, the W3C validator isn't for you.
 
-Finally, the W3C validator parses static markup while HTML inspector runs on live DOM in the browser. The benefit of running on live DOM is you get to run your tests after the browser has parsed the HTML and after any JavaScript has altered it. This is particularly important these days as much of the HTML you encounter has been altered by jQuery plugins or client-side templating engines.
+Finally, the W3C validator parses static markup while HTML inspector runs on live DOM in the browser. The benefit of running on live DOM is you get to run your tests after the browser has parsed the HTML and after any JavaScript has altered it. This is particularly important these days as much of the HTML on the Web has been altered by jQuery plugins or client-side templating engines.
 
 ## Why Should I Use It?
 
@@ -77,7 +77,7 @@ Another example is data attributes. To avoid conflicts with third party librarie
 
 ### HTML5 Element Usage
 
-HTML5 elements are becoming more and more common in the wild, but a lot developers don't know or don't care about their semantic meaning or their proper usage. If you care, then you should write some rules to warn developers when they may be using HTML5 elements incorrectly.
+HTML5 elements are becoming more and more common in the wild, but a lot of developers don't know or don't care about their semantic meaning or their proper usage. If you care, then you should write some rules to warn developers when they may be using HTML5 elements incorrectly.
 
 An easy example of this is the HTML5 `<section>` element. The [spec warns](http://drafts.htmlwg.org/html/master/sections.html#the-section-element) that `<section>` is not simply a generic container; instead, it should only be used when its contents belong in the [document outline](http://drafts.htmlwg.org/html/master/sections.html#outline). A good test for proper usage of the `<section>` element is to check if the section contains a heading. If not, maybe it should simply be a `<div>`.
 
@@ -113,6 +113,8 @@ In fact, the Web Accessibility Initiative lays out a lot of [easy ways](http://w
 
 HTML Inspector is new and has a lot of room to grow. The plan for the near future is to expand the ruleset and possibly even create a repository of user submitted rules. If certain rules grow in popularity, who knows, they may even lead to new best-practices.
 
-My vision for HTML Inspector is to make it a reflection of the wider conventions of Web community. If you've created rules that work well for you or your team, please suggest them and contribute back so others can benefit.
+My vision for HTML Inspector is to make it a reflection of the wider conventions of the Web community. If you've created rules that work well for you or your team, please suggest them and contribute back so others can benefit.
 
 If you want to get started using HTML Inspector, please see the [getting started](https://github.com/philipwalton/html-inspector#getting-started) guide or the [API documentation](#).
+
+If you have any other feedback, feel free to leave a comment.

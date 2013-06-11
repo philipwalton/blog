@@ -13,13 +13,13 @@ This leniency has led a lot of people to believe that proper HTML doesn't matter
 
 But good HTML means so much more than just valid markup.
 
-Good HTML is good because it provides meaning to your content and structure to your CSS. It interacts predictably with your APIs and conforms to your established conventions. It's easy to maintain and easy to scale as your application grows. In short, good HTML makes our lives as developers easier, not harder.
+Good HTML is good because it provides meaning to your content and structure to your CSS. It interacts predictably with your APIs and conforms to your established conventions. It's easy to maintain and easy to scale as your application grows. In short, good HTML makes your life as developers easier, not harder.
 
-HTML Inspector aims to help you and your team write the kind of markup you *want* to be writing. It's a code quality tool that is completely customizable, so you can take what you like and change what you don't. It's also extensible and pluggable, making it possible to write your own rules that enforce your chosen conventions.
+[HTML Inspector](https://github.com/philipwalton/html-inspector) aims to help you and your team write the kind of markup you *want* to be writing. It's a code quality tool that is completely customizable, so you can take what you like and change what you don't. It's also extensible and pluggable, making it possible to write your own rules that enforce your chosen conventions.
 
-In this article I'll try to answer some basic questions you may be asking: How does HTML Inspector work? Why should you use it? And how is it different than what's already out there?
+In this article I'll try to answer some basic questions you may be asking: How does HTML Inspector work? Why should I use it? And how is it different than what's already out there?
 
-If you want to learn more about the specifics of the API or how to write you own rules, please check out the [documentation](http://philipwalton.github.io/html-inspector/) or the [project repo](https://github.com/philipwalton/html-inspector/).
+If you want to learn more about [configuring HTML Inspector](https://github.com/philipwalton/html-inspector#configuring-html-inspector) or how to [write you own rules](https://github.com/philipwalton/html-inspector#writing-your-own-rules), please check out the [Github repo](http://philipwalton.github.io/html-inspector).
 
 ## How it Works?
 
@@ -27,7 +27,7 @@ HTML Inspector traverses the DOM and emits events as it goes. Developers can the
 
 The simplest way to see HTML Inspector in action is to download the source code and run it on one of your pages. HTML Inspector's only dependency is jQuery, so if you're not already loading that, you'll need to.
 
-To add HTML Inspector to a page and run it with the default rules and configurations, simply add the following lines right before the closing <body> tag, refresh the page, and check out the warnings in the console:
+To add HTML Inspector to a page and run it with the default rules and configurations, simply add the following lines right before the closing `</body>` tag, and check out the warnings in the console:
 
 {% highlightjs xml %}
 <!-- Include jQuery if it's not already loaded -->
@@ -39,11 +39,11 @@ Here's some sample output from a test I put together:
 
 [![Sample HTML Inspector Output]({{ '/assets/images/html-inspector-console.png' | absolute }})]({{ '/assets/images/html-inspector-console.png' | absolute }})
 
-If you disagree with any of the warnings you see, remember that everything in HTML Inspector is customizable. You can choose what rules to run, what options they're run with, and how the errors are reported.
+If you disagree with any of the warnings you see or want to log the errors somewhere other than the console, remember that everything in HTML Inspector is customizable. You can choose what rules to run, what options they're run with, and how the errors are reported.
 
 ## How is HTML Inspector different than the W3C Validator?
 
-Though they may seem similar, HTML Inpsector and the W3C validator are actually completely different tools.
+Though they may seem similar, HTML Inpsector and the [W3C validator](http://validator.w3.org/) are actually completely different tools.
 
 The W3C validator is uncompromisingly strict, and none of its warnings can be customized or surpressed. Maybe you're intentionally writing invalid markup, or maybe you only want the build to go red for particular errors. With the W3C validator, that's just not possible.
 
@@ -57,7 +57,7 @@ The best reason to use HTML Inspector is that it can't hurt; it can only help.
 
 Since HTML Inspector is only intended to run in development and test environments, it won't add weight to your production code. And it only reports the errors you want to know about, so it won't clutter your logs with unnecessary information.
 
-Writing markup with a consistent style across a large team is not easy. And if your organization has many agreed-upon conventions, HTML Inspector rules will help interns and new hires learn those conventions and prevent them from debasing your code.
+Writing markup with a consistent style across a large team is not easy. And if your organization has many agreed-upon conventions, HTML Inspector rules will help interns and new hires learn those conventions and prevent them from debasing your codebase.
 
 Finally, even if you're not interested in customizing HTML Inspector or writing your own rules, the built-in validations are a great sanity check and can help prevent common mistakes. They're also regularly updated to the latest published version of the HTML specification (currently [5.1](http://www.w3.org/TR/html51/)), so, if nothing else, using HTML Inspector will keep you apprised of newly deprecated elements or attributes.
 
@@ -77,7 +77,7 @@ Another example is data attributes. To avoid conflicts with third party librarie
 
 ### HTML5 Element Usage
 
-HTML5 elements are becoming more and more common in the wild, but a lot developers don't know or don't care about their semantic meaning or their proper usage. If you care then you should write some rules to warn developers when they may be using HTML5 elements incorrectly.
+HTML5 elements are becoming more and more common in the wild, but a lot developers don't know or don't care about their semantic meaning or their proper usage. If you care, then you should write some rules to warn developers when they may be using HTML5 elements incorrectly.
 
 An easy example of this is the HTML5 `<section>` element. The [spec warns](http://drafts.htmlwg.org/html/master/sections.html#the-section-element) that `<section>` is not simply a generic container; instead, it should only be used when its contents belong in the [document outline](http://drafts.htmlwg.org/html/master/sections.html#outline). A good test for proper usage of the `<section>` element is to check if the section contains a heading. If not, maybe it should simply be a `<div>`.
 
@@ -89,7 +89,7 @@ These types of rules are somewhat subjective and probably wouldn't make sense to
 
 HTML Inspector runs in the browser, which means it has access to things like `window.getComputedStyle()`. This allows you to test that your component styles haven't been overridden by other, more specific, CSS rules.
 
-For example, imagine you've defined a `button` class that's used to make all `<a>`, `<button>` and `<input>` element containing the `button` class look the same. As part of `.button`'s style declaration you include `text-decoration: normal` to prevent text underlines when used on hyperlinks.
+For example, imagine you've defined a `button` class that's used to make all `<a>`, `<button>` and `<input>` elements containing the `button` class look the same. As part of `.button`'s style declaration you include `text-decoration: normal` to prevent text underlines when used on hyperlinks.
 
 However, what if another developer comes along later and adds the following rule:
 
@@ -115,4 +115,4 @@ HTML Inspector is new and has a lot of room to grow. The plan for the near futur
 
 My vision for HTML Inspector is to make it a reflection of the wider conventions of Web community. If you've created rules that work well for you or your team, please suggest them and contribute back so others can benefit.
 
-If you want to get started using HTML Inspector, please see the [getting started](#) guide or the [API documentation](#).
+If you want to get started using HTML Inspector, please see the [getting started](https://github.com/philipwalton/html-inspector#getting-started) guide or the [API documentation](#).

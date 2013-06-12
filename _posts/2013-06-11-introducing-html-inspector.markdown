@@ -7,27 +7,21 @@ tags:
 - JavaScript
 ---
 
-Web browsers are incredibly forgiving of the HTML you give them. Missing attributes, misspelled tags, illegal characters, it doesn't matter. They'll bend over backwards to make it work.
+<p class="prelude"><a href="https://github.com/philipwalton/html-inspector">HTML Inspector</a> is a code quality tool to help you and your team write better markup. It's written in JavaScript and runs in the browser, so testing your HTML has never been easier.</p>
 
-This leniency has led a lot of people to believe that proper HTML doesn't matter. At least not nearly as much as the rest of the development process.
+Like [JSHint](http://www.jshint.com/) and [CSSLint](http://csslint.net), HTML Inspector is completely customizable, so you can use what you like and ignore what you don't. It's also extensible and pluggable, making it possible to write your own rules that enforce your chosen conventions.
 
-But good HTML means so much more than just valid markup.
+This article gives a brief overview of how HTML Inspector works and why someone would want to use it.
 
-Good HTML is good because it provides meaning to your content and structure to your CSS. It interacts predictably with your APIs and conforms to your established conventions. It's easy to maintain and easy to scale as your application grows. In short, good HTML makes your life as a developer easier, not harder.
+If you want to go deeper and learn more about [configuring HTML Inspector](https://github.com/philipwalton/html-inspector#configuring-html-inspector) or how to [write your own rules](https://github.com/philipwalton/html-inspector#writing-your-own-rules), please check out the [source on Github](https://github.com/philipwalton/html-inspector).
 
-[HTML Inspector](https://github.com/philipwalton/html-inspector) aims to help you and your team write the kind of markup you *want* to be writing. It's a code quality tool that is completely customizable, so you can take what you like and change what you don't. It's also extensible and pluggable, making it possible to write your own rules that enforce your chosen conventions.
+## How it Works
 
-In this article I'll try to answer some basic questions you may be asking: How does HTML Inspector work? Why should I use it? And how is it different than what's already out there?
+HTML Inspector traverses the DOM and emits events as it goes. The HTML Inspector rules can then listen for those events, test for certain conditions, and report errors when something unexpected is found. HTML Inspector comes with a set of [built-in rules](https://github.com/philipwalton/html-inspector/#built-in-rules), but if you need more, you can easily [write your own](https://github.com/philipwalton/html-inspector/#writing-your-own-rules).
 
-If you want to learn more about [configuring HTML Inspector](https://github.com/philipwalton/html-inspector#configuring-html-inspector) or how to [write your own rules](https://github.com/philipwalton/html-inspector#writing-your-own-rules), please check out the [Github repo](https://github.com/philipwalton/html-inspector).
+The best way to see how HTML Inspector works is to watch it in action. Simply download the [latest build](https://raw.github.com/philipwalton/html-inspector/master/dist/html-inspector.js) and add it to the bottom of one of your pages. HTML Inspector's only dependency is jQuery, so if you're not already loading that, you'll need to.
 
-## How it Works?
-
-HTML Inspector traverses the DOM and emits events as it goes. Developers can then write rules that listen for those events, test for certain conditions, and report errors when something unexpected is found.
-
-The simplest way to see HTML Inspector in action is to download the [source code](https://github.com/philipwalton/html-inspector) and run it on one of your pages. HTML Inspector's only dependency is jQuery, so if you're not already loading that, you'll need to.
-
-To add HTML Inspector to a page and run it with the default rules and configurations, simply add the following lines right before the closing `</body>` tag, and check out the warnings in the console:
+To add HTML Inspector to a page and run it with the default rules and configurations, just add the following lines right before the closing `</body>` tag, and check out the warnings in the console:
 
 {% highlightjs xml %}
 <!-- Include jQuery if it's not already loaded -->

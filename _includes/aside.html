@@ -5,12 +5,6 @@
     <p>Hello, I'm <strong>Philip Walton</strong>. I work as front end software engineer for <a href="http://appfolio.com/about">AppFolio</a> in Santa Barbara, CA. This blog is where I write about what I learn.</p>
 
     <a href="https://twitter.com/philwalton" class="twitter-follow-button" data-show-count="false" data-lang="en">Follow Me</a>
-    <script>
-      // Don't load the widgets when the sidebar isn't visible
-      if (window.innerWidth >= 616) { // 44em @ 14px font size
-        !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");
-      }
-    </script>
 
   </div>
 
@@ -18,7 +12,7 @@
     <h3 class="widget__title">Recent Articles</h3>
     <ul>
       {% for post in site.posts limit: 3 %}
-        <li class="post">
+        <li>
           <a href="{{ post.url | absolute }}">{{ post.title }}</a>
         </li>
       {% endfor %}

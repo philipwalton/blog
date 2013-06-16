@@ -45,7 +45,7 @@ Here's what the HTML and basic CSS look like. I've also included a visual demo (
 {% endhighlightjs %}
 
 <div class="codepen-wrapper">
-  <spanre class="codepen" data-height="240" data-type="result" data-href="ksBaI" data-user="philipwalton"><code></code></pre>
+  <pre class="codepen" data-height="240" data-type="result" data-href="ksBaI" data-user="philipwalton"><code></code></pre>
 </div>
 
 **Here's the challenge:** try to see if you can make the red `<span>` element stack behind the blue and green `<span>` elements without breaking any of the following rules:
@@ -59,7 +59,7 @@ To see if you can figure it out, click the *edit on Codepen* link above and play
 *Warning: Don't click on the CSS tab of the example below or it will give away the answer.*
 
 <div class="codepen-wrapper">
-  <spanre class="codepen" data-height="240" data-type="result" data-href="dfCtb" data-user="philipwalton" data-safe="true"><code></code></pre>
+  <pre class="codepen" data-height="240" data-type="result" data-href="dfCtb" data-user="philipwalton" data-safe="true"><code></code></pre>
 </div>
 
 ## The Solution

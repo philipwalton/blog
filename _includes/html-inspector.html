@@ -1,0 +1,27 @@
+{% if site.server %}
+  <script src="/components/jquery/jquery.js"></script>
+  <script src="/components/html-inspector/dist/html-inspector.js"></script>
+
+  <script>
+
+    // add Twitter generated classes to the unused-classes rule whitelist
+    HTMLInspector.rules.extend("unused-classes", function(config) {
+      config.whitelist = config.whitelist.concat([
+        "dsq-brlink",
+        "logo-disqus",
+        "twitter-follow-button",
+        "codepen"
+      ])
+      return config
+    })
+
+    // use the inuit BEM convention until I convert fully to suit
+    HTMLInspector.rules.extend("bem-conventions", {
+      methodology: "inuit"
+    })
+
+    // start the inspection
+    HTMLInspector.inspect()
+
+  </script>
+{% endif %}

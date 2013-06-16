@@ -19,7 +19,7 @@ title: Articles
 
     <li>
       <a href="{{ post.url | absolute }}">{{post.title}}</a>
-      (<time datetime="{{ post.date | datetime | date_to_xmlschema }}" pubdate>{{ post.date | date: "%m-%d-%Y"}}</time>)
+      (<time datetime="{{ post.date | datetime | date_to_xmlschema }}">{{ post.date | date: "%m-%d-%Y"}}</time>)
     </li>
 
     {% assign prev_year = this_year %}

@@ -10,7 +10,6 @@
     <meta name="HandheldFriendly" content="True">
     <meta name="MobileOptimized" content="320">
     <meta name=viewport content="width=device-width, minimum-scale=1.0, maximum-scale=1.0">
-
     <link href="{{ '/assets/stylesheets/application.css' | absolute }}" rel="stylesheet" type="text/css">
     <link href="http://feeds.feedburner.com/philipwalton" rel="alternate" title="{{ site.title }}" type="application/atom+xml">
     {% if page.canonical %}
@@ -18,47 +17,30 @@
     {% else %}
       <link rel="canonical" href="{{ page.url | absolute }}">
     {% endif %}
-
     <meta name="description" content="Thoughts on front-end development, architecture, and the future of the web.">
-
     <!--[if lt IE 9]>
     <script src="{{ '/assets/javascripts/html5shiv.js' | absolute }}"></script>
     <script src="{{ '/assets/javascripts/respond.js' | absolute }}"></script>
     <![endif]-->
-
   </head>
   <body>
-
     <header class="header" role="banner">
       <div class="l-container">
         {% include header.html %}
         {% include navigation.html %}
       </div>
     </header>
-
     <div class="l-container">
-
       <section class="l-content" role="main">
         {{ content }}
       </section>
-
       {% include aside.html %}
       {% include footer.html %}
-
     </div>
-
-    {% if page.id %}
-      <!--[if gte IE 9]><!-->
-      <script src="{{ '/assets/javascripts/highlight.js' | absolute }}"></script>
-      <script>hljs.initHighlightingOnLoad()</script>
-      <!--<![endif]-->
-    {% endif %}
-
     {% include google-analytics.html %}
     {% include highlightjs.html %}
     {% include twitter-buttons.html %}
     {% include disqus-script.html %}
     {% include html-inspector.html %}
-
   </body>
 </html>

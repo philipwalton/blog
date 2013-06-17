@@ -20,7 +20,7 @@ layout: nil
    <link href="{{ post.url | absolute }}"/>
    <updated>{{ post.date | date_to_xmlschema }}</updated>
    <id>{{ post.id | absolute }}</id>
-   {% capture excerpt %}{{ post | excerpt }} &hellip; <a rel="full-article" href="{{ post.url | absolute }}">[more]</a>{% endcapture %}
+   {% capture excerpt %}{{ {{ post.excerpt | strip_html | truncatewords: 40 }} <a rel="full-article" href="{{ post.url | absolute }}">[more]</a>{% endcapture %}
    <content type="html">{{ excerpt | xml_escape }}</content>
  </entry>
  {% endfor %}

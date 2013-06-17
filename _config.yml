@@ -1,21 +1,18 @@
-root: http://philipwalton.com
-devroot: http://localhost
 permalink: /articles/:title
-auto: true
-server: false
+
+# Use the port config option to determine if we're in prod or dev
+# anything other than port 80 is assumed to be dev
+port: 80
+url: http://philipwalton.com
+
 markdown: rdiscount
 pygments: true
+
 exclude:
 - config.rb
 - README.md
 - Rakefile
 - components
-
-jekyll-press:
-  exclude: 'atom.xml' # Exclude files from processing - file name, glob pattern or array of file names and glob patterns
-  js_options: {}      # js minifier options
-  css_options: {}     # css minifier options
-  html_options: {}    # html minifier options
 
 # Vendor Settings
 google_analytics_tracking_id: UA-21292978-1

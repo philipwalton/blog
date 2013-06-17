@@ -1,11 +1,14 @@
+require "rubygems"
+require "rake"
 require 'fileutils'
 
 desc "Load a local server and watch for any changes"
 task :preview, :port do |t, args|
 
-  annotate "Starting server on port #{args.port || 4000} and watching for changes."
+  port = args.port || 4000
+  annotate "Starting server on port #{port} and watching for changes."
 
-  jekyll_pid = Process.spawn("jekyll --auto --server #{args.port}")
+  jekyll_pid = Process.spawn("jekyll serve -w --port #{port}")
   compass_pid = Process.spawn("compass watch")
 
   trap("INT") {
@@ -24,7 +27,7 @@ task :generate do
   system "compass compile ."
 
   annotate "Generating site files"
-  system "jekyll  --no-auto --no-server"
+  system "jekyll build"
 
 end
 

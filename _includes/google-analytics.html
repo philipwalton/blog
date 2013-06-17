@@ -1,5 +1,7 @@
 {% if site.google_analytics_tracking_id %}
-  {% unless site.server %}
+
+  {% env prod %}
+
     <script type="text/javascript">
       var _gaq = _gaq || [];
       _gaq.push(['_setAccount', '{{ site.google_analytics_tracking_id }}']);
@@ -11,5 +13,7 @@
         var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
       })();
     </script>
-  {% endunless %}
+
+  {% endenv %}
+
 {% endif %}

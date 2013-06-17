@@ -2,4 +2,4 @@
 
 {% include article-meta.html %}
 
-<p>{{ post | excerpt }} &hellip; <a rel="full-article" href="{{ post.url | absolute }}">[more]</a></p>
+<p>{{ post.excerpt | strip_html | truncatewords: 40 }}<a rel="full-article" href="{{ post.url | absolute }}">[more]</a></p>

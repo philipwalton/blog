@@ -1,4 +1,5 @@
-{% if site.server %}
+{% env dev %}
+
   <script src="/components/jquery/jquery.js"></script>
   <script src="/components/html-inspector/dist/html-inspector.js"></script>
 
@@ -24,4 +25,5 @@
     HTMLInspector.inspect()
 
   </script>
-{% endif %}
+
+{% endenv %}

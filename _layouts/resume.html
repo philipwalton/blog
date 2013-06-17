@@ -21,11 +21,10 @@
     <script src="{{ '/assets/javascripts/respond.js' | absolute }}"></script>
     <![endif]-->
 
-    {% include google-analytics.html %}
-
   </head>
 </head>
 <body>
-{{ content }}
+  {{ content }}
+  {% include google-analytics.html %}
 </body>
 </html>

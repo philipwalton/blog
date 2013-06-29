@@ -1,7 +1,7 @@
 {% env dev %}
 
-  <script src="/components/jquery/jquery.js"></script>
-  <script src="/components/html-inspector/dist/html-inspector.js"></script>
+  <!-- <script src="/assets/javascripts/html-inspector.js"></script> -->
+  <script src="http://localhost:1234/dist/html-inspector.js"></script>
 
   <script>
 
@@ -21,8 +21,11 @@
       methodology: "inuit"
     })
 
+    // ignore iframes since I don't control twitter and disqus
+    HTMLInspector.config.exclude = ["svg", "iframe"]
+
     // start the inspection
-    HTMLInspector.inspect()
+    setTimeout(function() { HTMLInspector.inspect() }, 1000)
 
   </script>
 

@@ -12,6 +12,42 @@
         ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
         var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
       })();
+
+      // track clicks on outbound hyperlinks
+      (function() {
+
+        function isLink(el) {
+          return el.nodeName.toLowerCase() == "a"
+        }
+
+        function isExternalLink(el) {
+          return !(el.protocol == location.protocol && el.host == location.host)
+        }
+
+        function getLinkAncestor(el) {
+          if (isLink(el)) return el
+          while (el.parentNode && el.parentNode.nodeType == 1) {
+            if (isLink(el)) return el
+            el = el.parentNode
+          }
+        }
+
+        function logExternalClicks(event) {
+          var e = event || window.event
+            , target = e.target || e.srcElement
+            , link = getLinkAncestor(target)
+          if (link && isExternalLink(link)) {
+             _gaq.push(['_trackEvent', 'Outbound Link', 'Click', link.href]);
+          }
+        }
+
+        if (document.addEventListener) {
+          document.addEventListener("click", logExternalClicks)
+        }
+        else if (document.attachEvent) {
+          document.attachEvent("onclick", logExternalClicks)
+        }
+      }())
     </script>
 
   {% endenv %}

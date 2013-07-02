@@ -1,7 +1,5 @@
 {% if site.google_analytics_tracking_id %}
-
-  {% env prod %}
-
+  {% env dev %}
     <script type="text/javascript">
       var _gaq = _gaq || [];
       _gaq.push(['_setAccount', '{{ site.google_analytics_tracking_id }}']);
@@ -15,54 +13,25 @@
 
       // track clicks on outbound hyperlinks
       (function() {
-
-        var links = document.getElementsByTagName("a")
-          , link
-          , i = 0
-
-        function isLink(el) {
-          return el.nodeName.toLowerCase() == "a" && el.href
-        }
-
-        function isExternalLink(el) {
-          return el.href.indexOf(location.host) < 0
-        }
-
-        function getLinkAncestor(el) {
-          if (isLink(el)) return el
-          while (el.parentNode && el.parentNode.nodeType == 1) {
-            if (isLink(el)) return el
-            el = el.parentNode
-          }
-        }
-
+        var links = document.getElementsByTagName("a"), link, i = 0
         function logExternalClicks(event) {
-          var e = event || window.event
-            , target = e.target || e.srcElement
-            , link = getLinkAncestor(target)
-          if (link && isExternalLink(link)) {
-            _gaq.push(['_trackEvent', 'Outbound Link', link.href]);
-          }
+          var e = event || window.event, target = e.target || e.srcElement
+          _gaq.push(['_trackEvent', 'Outbound Link', target.href]);
         }
-
-        // register logging on click events
-        if (document.addEventListener) {
-          document.addEventListener("click", logExternalClicks)
-        }
-        else if (document.attachEvent) {
-          document.attachEvent("onclick", logExternalClicks)
-        }
-
-        // add target="_blank" to external links
         while(link = links[i++]) {
-          if (link.target != "_blank" && link.host != document.location.host) {
+          if (link.host != document.location.host) {
+            // add target="_blank" to fix
+            // https://github.com/philipwalton/blog/issues/38
             link.target = "_blank"
+            // register logging on click events
+            if (document.addEventListener) {
+              document.addEventListener("click", logExternalClicks)
+            } else if (document.attachEvent) {
+              document.attachEvent("onclick", logExternalClicks)
+            }
           }
         }
-
       }())
     </script>
-
   {% endenv %}
-
 {% endif %}

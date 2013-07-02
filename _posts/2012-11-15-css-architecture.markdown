@@ -23,7 +23,7 @@ These questions are natural when assessing other parts of the code base, and CSS
 
 ## The Goals of Good CSS Architecture
 
-In the CSS community, a general concensus of best practices is very difficult to come by. Judging purely by the [comments on Hacker News][1] and the [reaction of developers][2] to the release of [CSS Lint][3], it’s clear that many people disagree over even the basic things CSS authors should and shouldn’t do.
+In the CSS community, a general concensus of best practices is very difficult to come by. Judging purely by the [comments on Hacker News](http://news.ycombinator.com/item?id=2658948) and the [reaction of developers](http://2002-2012.mattwilcox.net/archive/entry/id/1054/) to the release of [CSS Lint](http://csslint.net/), it’s clear that many people disagree over even the basic things CSS authors should and shouldn’t do.
 
 So instead of laying out an argument for my own set of best practices, I think we should start by defining our goals. If we can agree upon the goals, hopefully we can start to spot bad CSS not because it breaks our preconceived notions of what’s good but because it actually hinders the development process.
 
@@ -250,7 +250,7 @@ We’ve already seen the downsides of modifying components based on one of their
 
 ### Organize Your CSS Into a Logical Structure
 
-[Jonathan Snook][4], in his excellent book [SMACSS][5], argues for organizing your CSS rules into four separate categories: base, layout, modules, and state. Base consists of reset rules and element defaults. Layout is for positioning of site-wide elements as well as generic layout helpers like grid systems. Modules are reusable visual elements, and state refers to styling that can be toggled on or off via JavaScript.
+[Jonathan Snook](http://snook.ca/), in his excellent book [SMACSS](http://smacss.com/), argues for organizing your CSS rules into four separate categories: base, layout, modules, and state. Base consists of reset rules and element defaults. Layout is for positioning of site-wide elements as well as generic layout helpers like grid systems. Modules are reusable visual elements, and state refers to styling that can be toggled on or off via JavaScript.
 
 In the SMACSS system, modules (which are equivalent to what I call components) comprise the vast majority of all the CSS rules, so I often find it necessary to break them down even further into abstract templates.
 
@@ -278,7 +278,7 @@ In general, just as it’s a best practice to separate your content from your pr
 
 These days most people write CSS with hyphens as word separators. But hyphens alone are usually not enough to distinguish between different types of classes.
 
-[Nicolas Gallagher][6] recently wrote about [his solution to this problem][7] which I have also adopted (with slight changes) with great success. To illustrate the need for a naming convention consider the following:
+[Nicolas Gallagher](http://nicolasgallagher.com) recently wrote about [his solution to this problem](http://nicolasgallagher.com/about-html-semantics-front-end-architecture/) which I have also adopted (with slight changes) with great success. To illustrate the need for a naming convention consider the following:
 
 {% highlightjs %}
 /* A component */
@@ -355,7 +355,7 @@ Many of the so-called “features” of preprocessors can actually be very bad f
 *   Never use `@extend` on a selector that isn’t a single class. It doesn’t make sense from a design perspective and it bloats the compiled CSS.
 *   Never use `@extend` for UI components in component modifier rules because you lose the inheritance chain (more on this in a bit).
 
-The best parts of preprocessors are functions like [`@extend`][8] and [`%placeholder`][9]. Both allow you to easily manage CSS abstraction without adding bloat to your CSS or a huge list of base classes in your HTML that can be very hard to manage.
+The best parts of preprocessors are functions like [`@extend`](http://sass-lang.com/docs/yardoc/file.SASS_REFERENCE.html#extend) and [`%placeholder`](http://sass-lang.com/docs/yardoc/file.SASS_REFERENCE.html#placeholder_selectors_). Both allow you to easily manage CSS abstraction without adding bloat to your CSS or a huge list of base classes in your HTML that can be very hard to manage.
 
 `@extend` should be used with care though because sometime you want those classes in your HTML. For example, when you first learn about `@extend` it might be tempting to use it with all of your modifier classes like so:
 
@@ -398,7 +398,7 @@ Here’s how it might look using the modal example referenced above:
 
 ### CSS Lint
 
-[Nicole Sullivan][10] and [Nicholas Zakas][11] created [CSS Lint][3] as a code quality tool to help developers detect bad practices in their CSS. Their site describes it as such:
+[Nicole Sullivan](http://www.stubbornella.org/) and [Nicholas Zakas](http://www.nczonline.net/) created [CSS Lint](http://csslint.net/) as a code quality tool to help developers detect bad practices in their CSS. Their site describes it as such:
 
 > CSS Lint points out problems with your CSS code. It does basic syntax checking as well as applying a set of rules to the code that look for problematic patterns or signs of inefficiency. The [rules] are all pluggable, so you can easily write your own or omit ones you don’t want.
 
@@ -434,15 +434,3 @@ HTML Inspector traverses your HTML and (much like CSS Lint) allows you to write 
 CSS isn’t just visual design. Don’t throw out programming best practices just because you’re writing CSS. Concepts like OOP, DRY, the open/closed principle, separation of concerns, etc. still apply to CSS.
 
 The bottom line is that whatever you do to organize your code, make sure you judge your methods by whether or not they actually help make your development easier and more maintainable in the long term.
-
- [1]: http://news.ycombinator.com/item?id=2658948
- [2]: http://2002-2012.mattwilcox.net/archive/entry/id/1054/
- [3]: http://csslint.net/
- [4]: http://snook.ca/
- [5]: http://smacss.com/
- [6]: http://nicolasgallagher.com
- [7]: http://nicolasgallagher.com/about-html-semantics-front-end-architecture/
- [8]: http://sass-lang.com/docs/yardoc/file.SASS_REFERENCE.html#extend
- [9]: http://sass-lang.com/docs/yardoc/file.SASS_REFERENCE.html#placeholder_selectors_
- [10]: http://www.stubbornella.org/
- [11]: http://www.nczonline.net/

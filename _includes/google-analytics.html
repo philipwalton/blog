@@ -16,6 +16,10 @@
       // track clicks on outbound hyperlinks
       (function() {
 
+        var links = document.getElementsByTagName("a")
+          , link
+          , i = 0
+
         function isLink(el) {
           return el.nodeName.toLowerCase() == "a" && el.href
         }
@@ -38,21 +42,24 @@
             , link = getLinkAncestor(target)
           if (link && isExternalLink(link)) {
             _gaq.push(['_trackEvent', 'Outbound Link', link.href]);
-            // prevent default and redirect manually
-            // wait a bit to ensure the tracking code runs
-            e.preventDefault ? e.preventDefault() : e.returnValue = false
-            setTimeout(function() {
-              document.location.href = link.href
-            }, 100)
           }
         }
 
+        // register logging on click events
         if (document.addEventListener) {
           document.addEventListener("click", logExternalClicks)
         }
         else if (document.attachEvent) {
           document.attachEvent("onclick", logExternalClicks)
         }
+
+        // add target="_blank" to external links
+        while(link = links[i++]) {
+          if (link.target != "_blank" && link.host != document.location.host) {
+            link.target = "_blank"
+          }
+        }
+
       }())
     </script>
 

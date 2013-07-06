@@ -1,13 +1,13 @@
 ---
 layout: post
-title: How to Unit Test 'Private' JavaScript Functions
+title: How to Unit Test Private JavaScript Functions
 tags:
 - JavaScript
 ---
 
-JavaScript closures provide an excellent way to keep variables and properties out of the global scope. And this is particularly important in JavaScript because all scripts run in the global scope, so it's quite easy to inadvertently pick the same variable name used by some other library.
+JavaScript's closures provide an excellent way to make variables and functions private, keeping them out of the global scope. This is particularly important in the browser because all scripts share the same scope, and it's quite easy to inadvertently pick a variable or function name used by another library.
 
-The problem, however, is that when functions are hidden inside a closure, they become impossible to test outside of that scope.
+The problem, however, is that when functions are hidden inside a closure, it's very difficult to test them.
 
 Here's an example:
 
@@ -28,20 +28,20 @@ var myModule = (function() {
 }())
 {% endhighlightjs %}
 
-The immediately invoked function expression returns an object that exposes the `bar` function globally, but the `foo` function remains inaccessible to any code not inside the immediately invoked function's scope.
+The immediately invoked function expression returns an object that exposes the `bar` function globally, but the `foo` function remains inaccessible to any code not appearing inside the immediately invoked function.
 
-In other words, writing a unit test for `bar` is easy, but writing a unit test for `foo` is impossible. So what can you do? How can you test `foo`?
+In other words, given the above code, writing a unit test for `bar` is easy, but writing a unit test for `foo` is impossible. So what can you do? How can you test `foo`?
 
 If you search Stack Overflow for an answer to this question, you'll basically find the following two answers repeated over and over again:
 
 1. Don't test private functions (since they're implementation details)
 2. If you must test them, make them public
 
-While these answers may be valid and good advice in some situations, they certainly didn't sit well with me, nor do I think they're true for most situations. Based on my own experience writing JavaScript, I've encountered numerous instances where I wanted to keep a function hidden from the public API but still want it tested.
+While these answers may apply to some contexts, they certainly don't make sense for every project. From my personal experience writing JavaScript, I've encountered many situations where I wanted to keep a function hidden from the public API but still want it tested.
 
-I believe any real solution to this problem shouldn't require developers to compromise their coding patterns or API designs.
+I believe any real solution to this problem shouldn't require developers to compromise their design patterns for the sake of testing, nor should it require lesser test coverage just to produce a nicer API. We should be able to have it both ways.
 
-Here is the solution I use today.
+Below is the solution I use to address these issues.
 
 ## My Solution
 
@@ -52,7 +52,7 @@ Given the nature of JavaScript scoping, we know it's impossible to access local 
 
 Option one is not really a good solution because you usually want to keep all of your test code together in the same place. Mixing your tests with the production code would make it significantly harder to maintain and organize.
 
-Option two, however, defeats the whole purpose of encapsulating the code in the first place.
+And options two defeats the whole purpose of encapsulating the code in the first place.
 
 But what if there were a way to use option two conditionally? What if we could write code inside a closure that gives our tests access to the private variables and function, but then remove that code when we deploy to production?
 
@@ -60,7 +60,7 @@ If you're using a build system, you can do exactly that.
 
 ### Different Builds for Testing and Production
 
-Consider the above myModule example with the following code additions (highlighted)
+Consider the above myModule example with the following code additions (changes highlighted):
 
 {% highlightjs javascript %}
 var myModule = (function() {
@@ -82,13 +82,13 @@ var myModule = (function() {
 }())
 {% endhighlightjs %}
 
-As you can see, the above changes exposes the `foo` function on the module, but do so in a way that can be easily identified and stripped out later.
+As you can see, the above changes exposes the `foo` function on the module, but do so in a way that can be easily identified by the surrounding comments and stripped out later.
 
-The strategy here is to write you code exactly how you'd like it to appear when released, then add on whatever bridge code you need to expose the parts you want to test. The added-on code can be as messy or hacky as you need because it'll get striped out later.
+The strategy here is to write you code exactly how you'd like it to appear when released, then add on whatever bridge code you need to expose the parts you want to test. It's OK if the bridge code is a little hacky because it'll get stripped out later.
 
 ### An Example Implementation
 
-If you're already using a build system (which I highly recommend), adding an extra step to strip out test-only code blocks is relatively easy. Below is an example of how you could implement this using [GruntJS](http://gruntjs.com/).
+If you're already using a build system (if you're not I highly recommend doing so), adding an extra step to strip out test-only code blocks is relatively easy. Below is an example of how you could implement this using [GruntJS](http://gruntjs.com/).
 
 First, add your project specific data to the `initConfig` object:
 
@@ -125,7 +125,7 @@ grunt.registerMultiTask(
         // do the replacement
         contents = contents.replace(pattern, "")
         grunt.file.write(file, contents)
-        // Print a success message.
+        // print a success message.
         grunt.log.writeln("Removed test code from " + file)
       }
     }

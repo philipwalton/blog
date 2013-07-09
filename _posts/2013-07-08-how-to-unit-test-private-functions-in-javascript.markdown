@@ -94,7 +94,7 @@ The strategy here is to write your code exactly how you'd like it to appear when
 
 ### An Example Implementation
 
-Assuming you're already using a build system (if you're not I highly recommend doing so), adding an extra step to strip out test-only code blocks is relatively easy. Below is an example of how you could implement this using [GruntJS](http://gruntjs.com/) and the [grunt-strip-code](https://github.com/philipwalton/grunt-strip-code) plugin I created.
+Assuming you're already using a build system (if you're not I highly recommend doing so), adding an extra step to strip out test-only code blocks is relatively easy. Below is an example of how you could implement this using [GruntJS](http://gruntjs.com/) and the [grunt-strip-code](https://github.com/philipwalton/grunt-strip-code) plugin.
 
 First, make sure to add the task as a dependency to your project:
 
@@ -128,8 +128,17 @@ grunt.initConfig({
 Finally, add your new task to the deploy step (making sure not to add it to the testing step):
 
 {% highlightjs javascript %}
-grunt.registerTask("test", ["concat", "jshint", "jasmine"])
-grunt.registerTask("deploy", ["concat", **"strip-code"**, "jshint", "uglify"])
+grunt.registerTask("test", [
+  "concat",
+  "jshint",
+  "jasmine"
+])
+grunt.registerTask("deploy", [
+  "concat",
+  **"strip-code"**,
+  "jshint",
+  "uglify"
+])
 {% endhighlightjs %}
 
 Now, when you test your code, those test-only blocks will be in the source like you want, but they'll be stripped out when you deploy to production.
@@ -144,34 +153,32 @@ There are a lot of pros to this approach, and I certainly favor it over exposing
 
 Anytime you change your code between when it's tested and when it's deployed, you run the risk of missing something. If you weren't careful and part of your library depended on the code you removed, your library would break in production, and you might not know about it until long after it shipped.
 
-For this reason I recommend that any stripped code only contain the bare essentials to expose your private functions, and it should do so in a way that makes it obvious that this code is not intended to be used elsewhere.
-
-Consider this approach to make the myModule example even more obvious:
+Luckily, there are two relatively simple strategies to help prevent this. The easiest way is to assign your test only methods to an object namespace that is obviously not intended for normal use. For example:
 
 {% highlightjs javascript %}
-var myModule = (function() {
-
-  function foo() {
-    // private function `foo` inside closure
-    return "foo"
-  }
-
-  var api = {
-    bar: function() {
-      // public function `bar` returned from closure
-      return "bar"
-    }
-  }
-
-  /* test-code */
-  **api.__test__.foo = foo**
-  /* end-test-code */
-
-  return api
-}())
+/* test-code */
+**api.__testonly__.foo = foo**
+/* end-test-code */
 {% endhighlightjs %}
 
-As you can see, the name you choose to expose your methods can have an impact on the likelihood of you using that method in other parts of your library. This can be particularly important if you have a number of people contributing to your code who may or may not realize what is going on inside those comments.
+Using a namespace like `__testonly__` not only makes the intent obvious, it also makes it possible to add an additional step to the build process to make sure no `__testonly__` code appears in the final release.
+
+Another strategy is to split your test suite into two phases. The first phase tests the private methods. The second phase strips the code and then tests the public methods. Here's an example of that:
+
+{% highlightjs javascript %}
+grunt.registerTask("test", [
+  "concat",
+  "jshint",
+  **"jasmine:private"**,
+  **"strip-code"**,
+  "jshint",
+  **"jasmine:public"**
+])
+{% endhighlightjs %}
+
+Though not always possible (depending on your test setup), this is probably the safest method as it still tests the public API after stripping out the test-only code.
+
+These two strategies may not be necessary if you're the only developer or working on a small team, but the more people you have contributing the more caution you'll need to take. Obviously it's up to you to determine the right approach for your situation.
 
 ## Conclusion
 
@@ -180,6 +187,3 @@ To summarize, due to the nature of JavaScript it's important to not expose too m
 Even though that code may be an implementation detail, merely testing the public API may not give you the peace of mind you need when making code changes in the future.
 
 Testing your code is important, even if it takes a little bit of extra work. This article shows you how you can use a build system to test your private functions without compromising encapsulation and modularity.
-
-
-

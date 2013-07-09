@@ -8,7 +8,7 @@ task :preview, :port do |t, args|
   port = args.port || 4000
   annotate "Starting server on port #{port} and watching for changes."
 
-  jekyll_pid = Process.spawn("jekyll serve -w --port #{port}")
+  jekyll_pid = Process.spawn("jekyll serve -w --drafts --port #{port}")
   compass_pid = Process.spawn("compass watch")
 
   trap("INT") {

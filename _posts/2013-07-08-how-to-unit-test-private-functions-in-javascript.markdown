@@ -1,6 +1,7 @@
 ---
 layout: post
 title: How to Unit Test Private Functions in JavaScript
+date: 2013-07-08 23:28:18
 tags:
 - JavaScript
 ---

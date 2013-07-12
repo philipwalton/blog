@@ -6,6 +6,13 @@ tags:
 - JavaScript
 ---
 
+<div class="callout">
+  <p><strong>Update:</strong> A lot of readers have commented or tweeted that I shouldn't be unit testing private functions in the first place. Admittedly, this article is a little light on the <em>why</em> and mainly focuses on the <em>how</em>.</p>
+
+  <div>In the next few days I'll post a follow up article explaining why I personally like to unit test private functions in some situations.</div>
+</div>
+
+
 JavaScript's closures provide an excellent way to make variables and functions private, keeping them out of the global scope. This is particularly important in the browser because all scripts share the same scope, and it's quite easy to inadvertently pick a variable or function name used by another library.
 
 The problem, however, is that when functions are hidden inside a closure, it's very difficult to test them.

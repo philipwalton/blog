@@ -156,11 +156,11 @@ It's the best of both worlds.
 
 ### A Word of Caution
 
-There are a lot of pros to this approach, and I certainly favor it over exposing your private methods in an awkward way or not testing them at all, but there is a downside that you should be aware of.
+There are a lot of pros to this approach, and I certainly favor it over exposing your private functions in an awkward way or not testing them at all, but there is a downside that you should be aware of.
 
 Anytime you change your code between when it's tested and when it's deployed, you run the risk of missing something. If you weren't careful and part of your library depended on the code you removed, your library would break in production, and you might not know about it until long after it shipped.
 
-Luckily, there are two relatively simple strategies to help prevent this. The easiest way is to assign your test only methods to an object namespace that is obviously not intended for normal use. For example:
+Luckily, there are two relatively simple strategies to help prevent this. The easiest way is to assign your test only functions to an object namespace that is obviously not intended for normal use. For example:
 
 {% highlightjs javascript %}
 /* test-code */
@@ -170,7 +170,7 @@ Luckily, there are two relatively simple strategies to help prevent this. The ea
 
 Using a namespace like `__testonly__` not only makes the intent obvious, it also makes it possible to add an additional step to the build process to make sure no `__testonly__` code appears in the final release.
 
-Another strategy is to split your test suite into two phases. The first phase tests the private methods. The second phase strips the code and then tests the public methods. Here's an example of that:
+Another strategy is to split your test suite into two phases. The first phase tests the private functions. The second phase strips the code and then tests the public functions. Here's an example of that:
 
 {% highlightjs javascript %}
 grunt.registerTask("test", [

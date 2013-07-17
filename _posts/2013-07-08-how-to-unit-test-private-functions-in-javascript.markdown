@@ -10,7 +10,7 @@ excerpt: JavaScript's closures provide an excellent way to make variables and fu
 <div class="callout">
   <p><strong>Update:</strong> A lot of readers have commented or tweeted that I shouldn't be unit testing private functions in the first place. Admittedly, this article is a little light on the <em>why</em> and mainly focuses on the <em>how</em>.</p>
 
-  <div>In the next few days I'll post a follow up article explaining why I personally like to unit test private functions in some situations.</div>
+  <div>To explain some of my rationale, I wrote a follow-up article:<br><a href="/articles/why-i-test-private-functions-in-javascript/">Why I Test Private Functions In JavaScript</a></div>
 </div>
 
 

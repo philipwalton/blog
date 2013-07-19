@@ -56,7 +56,7 @@ Since JavaScript usually runs in the browser and shares the same global scope as
 
 This is probably the most common reason JavaScript developers make their code private.
 
-In addition, since browser libraries are under tremendous pressure to keep their file size small and their dependency count low, it's quite common for library authors to role their own implementations of already solved problems.
+In addition, since browser libraries are under tremendous pressure to keep their file size small and their dependency count low, it's quite common for library authors to roll their own implementations of already solved problems.
 
 Most back-end languages have a standard way of including modules, and there is usually little to no performance cost incurred by including a large module and only using a small portion of it. But this is definitely not the case in the browser. Until there is more standardization and consensus around client-side modules and module dependencies, and until more front-end libraries transition from large monolithic frameworks to smaller, single-purpose modules, most browser library authors will continue to operate in this manner.
 

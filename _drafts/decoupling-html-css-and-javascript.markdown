@@ -10,7 +10,7 @@ tags:
 
 Any non-trivial site or application on the Web today will contain a large amount of HTML, CSS, and JavaScript. As the use of the Internet evolves and our dependence on it increases, having a plan for organizing and maintaining your front-end code is an absolute must.
 
-In today's large Web companies, an increasing number of people are touching an increasing percentage of the front-end code. As a result, most organizations struggle to keep their code modular so as to prevent changes in one place from inadvertently affecting another.
+In today's large Web companies, an increasing number of people are touching an increasingly large percentage of the front-end code. As a result, most organizations struggle to keep their code modular. Changes to one part of the application often inadvertently break unrelated parts downstream.
 
 Preventing unintended consequences is not an easy problem to solve, especially since HTML, CSS, and JavaScript are, by their nature, co-dependent.
 
@@ -20,11 +20,11 @@ In this article I'll talk about how I've learned to decouple my HTML, CSS, and J
 
 ## The Goal
 
-There is always going to be some coupling between HTML, CSS, and JavaScript. For better or for worse, these technologies were built to interact with each other. As an example, a fly-in transition might be defined with a class selector in a stylesheet, but it is often triggered by user interaction, applied via JavaScript, and initiated by adding the class to the HTML.
+There will always be some coupling between HTML, CSS, and JavaScript. For better or for worse, these technologies were built to interact with each other. As an example, a fly-in transition might be defined with a class selector in a stylesheet, but it is often triggered by user interaction, applied via JavaScript, and initiated by adding the class to the HTML.
 
-Since some coupling in your front-end code will always be required. Your goal shouldn't be to simply eliminate coupling altogether. Instead, it should be to minimize the coupling that makes certain code parts unnecessarily dependent on others.
+Since some coupling in your front-end code is inevitable. Your goal shouldn't be to simply eliminate coupling altogether. Instead, it should be to minimize the coupling that makes certain code parts unnecessarily dependent on others.
 
-In general, the reason to decouple code is so developers can freely change one part without worrying how it will affect some other unrelated part of the application. As today's Web teams grow in size and specialization, this is more important than ever.
+A back-end developer should be able to change the markup in an HTML template without worrying about accidentally breaking a CSS rule or some JavaScript functionality. As today's Web teams grow in size and specialization, this goal is more important than ever.
 
 ## Anti-Patterns
 
@@ -52,11 +52,11 @@ CSS Zen Garden is a great idea as long as the markup of your site is rarely chan
 
 Instead of long, complex CSS selectors, it's best to (whenever possible) style all your visual components with one or more classes on the root element of the component itself. For example, if you have submenus in your sidebar, just add the class `submenu` to each of the submenu elements. Don't do something like `ul.sidebar > li > ul`.
 
-This approach ends up requiring more classes in the HTML, but it lowers the coupling between it and this CSS. This makes the code much more maintainable in the long run. It also allows your components to be reused throughout your site or on different sites altogether.
+This approach ends up requiring more classes in the HTML, but it lowers the coupling between it and this CSS making the code much more reusable and maintainable in the long run. It also makes your markup self-documenting. If there are no classes in the HTML, a developer who is unfamiliar with the CSS has no idea how her markup changes will affect things. On the other hand, if there are classes in the HTML it is very obvious what styles are being applied.
 
 ### Classes With More Than One Responsibility
 
-Sometimes a class is used for both styling purposes and as a JavaScript hook. While this may seem like a savings (it requires one fewer class in the markup) it couples the presentation of the element to its functionality.
+Sometimes a class is used for both styling purposes and as a JavaScript hook. While this may seem like a savings (since it requires one fewer class in the markup) it actually couples the presentation of the element to its functionality.
 
 {% highlightjs xml %}
 <button class="add-item">Add to Cart</button>
@@ -66,9 +66,9 @@ The above example shows an "Add to Cart" button styled with the `add-item` class
 
 If a developer wants to add a click event listener to this element, it can be quite tempting to hook into the class that's already there. I mean, why add another class?
 
-But imagine that there are many of these buttons throughout the site that all look the same and all invoke the same JavaScript functionality. Then imagine the marketing team wants a particular one of these buttons to look different than the rest of them. Perhaps it needs to be a lot bigger and a different color.
+But imagine that there are many of these buttons throughout the site that all look the same and all invoke the same JavaScript functionality. Then imagine the marketing team wants a particular one of these buttons to look different than the rest of them. Perhaps it needs to be a lot bigger with a more eye-catching color.
 
-This is a problem because the JavaScript code that is listening for the click event is expecting the class `add-item` to be used, but your new button now cannot use that class (or be forced to unset everything it declared). You may even have some testing code that is also expecting the `add-item` class to be present, so you'll have yet another place where code needs to be updated.
+This is a problem because the JavaScript code that is listening for the click event is expecting the class `add-item` to be used, but your new button now cannot use that class (or it must unset everything it declared and reset the new styles). You may even have some testing code that is also expecting the `add-item` class to be present, so you'll have yet another place where code needs to be updated.
 
 Even worse still is if your "Add to Cart" functionality is used by more than just this application. If the code has been abstracted to a separate module then what should have been a simple style change can now potentially introduce bugs in a completely different project.
 
@@ -84,23 +84,23 @@ The "Add to Cart" example above would then be rewritten as:
 <button class="js-add-to-cart add-item">Add to Cart</button>
 {% endhighlightjs %}
 
-Now if one particular "Add to Cart" button needs to look different, you can just change the style class name without affecting the functionality.
+Now if one particular "Add to Cart" button needs to look different, you can simply change the style class and leave the behavior class alone.
 
 {% highlightjs xml %}
-<button class="js-add-to-cart quick-add">Add to Cart</button>
+<button class="js-add-to-cart add-item-special">Add to Cart</button>
 {% endhighlightjs %}
 
 ### JavaScript That Knows Too Much About Styling
 
-Similar to how JavaScript can use classes to find elements in the DOM, it also  often adds or removes classes to change the style of elements. But this can be a problem if those classes aren't identifiably different from the classes that appear on page load.
+Similar to how JavaScript may use classes to find elements in the DOM, it also  often adds or removes classes to change the style of elements. But this can be a problem if those classes aren't identifiably different from the classes that appear on page load.
 
 When JavaScript code knows too much about component styling it becomes very easy for a CSS developer to make changes to a stylesheet and not realize he's breaking critical functionality.
 
-This is not to say that JavaScript should not alter the look or style of a visual components, but when it does it should do so through an agreed-upon interface. It should use classes that are identifiably different from classes that express default styling.
+This is not to say that JavaScript shouldn't alter the look or style of a visual components, but if it does it should do so through an agreed-upon interface. It should use classes that are identifiably different from classes that express default styling.
 
-#### Separate State Styling from Default Styling
+#### Differentiate State Styling from Default Styling
 
-The appearance of a page will often change as a result of user interaction. For example a pop-up may appear and disappear and an accordion section may expand and collapse. Such changes are usually made via JavaScript, and they're often done by adding or removing a class.
+The appearance of a page will often change as a result of user interaction. For example a pop-up may appear or disappear and an accordion section may expand or collapse. Such changes are usually made via JavaScript, and they're often done by adding or removing a class.
 
 If JavaScript is altering the appearance of the page with classes, it's helpful to be aware of this when looking at the class selector in the CSS file. Having a convention for state specific classes gives someone looking at a CSS rule a sense of where and how this rule is used.
 
@@ -112,7 +112,7 @@ Similar to `js-*` prefixed classes, I recommend using the prefix `is-*` to defin
 
 Notice that the state class is chained to the component class; this is important. Since state rules describe the state of a component, they should not appear on their own.
 
-In addition, by using a prefix like `is-*` we can write tests to ensure that this is enforced. One way to test these types of rules is using [CSSLint](http://csslint.net).
+In addition, by using a prefix like `is-*` we can write tests to ensure that this is enforced. One way to test these types of rules is using [CSSLint](http://csslint.net) and [HTML Inspector](http://philipwalton.com/articles/introducing-html-inspector/).
 
 ### JavaScript "Selectors"
 
@@ -120,11 +120,9 @@ jQuery made it extremely easy for users to find elements in the DOM via a langua
 
 JavaScript “selectors" should not rely too heavily on the DOM structure. Such selectors are significantly slower and require far too intimate a knowledge of the HTML.
 
-As with the first example, a developer working on an HTML template should be able to make basic changes to the markup without fear of it breaking essential functionality. If there is functionality that can be broken, it should be obvious what that is.
+As with the first example, a developer working on an HTML template should be able to make basic changes to the markup without fear of it breaking essential functionality. If there is functionality that can be broken, it should be apparent in the markup.
 
-I've already mentioned that `js-*` prefixed classes should be used as JavaScript hooks. In addition to disambiguating styling classes from functional classes, they also express intention in the markup. When someone editing the HTML sees a `js-*` prefixed class, they'll know it's used for something.
-
-If the JavaScript code is instead depending on long, complex selectors, it's not at all clear in the markup that anything functional is happening.
+I've already mentioned that `js-*` prefixed classes should be used as JavaScript hooks. In addition to disambiguating styling classes from functional classes, they also express intention in the markup. When someone editing the HTML sees a `js-*` prefixed class, they'll know it's used for something. If the JavaScript code is instead depending on long, complex selectors, it's not at all clear in the markup that anything functional is happening.
 
 #### Don't Use Complex Selectors for DOM Traversal
 
@@ -146,7 +144,7 @@ var saveBtn = document.querySelector(".js-save-btn")
 
 ## Classes Are Your Contract
 
-Almost every coupling problem in HTML, CSS, and JavaScript can be mitigated with an appropriate use of classes and a predictable class naming convention.
+Almost every type of coupling between HTML, CSS, and JavaScript can be lessened with an appropriate use of classes and a predictable class naming convention.
 
 Many other languages use events to decouple code. For example, instead of object A calling a method on object B, it simply emits a particular event in a given circumstance, and object B can subscribe to that event. This way, object B doesn't need to know anything about object A's interface, it simply needs to know what event to listen for.
 

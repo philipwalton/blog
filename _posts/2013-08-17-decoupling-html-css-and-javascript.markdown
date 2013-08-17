@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Decoupling Your HTML, CSS, and JavaScript
-date: 2013-08-11 02:30:00
+date: 2013-08-17 12:39:09
 tags:
 - HTML
 - CSS
@@ -14,7 +14,7 @@ In today's large Web companies, an increasing number of people are touching an i
 
 Preventing unintended consequences is not an easy problem to solve, especially since HTML, CSS, and JavaScript are, by their nature, co-dependent.
 
-To make matters worse, traditional computer science principles like the separation of concerns which have long been a part of server-side development rarely get discussed when it comes to front-end code.
+To make matters worse, traditional computer science principles like the separation of concerns, which have long been a part of server-side development, rarely get discussed when it comes to front-end code.
 
 In this article I'll talk about how I've learned to decouple my HTML, CSS, and JavaScript. From my experience and the experience of people I know, the best ways to accomplish this are far from obvious and often counter-intuitive.
 
@@ -36,7 +36,7 @@ The following are all anti-patterns I've either seen repeatedly or done myself. 
 
 CSS Zen Garden showed the world that you can completely change the look of an entire website without changing the markup at all. It was the poster child of the semantic Web movement, and one of its main tenants was to avoid the use of presentational classes.
 
-At first glance, CSS Zen Garden may seem like a great example of decoupling. After all, its entire point was to separate the style from the presentation. The problem, however, is that to do this you usually need selectors in your stylesheet that look like this:
+At first glance, CSS Zen Garden may seem like a great example of decoupling. After all, its entire point was to separate the style from the markup. The problem, however, is that to do this you usually need selectors in your stylesheet that look like this:
 
 {% highlightjs css %}
 #sidebar section:first-child h3 + p { }
@@ -44,11 +44,9 @@ At first glance, CSS Zen Garden may seem like a great example of decoupling. Aft
 
 In CSS Zen Garden, the HTML is almost entirely decoupled from the CSS, but the CSS is extremely coupled to the HTML and requires an intimate knowledge of its markup structure.
 
-This may not seem bad if the person maintaining the CSS also maintains the HTML, but as soon as you add a few more people to the mix, it can quickly get out of hand. If a developer comes along and adds a `<div>` before the first section, the above rule won't work, and the developer will likely not know.
+This may not seem bad if the person maintaining the CSS also maintains the HTML, but as soon as you add a few more people to the mix, it can quickly get out of hand. If a developer comes along and adds a `<div>` before the first `<section>`, the above rule won't work, and the developer will likely not know.
 
 CSS Zen Garden is a great idea as long as the markup of your site is rarely changing. However, that's usually not the case in today's Web apps.
-
-#### Style Components Based on What They Are, Not Where They Are
 
 Instead of long, complex CSS selectors, it's best to (whenever possible) style all your visual components with one or more classes on the root element of the component itself. For example, if you have submenus in your sidebar, just add the class `submenu` to each of the submenu elements. Don't do something like `ul.sidebar > li > ul`.
 
@@ -64,15 +62,13 @@ Sometimes a class is used for both styling purposes and as a JavaScript hook. Wh
 
 The above example shows an "Add to Cart" button styled with the `add-item` class.
 
-If a developer wants to add a click event listener to this element, it can be quite tempting to hook into the class that's already there. I mean, why add another class?
+If a developer wants to add a click event listener to this element, it can be quite tempting to hook into the class that's already there. I mean, if there's already one there, why add another?
 
 But imagine that there are many of these buttons throughout the site that all look the same and all invoke the same JavaScript functionality. Then imagine the marketing team wants a particular one of these buttons to look different than the rest of them. Perhaps it needs to be a lot bigger with a more eye-catching color.
 
 This is a problem because the JavaScript code that is listening for the click event is expecting the class `add-item` to be used, but your new button now cannot use that class (or it must unset everything it declared and reset the new styles). You may even have some testing code that is also expecting the `add-item` class to be present, so you'll have yet another place where code needs to be updated.
 
 Even worse still is if your "Add to Cart" functionality is used by more than just this application. If the code has been abstracted to a separate module then what should have been a simple style change can now potentially introduce bugs in a completely different project.
-
-#### Don't Use Classes For Both Styling and Behavior
 
 It's perfectly acceptable (actually encouraged) to use classes as JavaScript hooks, but if you're going to do so, do it in a way that avoids coupling between style classes and behavior classes.
 
@@ -98,11 +94,9 @@ When JavaScript code knows too much about component styling it becomes very easy
 
 This is not to say that JavaScript shouldn't alter the look or style of a visual components, but if it does it should do so through an agreed-upon interface. It should use classes that are identifiably different from classes that express default styling.
 
-#### Differentiate State Styling from Default Styling
-
 The appearance of a page will often change as a result of user interaction. For example a pop-up may appear or disappear and an accordion section may expand or collapse. Such changes are usually made via JavaScript, and they're often done by adding or removing a class.
 
-If JavaScript is altering the appearance of the page with classes, it's helpful to be aware of this when looking at the class selector in the CSS file. Having a convention for state specific classes gives someone looking at a CSS rule a sense of where and how this rule is used.
+If JavaScript is altering the appearance of the page with classes, it's helpful to be aware of this when looking at the class selector in the CSS file. Having a convention for state specific classes gives someone looking at a CSS rule a sense of where and how it's used.
 
 Similar to `js-*` prefixed classes, I recommend using the prefix `is-*` to define class selectors that alter the state of a visual component. An example CSS rule might look like this:
 
@@ -112,7 +106,7 @@ Similar to `js-*` prefixed classes, I recommend using the prefix `is-*` to defin
 
 Notice that the state class is chained to the component class; this is important. Since state rules describe the state of a component, they should not appear on their own.
 
-In addition, by using a prefix like `is-*` we can write tests to ensure that this is enforced. One way to test these types of rules is using [CSSLint](http://csslint.net) and [HTML Inspector](http://philipwalton.com/articles/introducing-html-inspector/).
+In addition, by using a prefix like `is-*` we can write tests to ensure that this convention is followed. One way to test these types of rules is using [CSSLint](http://csslint.net) and [HTML Inspector](http://philipwalton.com/articles/introducing-html-inspector/).
 
 ### JavaScript "Selectors"
 
@@ -122,9 +116,7 @@ JavaScript “selectors" should not rely too heavily on the DOM structure. Such 
 
 As with the first example, a developer working on an HTML template should be able to make basic changes to the markup without fear of it breaking essential functionality. If there is functionality that can be broken, it should be apparent in the markup.
 
-I've already mentioned that `js-*` prefixed classes should be used as JavaScript hooks. In addition to disambiguating styling classes from functional classes, they also express intention in the markup. When someone editing the HTML sees a `js-*` prefixed class, they'll know it's used for something. If the JavaScript code is instead depending on long, complex selectors, it's not at all clear in the markup that anything functional is happening.
-
-#### Don't Use Complex Selectors for DOM Traversal
+I've already mentioned that `js-*` prefixed classes should be used as JavaScript hooks. In addition to disambiguating styling classes from functional classes, they also express intention in the markup. When someone editing the HTML sees a `js-*` prefixed class, they'll know it's used for something. If the JavaScript code is instead depending on a particular markup structure to query for elements, it won't be apparent in the markup that anything functional is happening.
 
 Instead of traversing the DOM with long, complex selectors, stick to single class selectors or IDs.
 
@@ -134,9 +126,9 @@ Consider the following code:
 var saveBtn = document.querySelector("#modal div:last-child > button:last-child")
 {% endhighlightjs %}
 
-The above code saves you from having to add a class to the HTML, but it also makes your code very susceptible to markup changes. If the designers suddenly decide to align the save button on the left and the cancel button on the right, your code will no longer work.
+The above code saves you from having to add a class to the HTML, but it also makes your code very susceptible to markup changes. If the designers suddenly decide to put the save button on the left and the cancel button on the right, your code will no longer work.
 
-A much better approach, using the prefix method mentioned above, would be to just use a class.
+A much better approach (using the prefix method mentioned above) would be to just use a class.
 
 {% highlightjs javascript %}
 var saveBtn = document.querySelector(".js-save-btn")
@@ -154,31 +146,26 @@ Likewise, JavaScript doesn't need complex DOM traversal functions that also requ
 
 Classes should be the glue that connects your HTML, CSS, and JavaScript together.
 
-## Some Considerations
-
-HTML, CSS, and JavaScript are not created equal. Difference in language capabilities can play a role in how much coupling to avoid. For example, in JavaScript it is very easy to encapsulate functionality so it doesn't conflict with other code. In CSS, however, this is not the case.
-
-This means that more consideration must be given to the CSS when trying to decouple front-end code since the global nature of CSS is inherently harder to manage.
-
-Another important consideration is the type of developer working on a particular language. In my experience a large number of people will likely touch the HTML templates, but CSS is often maintained by a more specialized person who "owns" that code.
-
-Because a lot of people are touching the markup who are probably not touching the CSS, it's extra important that your CSS rules are decoupled from the markup structure.
-
-Intentionality in the markup is key. The more you can express the functionality of the HTML through the classes you add to its elements, the less likely developers are to accidentally make changes that break that functionality.
-
 ## The Future
 
-The WHATWG is currently working on the [Web Components](http://www.w3.org/TR/2013/WD-components-intro-20130606/) specification, which will allow developers to bundle HTML, CSS, and JavaScript together as individual components or modules that are encapsulated from the rest of the page.
+The [WHATWG](http://www.whatwg.org/) is currently working on the [Web Components](http://www.w3.org/TR/2013/WD-components-intro-20130606/) specification, which will allow developers to bundle HTML, CSS, and JavaScript together as individual components or modules that are encapsulated from the rest of the page.
 
-When that spec if implemented in browsers, a lot of the suggestions I've given in this article will become less important as it will be more obvious what code is meant to work with what. However, it's still important to understand the broader principles behind how these methods work and why they're needed.
+When that spec if implemented in browsers, a lot of the suggestions I've given in this article will become less critical (since it will be more obvious what code is meant to work with what); however, it's still important to understand these broader principles and why they're needed.
 
-And even if these principles are less important in the era of Web Components they still apply. Practices that work for large teams and big applications will still work for small modules written by individual developers. The reverse it not necessarily the case.
+Even if these practices become less important in the era of Web Components, the theory still applies. Practices that work for large teams and big applications will still work for small modules written by individual developers. The reverse is not necessarily the case.
 
 ## Conclusion
 
 The mark of maintainable HTML, CSS, and JavaScript is when individual developers can easily and confidently edit parts of the code base without those changes inadvertently affecting other, unrelated parts.
 
-One of the best ways to prevent unintended consequences is to connect these three technologies together with a predictable set of thoughtfully named classes that express intentionality and reflect their chosen purpose to any developer who encounters them.
+One of the best ways to prevent unintended consequences is to connect these three technologies together with a predictable set of thoughtfully named classes that express their intention and reflect their chosen purpose to any developer who encounters them.
+
+To avoid the above anti-patterns, keep the following principles in mind:
+
+* Avoid complex CSS selectors in your stylesheets and JavaScript files.
+* Style components based on what they are, not where they are.
+* Don't use the same class for both style and behavior.
+* Differentiate state styles from default styles.
 
 Using classes this way will often require a lot of classes being present in the HTML, but the gains in predictability and maintainability are well worth it. After all, adding classes to HTML is quite easy and something that a developer of any skill level can do. To quote [Nicolas Gallagher](http://nicolasgallagher.com/about-html-semantics-front-end-architecture/):
 

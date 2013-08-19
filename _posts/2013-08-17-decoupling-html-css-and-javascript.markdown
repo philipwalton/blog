@@ -16,7 +16,7 @@ Preventing unintended consequences is not an easy problem to solve, especially s
 
 To make matters worse, traditional computer science principles like the separation of concerns, which have long been a part of server-side development, rarely get discussed when it comes to front-end code.
 
-In this article I'll talk about how I've learned to decouple my HTML, CSS, and JavaScript. From my experience and the experience of people I know, the best ways to accomplish this are far from obvious and often counter-intuitive.
+In this article I'll talk about how I've learned to decouple my HTML, CSS, and JavaScript. From my experience and the experience of people I know, the best ways to accomplish this are far from obvious, often counter-intuitive, and sometimes go against much of the so-called "best-practices" out there.
 
 ## The Goal
 
@@ -30,7 +30,7 @@ A back-end developer should be able to change the markup in an HTML template wit
 
 It's not always obvious when front-end code is tightly coupled. And this is compounded by the fact that what may seem like loose coupling from one perspective is actually tight coupling from another.
 
-The following are all anti-patterns I've either seen repeatedly or done myself. In each, I try to explain why the coupling is bad and how it can be avoided.
+The following are all anti-patterns I've either seen repeatedly or done myself and learned from my mistakes. In each, I try to explain why the coupling is bad and how it can be avoided.
 
 ### Overly Complex Selectors
 
@@ -48,7 +48,13 @@ This may not seem bad if the person maintaining the CSS also maintains the HTML,
 
 CSS Zen Garden is a great idea as long as the markup of your site is rarely changing. But that's usually not the case with today's Web apps.
 
-Instead of long, complex CSS selectors, it's best to (whenever possible) style all your visual components with one or more classes on the root element of the component itself. For example, if you have submenus in your sidebar, just add the class `submenu` to each of the submenu elements. Don't do something like `ul.sidebar > li > ul`.
+Instead of long, complex CSS selectors, it's best to (whenever possible) style all your visual components with one or more classes on the root element of the component itself. For example, if you have submenus in your sidebar, just add the class `submenu` to each of the submenu elements. Don't use a rule like:
+
+{% highlightjs css %}
+ul.sidebar > li > ul {
+  /* submenu styles */
+}
+{% endhighlightjs %}
 
 This approach ends up requiring more classes in the HTML, but it lowers the coupling between it and this CSS making the code much more reusable and maintainable in the long run. It also makes your markup self-documenting. If there are no classes in the HTML, a developer who is unfamiliar with the CSS has no idea how her markup changes will affect other code. On the other hand, if there are classes in the HTML it is very obvious what styles or functionality is being applied.
 
@@ -64,11 +70,11 @@ The above example shows an "Add to Cart" button styled with the `add-item` class
 
 If a developer wants to add a click event listener to this element, it can be quite tempting to hook into the class that's already there. I mean, if one already exists, why add another?
 
-But imagine that there are many of these buttons throughout the site that all look the same and all invoke the same JavaScript functionality. Then imagine the marketing team wants a particular one of these buttons to look different than the rest of them. Maybe it needs to be a lot bigger with a more eye-catching color.
+But imagine that there are many of these buttons throughout the site that all look the same and all invoke the same JavaScript functionality. Then imagine the marketing team wants a particular one of these buttons to look totally different than the rest of them. Maybe it needs to be a lot bigger with a more eye-catching color.
 
 This is a problem because the JavaScript code that is listening for the click event is expecting the class `add-item` to be used, but your new button now cannot use that class (or it must unset everything it declared and reset the new styles). It's even more of a problem if you have some testing code that is also expecting the `add-item` class to be present, so you'll have yet another place where code needs to be updated.
 
-Worse still is if your "Add to Cart" functionality is used by more than just this application. If the code has been abstracted to a separate module then what should have been a simple style change can now potentially introduce bugs in a completely different project.
+Worse still is if your "Add to Cart" functionality is used by more than just this application. If the code has been abstracted to a separate module then what should have been a simple style change can now potentially introduce bugs in a completely different application.
 
 It's perfectly acceptable (actually encouraged) to use classes as JavaScript hooks, but if you're going to do so, do it in a way that avoids coupling between style classes and behavior classes.
 
@@ -88,7 +94,7 @@ Now if one particular "Add to Cart" button needs to look different, you can simp
 
 ### JavaScript That Knows Too Much About Styling
 
-In the same way that JavaScript can use classes to find elements in the DOM, it also often adds or removes classes to change the style of elements. But this can be a problem if those classes aren't identifiably different from the classes that appear on page load.
+In the same way that JavaScript can use classes to find elements in the DOM, it can also add or remove classes to change the style of elements. But this can be a problem if those classes aren't identifiably different from the classes that appear on page load.
 
 When JavaScript code knows too much about component styling it becomes very easy for a CSS developer to make changes to a stylesheet and not realize he's breaking critical functionality.
 
@@ -144,9 +150,9 @@ In event driven programming, instead of object A calling a method on object B, i
 
 Arguably event systems require a form of coupling since Object B needs to know the names of the events to subscribe to, but it's quite a bit looser coupling than if Object A needed to know Object B's public methods.
 
-HTML classes are very similar. Instead of a CSS file defining complex selectors (which, using the analogy, is equivalent to knowing the HTML's internal interface), it can simply define the look of a visual component via a single class. The HTML may then choose to use that class or not use it. The CSS doesn't need to care.
+HTML classes are very similar. Instead of a CSS file defining complex selectors (which, continuing the analogy, is equivalent to knowing the HTML's internal interface), it can simply define the look of a visual component via a single class. The HTML may then choose to use that class or not use it. The CSS doesn't need to care.
 
-Likewise, JavaScript doesn't need complex DOM traversal functions that also require an intimate knowledge of the HTML structure, it can simply listen for the user's interaction with elements that contain the agreed-upon class names.
+In the same way, JavaScript doesn't need complex DOM traversal functions that also require an intimate knowledge of the HTML structure, it can simply listen for the user's interaction with elements that contain the agreed-upon class names.
 
 Classes should be the glue that connects your HTML, CSS, and JavaScript together. In my experience they're are the easiest and best way to connect the three technologies without intermingling them too much.
 
@@ -162,11 +168,11 @@ Even if these practices become less important in the era of Web Components, the 
 
 The mark of maintainable HTML, CSS, and JavaScript is when individual developers can easily and confidently edit parts of the code base without those changes inadvertently affecting other, unrelated parts.
 
-One of the best ways to prevent unintended consequences is to connect these three technologies together with a predictable set of thoughtfully named classes that express their intention and reflect their chosen purpose to any developer who encounters them.
+One of the best ways to prevent unintended consequences is to connect these three technologies together through a predictable set of thoughtfully named classes that express their intention and reflect their chosen purpose to any developer who encounters them.
 
 To avoid the above anti-patterns, keep the following principles in mind:
 
-* Favor component classes over complex CSS selectors in both CSS and JavaScript.
+* Favor explicit component and behavior classes over complex CSS selectors in both CSS and JavaScript.
 * Style components based on what they are, not where they are.
 * Don't use the same class for both style and behavior.
 * Differentiate state styles from default styles.

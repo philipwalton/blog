@@ -34,7 +34,7 @@ The following are all anti-patterns I've either seen repeatedly or done myself a
 
 ### Overly Complex Selectors
 
-CSS Zen Garden showed the world that you can completely change the look of an entire website without changing the markup at all. It was the poster child of the semantic Web movement, and one of its main tenants was to avoid the use of presentational classes.
+CSS Zen Garden showed the world that you can completely change the look of an entire website without changing the markup at all. It was the poster child of the semantic Web movement, and one of its main tenets was to avoid the use of presentational classes.
 
 At first glance, CSS Zen Garden may seem like a great example of decoupling. After all, its entire point was to separate the style from the markup. The problem, however, is that to do this you usually need selectors in your stylesheet that look like this:
 

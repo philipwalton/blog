@@ -80,7 +80,7 @@ Hopefully the rest of this article will make things a little more clear.
 
 Z-index seems so simple: elements with a higher z-index are stacked in front of elements with a lower z-index, right? Well, actually, no. This is part of the problem with z-index. It appears so simple, so most developers don't take the time to read the rules.
 
-Every element in an HTML document can be either in front of or behind other element in the document. This is known as the stacking order. The rules to determine this order are pretty clearly defined in the spec, but as I've already stated, they're not fully understood by most developers.
+Every element in an HTML document can be either in front of or behind every other element in the document. This is known as the stacking order. The rules to determine this order are pretty clearly defined in the spec, but as I've already stated, they're not fully understood by most developers.
 
 When the z-index and position properties aren't involved, the rules are pretty simple: basically, the stacking order is the same as the order of appearance in the HTML. (OK, it's actually a [little more complicated](http://www.w3.org/TR/CSS2/zindex.html) than that, but as long as you're not using negative margins to overlap inline elements, you probably won't encounter the edge cases.)
 
@@ -103,6 +103,11 @@ New stacking contexts can be formed on an element in one of three ways:
 The first and second ways to form stacking context make a lot of sense and are generally understood by Web developers (even if they don't know what they're called).
 
 The third way (opacity) is almost never mentioned outside of w3c specification documents.
+
+<p class="callout">
+  <strong>Update:</strong> In addition to opacity, several newer CSS properties also create stacking contexts. These include: <a href="http://www.w3.org/TR/css3-transforms/">transforms</a>, <a href="http://www.w3.org/TR/filter-effects/">filters</a>, <a href="http://www.w3.org/TR/css3-regions/">css-regions</a>, <a href="http://www.w3.org/TR/css3-page/">paged media</a>, and possibly others. As a general rule, it seems that if a CSS property requires rendering in an offscreen context, it must create a new stacking context.
+</p>
+
 
 ## Determining an Element's Position in the Stacking Order
 

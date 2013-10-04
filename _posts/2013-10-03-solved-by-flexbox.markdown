@@ -8,7 +8,7 @@ tags:
 
 The first version of [philipwalton.com](http://philipwalton.com) was built using [Flexbox](http://www.w3.org/TR/css3-flexbox/) way back in 2010 when the syntax was `display:box`. It only worked in Chrome, Safari, and Firefox and was pretty buggy, but it worked and was a million times better than any existing layout method.
 
-I was distrought when I first learned that the Flexbox spec was being rewritten, certain that it would be years before the new version had anything close to the browser support of the current version, much less enough support to be used in any real application.
+I was distrought when I first learned that the Flexbox spec was being rewritten, certain that it would be years before the new version had anything close to the browser support of the old version, much less enough support to be used in any real application.
 
 Well, it's been three years &mdash; which sounds longer than it feels &mdash; and the new version of Flexbox is finally going to be available in every major browser. After ages of being forced to use JavaScript or crazy hacks to acheive what should be simple layouts, we finally have a proper solution.
 

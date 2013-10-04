@@ -10,9 +10,6 @@
 *~
 *.sass-cache
 
-# Ignore bower componnents
-components
-
 # OS or Editor folders
 .DS_Store
 Thumbs.db

@@ -4,8 +4,13 @@
 
 html {
   color: #303030;
-  font: 300 .9375em/1.4 "Open Sans", sans-serif;
-
+  font: 400 .9375em/1.4 "Open Sans", sans-serif;
+  @media
+    only screen and (-webkit-min-device-pixel-ratio: 1.25),
+    only screen and (-o-min-device-pixel-ratio: 5/4),
+    only screen and (min-resolution: 120dpi) {
+      font-weight: 300;
+  }
 }
 
 a {

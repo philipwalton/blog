@@ -1,0 +1,14 @@
+{
+  "title": "Philip Walton",
+  "baseURL": "http://philipwalton.com",
+  "permalink": ":type/:title",
+  "postTypes": ["article", "page"],
+  "taxonomies": ["tag", "category"],
+  "excludeFiles": [
+    "package.json",
+    "**/.DS_Store",
+    ".gitignore",
+    ".git/**/*",
+    "node_modules/**/*"
+  ]
+}

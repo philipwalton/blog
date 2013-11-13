@@ -48,15 +48,17 @@ This may not seem bad if the person maintaining the CSS also maintains the HTML,
 
 CSS Zen Garden is a great idea as long as the markup of your site is rarely changing. But that's usually not the case with today's Web apps.
 
-Instead of long, complex CSS selectors, it's best to (whenever possible) style all your visual components with one or more classes on the root element of the component itself. For example, if you have submenus in your sidebar, just add the class `submenu` to each of the submenu elements. Don't use a rule like:
+Instead of long, complex CSS selectors, it's best to (whenever possible) style all your visual components with one or more classes on the root element of the component itself. For example, if you have submenus in your sidebar, just add the class `submenu` to each of the submenu elements. Considering the following two methods:
 
 {% highlightjs css %}
-ul.sidebar > li > ul {
-  /* submenu styles */
-}
+/* Bad */
+#sidebar ul > li > ul { }
+
+/* Good */
+.submenu { }
 {% endhighlightjs %}
 
-This approach ends up requiring more classes in the HTML, but it lowers the coupling between it and this CSS making the code much more reusable and maintainable in the long run. It also makes your markup self-documenting. If there are no classes in the HTML, a developer who is unfamiliar with the CSS has no idea how her markup changes will affect other code. On the other hand, if there are classes in the HTML it is very obvious what styles or functionality is being applied.
+The second approach ends up requiring more classes in the HTML, but it lowers the coupling between it and the CSS making the code much more reusable and maintainable in the long run. It also makes your markup self-documenting. If there are no classes in the HTML, a developer who is unfamiliar with the CSS has no idea how her markup changes will affect other code. On the other hand, if there are classes in the HTML it is very obvious what styles or functionality is being applied.
 
 ### Classes With More Than One Responsibility
 
@@ -160,7 +162,7 @@ Classes should be the glue that connects your HTML, CSS, and JavaScript together
 
 The [WHATWG](http://www.whatwg.org/) is currently working on the [Web Components](http://www.w3.org/TR/2013/WD-components-intro-20130606/) specification, which will allow developers to bundle HTML, CSS, and JavaScript together as individual components or modules that are encapsulated from the rest of the page.
 
-When that spec if implemented in the majority of browsers, a lot of the suggestions I've given in this article will become less critical (since it will be more obvious what code is meant to work with what); however, it's still important to understand these broader principles and why they're needed.
+When that spec is implemented in the majority of browsers, a lot of the suggestions I've given in this article will become less critical (since it will be more obvious what code is meant to work with what); however, it's still important to understand these broader principles and why they're needed.
 
 Even if these practices become less important in the era of Web Components, the theory still applies. Practices that work for large teams and big applications will still work for small modules written by individual developers. The reverse is not necessarily the case.
 

@@ -1,19 +1,27 @@
 <!--
 {
   "layout": "default",
-  "title": "Home"
+  "title": "Home",
+  "pagination": {
+    "type": "articles",
+    "limit": 6
+  },
+  "query": {
+    "type": "article",
+    "limit": 6
+  }
 }
 -->
 
 <h2>Recent Articles</h2>
 
 <ul>
-  {{# eachArticle }}
+  {{# query }}
     <li>
       <h3><a href="{{ permalink }}">{{ title }}</a></h3>
       <p>{{ date }}</p>
     </li>
   {{ else }}
     <li>Sorry, no articles available.</li>
-  {{/ eachArticle }}
+  {{/ query }}
 </ul>

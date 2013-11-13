@@ -5,10 +5,11 @@
   "postTypes": ["article", "page"],
   "taxonomyTypes": ["tag", "category"],
   "excludeFiles": [
-    "package.json",
     "**/.DS_Store",
+    "package.json",
     ".gitignore",
     ".git/**/*",
+    ".sass-cache/**/*",
     "node_modules/**/*"
   ]
 }

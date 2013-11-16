@@ -1,10 +1,9 @@
 <!--
 {
   "layout": "default",
-  "pagination": {
+  "query": {
     "limit": 3,
-    "type": "articles",
-    "taxonomy": ""
+    "type": "article"
   }
 }
 -->
@@ -12,7 +11,7 @@
 {{ page.title }}
 
 <ul>
-  {{#eachArticle tag=page.tag }}
+  {{#query }}
     <li>{{ title }}</li>
-  {{/eachArticle }}
+  {{/query }}
 </ul>

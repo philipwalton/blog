@@ -25,3 +25,12 @@ The bottom line is that most of the time I was interviewing I felt like I was be
 - At a web startup, a front-end developer is probably someone who has built or uses an MVC-style JavaScript framework. She is probably a very solid programmer and probably has a computer science degree.
 
 The point is the term is ambiguous and can apply to someone who is very technical to someone who doesn't program at all.
+
+## My Advice
+
+- Front-end candidates should be interviewed by at least one front-end team member. If you don't have a front-end team member, find someone you know and trust.
+
+- Obviously topics like logic and algorithims are important, especially for some companies. But if you're interviewing for a front-end position, the majority of questions should focus on front-end technologies. In other words, make sure that most of your questions could be answered better by a good front-end developer than a good back-end developer.
+
+- Treat front-end developers with the same amount or respect that you treat all of your developers. If you act like your front-end codebase is a necessary evil, then whoever you hire probably won't stay there for very long.
+

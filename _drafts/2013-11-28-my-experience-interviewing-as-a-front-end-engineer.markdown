@@ -4,6 +4,13 @@ title: My Experience Interviewing as a Front-End Engineer
 date: 2013-11-28 17:14:43
 ---
 
+Over the past few months I've been casually looking for front-end jobs in the San Francisco. It's not that I hated my current job or my current company, but with the tech scene in Santa Barbara being so small, I never felt like I really know how good (or bad) of a developer I actually was. I decided to interview at some big name companies in the Bay Area just see how I would fare.
+
+Throughout this whole process I sent inquires to, and had phone interviews with Google, Twitter, Rdio, Causes, Zoosk, and Chart.io. Of those I was invited to interview on-site with Google, Twitter, Causes, and Zoosk.
+
+Before I go any further or into any more detail, I want to give a few disclaimers. First of all, I don't think it would be fair or professional for me to divulge which companies made me offers and which didn't. I'll simply say that I received more than one offer and more than one rejection, but that it's not really relevant to my overriding point. Secondly, I want to stress that I'm going to do my best to honor the privacy of these companies. I don't want to call anyone in particular out for doing bad things; instead, I want to point out concerning trends that I saw and offer my thoughts on them.
+
+
 ## The Problems
 
 - Most companies didn't ask me any CSS questions. The few that did asked be extremely basic things that any web developer should know, back-end or front-end

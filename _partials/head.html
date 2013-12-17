@@ -1,5 +1,4 @@
 <meta charset="utf-8">
-<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 
 <title>{{#if page.title }}{{ page.title }} &mdash; {{/if}}Philip Walton</title>
 
@@ -8,4 +7,16 @@
 <meta name="MobileOptimized" content="320">
 <meta name=viewport content="width=device-width, minimum-scale=1.0, maximum-scale=1.0">
 
+<link href="{{linkTo '/assets/stylesheets/application.css'}}" rel="stylesheet" type="text/css">
+<link href="http://feeds.feedburner.com/philipwalton" rel="alternate" title="{{ site.title }}" type="application/atom+xml">
+
+{{#if page.canonical}}
+  <link rel="canonical" href="{{ page.canonical }}">
+{{/if}}
+
 <meta name="description" content="Thoughts on front-end development, architecture, and the future of the web.">
+
+<!--[if lt IE 9]>
+  <script src="{{linkTo '/assets/javascripts/html5shiv.js'}}"></script>
+  <script src="{{linkTo '/assets/javascripts/respond.js'}}"></script>
+<![endif]-->

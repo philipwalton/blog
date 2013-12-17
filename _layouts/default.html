@@ -4,7 +4,22 @@
     {{> head}}
   </head>
   <body>
-    {{{ content }}}
+    <header class="header" role="banner">
+      <div class="l-container">
+        {{> header}}
+        {{> navigation}}
+      </div>
+    </header>
+    <div class="l-container">
+      <section class="l-content" role="main">
+        {{{ content }}}
+      </section>
+      {{> aside}}
+      {{> footer}}
+    </div>
+    {{!> google-analytics}}
+    {{!> highlightjs}}
+    {{!> twitter-buttons}}
+    {{!> disqus-script}}
   </body>
-
 </html>

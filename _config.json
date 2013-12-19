@@ -4,6 +4,7 @@
   "permalink": ":type/:title",
   "postTypes": ["article", "page"],
   "taxonomyTypes": ["tag", "category"],
+  "excerptLength": 40,
   "excludeFiles": [
     "**/.DS_Store",
     "package.json",

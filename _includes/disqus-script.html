@@ -1,4 +1,5 @@
 {% if page.id %}
+  {% env pred %}
   <script>
     /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
     var disqus_shortname = "{{ site.disqus_shortname }}"; // required: replace example with your forum shortname
@@ -10,4 +11,5 @@
       (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
     })();
   </script>
+  {% endenv %}
 {% endif %}

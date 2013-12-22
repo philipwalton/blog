@@ -2,7 +2,7 @@
   "title": "Philip Walton",
   "baseURL": "http://philipwalton.com",
   "permalink": ":type/:title",
-  "postTypes": ["article", "page"],
+  "postTypes": ["article"],
   "taxonomyTypes": ["tag", "category"],
   "excerptLength": 40,
   "excludeFiles": [

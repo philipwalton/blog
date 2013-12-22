@@ -2,7 +2,7 @@
 {
   "layout": "default",
   "title": "Articles",
-  "permalink": "articles"
+  "permalink": "/articles"
 }
 -->
 

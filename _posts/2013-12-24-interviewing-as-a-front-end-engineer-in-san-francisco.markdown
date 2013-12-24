@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Interviewing as a Front-End Engineer in San Francisco
-date: 2013-11-28 17:14:43
+date: 2013-12-24 13:25:12
 ---
 
 A few months ago I started casually looking for front-end gigs in the San Francisco Bay Area. I liked my current job, but I felt I was outgrowing the tech scene in my town. I wanted to leave my small pond and see how I'd fare in a big one, with some of the best developers in the world.

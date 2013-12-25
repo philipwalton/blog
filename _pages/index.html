@@ -1,19 +1,21 @@
 <!--
 {
-  "layout": "default",
+  "layout": "page",
   "title": "Home",
   "heading": "Recent Articles",
   "permalink": "/",
   "query": {
     "type": "article",
-    "limit": 3
+    "limit": 6
   }
 }
 -->
 
 <div class="article-list">
   {{# query }}
-    {{> excerpt}}
+    <article>
+      {{> excerpt}}
+    </article>
   {{ else }}
     <p>Sorry, no articles available.</p>
   {{/ query }}

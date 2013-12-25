@@ -1,0 +1,18 @@
+<ul class="article-meta">
+  <li>
+    {{#is permalink page.permalink}}
+      <time datetime="{{moment date format='MMMM DD, YYYY'}}">{{moment date format="MMMM DD, YYYY"}}</time>
+    {{else}}
+      <a href="{{linkTo permalink}}">
+        <time datetime="{{moment date format='MMMM DD, YYYY'}}">{{moment date format="MMMM DD, YYYY"}}</time>
+      </a>
+    {{/is}}
+  </li>
+  {{#if tags.length}}
+    <li>
+      {{#each tags}}
+        <a href="/tags/{{lowercase this}}/">{{this}}</a>{{#unless @last}}, {{/unless}}
+      {{/each}}
+    </li>
+  {{/if}}
+</ul>

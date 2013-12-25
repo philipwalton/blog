@@ -1,5 +1,3 @@
-<article>
-  <h2 class="article-title"><a href="{{permalink}}">{{title}}</a></h2>
-  <p>{{moment date format="MMMM DD, YYYY"}}</p>
-  <p>{{excerpt}}</p>
-</article>
+<h2 class="article-title"><a href="{{permalink}}">{{title}}</a></h2>
+{{> article-meta}}
+<p>{{excerpt}}...<a rel="full-article" href="{{linkTo permalink}}">[more]</a></p>

@@ -1,13 +1,11 @@
 <!--
 {
-  "layout": "default"
+  "layout": "page",
+  "query": {
+    "type": "article",
+    "limit": 6
+  }
 }
 -->
 
-{{ page.title }}
-
-<ul>
-  {{#query }}
-    <li>{{ title }}</li>
-  {{/query }}
-</ul>
+{{> article-excerpt-list}}

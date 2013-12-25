@@ -1,6 +1,6 @@
 <!--
 {
-  "layout": "default",
+  "layout": "article",
   "title": "Solved by Flexbox",
   "date": "2013-10-03",
   "tags": [

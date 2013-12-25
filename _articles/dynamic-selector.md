@@ -1,6 +1,6 @@
 <!--
 {
-  "layout": "default",
+  "layout": "article",
   "title": "Dynamic Selectors",
   "date": "2013-02-20",
   "tags": [

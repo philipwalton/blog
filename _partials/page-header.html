@@ -6,7 +6,9 @@
       {{page.title}}
     {{/if}}
   </h1>
-  {{#if page.date}}
-    {{> article-meta}}
+  {{#if page.type}}
+    {{#with page}}
+      {{> article-meta this}}
+    {{/with}}
   {{/if}}
 </header>

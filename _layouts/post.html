@@ -1,0 +1,18 @@
+<!--
+{
+  "layout": "default",
+  "comments": true
+}
+-->
+
+<article role="article">
+
+  {{> page-header}}
+
+  {{{content}}}
+
+  {{#if page.comments}}
+    <p> loading disqus... </p>
+  {{/if}}
+
+</article>

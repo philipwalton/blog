@@ -12,5 +12,7 @@
     ".git/**/*",
     ".sass-cache/**/*",
     "node_modules/**/*"
-  ]
+  ],
+
+  "disqusShortname": "philipwalton"
 }

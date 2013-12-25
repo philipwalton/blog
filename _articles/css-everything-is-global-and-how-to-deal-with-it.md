@@ -1,6 +1,6 @@
 <!--
 {
-  "layout": "default",
+  "layout": "article",
   "title": "CSS: Everything is Global and How to Deal With It",
   "date": "2013-03-25",
   "tags": [

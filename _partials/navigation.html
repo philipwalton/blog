@@ -1,7 +1,7 @@
 <nav class="l-header-nav" role="navigation">
   <ul class="nav">
-    <li><a href="{{linkTo '/'}}">Home</a></li>
-    <li><a href="{{linkTo '/articles'}}">Articles</a></li>
-    <li><a href="{{linkTo '/about'}}">About</a></li>
+    <li><a {{#ifCurrentPage '/'}}class="is-selected"{{/ifCurrentPage}} href="{{linkTo '/'}}">Home</a></li>
+    <li><a {{#ifCurrentPage '/articles/'}}class="is-selected"{{/ifCurrentPage}} href="{{linkTo '/articles/'}}">Articles</a></li>
+    <li><a {{#ifCurrentPage '/about/'}}class="is-selected"{{/ifCurrentPage}} href="{{linkTo '/about/'}}">About</a></li>
   </ul>
 </nav>

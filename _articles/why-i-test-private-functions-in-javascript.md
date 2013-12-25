@@ -1,6 +1,6 @@
 <!--
 {
-  "layout": "default",
+  "layout": "article",
   "title": "Why I Test Private Functions In JavaScript",
   "date": "2013-07-17",
   "tags": [

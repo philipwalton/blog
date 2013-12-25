@@ -1,6 +1,6 @@
 <!--
 {
-  "layout": "default",
+  "layout": "article",
   "title": "Introducing HTML Inspector",
   "date": "2013-06-11",
   "tags": [

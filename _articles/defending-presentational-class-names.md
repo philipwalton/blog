@@ -1,6 +1,6 @@
 <!--
 {
-  "layout": "default",
+  "layout": "article",
   "title": "Defending Presentational Class Names",
   "date": "2013-01-24",
   "tags": [

@@ -1,6 +1,6 @@
 <!--
 {
-  "layout": "default",
+  "layout": "article",
   "title": "What No One Told You About Z-Index",
   "date": "2012-12-22",
   "tags": [

@@ -1,6 +1,6 @@
 <!--
 {
-  "layout": "default",
+  "layout": "article",
   "title": "How to Unit Test Private Functions in JavaScript",
   "date": "2013-07-08",
   "tags": [

@@ -1,10 +1,21 @@
 <!--
 {
   "layout": "default",
-  "foo": "bar"
+  "comments": true
 }
 -->
 
-<article>
-  {{{ content }}}
+<article role="article">
+
+  {{> page-header}}
+
+  {{{content}}}
+
+  <p class="callout callout--twitter">If you liked this article and think others should read it, please <a href="{{page.twitterShareLink}}">share it on Twitter</a>.
+  </p>
+
+  {{#if page.comments}}
+    {{> disqus}}
+  {{/if}}
+
 </article>

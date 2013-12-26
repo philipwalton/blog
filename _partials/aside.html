@@ -31,8 +31,8 @@
     <ul>
       {{#eachTag}}
         <li>
-          <a href="/tags/{{lowercase this}}/">{{this}}</a>
-          ({{countArticlesWithTag this}})
+          <a href="{{page.permalink}}">{{value}}</a>
+          ({{countArticlesWithTag value}})
         </li>
       {{/eachTag}}
     </ul>

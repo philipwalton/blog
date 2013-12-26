@@ -13,6 +13,7 @@
     "url": "https://github.com/philipwalton/blog/issues"
   },
   "devDependencies": {
-    "handlebars": ">=1.2.0"
+    "marked": "*",
+    "highlight.js": "*"
   }
 }

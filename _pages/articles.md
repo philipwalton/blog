@@ -2,14 +2,18 @@
 {
   "layout": "default",
   "title": "Articles",
-  "permalink": "/articles"
+  "header": "Article Archive",
+  "permalink": "/articles",
+  "query": {
+    "type": "article"
+  }
 }
 -->
 
 <h2>Archive</h2>
 
 <ul>
-  {{#each site.articles}}
-    <li><a href="{{ permalink }}">{{title}}</a></li>
-  {{/each}}
+  {{#query}}
+    <li><a href="{{ permalink }}">{{title}}</a> ({{moment date format="M/D/YYYY"}})</li>
+  {{/query}}
 </ul>

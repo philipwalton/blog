@@ -31,7 +31,7 @@ Luckily with the recent speed of browser development, my wish might actually be 
 
 Sass's `@extend` feature is often suggested as a solution to the OOCSS debate. With `@extend` you can define a simple selector and then within another selector declare that you're extending it. Here's an example:
 
-```
+```scss
 .button {
   background-color: gray;
   border: thin solid black;
@@ -70,7 +70,7 @@ While this is a very powerful tool and a great timesaver, it's not the answer. T
 
 The answer is pretty simple. It would be far too complicated to account for all possible situations. Consider the following example:
 
-```
+```scss
 @media (min-width: 10em) {
   .button {
     background-color: gray;
@@ -109,7 +109,7 @@ Sass does its best to make all occurrences of a base class include the extending
 
 Consider what happens when a selector tries to extend a selector with a higher specificity:
 
-```
+```scss
 /* The Sass */
 .button {
   border: thin solid black;
@@ -140,7 +140,7 @@ Any native inheritance in CSS must account for specificity.
 
 Similar to the example above, the following code is valid Sass, but it won't work as expected:
 
-```
+```scss
 /* The Sass */
 .button-extended {
   @extend .button;
@@ -171,7 +171,7 @@ Any native inheritance in CSS must account for source order.
 
 Consider again the `.button` class. This time we want to extend it so that when it's inside modal dialogs it's a nice glossy button. To do so we use [Modernizr](http://modernizr.com) to feature detect box shadow support. The selector looks like this:
 
-```
+```scss
 .button { }
 .boxshadow .modal .button-fancy {
   @extend .button;
@@ -199,7 +199,7 @@ The same is true when the class you extend can be nested inside itself. In OOCSS
 
 Nestable components aren't an uncommon requirement in CSS, but when you try to `@extend` components that you're also nesting in selectors, you get some pretty ugly generated CSS. Consider the following:
 
-```
+```scss
 /* The Sass */
 .media {
   /* media styles */
@@ -253,7 +253,7 @@ My proposal for native OOCSS introduces two new features: a new kind of simple s
 
 The new simple selector would be called the "abstract class selector". It would be a class name prepended with a percent sign (`%`) similar to Sass's placeholder syntax. The abstract class selector would match any element that inherits or extends from it. The new `@` rule would be used to declare the inheritance. Here is an example:
 
-```
+```text
 %button {
   background-color: gray;
   border: thin solid black;
@@ -274,7 +274,7 @@ Since an abstract class selector would be just another simple selector, it could
 
 All of the following would be valid uses of the abstract class selector:
 
-```
+```text
 %foo { }
 %foo %bar { }
 %baz:first-of-type { }
@@ -324,7 +324,7 @@ All other rules of specificity would apply normally, including the use of `!impo
 
 Abstract class selectors should be able to extend other abstract class selectors as well. This could allow for a very rich component hierarchy:
 
-```
+```text
 @extend %widget < %base-widget;
 @extend .my-widget < %widget;
 ```
@@ -337,7 +337,7 @@ To demonstrate how abstract class selectors could be used in a real project, let
 
 Here is the CSS for the skeleton grid system:
 
-```
+```text
 /* define a clearfix abstract class */
 %clearfix {
   /* clearfix implementation */
@@ -385,7 +385,7 @@ Now that we have our base grid system, we can extend from it to build a basic si
 
 We can easily use our base grid to style the above markup by simply extending a few of the abstract classes.
 
-```
+```text
 @extend .main < %grid-row;
 @extend .menu < %grid-col-1-4;
 @extend .content < %grid-col-1-2;
@@ -404,7 +404,7 @@ We can easily use our base grid to style the above markup by simply extending a 
 
 If we want our grid system to be responsive, we can use a media query to make each cell full width when the screen is smaller than `30em`. Notice that we're only modifying the abstract class selectors in this media query (which the `.menu`, `.content`, and `.promotional` class selectors will automatically inherit).
 
-```
+```text
 @media (max-width: 30em) {
   %grid-row {
     margin-left: 0;

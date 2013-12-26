@@ -26,4 +26,16 @@
     </ul>
   </div>
 
+  <div class="widget">
+    <h3 class="widget__title">Topics</h3>
+    <ul>
+      {{#eachTag}}
+        <li>
+          <a href="/tags/{{lowercase this}}/">{{this}}</a>
+          ({{countArticlesWithTag this}})
+        </li>
+      {{/eachTag}}
+    </ul>
+  </div>
+
 </aside>

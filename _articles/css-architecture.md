@@ -58,7 +58,7 @@ The following examples are all generalizations of code I’ve actually written, 
 
 In almost every site on the web there will be a particular visual element that looks exactly the same with each occurrence, except one. And when faced with this one-off situation almost every new CSS developer (and even experienced ones) handles it the same way. You figure out some unique parent for this one particular occurrence (or you create one), and you write a new rule to handle it.
 
-```
+```css
 .widget {
   background: yellow;
   border: 1px solid black;
@@ -95,7 +95,7 @@ Occasionally an article will make its way around the Internet showcasing the pow
 
 While technically true, the more I develop with CSS, the more I stay away from complex selectors. The more complicated a selector the more coupled it is to the HTML. Relying on HTML tags and combinators keeps your HTML squeaky clean, but it makes your CSS gross and dirty.
 
-```
+```css
 #main-nav ul li ul li div { }
 #content article h1:first-child { }
 #sidebar > div > h3 %2B p { }
@@ -118,7 +118,7 @@ In large applictaions you have to make trade-offs and compromises. The fragility
 When creating reusable design components, it’s very common to scope (as it were) the component’s sub-elements inside the component’s class name. For example:
 
 
-```
+```xml
 <div class="widget">
   <h3 class="title">...</h3>
   <div class="contents">
@@ -131,7 +131,7 @@ When creating reusable design components, it’s very common to scope (as it wer
 ```
 
 
-```
+```css
 .widget {}
 .widget .title {}
 .widget .contents {}
@@ -148,7 +148,7 @@ Overly generic class names lead to very unpredictable CSS.
 
 Sometimes you make a visual component that needs to be 20 pixels from the top left corner of a section in your site:
 
-```
+```css
 .widget {
   position: absolute;
   top: 20px;
@@ -201,7 +201,7 @@ After making the above mistakes over and over again, and paying the consequences
 
 The best way to make sure your selectors don’t style unwanted elements is to not give them the opportunity. A selector like `#main-nav ul li ul li div` could very easily end up applying to unwanted elements as your markup changes down the road. A style like `.subnav`, on the other hand, will have absolutely no chance of accidentally applying to an unwanted element. Applying classes directly to the elements you want to style is the best way to keep your CSS predictable.
 
-```
+```css
 /* Grenade */
 #main-nav ul li ul { }
 
@@ -223,7 +223,7 @@ Layout and position should be handled by either a separate layout class or a sep
 
 We already examined why parent selectors aren’t 100% effective at encapsulation and preventing style cross-contamination. A much better approach is applying namespaces to the classes themselves. If an element is a member of a visual component, every one of its sub-element classes should use the component’s base class name as a namespace.
 
-```
+```css
 /* High risk of style cross-contamination */
 .widget { }
 .widget .title { }
@@ -239,7 +239,7 @@ Namespacing your classes keeps your components self-contained and modular. It mi
 
 When an existing component needs to look slightly different in a certain context, create a modifier class to extend it.
 
-```
+```css
 /* Bad */
 .widget { }
 #sidebar .widget { }
@@ -283,7 +283,7 @@ These days most people write CSS with hyphens as word separators. But hyphens al
 
 [Nicolas Gallagher](http://nicolasgallagher.com) recently wrote about [his solution to this problem](http://nicolasgallagher.com/about-html-semantics-front-end-architecture/) which I have also adopted (with slight changes) with great success. To illustrate the need for a naming convention consider the following:
 
-```
+```css
 /* A component */
 .button-group { }
 
@@ -299,33 +299,33 @@ These days most people write CSS with hyphens as word separators. But hyphens al
 
 From looking at the above classes, it’s impossible to tell what type of rule they apply to. This not only increases confusion during development, but it also makes it harder to test your CSS and HTML in an automated way. A structured naming convention allows you to look at a class name and know exactly what its relationship is to other classes and where it should appear in the HTML — making naming easier and testing possible where it previously was not.
 
-```
-/* Templates Rules (using Sass placeholders) */
-%template-name
-%template-name--modifier-name
-%template-name__sub-object
-%template-name__sub-object--modifier-name
+```bash
+# Templates Rules (using Sass placeholders)
+%template-name { }
+%template-name--modifier-name { }
+%template-name__sub-object { }
+%template-name__sub-object--modifier-name { }
 
-/* Component Rules */
-.component-name
-.component-name--modifier-name
-.component-name__sub-object
-.component-name__sub-object--modifier-name
+# Component Rules
+.component-name { }
+.component-name--modifier-name { }
+.component-name__sub-object { }
+.component-name__sub-object--modifier-name { }
 
-/* Layout Rules */
-.l-layout-method
-.grid
+# Layout Rules
+.l-layout-method { }
+.grid { }
 
-/* State Rules */
-.is-state-type
+# State Rules
+.is-state-type { }
 
-/* Non-styled JavaScript Hooks */
-.js-action-name
+# Non-styled JavaScript Hooks
+.js-action-name { }
 ```
 
 The first example redone:
 
-```
+```css
 /* A component */
 .button-group { }
 
@@ -362,7 +362,7 @@ The best parts of preprocessors are functions like [`@extend`](http://sass-lang.
 
 `@extend` should be used with care though because sometime you want those classes in your HTML. For example, when you first learn about `@extend` it might be tempting to use it with all of your modifier classes like so:
 
-```
+```scss
 .button {
   /* button styles */
 }
@@ -380,7 +380,7 @@ As a general rule, I never extend UI components or anything that I might want to
 
 Here’s how it might look using the modal example referenced above:
 
-```
+```scss
 .modal {
   @extend %dialog;
   @extend %drop-shadow;

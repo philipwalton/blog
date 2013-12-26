@@ -19,7 +19,7 @@ In the following HTML you have three `<div>` elements, and each `<div>` contains
 
 Here's what the HTML and basic CSS look like. I've also included a visual demo (via [Codepen](http://codepen.io)) with the full CSS below:
 
-```
+```xml
 <div>
   <span class="red">Red</span>
 </div>
@@ -31,7 +31,7 @@ Here's what the HTML and basic CSS look like. I've also included a visual demo (
 </div>
 ```
 
-```
+```css
 .red, .green, .blue {
   position: absolute;
 }
@@ -69,7 +69,7 @@ To see if you can figure it out, click the *edit on Codepen* link above and play
 
 The solution is to add an opacity value less than `1` to the first `<div>` (the parent of the red `<span>`). Here is the CSS that was added to the Codepen above:
 
-```
+```css
 div:first-child {
   opacity: .99;
 }
@@ -139,7 +139,7 @@ The key to avoid getting tripped up is being able to spot when new stacking cont
 
 Getting back to the original problem, I've recreated the HTML structure adding comments within each tag indicating its place in the stacking order. This order is assuming the original CSS.
 
-```
+```xml
 <div><!-- 1 -->
   <span class="red"><!-- 6 --></span>
 </div>
@@ -153,7 +153,7 @@ Getting back to the original problem, I've recreated the HTML structure adding c
 
 When we add the opacity rule to the first `<div>`, the stacking order changes like so:
 
-```
+```xml
 <div><!-- 1 -->
   <span class="red"><!-- 1.1 --></span>
 </div>

@@ -15,6 +15,9 @@
 Thumbs.db
 .cache
 
+# Node
+node_modules
+
 # Static site output
 _site
 

@@ -1,0 +1,30 @@
+.l-background {
+  @include breakpoint(small) {
+    padding: 2em;
+    background-color: #e0e0e0;
+  }
+}
+
+.l-page {
+  @include transition(padding 0.2s);
+  margin: 2em;
+  @include breakpoint(small) {
+    @include box-shadow(0 0 1em rgba(0,0,0,.3));
+    background-color: white;
+    max-width: 70em;
+    margin: 0 auto;
+    padding: 3em 4em 1em;
+  }
+  @include breakpoint(medium) {
+    padding: 4em 5em 2em;
+  }
+  @include breakpoint(large) {
+    padding: 5em 6em 3em;
+  }
+}
+
+.l-header {
+  padding-bottom: 2em;
+  margin-bottom: 2em;
+  border-bottom: 1px solid $border-color;
+}

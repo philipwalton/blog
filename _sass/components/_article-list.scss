@@ -1,0 +1,11 @@
+.article-list {
+  article {
+    margin: 2em 0;
+    padding-top: 1.5em;
+    border-top: 1px solid $border-color;
+    &:first-child {
+      border-top: 0;
+      padding-top: 0;
+    }
+  }
+}

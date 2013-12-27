@@ -1,0 +1,45 @@
+.nav {
+  @extend %list-unstyled;
+  @extend %bebas-neue-subheading;
+  text-align: right;
+  text-shadow: 0 1px 0 rgba(255,255,255,.5);
+
+  li {
+    display: inline;
+  }
+  a {
+    @include transition(background-color .3s linear, color .1s ease);
+    background-color: $background-color;
+    color: inherit;
+    display: inline-block;
+    padding: 3.5em 1em 1em;
+    &:hover, &:active {
+      color: $accent-color;
+      background-color: blacken($background-color, 3%);
+      text-decoration: none;
+    }
+    &.is-selected {
+      background-color: blacken($background-color, 6%);
+    }
+  }
+
+  @include breakpoint(medium) {
+    text-align: left;
+    a {
+      @include transition(none);
+      margin-right: .5em;
+      padding: 0;
+      background-color: transparent;
+      line-height: 3em;
+      &:hover, &:active {
+        color: $accent-color;
+        background-color: transparent;
+        text-decoration: none;
+      }
+      &.is-selected {
+        @include box-shadow(0 -2px 0 #f04040 inset);
+        background-color: transparent;
+      }
+    }
+  }
+}

@@ -1,0 +1,76 @@
+*, *:before, *:after {
+  @include box-sizing(border-box);
+}
+
+html {
+  font-weight: 400;
+  font-size: .875em;
+  line-height: 1.5;
+  color: $text-color;
+  @media
+    only screen and (-webkit-min-device-pixel-ratio: 1.25),
+    only screen and (-o-min-device-pixel-ratio: 5/4),
+    only screen and (min-resolution: 120dpi) {
+      font-weight: 300;
+  }
+}
+
+a {
+  color: $accent-color;
+  text-decoration: none;
+  &:hover, &:active {
+    text-decoration: underline;
+  }
+}
+
+h1 {
+  font-size: 2.5em;
+  font-family: BebasNeueRegular;
+  font-weight: normal;
+  margin: 0 0 .5em;
+}
+
+h2 {
+  font-size: 1.5em;
+  font-family: Cambria, Palatino, serif;
+  margin: .6em 0;
+}
+
+h4 {
+  margin: 1em 0;
+  font-size: 1em;
+  color: #808080;
+}
+
+blockquote {
+  border-left: .5em solid $border-color;
+  margin: 1em 0;
+  padding-left: 1em;
+  font-style: italic;
+}
+
+pre {
+  background-color: $background-color;
+  padding: 1em 1.5em;
+
+  /*
+   * Improves readability of pre-formatted text in all browsers.
+   */
+  white-space: pre;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+ol, ul {
+  margin: 1em 0;
+  padding-left: 3em;
+}
+
+ul {
+  list-style-type: square;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}

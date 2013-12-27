@@ -1,0 +1,13 @@
+.separator {
+  @include breakpoint(small) {
+    display: inline-block;
+    &:after {
+      content: "\000a0";
+      display: inline-block;
+      width: 1px;
+      margin: 0 0.7em 0.5em 1em;
+      border-left: 1px solid $border-color;
+      line-height: 1;
+    }
+  }
+}

@@ -4,15 +4,6 @@
   "permalink": ":type/:title",
   "postTypes": ["article"],
   "taxonomyTypes": ["tag", "category"],
-  "excerptLength": 40,
-  "excludeFiles": [
-    "**/.DS_Store",
-    "package.json",
-    ".gitignore",
-    ".git/**/*",
-    ".sass-cache/**/*",
-    "node_modules/**/*"
-  ],
 
   "disqusShortname": "philipwalton"
 }

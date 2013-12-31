@@ -1,7 +1,7 @@
 var _ = require('lodash-node/modern')
 
-var site = require('../../ingen')
-var Query = require('../../ingen/lib/query')
+var site = require('ingen')
+var Query = site.Query
 
 site.Handlebars.registerHelper('articleArchive', function(options) {
   var query = new Query({type:'article'})

@@ -1,5 +1,5 @@
-var site = require('../../ingen')
+var Handlebars = require('ingen').Handlebars
 
-site.Handlebars.registerHelper('linkTo', function(url) {
+Handlebars.registerHelper('linkTo', function(url) {
   return url
 })

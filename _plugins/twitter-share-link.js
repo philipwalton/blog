@@ -1,4 +1,4 @@
-var events = require('../../ingen/lib/events')
+var events = require('ingen').events
 
 events.on('beforeRenderContent', function(post) {
   if (post.type == 'article') {

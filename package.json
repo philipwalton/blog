@@ -13,10 +13,13 @@
     "url": "https://github.com/philipwalton/blog/issues"
   },
   "devDependencies": {
+    "ingen": "*",
     "marked": "*",
     "highlight.js": "*",
     "moment": "*",
     "lodash-node": "*",
-    "shelljs": "*"
+    "shelljs": "*",
+    "html-minifier": "*",
+    "escape-html": "*"
   }
 }

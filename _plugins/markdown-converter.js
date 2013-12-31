@@ -1,19 +1,24 @@
 var marked = require('marked')
 var hljs = require("highlight.js")
-var events = require('../../ingen/lib/events')
+var escape = require('escape-html')
+var events = require('ingen').events
 
 var r = new marked.Renderer()
 
 r.code = function(code, lang) {
 
-  var cls = lang ? ' class="' + lang + '"' : ''
+  var cls = lang && lang != 'text' ? ' class="' + lang + '"' : ''
 
   if (lang == null) {
     code = hljs.highlightAuto(code).value
   }
   // if lang is "text" then don't highlight
-  else if (lang != "text") {
+  else if (lang != 'text') {
     code = hljs.highlight(lang, code).value
+  }
+  else {
+    // since we're not using highlight.js here, we need to espace the html
+    code = escape(code)
   }
 
   // Allow for highlighting portions of code blocks

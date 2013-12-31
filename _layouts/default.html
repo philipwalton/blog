@@ -17,8 +17,10 @@
       {{> aside}}
       {{> footer}}
     </div>
-    {{!> google-analytics}}
-    {{!> twitter-buttons}}
-    {{!> disqus-script}}
+    {{#is site.env 'production'}}
+      {{!> google-analytics}}
+      {{> twitter-buttons}}
+      {{> disqus-script}}
+    {{/is}}
   </body>
 </html>

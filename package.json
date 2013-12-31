@@ -16,6 +16,7 @@
     "marked": "*",
     "highlight.js": "*",
     "moment": "*",
-    "lodash-node": "*"
+    "lodash-node": "*",
+    "shelljs": "*"
   }
 }

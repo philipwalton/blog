@@ -1,7 +1,6 @@
 {
   "title": "Philip Walton",
   "baseURL": "http://philipwalton.com",
-  "permalink": ":type/:title",
   "postTypes": ["article"],
   "taxonomyTypes": ["tag", "category"],
 

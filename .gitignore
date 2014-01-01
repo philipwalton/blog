@@ -1,22 +1,14 @@
-# Numerous always-ignore extensions
-*.diff
-*.err
-*.orig
-*.log
-*.rej
-*.swo
-*.swp
-*.vi
-*~
-*.sass-cache
-
 # OS or Editor folders
 .DS_Store
 Thumbs.db
 .cache
 
-# Node
+# Temp files
+*.sass-cache
+
+# Dependencies
 node_modules
+bower_components
 
 # Static site output
 _site

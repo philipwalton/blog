@@ -1,0 +1,23 @@
+.l-header-main {
+  width: 50%;
+  margin: 3em 0;
+  float: left;
+}
+@media (max-width: 48em) {
+  .l-header-main {
+    width: auto;
+    float: none;
+    margin: 2em 0 1em;
+  }
+}
+
+.l-header-nav {
+  width: 50%;
+  float: right;
+}
+@media (max-width: 48em) {
+  .l-header-nav {
+    width: auto;
+    float: none;
+  }
+}

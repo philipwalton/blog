@@ -1,0 +1,49 @@
+.l-container {
+  max-width: 70em;
+  margin: 0 auto;
+  padding: 0 2em;
+}
+
+.l-content {
+  float: left;
+  width: 70%;
+  /* Hack: approx sidebar height */
+  min-height: 29em;
+  margin: 3em 0;
+  padding-right: 4%;
+  border-right: 1px solid var(border-color);
+}
+@media (max-width: 48em) {
+  .l-content {
+    float: none;
+    width: auto;
+    margin: 2em 0;
+    padding: 0;
+    border: 0;
+  }
+}
+
+.l-widgets {
+  float: left;
+  width: 30%;
+  margin: 3em 0;
+  padding-left: 4%;
+}
+@media (max-width: 48em) {
+  .l-widgets {
+    display: none;
+  }
+}
+
+.l-comments {
+  margin-top: 3em;
+  padding-top: 3em;
+  border-top: 1px solid var(border-color);
+}
+
+.l-footer {
+  margin: 2em 0;
+  border-top: 1px solid var(border-color);
+  clear: both;
+  font-size: .85em;
+}

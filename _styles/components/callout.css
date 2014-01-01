@@ -1,0 +1,22 @@
+.callout {
+  margin: 1.5em 0;
+  padding: 1em 1.5em;
+  background-color: var(background-color);
+}
+
+.callout--twitter {
+  margin: 2em 0;
+  padding-left: 52px;
+  background-repeat: no-repeat;
+  background-size: 16px;
+  background-image: inline("twitter-bird-blue-16.png");
+  background-position: 20px 18px;
+}
+@media
+  only screen and (-webkit-min-device-pixel-ratio: 1.25),
+  only screen and (-o-min-device-pixel-ratio: 5/4),
+  only screen and (min-resolution: 120dpi) {
+    .callout--twitter {
+      background-image: inline("twitter-bird-blue-32.png");
+    }
+}

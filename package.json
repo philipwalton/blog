@@ -14,12 +14,19 @@
   },
   "devDependencies": {
     "ingen": "*",
+    "fs-extra": "*",
     "marked": "*",
     "highlight.js": "*",
     "moment": "*",
     "lodash-node": "*",
     "shelljs": "*",
     "html-minifier": "*",
-    "escape-html": "*"
+    "escape-html": "*",
+    "rework": "0.18.3",
+    "rework-importer": "*",
+    "rework-shade": "*",
+    "autoprefixer": "*",
+    "clean-css": "*",
+
   }
 }

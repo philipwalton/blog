@@ -1,0 +1,5 @@
+.codepen-wrapper {
+  /* to contain the iframe from sneaking outside the border */
+  overflow: hidden;
+  border: 1px solid var(text-color);
+}

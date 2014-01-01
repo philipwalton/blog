@@ -26,6 +26,7 @@
     "rework-importer": ">=0.2.1",
     "rework-shade": "*",
     "autoprefixer": "*",
-    "clean-css": "*"
+    "clean-css": "*",
+    "uglify-js": "~2.4.8"
   }
 }

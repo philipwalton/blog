@@ -1,7 +1,10 @@
 {
   "title": "Philip Walton",
   "baseURL": "http://philipwalton.com",
-  "excludeFiles": ["bower_components/**/*"],
+  "excludeFiles": [
+    "bower_components/**/*",
+    "README.md"
+  ],
   "postTypes": ["article"],
   "taxonomyTypes": ["tag"],
 

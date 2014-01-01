@@ -1,24 +1,28 @@
 *, *:before, *:after {
-  @include box-sizing(border-box);
+  box-sizing: border-box;
 }
 
 html {
   color: #303030;
   font: 400 .9375em/1.4 "Open Sans", sans-serif;
-  @media
-    only screen and (-webkit-min-device-pixel-ratio: 1.25),
-    only screen and (-o-min-device-pixel-ratio: 5/4),
-    only screen and (min-resolution: 120dpi) {
+}
+
+@media
+  only screen and (-webkit-min-device-pixel-ratio: 1.25),
+  only screen and (-o-min-device-pixel-ratio: 5/4),
+  only screen and (min-resolution: 120dpi) {
+    html {
       font-weight: 300;
-  }
+    }
 }
 
 a {
-  color: $link-color;
+  color: var(link-color);
   text-decoration: none;
-  &:hover, &:active {
-    text-decoration: underline;
-  }
+}
+a:hover,
+a:active {
+  text-decoration: underline;
 }
 
 address {
@@ -26,16 +30,18 @@ address {
 }
 
 h1, h2 {
-  @include experimental(font-kerning, normal);
+  font-kerning: normal;
 }
 
 h1 {
-  @include transition(all 0.2s);
+  transition: all 0.2s;
   margin: 0 0 0.667em;
   font: 400 3em/1 serif;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  @include breakpoint(medium) {
+}
+@media (min-width: 54em) {
+  h1 {
     font-size: 4em;
     margin-bottom: .333em;
   }

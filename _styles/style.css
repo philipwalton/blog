@@ -1,9 +1,9 @@
 @import {
   file: ../bower_components/normalize-css/normalize.css;
 
-  file: variables.css;
-  file: fonts.css;
-  file: elements.css;
+  file: base/variables.css;
+  file: base/fonts.css;
+  file: base/elements.css;
 
   file: components/clearfix.css;
   file: components/lists.css;

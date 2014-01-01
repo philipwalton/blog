@@ -7,9 +7,8 @@ var autoprefixer = require('autoprefixer')
 var CleanCSS = require('clean-css')
 var events = require('ingen').events
 
-events.on('afterBuild', function() {
-
-  var stylesheet = fs.readFileSync('_styles/style.css', 'utf-8')
+function preprocess(source, dest) {
+  var stylesheet = fs.readFileSync(source, 'utf-8')
   var css = rework(stylesheet)
     .use(imprt({path:'_styles'}))
     .use(vars())
@@ -29,6 +28,10 @@ events.on('afterBuild', function() {
   // css = cleanCSS.minify(css)
 
   // save to the _site folder
-  fs.outputFileSync('_site/assets/css/style.css', css)
+  fs.outputFileSync(dest, css)
+}
 
+events.on('afterBuild', function() {
+  preprocess('_styles/style.css', '_site/assets/css/style.css')
+  preprocess('_styles/resume.css', '_site/assets/css/resume.css')
 })

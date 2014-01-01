@@ -1,5 +1,5 @@
-.column {
-  @include breakpoint(small) {
+@media (min-width: 35em) {
+  .column {
     display: inline-block;
     width: 48%;
     max-width: 18em;

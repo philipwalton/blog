@@ -22,11 +22,10 @@
     "shelljs": "*",
     "html-minifier": "*",
     "escape-html": "*",
-    "rework": "0.18.3",
-    "rework-importer": "*",
+    "rework": "*",
+    "rework-importer": ">=0.2.1",
     "rework-shade": "*",
     "autoprefixer": "*",
-    "clean-css": "*",
-
+    "clean-css": "*"
   }
 }

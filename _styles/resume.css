@@ -1,14 +1,11 @@
-@import {
+ @import url(../bower_components/normalize-css/normalize.css);
 
-  file: ../bower_components/normalize-css/normalize.css;
+ @import url(base/resume/variables.css);
+ @import url(base/resume/elements.css);
 
-  file: base/resume/variables.css;
-  file: base/resume/elements.css;
-
-  file: components/clearfix.css;
-  file: components/resume/separator.css;
-  file: components/resume/section.css;
-  file: components/resume/sub-section.css;
-  file: components/resume/column.css;
-  file: components/resume/site.css;
-}
+ @import url(components/clearfix.css);
+ @import url(components/resume/separator.css);
+ @import url(components/resume/section.css);
+ @import url(components/resume/sub-section.css);
+ @import url(components/resume/column.css);
+ @import url(components/resume/site.css);

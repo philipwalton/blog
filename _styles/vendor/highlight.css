@@ -1,0 +1,122 @@
+/* highlight.js github theme */
+
+.highlight em {
+  background-color: #fff080;
+  font-style: normal;
+}
+
+.highlight .comment,
+.highlight .template_comment,
+.highlight .diff .header,
+.highlight .javadoc {
+  color: #998;
+  font-style: italic
+}
+
+.highlight .keyword,
+.highlight .css .rule .keyword,
+.highlight .winutils,
+.highlight .javascript .title,
+.highlight .nginx .title,
+.highlight .subst,
+.highlight .request,
+.highlight .status {
+  color: #333;
+  font-weight: bold
+}
+
+.highlight .number,
+.highlight .hexcolor,
+.highlight .ruby .constant {
+  color: #099;
+}
+
+.highlight .string,
+.highlight .tag .value,
+.highlight .phpdoc,
+.highlight .tex .formula {
+  color: #d14
+}
+
+.highlight .title,
+.highlight .id {
+  color: #900;
+  font-weight: bold
+}
+
+.highlight .javascript .title,
+.highlight .lisp .title,
+.highlight .clojure .title,
+.highlight .subst {
+  font-weight: normal
+}
+
+.highlight .class .title,
+.highlight .haskell .type,
+.highlight .vhdl .literal,
+.highlight .tex .command {
+  color: #458;
+  font-weight: bold
+}
+
+.highlight .tag,
+.highlight .tag .title,
+.highlight .rules .property,
+.highlight .django .tag .keyword {
+  color: #000080;
+  font-weight: normal
+}
+
+.highlight .attribute,
+.highlight .variable,
+.highlight .lisp .body {
+  color: #008080
+}
+
+.highlight .regexp {
+  color: #009926
+}
+
+.highlight .class {
+  color: #458;
+  font-weight: bold
+}
+
+.highlight .symbol,
+.highlight .ruby .symbol .string,
+.highlight .lisp .keyword,
+.highlight .tex .special,
+.highlight .prompt {
+  color: #990073
+}
+
+.highlight .built_in,
+.highlight .lisp .title,
+.highlight .clojure .built_in {
+  color: #0086b3
+}
+
+.highlight .preprocessor,
+.highlight .pi,
+.highlight .doctype,
+.highlight .shebang,
+.highlight .cdata {
+  color: #999;
+  font-weight: bold
+}
+
+.highlight .deletion {
+  background: #fdd
+}
+
+.highlight .addition {
+  background: #dfd
+}
+
+.highlight .diff .change {
+  background: #0086b3
+}
+
+.highlight .chunk {
+  color: #aaa
+}

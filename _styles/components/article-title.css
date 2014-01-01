@@ -1,0 +1,9 @@
+.article-title {
+  margin: 0 0 .25em;
+}
+.article-title a {
+  color: inherit;
+}
+.article-title a:hover {
+  color: var(accent-color);
+}

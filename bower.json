@@ -1,0 +1,19 @@
+{
+  "name": "blog",
+  "homepage": "https://github.com/philipwalton/blog",
+  "authors": [
+    "Philip Walton <philip@philipwalton.com>"
+  ],
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "normalize-css": "*"
+  }
+}

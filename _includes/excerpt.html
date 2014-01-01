@@ -1,5 +1,0 @@
-<h2 class="article-title"><a href="{{ post.url | absolute }}">{{ post.title }}</a></h2>
-
-{% include article-meta.html %}
-
-<p>{{ post.excerpt | strip_html | truncatewords: 40 }}<a rel="full-article" href="{{ post.url | absolute }}">[more]</a></p>

@@ -1,0 +1,24 @@
+.sub-section {
+  margin-bottom: 1.5em;
+}
+
+@media (min-width: 54em) {
+  .sub-section__items {
+    width: 75%;
+    border-right: 1px solid var(border-color);
+    padding-right: 3em;
+  }
+}
+
+.sub-section__meta {
+  margin-bottom: 1em;
+}
+@media (min-width: 54em) {
+  .sub-section__meta {
+    float: right;
+    width: 25%;
+    padding-left: 2em;
+    text-align: right;
+    margin: 0;
+  }
+}

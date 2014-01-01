@@ -1,0 +1,9 @@
+{
+  "title": "Philip Walton",
+  "baseURL": "http://philipwalton.com",
+  "excludeFiles": ["bower_components/**/*"],
+  "postTypes": ["article"],
+  "taxonomyTypes": ["tag"],
+
+  "disqusShortname": "philipwalton"
+}

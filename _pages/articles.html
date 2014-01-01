@@ -1,0 +1,20 @@
+<!--
+{
+  "layout": "page",
+  "title": "Articles",
+  "header": "Article Archive",
+  "permalink": "/articles",
+  "query": {
+    "type": "article"
+  }
+}
+-->
+
+{{#articleArchive}}
+  <h3>{{year}}</h3>
+  <ul>
+    {{#each articles}}
+      <li><a href="{{ permalink }}">{{title}}</a> ({{moment date format="M/D/YYYY"}})</li>
+    {{/each}}
+  </ul>
+{{/articleArchive}}

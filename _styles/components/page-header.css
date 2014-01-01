@@ -1,0 +1,16 @@
+.page-header {
+  margin-bottom: 2em;
+  padding-bottom: 1.5em;
+  border-bottom: 1px solid var(border-color);
+}
+
+.page-header__title {
+  margin-bottom: .2em;
+  line-height: 1.1;
+}
+.page-header__title a {
+  color: inherit;
+}
+.page-header__title a:hover {
+  color: var(accent-color);
+}

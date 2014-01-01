@@ -5,5 +5,6 @@
   "postTypes": ["article"],
   "taxonomyTypes": ["tag"],
 
+  "googleAnalyticsTrackingID": "UA-21292978-1",
   "disqusShortname": "philipwalton"
 }

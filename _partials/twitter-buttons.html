@@ -1,8 +1,6 @@
-{% env prod %}
-  <script>
-    // Don't load the widgets when the sidebar isn't visible
-    if (window.matchMedia && window.matchMedia("(min-width: 48em)").matches) {
-      !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");
-    }
-  </script>
-{% endenv %}
+<script>
+  // Don't load the widgets when the sidebar isn't visible
+  if (window.matchMedia && window.matchMedia("(min-width: 48em)").matches) {
+    !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");
+  }
+</script>

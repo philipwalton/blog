@@ -25,7 +25,7 @@ function preprocess(source, dest) {
     keepSpecialComments: 0,
     processImport: false
   })
-  // css = cleanCSS.minify(css)
+  css = cleanCSS.minify(css)
 
   // save to the _site folder
   fs.outputFileSync(dest, css)

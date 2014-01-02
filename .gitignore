@@ -3,6 +3,9 @@
 Thumbs.db
 .cache
 
+# Temporary Files
+_tmp
+
 # Depedencies
 node_modules
 bower_components

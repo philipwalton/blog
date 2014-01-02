@@ -20,5 +20,7 @@ var options = {
 }
 
 events.on('beforeWrite', function(page) {
-  page.content = minify(page.content, options)
+  if (page.extension != '.xml') {
+    page.content = minify(page.content, options)
+  }
 })

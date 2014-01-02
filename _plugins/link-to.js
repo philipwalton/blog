@@ -1,5 +1,10 @@
+var path = require('path')
+var config = require('ingen').config
 var Handlebars = require('ingen').Handlebars
 
 Handlebars.registerHelper('linkTo', function(url) {
-  return url
+  var baseURL = config.env == "production"
+    ? config.baseURL
+    : 'http://localhost:' + config.port
+  return path.join(baseURL, url.toString())
 })

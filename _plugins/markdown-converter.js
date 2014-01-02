@@ -1,6 +1,6 @@
 var marked = require('marked')
 var hljs = require("highlight.js")
-var escape = require('escape-html')
+var he = require('he')
 var events = require('ingen').events
 
 var r = new marked.Renderer()
@@ -18,7 +18,8 @@ r.code = function(code, lang) {
   }
   else {
     // since we're not using highlight.js here, we need to espace the html
-    code = escape(code)
+    // unescape first in order to avoid double escaping
+    code = he.escape(he.unescape(code))
   }
 
   // Allow for highlighting portions of code blocks

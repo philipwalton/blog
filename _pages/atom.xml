@@ -1,0 +1,30 @@
+<!--
+{
+  "layout": "blank",
+  "permalink": "/atom.xml"
+}
+-->
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title>{{site.title}}</title>
+  <link href="http://philipwalton.com/atom.xml" rel="self"/>
+  <link href="http://philipwalton.com/"/>
+  <updated>{{moment format="YYYY-MM-DDTHH:mm:ssZ"}}</updated>
+  <id>http://philipwalton.com/</id>
+  <author>
+    <name>Philip Walton</name>
+    <email>philip@philipwalton.com</email>
+  </author>
+
+  {{#query}}
+    <entry>
+      <title>{{title}}</title>
+      <link href="{{linkTo permalink}}"/>
+      <updated>{{moment date format="YYYY-MM-DDTHH:mm:ssZ"}}</updated>
+      <id>{{linkTo permalink}}</id>
+      <content type="html">{{{excerpt}}}</content>
+    </entry>
+  {{/query}}
+
+</feed>

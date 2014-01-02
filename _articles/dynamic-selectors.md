@@ -2,7 +2,7 @@
 {
   "layout": "article",
   "title": "Dynamic Selectors",
-  "date": "2013-02-20",
+  "date": "2013-02-20T14:22:24-08:00",
   "tags": [
     "Architecture",
     "CSS",

@@ -2,7 +2,7 @@
 {
   "layout": "article",
   "title": "Interviewing as a Front-End Engineer in San Francisco",
-  "date": "2013-12-24"
+  "date": "2013-12-24T13:25:12-08:00"
 }
 -->
 

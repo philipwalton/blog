@@ -2,7 +2,7 @@
 {
   "layout": "article",
   "title": "What No One Told You About Z-Index",
-  "date": "2012-12-22",
+  "date": "2012-12-22T21:17:39-08:00",
   "tags": [
     "CSS"
   ]

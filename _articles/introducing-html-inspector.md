@@ -2,7 +2,7 @@
 {
   "layout": "article",
   "title": "Introducing HTML Inspector",
-  "date": "2013-06-11",
+  "date": "2013-06-11T08:22:52-07:00",
   "tags": [
     "HTML",
     "JavaScript"

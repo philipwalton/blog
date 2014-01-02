@@ -2,7 +2,7 @@
 {
   "layout": "article",
   "title": "How to Unit Test Private Functions in JavaScript",
-  "date": "2013-07-08",
+  "date": "2013-07-08T23:28:18-07:00",
   "tags": [
     "JavaScript"
   ],

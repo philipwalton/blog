@@ -2,7 +2,7 @@
 {
   "layout": "article",
   "title": "CSS Architecture",
-  "date": "2012-11-16",
+  "date": "2012-11-16T18:04:25-08:00",
   "canonical": "http://engineering.appfolio.com/2012/11/16/css-architecture",
   "tags": [
     "Architecture",

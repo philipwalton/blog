@@ -2,7 +2,7 @@
 {
   "layout": "article",
   "title": "Decoupling Your HTML, CSS, and JavaScript",
-  "date": "2013-08-17",
+  "date": "2013-08-17T12:39:09-07:00",
   "tags": [
     "HTML",
     "CSS",

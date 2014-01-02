@@ -2,7 +2,7 @@
 {
   "layout": "article",
   "title": "Why I Test Private Functions In JavaScript",
-  "date": "2013-07-17",
+  "date": "2013-07-17T08:47:00-07:00",
   "tags": [
     "JavaScript"
   ]

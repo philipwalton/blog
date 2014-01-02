@@ -2,7 +2,7 @@
 {
   "layout": "article",
   "title": "The Future of OOCSS: A Proposal",
-  "date": "2013-01-17",
+  "date": "2013-01-17T11:02:16-8:00",
   "tags": [
     "CSS",
     "OOCSS",

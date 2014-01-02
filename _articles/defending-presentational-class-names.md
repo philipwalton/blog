@@ -2,7 +2,7 @@
 {
   "layout": "article",
   "title": "Defending Presentational Class Names",
-  "date": "2013-01-24",
+  "date": "2013-01-24T08:57:01-08:00",
   "tags": [
     "CSS",
     "HTML",

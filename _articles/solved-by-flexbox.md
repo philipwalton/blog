@@ -2,7 +2,7 @@
 {
   "layout": "article",
   "title": "Solved by Flexbox",
-  "date": "2013-10-03",
+  "date": "2013-10-03T22:59:16-07:00",
   "tags": [
     "CSS"
   ]

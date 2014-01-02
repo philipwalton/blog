@@ -54,8 +54,9 @@ Here's a basic example of a messagebox component taken from an imaginary library
 
 A predictable convention like this allows you to easily replace the static names in the selector with a Sass variable like so:
 
-```css
+```scss
 $flux-messagebox-name: "messagebox" !default;
+
 .#{$flux-messagebox-name} { }
 .#{$flux-messagebox-name}-title { }
 .#{$flux-messagebox-name}-body { }
@@ -63,7 +64,7 @@ $flux-messagebox-name: "messagebox" !default;
 
 This technique has all the pros of a clean naming system like Bootstrap with almost none of the potential conflicts. If a project wants to include the messagebox styles above, but its CSS already has `.messagebox` defined, there's no problem. All they'd have to do is assign the `$flux-messagebox-name` variable to something else before including the messagebox's Sass file, and the conflict is solved.
 
-```css
+```scss
 /* first override the messagebox's class name */
 $flux-messagebox-name: "some-other-name";
 

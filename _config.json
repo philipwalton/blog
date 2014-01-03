@@ -1,7 +1,5 @@
 {
-  "title": "Philip Walton",
   "baseURL": "http://philipwalton.com",
-
   "timezone": "America/Los_Angeles",
 
   "excludeFiles": [

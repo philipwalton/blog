@@ -1,11 +1,13 @@
 <ul class="article-meta">
   <li>
-    <time datetime="{{moment date format='MMMM DD, YYYY'}}">{{moment date format="MMMM DD, YYYY"}}</time>
+    <time datetime="{{datetime date format="YYYY-MM-DDTHH:mm:ssZ"}}">
+      {{datetime date format="MMMM DD, YYYY"}}
+    </time>
   </li>
   {{#if tags.length}}
     <li>
       {{#each tags}}
-        <a href="{{page.permalink}}">{{value}}</a>{{#unless @last}}, {{/unless}}
+        <a href="{{linkTo page.permalink}}">{{value}}</a>{{#unless @last}}, {{/unless}}
       {{/each}}
     </li>
   {{/if}}

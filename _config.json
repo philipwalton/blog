@@ -1,9 +1,14 @@
 {
   "title": "Philip Walton",
   "baseURL": "http://philipwalton.com",
+
+  "timezone": "America/Los_Angeles",
+
   "excludeFiles": [
     "bower_components/**/*",
-    "README.md"
+    "bower.json",
+    "README.md",
+    "bin/**/*"
   ],
   "postTypes": ["article"],
   "taxonomyTypes": ["tag"],

@@ -21,12 +21,14 @@
     "lodash-node": "*",
     "shelljs": "*",
     "html-minifier": "*",
-    "escape-html": "*",
     "rework": "*",
     "rework-importer": ">=0.2.1",
+    "rework-vars": "~2.0.2",
     "rework-shade": "*",
     "autoprefixer": "*",
     "clean-css": "*",
-    "uglify-js": "~2.4.8"
+    "uglify-js": "~2.4.8",
+    "colors": "~0.6.2",
+    "he": "~0.3.6"
   }
 }

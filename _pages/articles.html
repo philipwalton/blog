@@ -14,7 +14,10 @@
   <h3>{{year}}</h3>
   <ul>
     {{#each articles}}
-      <li><a href="{{ permalink }}">{{title}}</a> ({{moment date format="M/D/YYYY"}})</li>
+      <li>
+        <a href="{{linkTo permalink}}">{{title}}</a>
+        (<time datetime="{{datetime date format='YYYY-MM-DDTHH:mm:ssZ'}}">{{datetime date format="M/D/YYYY"}}</time>)
+      </li>
     {{/each}}
   </ul>
 {{/articleArchive}}

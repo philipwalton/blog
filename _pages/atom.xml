@@ -10,7 +10,7 @@
   <title>{{site.title}}</title>
   <link href="http://philipwalton.com/atom.xml" rel="self"/>
   <link href="http://philipwalton.com/"/>
-  <updated>{{moment format="YYYY-MM-DDTHH:mm:ssZ"}}</updated>
+  <updated>{{datetime format="YYYY-MM-DDTHH:mm:ssZ"}}</updated>
   <id>http://philipwalton.com/</id>
   <author>
     <name>Philip Walton</name>
@@ -21,7 +21,7 @@
     <entry>
       <title>{{title}}</title>
       <link href="{{linkTo permalink}}"/>
-      <updated>{{moment date format="YYYY-MM-DDTHH:mm:ssZ"}}</updated>
+      <updated>{{datetime date format="YYYY-MM-DDTHH:mm:ssZ"}}</updated>
       <id>{{linkTo permalink}}</id>
       <content type="html">{{{excerpt}}}</content>
     </entry>

@@ -6,5 +6,5 @@ Handlebars.registerHelper('linkTo', function(url) {
   var baseURL = config.env == "production"
     ? config.baseURL
     : 'http://localhost:' + config.port
-  return path.join(baseURL, url.toString())
+  return baseURL + path.join('/', url.toString())
 })

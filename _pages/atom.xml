@@ -23,7 +23,6 @@
       <link href="{{linkTo permalink}}"/>
       <updated>{{datetime date format="YYYY-MM-DDTHH:mm:ssZ"}}</updated>
       <id>{{linkTo permalink}}</id>
-      <content type="html">{{{excerpt}}}</content>
     </entry>
   {{/query}}
 

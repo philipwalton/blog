@@ -17,9 +17,6 @@
   </head>
   <body>
     {{{content}}}
-    {{#is site.env 'production'}}
-      {{> google-analytics}}
-      <script src="{{linkTo '/assets/javascript/track-external-clicks.js'}}"></script>
-    {{/is}}
+    {{> resume-scripts}}
   </body>
 </html>

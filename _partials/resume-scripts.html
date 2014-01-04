@@ -1,22 +1,19 @@
 <script>
   {{#uglify}}
-    {{#is site.env 'production'}}
-      {{> google-analytics-setup}}
-      // ensure all non-essential stuff is loaded after window.load
-      // http://www.feedthebot.com/pagespeed/defer-loading-javascript.html
-      if (window.addEventListener) {
-        window.addEventListener("load", loadScripts, false);
-      }
-      else if (window.attachEvent) {
-        window.attachEvent("onload", loadScripts);
-      }
-      else {
-        window.onload = loadScripts;
-      }
-      function loadScripts() {
-        {{> google-analytics-loader}}
-        {{> track-external-clicks}}
-      }
-    {{/is}}
+    // ensure all non-essential stuff is loaded after window.load
+    // http://www.feedthebot.com/pagespeed/defer-loading-javascript.html
+    if (window.addEventListener)
+      window.addEventListener("load", loadScripts, false);
+    else if (window.attachEvent)
+      window.attachEvent("onload", loadScripts);
+    else
+      window.onload = loadScripts;
+
+    {{> google-analytics-setup}}
+
+    function loadScripts() {
+      {{> google-analytics-loader}}
+      {{> track-external-clicks}}
+    }
   {{/uglify}}
 </script>

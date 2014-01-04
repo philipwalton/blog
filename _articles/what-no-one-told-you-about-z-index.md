@@ -3,6 +3,7 @@
   "layout": "article",
   "title": "What No One Told You About Z-Index",
   "date": "2012-12-22T21:17:39-08:00",
+  "codepen": true,
   "tags": [
     "CSS"
   ]
@@ -48,7 +49,7 @@ Here's what the HTML and basic CSS look like. I've also included a visual demo (
 ```
 
 <div class="codepen-wrapper">
-  <pre class="codepen" data-height="240" data-type="result" data-href="ksBaI" data-user="philipwalton"><code></code></pre>
+  <pre class="codepen" data-height="250" data-type="result" data-href="ksBaI" data-user="philipwalton"><code></code></pre>
 </div>
 
 **Here's the challenge:** try to see if you can make the red `<span>` element stack behind the blue and green `<span>` elements without breaking any of the following rules:
@@ -62,7 +63,7 @@ To see if you can figure it out, click the *edit on Codepen* link above and play
 *Warning: Don't click on the CSS tab of the example below or it will give away the answer.*
 
 <div class="codepen-wrapper">
-  <pre class="codepen" data-height="240" data-type="result" data-href="dfCtb" data-user="philipwalton" data-safe="true"><code></code></pre>
+  <pre class="codepen" data-height="250" data-type="result" data-href="dfCtb" data-user="philipwalton" data-safe="true"><code></code></pre>
 </div>
 
 ## The Solution
@@ -174,5 +175,3 @@ Hopefully it's now a little more clear why the red box moved behind the other bo
 * [Elaborate description of Stacking Contexts](http://www.w3.org/TR/CSS2/zindex.html)
 * [The stacking context](https://developer.mozilla.org/en-US/docs/CSS/Understanding_z-index/The_stacking_context)
 * [The Z-Index CSS Property: A Comprehensive Look](http://coding.smashingmagazine.com/2009/09/15/the-z-index-css-property-a-comprehensive-look/)
-
-<script async src="http://codepen.io/assets/embed/ei.js"></script>

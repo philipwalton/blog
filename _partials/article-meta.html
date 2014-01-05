@@ -5,7 +5,7 @@
     </time>
   </li>
   {{#if tags.length}}
-    <li>
+    <li>Tagged as:
       {{#each tags}}
         <a href="{{linkTo page.permalink}}">{{value}}</a>{{#unless @last}}, {{/unless}}
       {{/each}}

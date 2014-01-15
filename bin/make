@@ -17,7 +17,7 @@ target.build = function() {
 
 target.preview = function() {
   echo('### previewing site on port 4000')
-  options.init({env: 'dev'})
+  options.init({env: 'development', includeDrafts:true})
   ingen.serve()
 }
 

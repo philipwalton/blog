@@ -11,7 +11,7 @@ Finding a good developer is hard.
 
 People constantly complain about how few qualified applicants they receive. They post their job openings to every known listing. They hire recruiters to scour Linkedin. They do all of this in the hopes that a bigger stack of resumes will yield at least one hire who is up to their standards.
 
-The obvious problem with this firehouse strategy is that it doesn't improve the quality of your applicants, it's simply playing the numbers. More resumes just ends up meaning more time spent considering people you'll never ultimately hire. And if you're like most companies, you don't have that kind of time.
+The obvious problem with this fire hose strategy is that it doesn't improve the quality of your applicants, it's simply playing the numbers. More resumes just ends up meaning more time spent considering people you'll never ultimately hire. And if you're like most companies, you don't have that kind of time.
 
 The best way to hire qualified developers isn't to hope they come to you, it's to go out and find them.
 
@@ -27,25 +27,23 @@ The technique I'm recommending aims to capture the best aspects of personal refe
 
 How? Simple. Look at Github.
 
-## Open Source
+### Open Source
 
 OK, obviously it's more complicated than just looking at Github. Ton's of companies look at a candidate's open source contributions as part of the hiring process and still have trouble finding good people.
 
-But merely looking at an someone's Github profile is not what I'm suggesting. Github shouldn't just be a tool for vetting, it should be a tool for recruiting.
+But merely looking at someone's Github profile is not what I'm suggesting. Github shouldn't just be a tool for vetting, it should be a tool for recruiting.
 
 If you're a web company, you probably use a lot of open source software in your stack. And given that this software is in your stack, you probably want to hire someone who knows how to use this software. Well, this is the great thing about open source: not only can you see the source, but you can also see the authors. And if you're using a piece of software in your stack, who better to hire than someone who helped write it?
 
 Now, I'm sure many of you have considered trying to hire the creators of popular open source libraries, but in truth, unless you're a big name company you probably won't be able to do that. Guys like John Resig, DHH, and Jeremy Ashkenas are basically off the market. And even if they were looking, they're probably not going to go work for some company they've never heard of.
 
-But the creators aren't the only people who make open source software. There's also the contributors. Millions of them!
+But the creators aren't the only people who make open source software. There's also the contributors &mdash; thousands of them!
 
-Think about it. Do you use Node, Rails, or Django on the back-end? Do you use Angular, Ember, or Backbone for the client? If so, why not reach out to one of the contributors? Do you need someone who knows the various browser quicks? Find a jQuery, Bootstrap or Foundation contributor.
+Think about it. Do you use Node, Rails, or Django on the back-end? Do you use Angular, Ember, or Backbone on the client? If so, why not recruit a contributor to one of those projects?  Do you need someone who knows how to handle browser inconsistencies? Find a jQuery, Bootstrap, or Foundation contributor.
 
-No matter what type of person you're trying to hire, there's an open source project with plenty of contributors who reflect those particular skills.
+No matter what type of person you're trying to hire, there's an open source project with plenty of contributors who have those particular skills.
 
-And with Github, finding those contributors and seeing exactly what and how much they've contributed is easy. Contributors are sorted by contribution amount by default.
-
-In case you're not sure how to do this, here are the contributor pages for a few of the more popular projects on Github:
+And with Github, finding contributors and seeing exactly what and how much they've contributed is easy. In case you're not sure how to do this, here are the contributor pages for a few of the more popular projects on Github:
 
 - [Bootstrap](https://github.com/twbs/bootstrap/graphs/contributors)
 - [d3](https://github.com/mbostock/d3/graphs/contributors)
@@ -57,15 +55,17 @@ In case you're not sure how to do this, here are the contributor pages for a few
 - [Meteor](https://github.com/meteor/meteor/graphs/contributors)
 - [Ember](https://github.com/emberjs/ember.js/graphs/contributors)
 
-## Why Contributors?
+### Why Contributors?
 
-At first it may seem like recruiting a library contributor is like buying an off brand version of the real thing. But if you ask me, a prolific, open source contributor is in many ways more valuable than the creator of the libraries they contribute to.
+At first it might seem like contributors aren't nearly as valuable as the original creators. After all, creators have to be innovative and know the project from end to end. A contributor might have just fixed a bug.
 
-After all, anyone who's made substantial contribution to an open source project has not only demonstrated their ability to write coherent code, but more importantly they've also demonstrated their ability to read, process, and improve upon the code someone else has written.
+While there's some truth to this, it's certainly not the case the contributors don't possess creator qualities. Furthermore, most companies spend the majority of their time building upon an existing project, not making something new.
 
-That second part is arguably much more valuable, especially to a bigger team with an existing codebase.
+In this sense, a prolific open source contributor can actually be more valuable than the creators of libraries they contribute to. After all, anyone who's made substantial contributions to an open source project has not only demonstrated their ability to write coherent code, but they've also demonstrated their ability to read, process, and improve upon the code someone else has written.
 
-Being a contributor is essentially what an employee is. It's what you're looking for. But ability to contribute is probably one of the hardest qualities to assess in an interview.
+That second part is extremely valuable, especially to a big team with an existing codebase.
+
+Being a contributor is essentially what an employee is. It's what you're looking for. Yet ability to contribute is probably one of the hardest qualities to assess in an interview.
 
 ## Considerations
 
@@ -79,7 +79,7 @@ I don't want to get into a debate about the merits of telecommuting, but I do wa
 
 ## Final Thoughts
 
-Nothing I've suggested in this article is particular novel. I'm sure people have been using open source to hire for years, probably decades.
+Nothing I've suggested in this article is particularly novel. I'm sure people have been using open source to hire for years, probably decades.
 
 My main goal was to emphasize two particular facets of leveraging open source when hiring. First, companies should use open source as a recruiting tool rather than simply a vetting tool, and second, while contributors to open source software often go unnoticed, the qualities that make someone a good contributor are essentially the exact qualities most companies are looking for.
 

@@ -29,7 +29,7 @@ How? Simple. Look at Github.
 
 ## Open Source
 
-OK, obviously it's more complicated that just looking at Github. Ton's of companies look at a candidate's open source contributions as part of the hiring process and still have trouble finding good people.
+OK, obviously it's more complicated than just looking at Github. Ton's of companies look at a candidate's open source contributions as part of the hiring process and still have trouble finding good people.
 
 But merely looking at an someone's Github profile is not what I'm suggesting. Github shouldn't just be a tool for vetting, it should be a tool for recruiting.
 

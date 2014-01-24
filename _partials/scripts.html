@@ -3,20 +3,23 @@
     // ensure all non-essential stuff is loaded after window.load
     // http://www.feedthebot.com/pagespeed/defer-loading-javascript.html
     if (window.addEventListener)
-      window.addEventListener("load", loadScripts, false);
+      window.addEventListener("load", afterWindowLoad, false);
     else if (window.attachEvent)
-      window.attachEvent("onload", loadScripts);
+      window.attachEvent("onload", afterWindowLoad);
     else
-      window.onload = loadScripts;
+      window.onload = afterWindowLoad;
 
     {{> google-analytics-setup}}
+    {{> async-script-loader}}
 
-    function loadScripts() {
+    function afterWindowLoad() {
       {{> google-analytics-loader}}
       {{> codepen-loader}}
       {{> twitter-button-loader}}
       {{> disqus-script-loader}}
-      {{> track-external-clicks}}
+
+      {{!TODO: convert this to the new analytics.js API before releasing}}
+      {{!> track-external-clicks}}
     }
   {{/uglify}}
 </script>

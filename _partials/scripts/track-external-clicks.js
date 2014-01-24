@@ -1,7 +1,7 @@
 {{#is site.env 'production'}}
 
   // track clicks on outbound hyperlinks
-  window._gaq && (function() {
+  (function() {
 
     var links = document.getElementsByTagName("a")
     var link

@@ -6,7 +6,6 @@
   win[fn] = function(url) {
 
     scriptEl = doc.createElement(tag);
-    scriptEl.id = id;
     scriptEl.async = 1;
     scriptEl.src = url;
 

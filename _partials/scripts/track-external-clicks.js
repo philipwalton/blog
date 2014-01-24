@@ -28,7 +28,7 @@
       var target = e.target || e.srcElement
       var link = getLinkAncestor(target)
       if (link && isExternalLink(link)) {
-        _gaq.push(['_trackEvent', 'Outbound Link', link.href]);
+        ga('send', 'event', 'Outbound Link', link.href);
       }
     }
 

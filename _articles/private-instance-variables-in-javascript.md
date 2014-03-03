@@ -197,7 +197,8 @@ var Car = (function() {
   function Car(mileage) {
     _(this).mileage = mileage
 
-    // mixin private methods
+    // Mixin private methods.
+    // I'm assuming such a function exists.
     mixin(_(this), privateMethods);
   }
 

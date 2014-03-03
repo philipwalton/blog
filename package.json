@@ -16,7 +16,7 @@
     "ingen": "*",
     "fs-extra": "*",
     "marked": "*",
-    "highlight.js": "*",
+    "highlight.js": "^7.5.0",
     "moment": "*",
     "lodash-node": "*",
     "shelljs": "*",

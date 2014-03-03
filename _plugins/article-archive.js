@@ -1,28 +1,33 @@
 var _ = require('lodash-node/modern')
 
-var site = require('ingen')
-var Query = site.Query
+module.exports = function() {
 
-site.Handlebars.registerHelper('articleArchive', function(options) {
-  var query = new Query({type:'article'})
-  var articles = query.run()
-  var archive = []
-  var curYear
+  var Handlebars = this.Handlebars
+  var Query = this.Query
 
-  _.each(articles, function(article, i) {
-    if (curYear && curYear.year == article.date.substr(0,4)) {
-      curYear.articles.push(article)
-    }
-    else {
-      curYear = {
-        year: article.date.substr(0,4),
-        articles: [article]
+  Handlebars.registerHelper('articleArchive', function(options) {
+
+    var query = new Query({type:'article'})
+    var articles = query.run()
+    var archive = []
+    var curYear
+
+    _.each(articles, function(article, i) {
+      if (curYear && curYear.year == article.date.substr(0,4)) {
+        curYear.articles.push(article)
       }
-      archive.push(curYear)
-    }
+      else {
+        curYear = {
+          year: article.date.substr(0,4),
+          articles: [article]
+        }
+        archive.push(curYear)
+      }
+    })
+
+    return _.map(archive, function(year) {
+      return options.fn(year)
+    }).join('')
   })
 
-  return _.map(archive, function(year) {
-    return options.fn(year)
-  }).join('')
-})
+}

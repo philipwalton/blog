@@ -1,7 +1,11 @@
 <!--
 {
   "layout": "blank",
-  "permalink": "/atom.xml"
+  "title": "philipwalton.com",
+  "permalink": "/atom.xml",
+  "query": {
+    "type": "article"
+  }
 }
 -->
 <?xml version="1.0" encoding="utf-8"?>

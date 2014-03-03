@@ -22,7 +22,7 @@
     "shelljs": "*",
     "html-minifier": "*",
     "rework": "*",
-    "rework-importer": ">=0.2.1",
+    "rework-importer": "~0.2.1",
     "rework-vars": "~2.0.2",
     "rework-shade": "*",
     "autoprefixer": "*",

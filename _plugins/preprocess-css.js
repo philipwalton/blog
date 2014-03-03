@@ -5,33 +5,38 @@ var imprt = require('rework-importer')
 var shade = require('rework-shade')
 var autoprefixer = require('autoprefixer')
 var CleanCSS = require('clean-css')
-var events = require('ingen').events
 
-function preprocess(source, dest) {
-  var stylesheet = fs.readFileSync(source, 'utf-8')
-  var css = rework(stylesheet)
-    .use(imprt({path:'_styles'}))
-    .use(vars())
-    .use(rework.extend())
-    .use(rework.inline('assets/images', 'assets/fonts'))
-    .use(shade())
-    .toString()
+module.exports = function() {
 
-  // add prefixes
-  css = autoprefixer('last 2 versions', '> 2%').process(css).css
+  var events = this.events
 
-  // minify
-  var cleanCSS = new CleanCSS({
-    keepSpecialComments: 0,
-    processImport: false
+  function preprocess(source, dest) {
+    var stylesheet = fs.readFileSync(source, 'utf-8')
+    var css = rework(stylesheet)
+      .use(imprt({path:'_styles'}))
+      .use(vars())
+      .use(rework.extend())
+      .use(rework.inline('assets/images', 'assets/fonts'))
+      .use(shade())
+      .toString()
+
+    // add prefixes
+    css = autoprefixer('last 2 versions', '> 2%').process(css).css
+
+    // minify
+    var cleanCSS = new CleanCSS({
+      keepSpecialComments: 0,
+      processImport: false
+    })
+    css = cleanCSS.minify(css)
+
+    // save to the _site folder
+    fs.outputFileSync(dest, css)
+  }
+
+  events.on('afterBuild', function() {
+    preprocess('_styles/style.css', '_site/assets/css/style.css')
+    preprocess('_styles/resume.css', '_site/assets/css/resume.css')
   })
-  css = cleanCSS.minify(css)
 
-  // save to the _site folder
-  fs.outputFileSync(dest, css)
 }
-
-events.on('afterBuild', function() {
-  preprocess('_styles/style.css', '_site/assets/css/style.css')
-  preprocess('_styles/resume.css', '_site/assets/css/resume.css')
-})

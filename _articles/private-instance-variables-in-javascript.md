@@ -23,11 +23,11 @@ var honda = new Car(5000);
 console.log(honda.mileage) // 5000
 ```
 
-In the above code, `mileage` is an instance variable of the Car object since each new Car object gets its own copy. This is distinct from regular variables (defined with the `var` keyword) since such variables are not associated with any particular object.
+In the above code, `mileage` is an instance variable of the Car object since each new Car object has its own `mileage` property. This is distinct from regular variables (defined with the `var` keyword) since such variables are not associated with any particular object.
 
-In most Object Oriented language, instance variables are private, which means they cannot be modified by any code outside of the class definition. This is normally a good thing because you usually want strict control over how the state of an object can change, and you establish those rules through methods.
+In most object oriented language, instance variables are private, which means they cannot be modified by any code outside of the class definition. This is normally a good thing because you usually want strict control over how the state of an object can change, and you establish that control through methods.
 
-Continuing with the Car example, let's add a `drive` method, since a car's mileage should only change by driving it.
+Continuing with the Car example, let's add a `drive` method, since a car's mileage should only change when you drive it.
 
 ```javascript
 Car.prototype.drive = function(miles) {
@@ -40,7 +40,7 @@ honda.drive(100);
 console.log(honda.mileage); // 100
 ```
 
-The problem with the above code (as most JavaScripter will easily spot) is that anyone who has access to the `honda` object can change the `mileage` directly. This is because in JavaScript, all properties are always public. There's no way to declare them private.
+The problem with the above code (as most JavaScripter will easily spot) is that anyone who has access to the `honda` object can change its `mileage` directly. This is because in JavaScript, all properties of an object are always public. There's no way (yet) to declare them otherwise.
 
 ```javascript
 var honda = new Car(0);
@@ -69,23 +69,22 @@ console.log(age) // undefined
 console.log(window.getAge()) // 42
 ```
 
-This pattern works well for keeping a regular variable hidden from external scope, but it doesn't work at all if what you want to keep hidden are the properties of an object. As mentioned before, if you have access to an object, you alway have access to all its properties.
+This pattern works well for keeping a regular variable hidden from the global scope, but it doesn't work at all if what you want to keep hidden is a property on an object. As mentioned before, if you have access to an object, you alway have access to all of its properties.
 
 So what can we do?
 
-Variable can be private, but as soon as you assign a variable to an instance you make it visible to an outer scope and therefore public.
-
 ### The Goal
 
-Before we attempt to solve this problem, I think it's helpful to clearly layout what we want to accomplish. What is the goal?
+Before we attempt to solve this problem, I think it's helpful to clearly establish what we want to accomplish.
 
-It's impossible (and often unwise) to try to make JavaScript be something its not. Instead of just trying to recreate some other language's version of private instance variables, let's see if we can meet the same ends by taking advantage of the flexibility and power of JavaScript.
+It's impossible (and often unwise) to try to make JavaScript be something its not. Instead of just trying to recreate some other language's version of private instance variables, let's see if we can achieve the same ends by leveraging JavaScript good features.
+
+Here are our goals:
 
 * Private properties should be accessible to all code within the class definition, but not accessible to any code outside of the class definition.
 * Dynamic changes to the public interface at runtime should never expose the private properties of an instance. Lexical scoping rules should still apply.
-
 * Private properties should have access to all public properties, but not necessarily the other way around (since public properties might be modified at runtime).
-* Making something private should be simple, intuitive, and apparent from just looking at the code.
+* The way to make a property private should be simple and intuitive, and the fact that it is private should be apparent to other developers.
 
 ### A Naive Solution
 

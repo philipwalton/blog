@@ -131,7 +131,7 @@ Also, by using `privStore[this.id]` you lose all of the advantages you get with 
 
 ## Introducing Private Parts
 
-The private parts module provides a simple and intuitive way to achieve property encapsulation in JavaScript. It builds on the common convention to use an underscore to represent something private, and it require only one line of setup.
+The private parts module provides a simple and intuitive way to achieve property encapsulation in JavaScript. It builds on the common convention to use an underscore to represent something private, and it requires only one line of setup code.
 
 Private parts has only a single method to learn called `scope()`. When you invoke it, it returns a function that acts like a key. It allows you to access the private properties of any object, so any code that has access to the key can access the private properties of an object, and any code that doesn't have access can do nothing.
 
@@ -171,21 +171,11 @@ console.log(honda.mileage); // undefined
 
 Private parts works almost exactly like I outlined in the naive solution, but it eliminates all of the boilerplate. It provides a straightforward way to access private properties, and it only adds a few extra characters of code.
 
-Any time you pass an object to the key function, it returns an object that is uniquely tied to the instance passed, and all properties of that object are safely stored behind a closure that prevents any code from touching it. It is only access with the key function, and the key function is only available to whatever scope you define it in.
+Any time you pass an object to the key function, it returns an object that is uniquely tied to the instance passed, and all properties of that object are safely stored inside a closure that prevents any code from touching it. It is only accessible with the key function, and the key function is only available to whatever scope you define it in.
 
 Furthermore, the object returned by the key function has the original instance as its prototype, so `_(this).somePublicMethod()` will work as well. This allows you to take full advantage of the dynamic `this` in JavaScript.
 
 ### What About Private Methods?
-
-
-
-The `scope` method can take an optional argument. If you pass an object to `scope` then instead of setting the prototype of the privacy object to the instance, it sets it to the passed object.
-
-This is very powerful. It allows you to define functions that are truly private yet still have full access to the `this` variable.
-
-In order to keep the prototype chain in tact, it's important that the private methods be defined on an object whose prototype is the constructors prototype.
-
-In case that was confusing, here's an full example that uses both private properties and private methods:
 
 ```javascript
 var Car = (function() {

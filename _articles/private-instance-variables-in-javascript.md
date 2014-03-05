@@ -10,9 +10,9 @@
 }
 -->
 
-Everyone once in a while I get a little annoyed that properties on `this` can't be private in JavaScript. I mean, you can't make properties on any object private in JavaScript, but I find it especially limiting that it can't be done on `this`.
+Everyone once in a while I get a little annoyed that properties on `this` can't be private in JavaScript. To be fair, you can't make *any* properties private in JavaScript, but I find it especially limiting that it can't be done on `this`.
 
-The equivalent to private properties on `this` would be private members or instance variables in many other object oriented language. In fact, in most other languages, instance variables are private by default, and can only be modified outside of the class definition with getters and setters.
+The equivalent to private properties on `this` would be private members or instance variables in many other object oriented language. In fact, in most other languages, instance variables are private by default, and can only be modified outside of the class definition by using getters and setters.
 
 Privacy and encapsulations are interesting concepts. They're kind of like laws in a society. It's possible to write a well-designed program without privacy and encapsulation just like it's possible to have a peaceful and orderly society without laws. But in reality, it turns out these constraints are actually very helpful because even the best of us end up tempted to do bad things every once in a while.
 
@@ -46,7 +46,9 @@ var honda = new Car(0);
 honda.mileage = 'pwned';
 ```
 
-This limitation might not seem so bad if you're just writing code for yourself. You know what should and shouldn't be done with your objects, and hopefully you'll respect those rules. But if you're on a bigger team, and you're dealing with objects whose business rules aren't obvious to everyone, the ability to change object properties directly can be disastrous.
+This limitation might not seem so bad if you're just writing code for yourself. You know what should and shouldn't be done with your objects, and hopefully you'll respect those rules. But if you're on a bigger team, and you're dealing with objects whose business rules aren't obvious to everyone, having direct access to properties that should be private can be disasterous.
+
+The problem gets even worse when you need to change the names or implementation details of these private properties. If anyone depending on your code is accessing the private members directly (even though they shouldn't be), your changes will break their code.
 
 ## Privacy In JavaScript
 
@@ -62,7 +64,7 @@ In JavaScript, the only way to make something private is to declare it in a scop
 }());
 
 // Since `age` is defined in the closure,
-// it can't be accessed form the outer scope
+// it can't be accessed from the outer scope
 console.log(age) // undefined
 
 // But it can be accessed through the getter.
@@ -77,42 +79,41 @@ So what can we do?
 
 Before we attempt to solve this problem, I think it's helpful to clearly establish what we want to accomplish.
 
-It's impossible (and often unwise) to try to make JavaScript be something its not. So, instead of just trying to recreate some other language's version of private instance variables, let's see if we can achieve the same ends by leveraging JavaScript's good features.
-
 Here are our goals:
 
 * Private properties should be accessible to all code within the class or module definition, but not accessible to any code outside of it.
 * Dynamic changes to the instance or the object's prototype at runtime should never expose any private properties. Lexical scoping rules should still apply.
 * Private properties should have access to all public properties, but not necessarily the other way around (since public properties might be modified at runtime).
 * The way to make a property private should be simple and intuitive, and the fact that it is private should be apparent to other developers.
+* It should be memory efficient.
 
-### Finding a Solution
+### Finding a Solution, a First Attempt
 
 True private properties are impossible in JavaScript (and least right now), so any solution to this problem will require faking it to a degree.
 
-When I was thinking about how to solve this issue, here was my initial (albeit crappy) solution:
+Here was my initial (albeit crappy) solution:
 
 ```javascript
 var Car = (function() {
 
-  var **privStore** = {};
+  var privStore = {};
 
   function Car(mileage) {
     // Create a place in `privStore` to save private properties
     // that is uniquely tied to this particular instance.
     this.id = uniqueId();
-    **privStore[this.id]** = {}
+    privStore[this.id] = {}
 
     // Store private stuff in `privStore` instead of on `this`.
-    **privStore[this.id].mileage** = mileage || 0;
+    privStore[this.id].mileage = mileage || 0;
   }
 
   Car.prototype.drive = function(miles) {
-    **privStore[this.id].mileage** += miles;
+    privStore[this.id].mileage += miles;
   };
 
   Car.prototype.getMileage = function() {
-    return **privStore[this.id].mileage**;
+    return privStore[this.id].mileage;
   };
 
   return Car;
@@ -125,13 +126,19 @@ This works, but like I said, it's really crappy. It meets some of our goals, but
 
 In addition, by using `privStore[this.id]` instead of `this` you won't be able to access public properties inside of private methods. You lose all the power of dynamic `this` in JavaScript.
 
+Lastly, it's not memory efficient. Because these private objects are stored on an object, they won't be garbage because the object retains a strong reference to them. Even if the public instance they're holding the private data for is garbage collected, they will remain until the entire object is destroyed.
+
 I wasn't satisfied, so I decided to keep exploring.
+
+### A Second Attempt
 
 After thinking about the problem a bit more, I realized you could eliminate most of this boilerplate by replacing `privStore[this.id]` with a function that does the same thing.
 
-Basically, you write function that accepts an object and returns another object that is just used to store private members. Since the only way to access this private object is to call this function, the scope of the private objects because the same as the scope of this particular function.
+Basically, you write function that accepts an object and returns another object that is just used to store private members. Since the only way to access this private object is to call this function, the scope of the private objects become the same as the scope of this particular function.
 
 I also realized that if the returned private object were created with the passed object as its prototype, then you'd be able to use `this` in private methods and access both private and public properties.
+
+Lastly, with ES6 [WeakMaps](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakMap) (or using a WeakMap [shim](https://github.com/Benvie/WeakMap)) we now have a data structure that can associate JavaScript objects with other objects rather than just objects with strings (like traditional JavaScript objects). This means we can avoid having to put an ID on each instance. It also means we can avoid the garbage collection issue since WeakMaps don't create strong references to the objecs they hold.
 
 I wanted to take this solution for a spin, so I wrote a small module to do it.
 
@@ -141,13 +148,13 @@ The private parts module provides a simple and intuitive way to achieve property
 
 ### Usage
 
-Using private parts is very easy. The gist is that whenever you have a property that you want to be private, instead of using `this.prop` you use `_(this).prop`.
+Using private parts is very easy, and honestly it's mostly just syntactic sugar. The gist is that whenever you have a property that you want to be private, instead of using `this.prop` you use `_(this).prop`.
 
-The `_()` function, which I refer to as the key accepts an object and returns a new object that's uniquely linked to the passed object so you can store private properties on it and those properties can't be access by anyone else. It acts like a key because without the key, you can't access the private properties.
+The `_()` function, which I refer to as the key function, accepts an object and returns a new object that's uniquely linked to the passed object so you can store private properties on it and those properties can't be access by anyone else. It call it a key function because it provides secure access to the private data. Without it, there's no way to access the private properties.
 
-I chosen the underscore as the name for the key function because underscores are commonly used when naming private variables. If you're using underscore for something else, you can easily change it.
+I chose the underscore as the name for the key function because underscores are commonly used when naming private variables. If you're using the underscore variable for something else, that's OK. You can easily name the key something else.
 
-The scope of the key function is determined by you. The private parts factory has a `scope()` method that returns a new key function, so wherever you assign it, that's the scope it gets.
+The scope of the key function is determined by you. The private parts factory has a `createKey()` method that returns a new key function, so whatever scope you call `createKey()` in, that's the scope it gets.
 
 Here's a more complete example:
 
@@ -185,65 +192,23 @@ console.log(honda.mileage); // undefined
 
 Since methods in JavaScript are just properties than happen to be functions, you can create private methods by assigning them to `_(this)`.
 
-I experimented with trying to inject a private prototype into the prototype chain so all instances could share a common object that contained the private methods, but I don't think this is possible for a number of reasons. `this` needed to be in the prototype chain, and it needed to be in the chain after the private methods (or they'd no longer be private). That means that there needs to an object containing the private methods for each instance.
+I experimented with trying to inject a private prototype into the prototype chain so all instances could share a common object that contained the private methods, but I don't think this is possible for a number of reasons. For one thing, `this` needed to be in the prototype chain, and it needed to be in the chain after the private methods (or they'd no longer be private). Unfortunately, that means that there needs to an object containing the private methods for each instance.
 
-Since JavaScript doesn't support multiple inheritance, sharing a private prototype won't work.
+Since JavaScript doesn't support multiple inheritance, sharing a private prototype won't work. If you're going to create a lot of instances and you have a lot of private methods, it's probably better to use another method. (If anyone can come up with a better solution than a mixin, I'd love to hear it!)
 
-(If anyone can come up with a better solution than a mixin, I'd love to hear it!)
+### The Prototype Chain
 
+For a clearer explanation about how the prototype chain is structured for the object, consider an instance of a `Foo` object created using the expression `new Foo()`
 
-```javascript
-var Car = (function() {
-
-  // Create the key function
-  var _ = PrivateParts.scope();
-
-  function Car(mileage) {
-    _(this).mileage = mileage
-
-    // Mixin private methods.
-    // I'm assuming such a function exists.
-    mixin(_(this), privateMethods);
-  }
-
-  Car.prototype.drive(miles) {
-    _(this).mileage += mileage;
-  }
-
-  Car.prototype.getMileage() {
-    return _(this).mileage;
-  }
-
-  Car.prototype.makeNew = function() {
-    // Private methods require wrapping `this`
-    // with the key function as well.
-    _(this).resetOdometer();
-  }
-
-  // Private methods
-  var privateMethods = {
-    resetOdometer = function() {
-      _(this).mileage = 0;
-    }
-  }
-
-  return Car;
-
-}());
-
-var honda = new Car(0);
-honda.drive(500);
-
-// You can't call private methods in an outer scope.
-honda.resetOdometer(); // Error!
-
-// But you can call public methods and internally
-// call private methods.
-honda.makeNew();
-
-console.log(honda.getMileage()); // 0
+```text
+_(this)  -->  this  -->  Foo.prototype
 ```
 
-## Caveats
+### Environment Support
 
+Private Parts works natively in any environment that supports the ES6 `WeakMap` data type and the ES5 method `Object.create()`.
 
+If you need to support an environment that doesn't natively support those things, you can easily include polyfills for them. Here are that two I've used.
+
+* [WeakMap](https://github.com/Benvie/WeakMap)
+* [Object.create](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/create)

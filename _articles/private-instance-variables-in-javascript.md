@@ -1,7 +1,7 @@
 <!--
 {
   "layout": "article",
-  "title": "Shimming Private Instance Variables in JavaScript",
+  "title": "Real Private Members in JavaScript",
   "date": "2014-03-01T21:59:57-08:00",
   "draft": true,
   "tags": [
@@ -9,6 +9,69 @@
   ]
 }
 -->
+
+Prefixing a method or variable name with an underscore is a pretty common convention used to signal to other developers that some thing is private.
+
+JavaScript is no different.
+
+Many of the more popular JavaScript style guides ([airbnb](https://github.com/airbnb/javascript#naming-conventions), [Dojo](http://dojotoolkit.org/community/styleGuide#Naming_Conventions), [aloha](http://aloha-editor.org/guides/style_guide.html#code-conventions)) recommend using this convention.
+
+But the funny thing is that most of them, immediately after recommending this convention, warn readers against accessing these private members outside of the class definition. Dojo says, "The [private] method or property is not intended for use by anything other than the class itself", and Alhoa offers this kind advice: "If you use methods that are not marked with @api@ you are on your own."
+
+If you're coming from another language, you might be scratching your head right now. *Wait, if it's private, how can someone access it outside of the class definition?*
+
+Well, that's the problem. In JavaScript all properties of all objects are always public. These conventions are used to signal intent but that's all they do. They don't enforce anything. At the end of the day, users of your library *will* touch your private parts in ways you didn't want (pun intended).
+
+I can't believe I'm about to say this, but I think I agree with [Douglas Crockford](http://javascript.crockford.com/code.html#names) on this:
+
+```
+Do not use _ (underbar) as the first character of a name. It is sometimes used to indicate privacy, but it does not actually provide privacy. If privacy is important, use the forms that provide private members. Avoid conventions that demonstrate a lack of competence.
+```
+
+## Privacy in JavaScript
+
+JavaScript has a very simple and easy to understand privacy model based on lexical, function scoping. In plain English that means variables can access any other variables declared within the same function or any of the outer (enclosing) functions. By contrast, variables cannot access other variables declared within inner functions.
+
+That's really all there is. There's no private; there's no protected. It's just good old function scoping.
+
+If you want to make a variable private but still be able to read or modify it in from an outside scope, you need to wrap the variable in a function and then create accessor methods:
+
+```javascript
+(function() {
+  var age = 42;
+  // Expose a function globally to access the age variable
+  window.getAge = function() {
+    return age;
+  }
+  window.setAge = function(newAge) {
+    if (typeof age == 'number' && age >= 0) {
+      age = newAge;
+    }
+  }
+}());
+```
+
+In the above example, `age` is private, but we can still get and set it from the global scope. The difference is we apply business rules so that `age` cannot be a string or a negative number. This is the whole point of privacy and when you simply say `_age` and hope the other users of your library abide by your rules, you're gonna have a bad time.
+
+Nothing I've said so far is particularly novel and if you're an experienced JavaScript developer you probably want me to get to the hard part.
+
+Variables are easy, the bigger questions is how can I make something private if it's a property of `this`?
+
+## Private Members
+
+The short answer is that you can't. If some part of the code has access to the `this` object, it has access to all of its properties.
+
+The long answer is that you can, but you have to fake it.
+
+Numerous attempts at faking it have been presented, but none of them are convenient enough to motivate developers to prefer them over just using an underscore in the name.
+
+Here's a
+
+
+
+
+
+
 
 Everyone once in a while I get a little annoyed that properties on `this` can't be private in JavaScript. To be fair, you can't make *any* properties private in JavaScript, but I find it especially limiting that it can't be done on `this`.
 

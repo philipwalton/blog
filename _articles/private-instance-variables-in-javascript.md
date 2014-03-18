@@ -12,7 +12,7 @@
 
 In many programming languages, it's common to prefix a variable or method name with an underscore to signal to other developers that it's private. JavaScript is no different. Many of the more popular JavaScript style guides ([airbnb](https://github.com/airbnb/javascript#naming-conventions), [Dojo](http://dojotoolkit.org/community/styleGuide#Naming_Conventions), [aloha](http://aloha-editor.org/guides/style_guide.html#code-conventions)) suggest doing this.
 
-Ironically, most of them, immediately after recommending this convention, warn readers against accessing these private members outside of the class definition. Dojo says, "The [private] method or property is not intended for use by anything other than the class itself", and Alhoa offers this kind advice: "If you use methods that are not marked with @api@ you are on your own."
+Ironically, most of them, immediately after making this recommendation, warn readers against accessing these private members outside of the class definition. Dojo says, "The [private] method or property is not intended for use by anything other than the class itself", and Alhoa offers this kind advice: "If you use methods that are not marked with @api@ you are on your own."
 
 If you're coming from another language, you might be scratching your head right now. *Wait, if it's private, how can someone access it outside of the class definition?*
 
@@ -30,7 +30,7 @@ There are [many compelling reasons](http://programmers.stackexchange.com/questio
 
 In JavaScript it's really easy to make variables and functions private. Unfortunately, as I've already explained, it's not possible to make properties of objects private.
 
-This is a real problem if you need to manage the state of an instances of a class (or in JavaScript terms, manage properties on `this`). No private properties means that any code that has access to the instance can alter the state in any way it wants.
+This is a real problem if you need to manage the state of an instances of a class (or in JavaScript terms, manage properties on `this`). No private properties means that any code that has access to the instance can alter its state in any way it wants.
 
 Here's an example of how I see most JavaScript code written today:
 
@@ -52,7 +52,7 @@ Car.prototype.readMileage() {
 }
 ```
 
-This is a pretty basic `Car` class with a single private member and two accessor methods. As you can see, the `drive` method take a number and increments the mileage property of the `Car` instance, and like any good method, it checks to make sure the input is valid before applying it, otherwise you could end up with bad data.
+This is a pretty basic `Car` class with a single private member and two accessor methods. As you can see, the `drive` method takes a number and increments the mileage property of the `Car` instance, and like any good method, it checks to make sure the input is valid before applying it, otherwise you could end up with bad data.
 
 The problem is that this check doesn't actually protect against bad data because at any point, anyone with access to the instance could manually change the `_mileage` property.
 
@@ -61,11 +61,11 @@ var honda = new Car();
 honda._mileage = 'pwned';
 ```
 
-So how can we protect against this? If properties cannot be made private, how can we protect the state of instances from outside tampering?
+So how can we protect against this? If properties cannot be made private, how can we ensure that the state of our instances are safe from outside tampering?
 
 ### A Step Closer
 
-It's true that properties cannot be made private, but properties of an instance aren't the only way to manage the state of an object. There could be a second object that is linked to the instance that stores the private state. And this second object *could* actually be private.
+It's true that properties cannot be made private, but properties of an instance aren't the only way to manage the state of an object. There could be a second object that is uniquely linked to the instance that stores its private state. And this second object *could* actually be private.
 
 Here's an example of how that might look:
 
@@ -122,8 +122,8 @@ This is my personal list of must-haves before I'd consider using a new privacy t
 * The way to declare and access a private property should be simple, convenient, and intuitive.
 * It should be clear from the code whether or not a property is private.
 * Private properties should only be accessible in the scope in which they're defined.
-* The prototype of `this` in the context of a private method should be the same as the prototype of `this` in a public method.
-* Dynamic changes to the instance or the constructor's prototype at runtime should never expose any private properties (lexical scoping rules should still apply).
+* The prototype of `this` in the context of a private method should include the instance's prototype, so private methods can call public methods if they wish.
+* Dynamic changes to the instance or the instance's prototype at runtime should never expose any private properties (lexical scoping rules should still apply).
 * The solution should be memory efficient.
 
 ### My Attempt
@@ -132,23 +132,23 @@ I wanted to solve this problem for myself and my own code, so I spent some time 
 
 An obvious optimization is that all setup code should be abstracted away into its own module. Creating the private store and mapping each new instance to an object that holds the private properties could all happen behind the scenes.
 
-A second optimization was that if the private object used to hold an instances private properties were created using `Object.create` then I could set its prototype to whatever I want. In this case, I want the prototype to be the instance. That way I can still call prototype methods by saying `this.someMethod()` as normal.
+A second optimization was that if the private object used to hold the instance members were created using `Object.create`, I could set its prototype to whatever I wanted. In this case, I want the prototype to be the instance (or some object that has the instance's prototype in its prototype chain). That way I can still call prototype methods by saying `this.someMethod()` as normal.
 
-Finally, with ES6 [WeakMaps](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakMap) (or using a WeakMap [shim](https://github.com/Benvie/WeakMap)) we now have a data structure that can associate JavaScript objects with other objects rather than just objects with strings (like traditional JavaScript objects). This means we can avoid having to put a unique ID on each instance. It also means we can avoid the garbage collection issue since WeakMaps don't create strong references to the objects they hold.
+Finally, with ES6 [WeakMaps](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakMap) (or using a WeakMap [shim](https://github.com/Benvie/WeakMap)) we now have a data structure that can associate JavaScript objects with other objects rather than just string with objects (like traditional JavaScript objects). This means we can avoid having to put a unique ID on each instance. It also means we can avoid the garbage collection issue since WeakMaps don't create strong references to the objects they hold.
 
 I wanted to take these optimizations for a test drive, so I wrote a small module to do it.
 
 ### Introducing "Private Parts"
 
-The private parts module provides a simple and intuitive way to achieve property encapsulation in JavaScript. It builds on the common convention to use an underscore to represent something private, while providing actual (rather than nominal) privacy. And as a plus, it only requires one line of setup code.
+The private parts module provides a simple and intuitive way to achieve true private members in JavaScript. It builds on the common convention to use an underscore to represent something private, while providing actual (rather than nominal) privacy. And as a plus, it only requires one line of setup code.
 
 Using private parts is very easy, and honestly it's mostly just syntactic sugar. The gist is that whenever you have a property that you want to be private, instead of using `this.prop` you use `_(this).prop`.
 
-The `_()` function, which I refer to as the key function, accepts an object and returns a new object that's uniquely linked to the passed object so you can store private properties on it, and those properties can't be access by anyone else. It's called it a key function because it provides secure access to the private object. Without it, the private object is completely inaccessible. I chose the underscore as the key function's name for convention reasons and also because it's short. But you can use anything you like.
+The `_()` function, which I refer to as the key function, accepts an object (the "public instance") and returns a new object (the "private instance") that is uniquely linked to the passed object so you can store private properties on it, and those properties can't be access by anyone else. It's called it a key function because it provides secure, one-way access to the private instance. Without it, the private instance is completely inaccessible. I chose the underscore as the variable name for the key function because it's short and is often used to connote privacy. But you can choose whatever you like.
 
-The magic behind the key function is it's scope &mdash; where it's defined. Since the key function is the only want to access the private data, where you define that key determines what other variables and functions have access to it. Usually you'll define it within your class module, making it impossible for external code to access your instance variables.
+The magic behind the key function is it's scope &mdash; where it's defined. Since the key function is the only want to access the private data, where you define that key determines which scope has access to the private instance. Usually you'll define it within your class or module, making it impossible for external code to access your instance variables.
 
-Here's a full example:
+Here's the previous example redone using Private Parts:
 
 ```javascript
 var Car = (function() {

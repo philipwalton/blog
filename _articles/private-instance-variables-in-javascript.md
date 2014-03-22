@@ -107,6 +107,7 @@ As I said before, this method works, but it has a number of downsides:
 * There's too much extra code to type. If you have tens or hundreds of modules, it will quickly become a burden.
 * You have to store an ID property on each instance, which is both annoying and potentially conflicting depending on the property name you choose.
 * By using the object `privateStore[this.id]` instead of `this` you lose access to the instance's prototype.
+* You also lose the ability to sub-class since `privateStore` is only available to a single scope.
 * It's not memory efficient. Since the `privateStore` object holds a reference to each of the private instance objects, none of those objects can be garbage collected. If the public instance goes away it will be impossible to access those private properties, but they'll still be taking up space in memory. In other words, it's a memory leak.
 
 Whether these downsides trump the downsides of not actually having privacy is hard to say and depends on the situation. Based on the amount of code I've seen using this strategy (approximately zero code), I'd say developers prefer leaking private variables to all this boilerplate.
@@ -123,6 +124,7 @@ This is my personal list of must-haves before I'd consider using a new privacy t
 * It should be clear from the code whether or not a property is private.
 * Private properties should only be accessible in the scope in which they're defined.
 * The prototype of `this` in the context of a private method should include the instance's prototype, so private methods can call public methods if they wish.
+* It should work with classical inheritance patterns (i.e. subclasses).
 * Dynamic changes to the instance or the instance's prototype at runtime should never expose any private properties (lexical scoping rules should still apply).
 * The solution should be memory efficient.
 

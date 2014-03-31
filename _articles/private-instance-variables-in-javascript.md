@@ -111,11 +111,11 @@ As I said before, this method works, but it has a number of downsides:
 
 Whether these downsides trump the downsides of not actually having privacy is hard to say and depends on the situation. Based on the amount of code I've seen using this strategy (approximately zero code), I'd say developers prefer leaking private variables to all this boilerplate.
 
-In any case, we can do better than this.
+In any case, we can do better.
 
 ## What Does a Good Solution Look Like?
 
-Before looking at other solutions to this issue, I think it would be helpful to define what a good solution is. What are the goals we're trying to achieve? If we can clearly define our goals then we can measure any solution against how close it gets to the ideal.
+Before looking at other solutions to this issue, I think it would be helpful to define what a good solution is. What are the goals we're trying to achieve? If we can clearly define some goals then we can measure any solution against how close it gets to the ideal.
 
 This is my personal list of must-haves before I'd consider using a new privacy technique in a real project:
 
@@ -246,6 +246,16 @@ _(this)  >>>  privateMethods  >>>  SomeClass.prototype
 ```
 
 Hopefully this isn't too confusing, but in case it is, the [GitHub README](https://github.com/philipwalton/private-parts#controlling-the-prototype-chain) goes into more detail about how the prototype chain and how you can control it.
+
+## What About Subclasses?
+
+Many languages have this notion of "protected" variables and methods. They're like private, but their reach extends to subclasses and (depending on the language) the namespace or package.
+
+Private Parts does not, out of the box, attempt to address this use case. Key function access is based on scope, and if your subclasses is defined in a different scope or module, invoking methods defined in the superclass from the scope of the subclass won't work. They keys will be different.
+
+I spent a good deal of time trying to make this work because I really wanted to have some holy-grail solution. But at the end of the day I decided it wasn't worth it. Ultimately, there are things that JavaScript is good at and things it's not, and the amount of ceremony required to make protected work just didn't seem worth it, and moreover seemed to be a misuse of the language.
+
+If you're curious as to what my attempt looked like, check out my [Mozart](https://github.com/philipwalton/mozart) module or [this demo](http://bbenvie.com/articles/2012-07-25/JavaScript-Classes-with-private-protected-and-super) by [Brandon Benvie](http://bbenvie.com/), which Mozart was based on.
 
 ## Conclusion
 

@@ -22,7 +22,7 @@ Well, therein lies the problem. In JavaScript all properties of all objects are 
 
 > Do not use _ (underbar) as the first character of a name. It is sometimes used to indicate privacy, but it does not actually provide privacy. If privacy is important, use the forms that provide private members. Avoid conventions that demonstrate a lack of competence.
 
-You won't hear me say this often, but I agree with Douglas Crockford here. It's time that we, the JavaScript community (myself included), take privacy seriously.
+You won't hear me say this often, but I agree with Douglas Crockford here. It's time that we, the JavaScript community (myself included), take privacy more seriously.
 
 There are [many compelling reasons](http://programmers.stackexchange.com/questions/143736/why-do-we-need-private-variables) to use private members, and not a single one of them is solved with a naming convention alone. It's short sighted to merely say, "If someone uses a private variable out of scope, that's their problem". Because chances are, it's going to be your problem too.
 
@@ -30,7 +30,7 @@ There are [many compelling reasons](http://programmers.stackexchange.com/questio
 
 In JavaScript it's really easy to make variables and functions private. Unfortunately, as I've already explained, it's not possible to make properties of objects private.
 
-This can be a real problem in situations where you need to manage instance state (or in JavaScript terms, manage properties on `this`). No private properties means that any code that has access to the instance can alter its state in any way it wants.
+This can be a real problem in situations where you need to manage the state of an instance (or in JavaScript terms, manage properties on `this`). No private properties means that any code that has access to the instance can alter its state in any way it wants.
 
 Here's an example of how I see most JavaScript code written today:
 
@@ -72,7 +72,7 @@ Here's an example of how that might look:
 ```javascript
 var Car = (function() {
 
-  // Create an store to hold the private objects.
+  // Create a store to hold the private objects.
   var privateStore = {};
   var uid = 0;
 
@@ -100,7 +100,7 @@ var Car = (function() {
 }());
 ```
 
-In the above code, you give each instance a unique ID, and then everywhere you would have previously written `this._mileage` you now write `privateStore[this.id].mileage` which points to an object that is only accessible inside the closure created by the [IIFE](http://en.wikipedia.org/wiki/Immediately-invoked_function_expression). This object holds all of the private data and it's truly private. You can pass `Car` instances around to external code and that code can't modify the instance state.
+In the above code, you give each instance a unique ID, and then everywhere you would have previously written `this._mileage` you now write `privateStore[this.id].mileage` which points to an object that is only accessible inside the closure created by the [IIFE](http://en.wikipedia.org/wiki/Immediately-invoked_function_expression). This object holds all of the private data and it's truly private. You can pass `Car` instances around to external code their internal state can't be modified.
 
 As I said before, this method works, but it has a number of downsides:
 
@@ -111,7 +111,7 @@ As I said before, this method works, but it has a number of downsides:
 
 Whether these downsides trump the downsides of not actually having privacy is hard to say and depends on the situation. Based on the amount of code I've seen using this strategy (approximately zero code), I'd say developers prefer leaking private variables to all this boilerplate.
 
-In any case, we can do better.
+Either way, I think we can do better.
 
 ## What Does a Good Solution Look Like?
 
@@ -132,7 +132,7 @@ I wanted to solve this problem for myself and my own code, so I spent some time 
 
 An obvious optimization is that all setup code should be abstracted away into its own module. Creating the private store and mapping each new instance to an object that holds the private properties could all happen behind the scenes.
 
-A second optimization is that if the private object used to hold the instance members were created using `Object.create`, I could set its prototype to whatever I wanted. In this case, I want the prototype of the private object to be same as the prototype of the public instance (or some object that has the instance's prototype in its prototype chain). That way prototype methods are shared rather than copied.
+A second optimization is that if the private object used to hold the instance members were created using `Object.create`, I could set its prototype to whatever I wanted. In this case, I want the prototype of the private object to be same as the prototype of the public instance (or some object that has the instance's prototype in its prototype chain). That way prototype methods can be shared rather than copied.
 
 Finally, with ES6 [WeakMaps](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakMap) (or using a WeakMap [shim](https://github.com/Benvie/WeakMap)) we now have a data structure that can associate objects with other objects (traditional objects in JavaScript can only have string keys). This means we can avoid having to put a unique ID on each instance. It also means we can avoid the garbage collection issue since WeakMaps don't create strong references to the objects they hold.
 
@@ -144,9 +144,9 @@ The Private Parts module provides a simple and intuitive way to achieve true pri
 
 Using Private Parts is very easy, and honestly it's mostly just syntactic sugar. The gist is that whenever you have a property that you want to be private, instead of writing `this.prop` you write `_(this).prop`.
 
-The `_()` function, which I refer to as the key function, accepts an object (the "public instance") and returns a new object (the "private instance") that is uniquely linked to the passed object so you can store private properties on it, and those properties can't be access by anyone else. It's called it a key function because it provides secure, one-way access to the private instance. Without it, the private instance is completely inaccessible. I chose the underscore as the variable name for the key function because it's short and is often used to connote privacy. But you can choose whatever you like.
+The `_()` function, which I refer to as the key function, accepts an object (the "public instance") and returns a new object (the "private instance") that is uniquely linked to the passed object so you can store private properties on it, and those properties can't be accessed by anyone else. It's called it a key function because it provides secure, one-way access to the private instance. Without it, the private instance is completely inaccessible. I chose the underscore as the variable name for the key function because it's short and is often used to denote privacy. But you can choose whatever you like.
 
-The magic behind the key function is it's scope &mdash; where it's defined. Since the key function is the only way to access the private instance data, where you define that key determines which scope has access to the private instance. Usually you'll define it within your class or module, making it impossible for external code to access your instance variables.
+The magic behind the key function is where it's defined &mdash; its scope. Since using the key function is the only way to access the private instance data, where you define that key determines which scope has access to the private instances. Usually you'll define it within your class or module, making it impossible for external code to access your instance variables.
 
 Here's the previous example redone using Private Parts:
 
@@ -208,7 +208,9 @@ But using `call` or `apply` isn't as convenient as invoking a private method dir
 
 Private Parts has a solution to this problem.
 
-The `createKey` function accepts an optional parameter that, when passed, is used as the prototype for any private instances created by that key. This passed object is essentially a "private prototype". It's in the prototype chain, but it's only accessible to the private instances (not the public ones).
+The `createKey` function accepts an optional parameter that, when passed, is used to control how private instances are created. If `createKey` is passed an object, that object is used as the prototype for all newly created private instances.
+
+In essence, this object becomes a sort of "private prototype" because it's in the prototype chain but only the private instances have access to it.
 
 ```javascript
 var privateMethods = {
@@ -226,9 +228,7 @@ SomeClass.prototype.publicMethod = function() {
 }
 ```
 
-Most strategies for making private methods in JavaScript involve each new instance getting a copy of each private method. That works, but it's unnecessarily wasteful. Using a prototype object is far more efficient because it allows all instances to share the same function objects.
-
-It's worth noting that in some cases, a private method might need to call a public method. In order for that to work, the private methods object needs to have the constructor's prototype in its prototype chain as well. That will enable the `this` context within private methods to have access to both private and public methods. Here's how you'd do that:
+In some cases, a private method might need to call a public method. In order for that to work, the private methods object will need to have the public prototype in its protype chain. This can be easily achieved using `Object.create` when creating the private methods object.
 
 ```javascript
 var privateMethods = Object.create(SomeClass.prototype);
@@ -238,14 +238,17 @@ privateMethods.privateMethodTwo = function() { /* ... */ };
 var _ = require('private-parts').createKey(privateMethods);
 ```
 
-Now the prototype chain for private instances includes the private methods object as well as the constructor prototype:
+This is how the prototype chain will now look for private instances. As you can see, both the private and public methods are accessible. For public instances, however, only the public methods are visible.
 
 ```javascript
-// The prototype chain for private instances
+// The private instance prototype chain.
 _(this)  >>>  privateMethods  >>>  SomeClass.prototype
+
+// The public instance prototype chain.
+this  >>>  SomeClass.prototype
 ```
 
-Hopefully this isn't too confusing, but in case it is, the [GitHub README](https://github.com/philipwalton/private-parts#controlling-the-prototype-chain) goes into more detail about how the prototype chain and how you can control it.
+Hopefully this isn't too confusing, but in case it is, the [GitHub README](https://github.com/philipwalton/private-parts#controlling-the-prototype-chain) goes into more detail about the prototype chain and how you can control it.
 
 ## What About Subclasses?
 
@@ -253,13 +256,28 @@ Many languages have this notion of "protected" variables and methods. They're li
 
 Private Parts does not, out of the box, attempt to address this use case. Key function access is based on scope, and if your subclasses is defined in a different scope or module, invoking methods defined in the superclass from the scope of the subclass won't work. They keys will be different.
 
-I spent a good deal of time trying to make this work because I really wanted to have some holy-grail solution. But at the end of the day I decided it wasn't worth it. Ultimately, there are things that JavaScript is good at and things it's not, and the amount of ceremony required to make protected work just didn't seem worth it, and moreover seemed to be a misuse of the language.
+If you really need to make this work for whatever reason, you can always create a wrapper scope to contain your class hierarchy and include the files lexically via some templating engine.
 
-If you're curious as to what my attempt looked like, check out my [Mozart](https://github.com/philipwalton/mozart) module or [this demo](http://bbenvie.com/articles/2012-07-25/JavaScript-Classes-with-private-protected-and-super) by [Brandon Benvie](http://bbenvie.com/), which Mozart was based on.
+```javascript
+(function() {
+  var _ = require('private-parts').createKey();
+
+  // If neither Class nor Subclass define their own key function,
+  // they can share the one created above.
+  {{> 'path/to/class' }}
+  {{> 'path/to/sub-class' }}
+});
+```
+
+Personally, I don't recommend the above approach. It relies on a very specific build system, and it won't work with most module systems popular today.
+
+Another way to solve this issue would be to implement your own inheritence system that is aware of the need to share the key function between subclasses. I made a demo of such a system called [Mozart](https://github.com/philipwalton/mozart). Mozart is built on an idea I originally took from [Brandon Benvie](http://bbenvie.com/articles/2012-07-25/JavaScript-Classes-with-private-protected-and-super) of Mozilla with a few added modifications and better browser support.
+
+I don't necessarily recomend using this approach either, as I feel on some level it's forcing JavaScript to be something it's not. I simply include it to show off the power and flexibiliy JavaScript provides; also I know how much some people love their class heirarchies!
 
 ## Conclusion
 
-I don't want to present this method as the one true way to do private properties in JavaScript, but I do think it's a lot cleaner than anything I've tried before. If others know of a better way, I'd love to hear it.
+I don't want to present Private Parts as the one true way to do private properties in JavaScript, but I do think it's a lot cleaner than anything I've tried before. If others know of a better way, I'd love to hear it.
 
 The point I do want to stress is that I think we need to do something.
 

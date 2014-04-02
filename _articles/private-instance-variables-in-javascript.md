@@ -252,28 +252,15 @@ Hopefully this isn't too confusing, but in case it is, the [GitHub README](https
 
 ## What About Subclasses?
 
-Many languages have this notion of "protected" variables and methods. They're like private, but their reach extends to subclasses and (depending on the language) the namespace or package.
+Many languages have what are known as "protected" members. Unlike private members (which are only accessible to the current class) protected members can be accessed by the current class and any of its subclasses.
 
-Private Parts does not, out of the box, attempt to address this use case. Key function access is based on scope, and if your subclasses is defined in a different scope or module, invoking methods defined in the superclass from the scope of the subclass won't work. They keys will be different.
+It is possible to implement something very similar to protected members using Pirvate Parts; however, there are several gotchas. It doesn't "just work" out of the box.
 
-If you really need to make this work for whatever reason, you can always create a wrapper scope to contain your class hierarchy and include the files lexically via some templating engine.
+In order for multiple classes to share access to their private instances, they must also share the same key function. This means they either have to be defined in the same scope (which isn't how classes are normally defined), or they have to pass a reference to the key function in a way that still keeps it hidden from outside code.
 
-```javascript
-(function() {
-  var _ = require('private-parts').createKey();
+Since I rarely find myself needing or wanting protected members in my programs, I didn't feel the need to prioritize support for them. Private Parts is intended to be a rather generic solution, and more specific concerns can be implemented separately.
 
-  // If neither Class nor Subclass define their own key function,
-  // they can share the one created above.
-  {{> 'path/to/class' }}
-  {{> 'path/to/sub-class' }}
-});
-```
-
-Personally, I don't recommend the above approach. It relies on a very specific build system, and it won't work with most module systems popular today.
-
-Another way to solve this issue would be to implement your own inheritence system that is aware of the need to share the key function between subclasses. I made a demo of such a system called [Mozart](https://github.com/philipwalton/mozart). Mozart is built on an idea I originally took from [Brandon Benvie](http://bbenvie.com/articles/2012-07-25/JavaScript-Classes-with-private-protected-and-super) of Mozilla with a few added modifications and better browser support.
-
-I don't necessarily recomend using this approach either, as I feel on some level it's forcing JavaScript to be something it's not. I simply include it to show off the power and flexibiliy JavaScript provides; also I know how much some people love their class heirarchies!
+However, to show that it *is* possible, I put together a module called [Mozart](https://github.com/philipwalton/mozart) that uses Private Parts under the hood to solve some of the more classical inheritance issues in JavaScript.
 
 ## Conclusion
 

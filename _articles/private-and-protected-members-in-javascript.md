@@ -10,21 +10,19 @@
 }
 -->
 
-In many programming languages, it's common to prefix a variable or method name with an underscore to signal to other developers that it's private. JavaScript is no different. Many of the more popular JavaScript style guides ([airbnb](https://github.com/airbnb/javascript#naming-conventions), [Dojo](http://dojotoolkit.org/community/styleGuide#Naming_Conventions), [aloha](http://aloha-editor.org/guides/style_guide.html#code-conventions)) suggest doing this.
+Privacy has been a complicated issue throughout JavaScript's history.
 
-Ironically, most of them, immediately after making this recommendation, warn readers against accessing these private members outside of the class definition. Dojo says, "The [private] method or property is not intended for use by anything other than the class itself", and Alhoa offers this kind advice: "If you use methods that are [marked private] you are on your own."
+While it's always been possible to meet even the most stringent privacy needs (the myriad of compile-to-js languages proves this), the extraneous ceremony required to really do it right is often too much of a turn-off &mdash; especially to those coming from other languages where privacy is built in.
 
-If you're coming from another language, you might be scratching your head right now. *Wait, if it's private, how can someone access it outside of the class definition?*
+In JavaScript we like to prefix our private members with an underscore to let other developers know not to touch them. Many of the more popular JavaScript style guides ([airbnb](https://github.com/airbnb/javascript#naming-conventions), [Dojo](http://dojotoolkit.org/community/styleGuide#Naming_Conventions), [aloha](http://aloha-editor.org/guides/style_guide.html#code-conventions)) recommend this. But unless you have a way to enforce such a convention, it can never really be trusted.
 
-Well, therein lies the problem. In JavaScript all properties of all objects are public &mdash; all the time. This naming convention is used to signal intent, but that's all it does. It doesn't enforce anything.
-
-[Douglas Crockford](http://javascript.crockford.com/code.html#names) has this to say on the subject:
+Thought leaders in the JavaScript community have long warned against fake privacy. [Douglas Crockford](http://javascript.crockford.com/code.html#names) has this to say on the subject:
 
 > Do not use _ (underbar) as the first character of a name. It is sometimes used to indicate privacy, but it does not actually provide privacy. If privacy is important, use the forms that provide private members. Avoid conventions that demonstrate a lack of competence.
 
-I don't always agree with Douglas Crockford, but this time I do. It's time that we, the JavaScript community (myself included), take privacy more seriously.
+But despite the warnings, a quick search on Github will show that they're not being taken seriously. Developers don't like to jump through hoops, even if it's for their own good.
 
-There are [many compelling reasons](http://programmers.stackexchange.com/questions/143736/why-do-we-need-private-variables) to use private members, and not a single one of them is solved with a naming convention alone. It's short sighted to merely say, "If someone uses a private variable out of scope, that's their problem". Because chances are, it's going to be your problem too.
+In my opinion, the only way we're really going to solve this problem is if we take the hoops away, or at least minimize them. In this article I present some ideas to do both.
 
 ## Privacy in JavaScript Today
 

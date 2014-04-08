@@ -1,7 +1,7 @@
 <!--
 {
   "layout": "article",
-  "title": "Real Private Members in JavaScript",
+  "title": "Private and Protected Members in JavaScript",
   "date": "2014-03-01T21:59:57-08:00",
   "draft": true,
   "tags": [
@@ -140,7 +140,7 @@ I wanted to take these optimizations for a test drive, so I wrote a small module
 
 ### Introducing "Private Parts"
 
-The private parts module provides a simple and intuitive way to achieve property encapsulation in JavaScript. It builds on the common convention to use an underscore to represent something private, while providing actual (rather than nominal) privacy. And as a plus, it only requires one line of setup code.
+The [Private Parts](https://github.com/philipwalton/private-parts) module provides a simple and intuitive way to achieve property encapsulation in JavaScript. It builds on the common convention to use an underscore to represent something private, while providing actual (rather than nominal) privacy. And as a plus, it only requires one line of setup code.
 
 Using private parts is very easy, and honestly it's mostly just syntactic sugar. The gist is that whenever you have a property that you want to be private, instead of using `this.prop` you use `_(this).prop`.
 
@@ -187,68 +187,82 @@ honda.drive(500);
 console.log(honda.mileage); // undefined
 ```
 
-### Preserving the Prototype Chain
+There's a lot more that private parts can do (like setting the prototype chain for private instances, or passing a factory function to define how private instaces are created), but I won't repeat here what is already stated in the [README](https://github.com/philipwalton/private-parts).
 
-When you use the key function to return a private instance, what happens if you try to access a public or prototype property from the private instance? Consider the following somewhat contrived example:
+## What About Protected Members and Subclasses?
 
-```javascript
-function driveOnlyIfYouCan(miles) {
-  if (this.mileage < 100000) {
-    this.drive(miles);
-  } else {
-    this.turnOnCheckEngineLight();
-  }
-}
+The key function in Private Parts limits the access of private members to just the scope its defined in. But what if your programs contain subclass that are defined in separate scopes or files?
 
-// Assume the above function is invoked with the
-// private instance as its `this` context.
-driveOnlyIfYouCan.call(_(this), miles);
-```
+Private Parts is a fairly low level privacy solution and doesn't attempt to solve all problems. It doesn't have an out-of-the-box solution for subclasses; however, it provides you with all the tools you'd need to build your own.
 
-In the above example `this` inside the `driveOnlyIfYouCan` function is not the public `Car` instance; rather, it's the private instance return by the key function. And it's used to reference both private members (like `mileage`) and prototype members (like `drive`). Will this work?
+JavaScript is an incredibly flexible language, and through the power of closures and first class functions, you can easily create a fully-functioning class inheritance system that gives you public, private, and protected members.
 
-The answer is yes, because the private instance return by the key function is created with the public instance as its prototype. To visualize how this works, here's the prototype chain for a private instance of the `Car` class:
+### Introducing "Mozart"
 
-```text
-_(this)  >>>  this  >>>  Car.prototype
-```
+[Mozart](https://github.com/philipwalton/mozart) is a classical inheritance implementation built to show off the power of Private Parts. Some of the features of Mozart include:
 
-The only gotcha to this approach is that the private instance can have [own](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/hasOwnProperty) properties with the same name as its public or prototype properties. It's possible that you might think you're setting a public property when in fact you're actually setting an own property by the same name on the private instance.
+- Simple subclassing.
+- Private and protected methods and properties.
+- Intuitive supermethod calling.
+- Dynamic getter and setter generation.
 
-### What About Private Methods?
+Mozart uses a function closures for its class definitions. These closures allow the key functions to be passed to the appropriate subclasses yet still remain inaccessible to the public.
 
-Since methods in JavaScript are just properties that happen to be functions, you can create private methods by assigning them to `_(this)`.
-
-I experimented with trying to inject a private prototype into the prototype chain so all instances could share a common object that contained the private methods, but I couldn't get it to work and I don't think it's possible for a number of reasons. For one thing, the public instance (`this`) needed to be in the prototype chain, and it needed to be in the chain after the private methods (or they'd no longer be private).
-
-Since there are multiple instances, and the private methods object would need to be in the prototype chain ahead of the public instance, there would also need to be multiple private methods objects. One for each instance. Since JavaScript doesn't support multiple inheritance, sharing a private prototype won't work.
-
-That being said, there are still good and bad ways to do this. Adding an object to the prototype chain that references the function in the private methods object (the mixin strategy) is much better than creating completely separate copies of all of those functions.
-
-Here's an example of creating private methods with a mixin:
+Here's an example class built with Mozart using Node.js:
 
 ```javascript
-var _ = PrivateParts.createKey();
+var ctor = require('mozart');
 
-function Klass() {
-  // Assuming a `mixin` function is defined.
-  **mixin(this, privateMethods)**;
-}
+var Citizen = ctor(function(proto, _, _protected) {
 
-Klass.prototype.publicMethod = function() {
-  // Call a private method via _(this).
-  _(this).privateMethod();
-}
+  // == PUBLIC ==
 
-// Private methods don't go on the prototype, instead
-// they get "mixed in" to each instance by the constructor.
-var privateMethods = {
-  privateMethod: function() { /* ... */ },
-  someOtherPrivateMethod: function() { /* ... */ }
-}
+  proto.init = function(name, age) {
+    _(this).name = name;
+    _(this).age = age;
+  };
+  proto.vote = function(politician) {
+    if (_(this).allowedToVote()) {
+      console.log(_(this).name + ' voted for ' + politician);
+    } else {
+      throw new Error(_(this).name + ' is not allowed to vote.');
+    }
+  };
+
+  // == PROTECTED ==
+
+  _protected.allowedToVote = function() {
+    return this.age > 18;
+  };
+});
 ```
 
-(If anyone can come up with a better solution, I'd love to hear it!)
+The above class defines both public and protected methods and uses the passed key function to store data on the instance.
+
+To subclass `Citizen`, simply call its `subclass` method:
+
+```javascript
+var Criminal = Citizen.subclass(function(proto, _, _protected) {
+
+  proto.init = function(name, age, crime) {
+    _(this).crime = crime;
+    proto.super.init.call(this, name, age);
+  };
+
+  _protected.allowedToVote = function() {
+    return _(this).crime != 'felony'
+      && _protected.super.allowedToVote.call(this);
+  };
+});
+```
+
+As you can see, two of the methods in this subclass (`init` and `allowedToVote`) are overriden, yet they're still able to invoke their supermethods. The `vote` method is simply inherited as you'd expect.
+
+The `_` key is shared between both classes, so it's able to access the private instance (really the protected instance) regardless of which class invokes it.
+
+The other two arguments passed to the class definition are the public and protected prototypes. `proto` is the constructor's prototype property (i.e. `Citizen.prototype`), and `_protected` is a secret prototype chain that is created for each class heirarchy. The prototype of `_protected` in the context of the Criminal class is actually the `_protected` argument from the Citizen class. That is what enables code like `_protected.super.allowedToVote.call` to work.
+
+This just skims the top of what you can do with Mozart. I didn't even get to private members or dynamic getters and setters, but if you want to learn more you can check out the [documentation on Github](https://github.com/philipwalton/mozart).
 
 ## Conclusion
 

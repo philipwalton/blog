@@ -22,7 +22,7 @@ Well, therein lies the problem. In JavaScript all properties of all objects are 
 
 > Do not use _ (underbar) as the first character of a name. It is sometimes used to indicate privacy, but it does not actually provide privacy. If privacy is important, use the forms that provide private members. Avoid conventions that demonstrate a lack of competence.
 
-You won't hear me say this often, but I agree with Douglas Crockford here. It's time that we, the JavaScript community (myself included), take privacy more seriously.
+I don't always agree with Douglas Crockford, but this time I do. It's time that we, the JavaScript community (myself included), take privacy more seriously.
 
 There are [many compelling reasons](http://programmers.stackexchange.com/questions/143736/why-do-we-need-private-variables) to use private members, and not a single one of them is solved with a naming convention alone. It's short sighted to merely say, "If someone uses a private variable out of scope, that's their problem". Because chances are, it's going to be your problem too.
 
@@ -52,7 +52,7 @@ Car.prototype.readMileage() {
 }
 ```
 
-This is a pretty basic `Car` class with a single private member and two accessor methods. As you can see, the `drive` method takes a number and increments the mileage property of the `Car` instance, and like any good method, it checks to make sure the input is valid before applying it, otherwise you could end up with bad data.
+This is a pretty basic car class with a single private member and two accessor methods. As you can see, the `drive` method takes a number and increments the mileage property of the car instance, and like any good method, it checks to make sure the input is valid before applying it, otherwise you could end up with bad data.
 
 The problem is that this check doesn't actually protect against bad data because at any point, anyone with access to the instance could manually change the `_mileage` property.
 
@@ -79,7 +79,7 @@ var Car = (function() {
   function Car(mileage) {
     // Use a unique ID to reference this instance
     // in the private store.
-    privateStore[this.id = uid++] = {}
+    privateStore[this.id = uid++] = {};
     // Store private stuff in the private store
     // instead of on `this`.
     privateStore[this.id].mileage = mileage || 0;
@@ -89,7 +89,7 @@ var Car = (function() {
     if (typeof miles == 'number' && miles > 0)
       privateStore[this.id].mileage += miles;
     else
-      throw new Error('drive can only accept positive numbers')
+      throw new Error('drive can only accept positive numbers');
   };
 
   Car.prototype.readMileage = function() {
@@ -100,13 +100,14 @@ var Car = (function() {
 }());
 ```
 
-In the above code, you give each instance a unique ID, and then everywhere you would have previously written `this._mileage` you now write `privateStore[this.id].mileage` which points to an object that is only accessible inside the closure created by the [IIFE](http://en.wikipedia.org/wiki/Immediately-invoked_function_expression). This object holds all of the private data and it's truly private. You can pass `Car` instances around to external code their internal state can't be modified.
+In the above code, you give each instance a unique ID, and then everywhere you would have previously written `this._mileage` you now write `privateStore[this.id].mileage` which points to an object that is only accessible inside the closure created by the [IIFE](http://en.wikipedia.org/wiki/Immediately-invoked_function_expression). This object holds all of the private data and it's truly private. You can pass car instances around to external code their internal state can't be modified.
 
 As I said before, this method works, but it has a number of downsides:
 
 * There's too much extra code to type. If you have tens or hundreds of modules, it will quickly become a burden.
 * You have to store an ID property on each instance, which is both annoying and potentially conflicting depending on the property name you choose.
 * By using the object `privateStore[this.id]` instead of `this` you lose access to the instance's prototype.
+* This won't work with subclasses that are defined in another scope.
 * It's not memory efficient. Since the `privateStore` object holds a reference to each of the private instance objects, none of those objects can be garbage collected. If the public instance goes away it will be impossible to access those private properties, but they'll still be taking up space in memory. In other words, it's a memory leak.
 
 Whether these downsides trump the downsides of not actually having privacy is hard to say and depends on the situation. Based on the amount of code I've seen using this strategy (approximately zero code), I'd say developers prefer leaking private variables to all this boilerplate.

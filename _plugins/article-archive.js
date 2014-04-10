@@ -4,13 +4,16 @@ module.exports = function() {
 
   var Handlebars = this.Handlebars
   var Query = this.Query
+  var posts = this.posts.all();
 
   Handlebars.registerHelper('articleArchive', function(options) {
 
-    var query = new Query({type:'article'})
+    var query = new Query({type:'article'}, posts);
     var articles = query.run()
     var archive = []
     var curYear
+
+    debugger
 
     _.each(articles, function(article, i) {
       if (curYear && curYear.year == article.date.substr(0,4)) {

@@ -221,7 +221,7 @@ SomeClass.prototype.publicMethod = function() {
 }
 ```
 
-In some cases, a private method might need to call a public method. In order for that to work, `privateMethods` will need to have the public prototype in its protoype chain. This can be easily achieved using `Object.create` to instantiate the `privateMethods` object.
+In some cases, a private method might need to call a public method. In order for that to work, `privateMethods` will need to have the public prototype in its prototype chain. This can be easily achieved using `Object.create` to instantiate the `privateMethods` object.
 
 ```javascript
 var privateMethods = Object.create(SomeClass.prototype);
@@ -287,9 +287,9 @@ var Citizen = ctor(function(prototype, _, _protected) {
 });
 ```
 
-The above class defines both public and protected methods and uses the passed key function to store data on the instance.
+The above citizen class defines both public and protected methods and uses the passed key function to store data on the instance.
 
-To subclass `Citizen`, simply call its `subclass` method. As you'll see, two of the methods in this subclass (`init` and `allowedToVote`) are overriden and call super, and the `vote` method is simply inherited as you'd expect from a subclass.
+To subclass citizen, simply call its `subclass` method. As you'll see, two of the methods in this subclass (`init` and `allowedToVote`) are overridden and call super, and the `vote` method is simply inherited as you'd expect from a subclass.
 
 ```javascript
 var Criminal = Citizen.subclass(function(prototype, _, _protected) {
@@ -309,9 +309,9 @@ var joe = new Criminal('Joe', 27, 'felony');
 joe.vote('Obama') // Throws: Joe is not allowed to vote.
 ```
 
-In case it's not clear what's going on here, the class definition is providing you with two prototypes to define methods on. The public (regular) prototype, and the protected prototype (passed as `_protected`). Protected methods and properties are accessed using the protected key (stored here on `_`), and regular methods are access using `this` as usual.
+In case it's not clear what's going on here, the class definition is providing you with two prototypes to define methods on. The public (regular) prototype, and the protected prototype (passed as `_protected`). Protected methods and properties are accessed using the protected key (stored here on `_`), and regular methods are accessed using `this` as usual.
 
-When calling `subclass` on a constructor, a new class is formed that extends both the public and protected prototypes and makes them available to the subclass definition. It also stores a property called `super` the points to the parent class' respective prototypes for easy super method invokation.
+When calling `subclass` on a constructor, a new class is formed that extends both the public and protected prototypes and makes them available to the subclass definition. It also stores a property called `super` that points to the parent class' respective prototypes for easy super method invocation. The protected key is also passed to the subclass allowing all instances of this class hierarchy to access it.
 
 This just skims the top of what you can do with Mozart. I didn't even mention private methods or dynamic getters and setters. If you'd like to dig deeper, check out the [documentation on Github](https://github.com/philipwalton/mozart) and play around with it. I'd love feedback or suggestions for how to make it simpler.
 

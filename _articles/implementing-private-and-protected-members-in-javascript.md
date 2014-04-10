@@ -52,7 +52,7 @@ Car.prototype.readMileage() {
 
 This is a pretty basic car class with a single private member and two accessor methods. As you can see, the `drive` method takes a number and increments the mileage property of the car instance. And like any good method, it checks to make sure the input is valid before applying it, otherwise you could end up with bad data.
 
-The problem is this check doesn't actually protect against bad data since anyone with access to the instance could manually change the `_mileage` property.
+The problem is this check doesn't actually protect against bad data since anyone with access to the instance could manually change the `_mileage` property later.
 
 ```javascript
 var honda = new Car();
@@ -63,7 +63,7 @@ So how can we protect against bad data if properties cannot be private? How can 
 
 ### A Step Closer
 
-It's true that properties cannot be made private, but setting properties on an instance isn't the only way to manage its state. There could be another object that is uniquely linked to the instance that is responsible for storing its state. And this second object *could* actually be private.
+It's true that properties cannot be made private, but setting properties on an instance isn't the only way to manage its state. There could be another object that is uniquely linked to the instance that is responsible for storing its state. And this second object actually *could* be private.
 
 Here's an example of how that might look:
 
@@ -98,14 +98,16 @@ var Car = (function() {
 }());
 ```
 
-In the above code, you give each instance a unique ID, and then everywhere you would have previously written `this._mileage` you now write `privateStore[this.id].mileage` which points to an object that is only accessible inside the closure created by the [IIFE](http://en.wikipedia.org/wiki/Immediately-invoked_function_expression). This object holds all of the private data and it's truly private. You can pass car instances around to external code, and their internal state can't be modified.
+In the above code, you give each instance a unique ID, and then everywhere you would have previously written `this._mileage` you now write `privateStore[this.id].mileage` which points to an object that is only accessible inside the module closure. This object holds all of the private data and it's truly private. You can pass car instances around to external code, and their internal state can't be modified.
+
+### The Problems
 
 As I said before, this method works, but it has a number of downsides:
 
 * There's too much extra code to type. If you have tens or hundreds of modules, it will quickly become a burden.
 * You have to store an ID property on each instance, which is both annoying and potentially conflicting depending on the property name you choose.
 * By using the object `privateStore[this.id]` instead of `this` you lose access to the instance's prototype.
-* Private members can't be referenced in subclasses defined in a different scope, i.e. they can't be protected members.
+* Private members can't be referenced in subclasses defined in different scopes, i.e. they can't be protected members.
 * It's not memory efficient. Since the `privateStore` object holds a reference to each of the private instance objects, none of those objects can be garbage collected. If the public instance goes away it will be impossible to access those private properties, but they'll still be taking up space in memory.
 
 Whether these downsides trump the downsides of not actually having privacy is debatable and depends on the situation. But based on the amount of code I've seen using this strategy (approximately zero code), I'd say developers prefer leaking private variables to all this boilerplate.
@@ -136,7 +138,7 @@ A second optimization is that if the private object were created using `Object.c
 
 Finally, with ES6 [WeakMaps](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakMap) (or using a WeakMap [shim](https://github.com/Benvie/WeakMap)) we now have a data structure that can associate objects with other objects (traditional JavaScript objects can only have string keys). This means we can avoid having to put a unique ID on each instance. It also means we avoid the garbage collection issue since WeakMaps don't create strong references to the objects they hold.
 
-I wanted to take these optimizations for a test drive, so I started writing some code. I ended up making two new modules. [Private Parts](https://github.com/philipwalton/private-parts), a low level public-private store, and [Mozart](https://github.com/philipwalton/mozart), a full-featured classical inheritance solution.
+I wanted to take these optimizations for a spin, so I started writing some code. I ended up making two new modules: [Private Parts](https://github.com/philipwalton/private-parts), a low level public-private store, and [Mozart](https://github.com/philipwalton/mozart), a full-featured classical inheritance solution.
 
 In the next few sections I'll talk about how these modules can help you define classes with both private and protected properties and methods.
 
@@ -172,20 +174,21 @@ var Car = (function() {
 }());
 ```
 
-The main difference (highlighted in the above example) is one line of code that invokes a method called `createKey` and stores it on the underscore variable. The other difference is everywhere I previously wrote `this._mileage` I now write `_(this).mileage)`.
+The main difference (highlighted in the above example) is one line of code that invokes a method called `createKey` and stores it on the underscore variable. The other difference is everywhere I previously wrote `this._mileage` I now write `_(this).mileage`.
 
-As you can probably guess, the underscore variable that stores the result of the `createKey` method is actually a function that takes the `this` object and returns its private instance. Just like in the second example I showed, but the boilerplate is mostly gone.
+As you can probably guess, the underscore variable that stores the result of the `createKey` method is actually a function that takes the `this` object and returns its private instance. It's the same idea as in the second example I showed, but without all the boilerplate.
 
-The underscore variable in the above example is what I call the "key function". You can create new key functions by invoking the `createKey` method as shown in the example. A key function accepts an object (which I call the "public instance") and returns a new object (the "private instance") that is uniquely linked to the passed object so you can store private properties on it. It's called a key function because it provides secure, one-way access to the private instance. Without it, the private instance is completely inaccessible. I typically assign the key function to the underscore variable because it's short and is often used to denote privacy. But you can choose whatever you like.
+The underscore variable in the above example is what I call the "key function". You can create new key functions by invoking the `createKey` method as shown in the example. A key function accepts an object (which I call the "public instance") and returns a new object (the "private instance"). It's uniquely linked to the public instance, so you can store private properties on it.
 
-The reason this works (and actually provides privacy) is because the only way to access the private instance is with the key function, and the only way to access the key function is to be in the scope where its declared. If you always define your classes/modules within a scope, and your key function is within that scope, you can have truly private members.
+I call it a key function because it provides secure, one-way access to the private instance. Without it, the private instance is completely inaccessible. I typically assign the key function to the underscore variable because it's short and is often used to denote privacy. But you can choose whatever you like.
+
+The reason this works (and actually provides privacy) is because the only way to access the private instance is with the key function, and the only way to access the key function is to be in the scope where its declared. If you always define your classes/modules within a closure, and your key function is within that closure, you can have truly private members.
 
 ## Private Methods
 
-Private methods have always been semi-possible in JavaScript thanks to dynamic `this` and the function methods `call` and `apply`.
+Private methods have always been semi-possible in JavaScript thanks to dynamic `this` and the Function prototype methods `call` and `apply`.
 
 ```javascript
-// Some function in a closure.
 function privateMethod() {
   this.doSomething();
 }
@@ -207,8 +210,8 @@ In essence, this object becomes a sort of "private prototype" because it's in th
 
 ```javascript
 var privateMethods = {
-  privateMethodOne: function() { /* ... */ },
-  privateMethodTwo: function() { /* ... */ }
+  privateMethodOne: function() { ... },
+  privateMethodTwo: function() { ... }
 }
 
 var _ = PrivateParts.createKey(privateMethods);
@@ -225,8 +228,8 @@ In some cases, a private method might need to call a public method. In order for
 
 ```javascript
 var privateMethods = Object.create(SomeClass.prototype);
-privateMethods.privateMethodOne = function() { /* ... */ };
-privateMethods.privateMethodTwo = function() { /* ... */ };
+privateMethods.privateMethodOne = function() { ... };
+privateMethods.privateMethodTwo = function() { ... };
 
 var _ = PrivateParts.createKey(privateMethods);
 ```
@@ -249,7 +252,7 @@ The Private Parts key function limits the access of private members to just the 
 
 Private Parts is a fairly low level privacy solution and doesn't attempt to solve all problems. It doesn't have an out-of-the-box solution for subclasses; however, it provides you with all the tools you'd need to build your own.
 
-The [Mozart](https://github.com/philipwalton/mozart) module I mentioned above is one such example. Mozart is a classical inheritance implementation based on [Brandon Benvie's example](http://bbenvie.com/articles/2012-07-25/JavaScript-Classes-with-private-protected-and-super) and built to show off the power of Private Parts. Some of the features of Mozart include:
+The [Mozart](https://github.com/philipwalton/mozart) module I mentioned above is one such example. Mozart is a classical inheritance implementation based on [Brandon Benvie's work](http://bbenvie.com/articles/2012-07-25/JavaScript-Classes-with-private-protected-and-super) and built to show off the power of Private Parts. Some of the features of Mozart include:
 
 - Simple subclassing.
 - Private and protected methods and properties.
@@ -309,7 +312,7 @@ var joe = new Criminal('Joe', 27, 'felony');
 joe.vote('Obama') // Throws: Joe is not allowed to vote.
 ```
 
-In case it's not clear what's going on here, the class definition is providing you with two prototypes to define methods on. The public (regular) prototype, and the protected prototype (passed as `_protected`). Protected methods and properties are accessed using the protected key (stored here on `_`), and regular methods are accessed using `this` as usual.
+In case it's not clear what's going on here, the class definition is providing you with two prototypes to define methods on. The public (regular) prototype, and the protected prototype (the `_protected` variable). Protected methods and properties are accessed using the protected key (the `_` variable), and regular methods are accessed using `this` as usual.
 
 When calling `subclass` on a constructor, a new class is formed that extends both the public and protected prototypes and makes them available to the subclass definition. It also stores a property called `super` that points to the parent class' respective prototypes for easy super method invocation. The protected key is also passed to the subclass allowing all instances of this class hierarchy to access it.
 

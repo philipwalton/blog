@@ -2,7 +2,7 @@
 {
   "layout": "article",
   "title": "Implementing Private and Protected Members in JavaScript",
-  "date": "2014-04-09T20:59:27-08:00",
+  "date": "2014-04-09T20:59:27-07:00",
   "tags": [
     "JavaScript"
   ]

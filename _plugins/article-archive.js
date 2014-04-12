@@ -13,8 +13,6 @@ module.exports = function() {
     var archive = []
     var curYear
 
-    debugger
-
     _.each(articles, function(article, i) {
       if (curYear && curYear.year == article.date.substr(0,4)) {
         curYear.articles.push(article)

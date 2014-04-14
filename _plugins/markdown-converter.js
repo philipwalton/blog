@@ -2,6 +2,8 @@ var marked = require('marked')
 var hljs = require("highlight.js")
 var he = require('he')
 
+var md = /\.md$/
+
 module.exports = function() {
 
   var events = this.events
@@ -31,12 +33,15 @@ module.exports = function() {
     return '<pre class="highlight"><code' + cls + '>' + code + '</code></pre>'
   }
 
-  events.on('afterRenderContent', function(page) {
-    if (page.extension == '.md') {
+  events.on('afterRenderContent', function(p) {
+
+    // TODO: getting the extension really should be something
+    // the permalink provides.
+    if (md.test(p.template.filename)) {
       // TODO: changing the extention should be automatically done
       // by the Permalink object.
-      page.permalink = page.permalink.replace(/\.md$/, '.html')
-      page.content = marked(page.content, {renderer: r})
+      p.permalink = p.permalink.replace(/\.md$/, '.html')
+      p.content = marked(p.content, {renderer: r})
     }
   })
 

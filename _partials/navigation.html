@@ -1,7 +1,7 @@
 <nav class="l-header-nav" role="navigation">
   <ul class="nav">
-    <li><a {{#is page.selectedTab 'Home'}}class="is-selected"{{/is}} href="{{linkTo '/'}}">Home</a></li>
-    <li><a {{#is page.selectedTab 'Articles'}}class="is-selected"{{/is}} href="{{linkTo '/articles/'}}">Articles</a></li>
-    <li><a {{#is page.selectedTab 'About'}}class="is-selected"{{/is}} href="{{linkTo '/about/'}}">About</a></li>
+    <li><a {{#is selectedTab 'Home'}}class="is-selected"{{/is}} href="{{linkTo '/'}}">Home</a></li>
+    <li><a {{#is selectedTab 'Articles'}}class="is-selected"{{/is}} href="{{linkTo '/articles/'}}">Articles</a></li>
+    <li><a {{#is selectedTab 'About'}}class="is-selected"{{/is}} href="{{linkTo '/about/'}}">About</a></li>
   </ul>
 </nav>

@@ -1,4 +1,5 @@
-var minify = require('html-minifier').minify
+var path = require('path');
+var minify = require('html-minifier').minify;
 
 module.exports = function() {
 
@@ -12,7 +13,7 @@ module.exports = function() {
     removeCDATASectionsFromCDATA: true,
     collapseWhitespace: true,
     collapseBooleanAttributes: true,
-    removeAttributeQuotes: true,
+    removeAttributeQuotes: false, // true,
     removeRedundantAttributes: true,
     useShortDoctype: true,
     removeEmptyAttributes: true,
@@ -23,7 +24,13 @@ module.exports = function() {
   }
 
   events.on('beforeWrite', function(page) {
-    if (page.extension != '.xml') {
+
+    // TODO: consider making `extension` a method on permalink
+    var extension = page.template.filename
+      ? path.extname(page.template.filename)
+      : '.html'
+
+    if (extension != '.xml') {
       page.content = minify(page.content, options)
     }
   })

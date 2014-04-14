@@ -1,6 +1,6 @@
 <meta charset="utf-8">
 
-<title>{{#if page.title }}{{ page.title }} &mdash; {{/if}}Philip Walton</title>
+<title>{{#if title }}{{ title }} &mdash; {{/if}}{{site.title}}</title>
 
 <!-- http://t.co/dKP3o1e -->
 <meta name="HandheldFriendly" content="True">
@@ -10,8 +10,8 @@
 <link href="{{linkTo '/assets/css/style.css'}}" rel="stylesheet" media="only all">
 <link href="http://feeds.feedburner.com/philipwalton" rel="alternate" title="{{ site.title }}" type="application/atom+xml">
 
-{{#if page.canonical}}
-  <link rel="canonical" href="{{ page.canonical }}">
+{{#if canonical}}
+  <link rel="canonical" href="{{ canonical }}">
 {{/if}}
 
 <meta name="description" content="Thoughts on web development, open source, software architecture, and the future.">

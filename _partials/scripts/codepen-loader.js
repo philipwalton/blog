@@ -1,3 +1,3 @@
-{{#if page.codepen}}
+{{#if codepen}}
   loadScriptAsync('//codepen.io/assets/embed/ei.js');
 {{/if}}

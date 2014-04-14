@@ -1,12 +1,12 @@
 <header class="page-header">
   <h1 class="page-header__title">
-    {{#if page.heading}}
-      {{page.heading}}
+    {{#if heading}}
+      {{heading}}
     {{else}}
-      {{page.title}}
+      {{title}}
     {{/if}}
   </h1>
-  {{#if page.type}}
+  {{#if type}}
     {{#with page}}
       {{> article-meta this}}
     {{/with}}

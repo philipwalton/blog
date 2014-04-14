@@ -8,23 +8,21 @@
   {{/ query }}
 </div>
 
-{{#with page}}
-  {{#if paginated}}
-    <div class="callout paginator">
-      <span class="paginator__prev">
-        {{#if prevPage}}
-          <a href="{{linkTo prevPage.permalink}}">&laquo; Previous</a>
-        {{else}}
-          &laquo; Previous
-        {{/if}}
-      </span>
-      <span class="paginator__next">
-        {{#if nextPage}}
-          <a href="{{linkTo nextPage.permalink}}">Next &raquo;</a>
-        {{else}}
-          Next &raquo;
-        {{/if}}
-      </span>
-    </div>
-  {{/if}}
-{{/with}}
+{{#if paginated}}
+  <div class="callout paginator">
+    <span class="paginator__prev">
+      {{#if prevPage}}
+        <a href="{{linkTo prevPage.permalink}}">&laquo; Previous</a>
+      {{else}}
+        &laquo; Previous
+      {{/if}}
+    </span>
+    <span class="paginator__next">
+      {{#if nextPage}}
+        <a href="{{linkTo nextPage.permalink}}">Next &raquo;</a>
+      {{else}}
+        Next &raquo;
+      {{/if}}
+    </span>
+  </div>
+{{/if}}

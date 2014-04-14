@@ -3,10 +3,9 @@
   "timezone": "America/Los_Angeles",
 
   "excludeFiles": [
-    "bower_components/**/*",
     "bower.json",
     "README.md",
-    "bin/**/*"
+    "bin"
   ],
   "postTypes": ["article"],
   "taxonomyTypes": ["tag"],

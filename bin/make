@@ -11,7 +11,7 @@ var Site = require('ingen')
 target.build = function() {
   echo('### building site...'.grey)
   var site = new Site()
-  site.serve()
+  site.build()
 }
 
 target.preview = function() {

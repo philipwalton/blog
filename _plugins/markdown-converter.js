@@ -2,8 +2,6 @@ var marked = require('marked')
 var hljs = require("highlight.js")
 var he = require('he')
 
-var md = /\.md$/
-
 module.exports = function() {
 
   var events = this.events
@@ -34,10 +32,7 @@ module.exports = function() {
   }
 
   events.on('afterRenderContent', function(p) {
-
-    // TODO: getting the extension really should be something
-    // the permalink provides.
-    if (md.test(p.template.filename)) {
+    if (p.format == 'markdown') {
       // TODO: changing the extention should be automatically done
       // by the Permalink object.
       p.permalink = p.permalink.replace(/\.md$/, '.html')

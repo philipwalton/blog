@@ -1,3 +1,3 @@
 {{#if codepen}}
-  loadScriptAsync('//codepen.io/assets/embed/ei.js');
+  getScript('//codepen.io/assets/embed/ei.js');
 {{/if}}

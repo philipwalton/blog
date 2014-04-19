@@ -2,23 +2,17 @@
   {{#uglify}}
     (function(window, document) {
 
-      if (window.addEventListener)
-        window.addEventListener("load", loadScripts, false);
-      else if (window.attachEvent)
-        window.attachEvent("onload", loadScripts);
-      else
-        window.onload = loadScripts;
-
-      {{> google-analytics-setup}}
+      {{> add-listener}}
       {{> get-script}}
+      {{> google-analytics-setup}}
 
-      function loadScripts() {
+      addListener('load', function() {
         {{> google-analytics-loader}}
         {{> codepen-loader}}
         {{> twitter-button-loader}}
         {{> disqus-script-loader}}
         {{> track-external-clicks}}
-      }
+      });
 
     }(window, document));
 

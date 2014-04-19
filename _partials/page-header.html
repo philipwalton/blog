@@ -6,9 +6,7 @@
       {{title}}
     {{/if}}
   </h1>
-  {{#if type}}
-    {{#with page}}
-      {{> article-meta this}}
-    {{/with}}
-  {{/if}}
+  {{#is layout 'article'}}
+    {{> article-meta post}}
+  {{/is}}
 </header>

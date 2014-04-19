@@ -55,6 +55,7 @@ blockquote {
 pre {
   background-color: var(background-color);
   padding: 1em 1.5em;
+  word-break: break-word;
 }
 
 ol, ul {

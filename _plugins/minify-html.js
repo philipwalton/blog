@@ -13,7 +13,7 @@ module.exports = function() {
     removeCDATASectionsFromCDATA: true,
     collapseWhitespace: true,
     collapseBooleanAttributes: true,
-    removeAttributeQuotes: false, // true,
+    removeAttributeQuotes: true,
     removeRedundantAttributes: true,
     useShortDoctype: true,
     removeEmptyAttributes: true,
@@ -28,11 +28,11 @@ module.exports = function() {
     // TODO: consider making `extension` a method on permalink
     var extension = page.template.filename
       ? path.extname(page.template.filename)
-      : '.html'
+      : '.html';
 
     if (extension != '.xml') {
-      page.content = minify(page.content, options)
+      page.content = minify(page.content, options);
     }
-  })
+  });
 
-}
+};

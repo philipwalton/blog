@@ -2,8 +2,7 @@
 {
   "layout": "article",
   "title": "Stop Copying Social Code Snippets",
-  "date": "2014-04-17T20:07:32-07:00",
-  "draft": true,
+  "date": "2014-04-20T16:17:32-07:00",
   "tags": [
     "JavaScript",
     "HTML"

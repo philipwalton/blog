@@ -10,19 +10,20 @@ var Site = require('../../ingen/lib/site')
 
 target.build = function() {
   echo('### building site...'.grey)
-  var site = new Site()
-  site.build()
+  // var site = new Site()
+  // site.build()
+  // exec('git init')
 }
 
 target.preview = function() {
   echo('### previewing site on port 4000')
-  var site = new Site({env: 'development', includeDrafts:true})
-  site.serve()
+  // var site = new Site({env: 'development', includeDrafts:true})
+  // site.serve()
 }
 
 target.deploy = function() {
 
-  target.build()
+  // target.build()
 
   rm('-rf', '_tmp')
   mkdir('_tmp')

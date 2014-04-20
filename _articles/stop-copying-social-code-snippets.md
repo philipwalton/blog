@@ -1,7 +1,7 @@
 <!--
 {
   "layout": "article",
-  "title": "Stop Copying Third-Party Code Snippets",
+  "title": "Stop Copying Social Code Snippets",
   "date": "2014-04-17T20:07:32-07:00",
   "draft": true,
   "tags": [
@@ -11,38 +11,39 @@
 }
 -->
 
+If you're a web developer, chances are, at some point, you've had to add a social widget to one of your page. Actually, probably more than one. And chances are you didn't want to put too much thought into it, so you just copied some code from the Internet and called it a day. Done and done.
 
-If you've ever built a website, chances are, at some point, you've had to put a social widget somewhere on one of your pages. And chances are you didn't want to put too much thought into it, so you just copied some code from the internet and called it a day. Done and done.
+I mean, the Web is filled with code that has been blindly copied from one source to another. Tweet buttons, Like buttons, Disqus comments, Google Analytics, all of these come with nice, neat, one size fits all code snippets.
 
-I mean, the Web is filled with code that has been blindly copied from one source to another. Tweet buttons, Like buttons, Disqus comments, Google Analytics, Codepen Embeds, all of these come with nice, neat, one size fits all code snippets.
+In case you haven't figured it out from the title (and my tone), I think you should stop it.
 
-In case you haven't figured it out from the title (and my tone), I think this is a bad idea.
+If you're a professional web developer, these snippets are not for you. They're for your friends and relatives, your uncle's restaurant business or your sister's baby blog, but they're not for you.
 
-If you're a professional web developer, these snippets are not for you. They're for your non-technical friends and relatives, but not for you.
+Prepackaged solutions can never been optimized for all cases, and they frequently come with baggage you don't want or need.
 
-Prepackaged solutions can never been optimized for all cases, and these snippets are no exception. If you care about performance, reusability, and DRY code, then you should make a promise to yourself to avoid this temptation and take the two seconds it requires to figure out what the code is actually doing and see if it can be optimized for your individual situation.
+Sure, there are bigger fish to fry, but if you care about performance, reusability, and clean code, then you should make an effort to avoid this temptation. Rise to the challenge, as a professional, and take the two seconds it requires to figure out what the code is doing; maybe you can do it better.
 
 ## Myths of Social Widgets
 
-You might be thinking to yourself: "but this code was written by a super genius at [insert big company name here] and its been tested on millions and millions of websites; I don't want to mess with that."
+Now, you might be thinking to yourself: "but this code was written by a super genius at [insert big company name here] and its been tested on millions and millions of websites; I don't want to mess with that."
 
-The first part of this sentiment is absolutely not true. The people who wrote these snippets are just like you and me, and the complexity of the code is so minimal that the intelligence of the author is irrelevant.
+The first part of this sentiment is absolutely not true. The people who wrote these snippets are just like you and me, and the complexity of the code is so minimal that the intelligence of the author is irrelevant. In any case, the source is right there, so you can learn from their genius.
 
-The second part of this sentiment (the testing part) may be a legitimate concern in general, but I don't think it really applies to social widget initialization code. These snippets are only a couple of lines at most, and usually, either they work or they don't. If you don't see any JavaScript errors in the console, and the widgets actually work in the browsers you're targeting, that's pretty much all the testing you need.
+The second part of this sentiment (the testing part) may be a legitimate concern in general, but I don't think it really applies to social widget code. These snippets are only a couple of lines at most, and usually, either they work or they don't. If you don't see any JavaScript errors in the console, and the widgets actually load in the browsers you're targeting, that's pretty much all the testing you need.
 
-Note that this doesn't actually require more testing on your part because you should be checking that these widgets work in your target browsers anyway. There's always the possibility that something you're doing is conflicting with the recommended snippets, so whether you're checking their code or your own, you're still doing the same amount of work.
+Note that this doesn't actually require additional testing on your part since you should be checking that these widgets work in your target browsers anyway. There's always the possibility that something you're doing is conflicting with the recommended snippets, so regardless of what you do, you still have to test that it works.
 
 ## The Anatomy of a Social Code Snippet
 
 Almost every social snippet out there does the same two things:
 
 1. It adds a placeholder element to the HTML.
-2. It loads a script from their site to initialize the widget inside the placeholder element.
+2. It loads a script from their site that adds some stuff to the placeholder.
 
-That's it. Don't believe me? Well, let's look at a few of them to prove it.
+That's it. Don't believe me? Well, let's look at a few examples to prove it.
 
-*(If you do believe me and want to skip to ahead to my suggestions, go to the section entitled [What You Should Do Instead
-](#what-you-should-do-instead).)*
+*(If you do believe me and just want to skip to my recommendations, go to the section entitled [What To Do Instead
+](#what-to-do-instead).)*
 
 ### Twitter
 
@@ -55,7 +56,7 @@ Here is the code that [developers.twitter.com](https://dev.twitter.com/docs/twee
 
 Don't let the fact that it's all minified and obfuscated intimidate you. This is very basic code that I'm confident you can understand.
 
-The HTML element is pretty obvious. It's just a plain old link with the class `twitter-share-button`.
+The HTML part is pretty straight forward. It's just a plain old link with the class `twitter-share-button`. This is the placeholder element that I mentioned above.
 
 The JavaScript portion is a bit more complex, so let me prettify the code a bit and replace the single letter variables so you can get a clearer picture of what's going on.
 
@@ -72,13 +73,13 @@ if (!document.getElementById('twitter-wjs')) {
 Let's walk through what this code is doing.
 
 1. It declares the variables `js` and `fjs`, and assigns `fjs` to the first script element on the page.
-2. It then checks to see if the document already has an element with the id of "twitter-wjs". If it does, nothing happens, if it doesn't it goes into the if conditional.
-3. It creates a new script element, assigns it to the `js` variable, and sets the id to "twitter-wjs" and the `src` attribute to https://platform.twitter.com/widgets.js.
+2. It then checks to see if the document already has an element with the ID `twitter-wjs`. If it does, nothing happens. If it doesn't, it goes into the if conditional.
+3. It creates a new script element, assigns it to the `js` variable, and sets the ID to `twitter-wjs` and the `src` attribute to `https://platform.twitter.com/widgets.js`.
 4. Finally, it inserts the script element into the DOM immediately before the first script element.
 
 This is actually very uncomplicated code. All it's doing is downloading an external script and running it on your page.
 
-It does a single to check to make sure the script hasn't already been downloaded, which is important because so many people copy this code multiple times onto the same page. Obviously the same script file doesn't need to be downloaded more than once.
+It does a single check to make sure the script hasn't already been downloaded, which is important because so many people blindly paste this code multiple times onto the same page, and obviously the same script file doesn't need to be downloaded more than once.
 
 Well, that was Twitter, now let's take a look at another snippet.
 
@@ -100,9 +101,7 @@ Well, that was Twitter, now let's take a look at another snippet.
 
 Facebook's code is a little less obfuscated, so this snippet is a bit easier to read. Can you see how similar it is? They even use the exact same short variable names `js`, `fjs`, `d`, `s`, and `id`.
 
-Think about all the websites out there that have both this script and the twitter script multiple times on the exact same set of pages.
-
-It's a complete waste of space.
+Think about all the websites out there that have both this script and the twitter script multiple times on the exact same set of pages. There's a crazy amount of duplication.
 
 ### Disqus
 
@@ -119,26 +118,25 @@ dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
 </script>
 ```
 
-Are you starting to see a pattern here?
+The Disqus snippet is slightly different because it requires you to assign your Disqus username to the variable `disqus_shortname` and then it downloads a script from that subdomain. But it's also different in how it downloads the external script file:
 
-The disqus code is slightly different because it requires you to assign your Disqus username to the variable `disqus_shortname` and then it downloads a script located on that subdomain.
+- It adds the `type` attribute `text/javascript` to the script element.
+- It adds the `async` attribute.
+- It appends the newly created script element to the `<head>` (or to the `<body>` if `<head>` can't be found) rather that inserting it before the first script element.
 
-The other differences are it:
-- Adds the `type` attribute "text/javascript" to the script element
-- Adds the `async` attribute
-- Appends the newly created script element to the `<head>` (or to the `<body>` if `<head>` can't be found).
+You might be asking yourself. Are these differences important? Disqus is a big name company, surely they're doing things differently for a reason, right?
 
-You might assume that the difference between this code snippet and the Twitter/Facebook version are important, but trust me, they're not.
+To answer this question bluntly: no, these differences aren't important.
 
-First of all, it's totally unnecessary to add the "text/javascript" attribute if you're using an html5 doctype (which you probably are). Secondly, it's unnecessary to check for the presence of the `<head>` element since all browsers automatically add that when creating the DOM. Finally, the `async` attribute is added to the script to prevent it from blocking during download; however, this isn't necessary if it's added to a portion of the DOM that's already been parse.
+First of all, it's totally unnecessary to set a script's `type` attribute to `text/javascript` if you're using an html5 doctype (which you probably are). Secondly, it's unnecessary to check for the presence of the `<head>` element since all browsers automatically add that when creating the DOM. Finally, the `async` attribute is added to the script to prevent it from blocking during download; however, any script that is dynamically added to the DOM is evaluated as async by default.
 
-I highlight these differences not to poke fun of Disqus, but instead to point out that just because a snippet was developed by a big company and used on millions of websites doesn't means its perfect in every way.
+I'm going to give Disqus the benefit of the doubt and assume that they had a good reason for writing the code they did. Perhaps they had some big enterprise client with really old, invalid HTML, parsing errors, and no doctype, and this was the solution they needed to get it working for them. I don't know, but the point is these differences don't apply to you, so there's no reason to carry someone else's baggage.
 
-You control the code on your website, so there's no reason to include code written for the lowest common denominator.
+This also helps disprove the first myth about social snippets. Just because some big name company is using them, doesn't mean they're a best-practice.
 
 ### Google Analytics
 
-Google Analytics is by far the most complicated of the social snippets because, in addition to downloading an external script, it creates a function on the page that the external script will need to invoke later on.
+Google Analytics is a little bit more complicated than the other social snippets. In addition to downloading an external script, it also creates a function on the page that the external script needs to interact with.
 
 Here's the Google Analytics snippet, formatted so it's a bit easier to read:
 
@@ -159,11 +157,11 @@ ga('create', 'UA-XXXX-Y', 'auto');
 ga('send', 'pageview');
 ```
 
-While this code is definitely more complicated, and changing it will increase the risk of things breaking. I'd still recommend you do just that.
+While this code is definitely more involved than the other snippets, and changing it will increase the risk of things breaking. I'd still recommend you don't blindly paste it into your website.
 
-The Google Analytics developer documentation has an [unminifed and commented version of this script](https://developers.google.com/analytics/devguides/collection/analyticsjs/advanced#snippetReference), and I highly suggest looking at that to see what's actually going on.
+The Google Analytics developer documentation has an [unminified and commented version of this script](https://developers.google.com/analytics/devguides/collection/analyticsjs/advanced#snippetReference), and I highly suggest looking at that to see what's actually going on.
 
-To spoil the mystery, if you download their external script elsewhere, and if you don't need to rename the `ga` function, the following code will work just fine:
+To spoil the mystery, unless you're doing something custom, the code below will work just fine:
 
 ```javascript
 // Initialize the `ga` function and its properties.
@@ -182,48 +180,37 @@ This updated snippet creates a `ga` function that, when invoked, pushes the argu
 
 This new code does the exact same thing as the original snippet, but it's vastly simplified since it doesn't try to support all possible custom use cases.
 
-## What You Should Do Instead
+All you have to do is load the external script yourself, and everything should work as normal.
 
-Adding an asynchronous script element to a page is okay from a performance perspective, but it's certainly not "optimized".
+## What To Do Instead
 
-Performance experts have long said that the number one way to reduce page load times is to minimize the total number of requests. But they also recommend that your initial load only contain the minimum needed for your users to interact with your site.
+While using asynchronous script loading is certainly better than a bunch of blocking scripts littered throughout the page, its no magic bullet. Asynchronous scripts don't block rendering, but they do delay page loads.
 
-Performance experts have long said that the number one way to reduce page load times is to minimize the total number of requests. But they also recommend that in your initial load you only bundle the bare minimum needed for your users to interact with your site.
+If you add a script element to the DOM before the window's `load` event fires, that event will be delayed until the newly added script is downloaded, parsed, and run. If you're adding multiple scripts (most people are), the `load` event could be delayed a long time.
 
-To put that in the context of social widgets, the ideal way to load them depends on how mission critical they are.
+Now, you might be thinking to yourself. Who cares about `load`? Isn't `DOMContentLoaded` the event I should really be worried about?
 
-Chances are, they're not mission critical, so you should probably wait until after the page is loaded to make those requests.
+`DOMContentLoaded` is the event that fires once the document has been fully parsed and is able to be traversed by scripts. If you're waiting to do some DOM manipulation, then yes, this is the event you should care about.
 
-### Wait Until After Page Load
+But the window's `load` event is just as important, arguably moreso, and for a few reasons:
 
-Asynchronous scripts have one advantage over regular script. They don't block rendering. But that's the only thing they do, they are not a magic performance bullet.
+- Google search ranking algorithms take page load times into account, and those page load times are based on the `load` event.
+- If the URL has a hash fragment, browsers will not scroll down to that location until after the `load` event fires. This can significantly affect how snappy your page feels.
+- Browser plugins commonly listen for the `load` event, so any plugins your visitors have could make your pages seem slower than they really are.
 
-If an asynchronous script is added to the DOM before the window is fully loaded, it will delay the load event. The script must be downloaded, processed, and run before `load` can be fired. In other words, asynchronous scripts still slow down your pages.
+I'm sure there are many more reasons to care about the `load` event, but this list is convincing enough for me.
 
-Now, you might be saying to yourself. Who cares about `window.onload`. Isn't `DOMContentLoaded` the event I should really be worried about?
+Given all of this, you have two choices for how to implement your social widgets. And your decision will depends solely on how essential these widgets are to your user experience:
 
-Well, yes and no. `DOMContentLoad` only matters if you have critical functionality waiting for that event, which isn't the case if you're loading your scripts in the footer. But there are a lot of things dependent on the `load` event that are outside of your control.
+- If they're essential, they shouldn't be asychronously loaded at all.
+- If they're non-essential (which is usually the case), you should wait until after the `load` event to download and intialize them.
 
-If the URL has a hash fragment, browsers will not scroll to it until after the page is fully loaded. Also, any browser extensions your users have installed may be waiting for the load event as well. In addition, Google has admitted to adding page load times into its ranking algorithms, and Google is using the `load` event, not `DOMContentLoaded`, so if your pagerank is a concern, you should wait until after `window.onload` to include any non-critical content.
+### Waiting Until After Page Load
 
-### Bundle the External Scripts With Your Main JavaScript File
-
-If one or more of these third party script are critical to your user experience, there's no reason to make a separate request for them.
-
-Instead, as part of your build process, go out and fetch the scripts and include them into your main concatenated, minified, and gzipped script file.
-
-As I said before, this is probably not necessary as social plugins are rarely mission critical, but in the event they are, you want your users to have them as soon as possible, with as few requests as possible.
-
-## Loading Scripts Yourself
-
-If you choose to take my advice and not copy and paste code snippets, you'll have to load those scripts yourself. This isn't hard. If you've been paying attention you've already seen several ways to do this.
-
-I recommend writing a simple `getScript` function that can be reused for each of these social scripts.
-
-Here's an example that is essentially just the Twitter code refactored:
+Since none of the snippets we've look at thus far wait for the `load` event, we'll have to implement our own script loader. This is easy as we've already seen many examples for how to do it. Here's a basic implementation:
 
 ```javascript
-var getScript = function(firstScript) {
+var getScript = (function(firstScript) {
   return function(src) {
     var script = document.createElement('script');
     script.src = src;
@@ -232,9 +219,9 @@ var getScript = function(firstScript) {
 }(document.getElementsByTagName('script')[0]));
 ```
 
-The above codes caches a reference to the first script on the page (to avoid multiple DOM lookups), and then it returns a function that adds your new script element right before the first script. If you need something more bespoke, you can of course customize this to meet your needs.
+The above code caches a reference to the first script on the page (to avoid multiple DOM lookups), then it returns a function that adds your new script element right before the first script.
 
-If you use the above function, you can load all your social plugins after the window loads like so:
+Once you have a script loading function, just use it in the `window.onload` callback.
 
 ```javascript
 window.onload = function() {
@@ -245,12 +232,36 @@ window.onload = function() {
 };
 ```
 
-It's important to note that some of these social snippets (like Google Analytics) still required initialization, so don't forget those parts.
+If you're using a library like jQuery, then you don't even need to write the script loading code at all. jQuery can do that for you. (As can many other libraries, so check your dependencies before reinventing the wheel.)
 
-Finally, once all this code is written, it should be bundled together into a single resource and served minified and gzipped.
+```javascript
+$(window).on('load', function() {
+  $.getScript('//www.google-analytics.com/analytics.js');
+  $.getScript('//philipwalton.disqus.com/embed.js');
+  $.getScript('https://platform.twitter.com/widgets.js');
+  $.getScript('//connect.facebook.net/en_US/all.js');
+});
+```
+
+It's important to note that some of these social snippets (like Google Analytics) still require initialization, so don't forget about those parts.
+
+### Bundling the External Scripts With Your Main JavaScript File
+
+If one or more of these third party widgets are critical to your user experience, then you should be loading them immediately, and they should be bundled with your main JavaScript file.
+
+To do this you'll need to add a step to your build process that downloads these external dependencies and includes them with your other assets.
+
+There's nothing wrong with this approach, and in many ways its safer and more resilient than loading a file on the fly from a domain you don't control. In fact, you could even take this approach if you're loading these scripts after the `load` event. Bundling them together reduces the total number of requests and it allows you to control exactly what code and what version of that code is being run.
+
+On the other hand, if your users have those social scripts cached (as many do) bundling them will negate that performance benefit. You'll have to weigh the pros and cons of each approach for yourself.
 
 ## Conclusion
 
-I know that copying and pasting social code is a dead simple. And I know that trying to figure out what each snippet is doing (and then optimizing it for your specific needs) will take time. But I hope this article will give you the courage or the motivation to try.
+I know that copying and pasting social code is dead simple. And I know that trying to figure out what each snippet is doing (and then optimizing it for your specific needs) will take time. But I hope this article will give you the courage and the motivation to try. At the very least, if you're going to use someone's pre-packaged code, you should have a good reason.
 
-In addition, I hope that more companies will follow the example set by Google Analytics and post an unminifed and commented version on their websites. There's no reason to force users into the lowest common denominator. Give your non-savvy users the simplest option, but don't assume your more technical users aren't capable of customizing the code for their own needs.
+In addition, I hope that more companies will follow the example set by Google Analytics and post an unminified and commented version on their websites. There's no reason to force users into the lowest common denominator. Give your non-savvy users the simplest option, but don't assume your more technical users aren't capable of customizing the code to fit their needs.
+
+## Additional Resources
+
+- [Deep dive into the murky waters of script loading](http://www.html5rocks.com/en/tutorials/speed/script-loading/)
+- [WHATWG Scripting Spec](http://www.whatwg.org/specs/web-apps/current-work/multipage/scripting-1)

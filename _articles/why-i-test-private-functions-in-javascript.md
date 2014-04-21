@@ -9,7 +9,7 @@
 }
 -->
 
-Last week I published an article on this blog entitled [How to Unit Test Private Functions in JavaScript]({{linkTo '/articles/how-to-unit-test-private-functions-in-javascript/'}}). The article was well received and even mentioned in a few popular newsletters (most notably [JavaScript Weekly](http://javascriptweekly.com/archive/138.html)). Still, a decent amount of the feedback I received in the comments and on Twitter strongly disagreed with my approach. The most common criticism was: unit testing private functions is unnecessary and a mark of bad design.
+Last week I published an article on this blog entitled [How to Unit Test Private Functions in JavaScript](/articles/how-to-unit-test-private-functions-in-javascript/). The article was well received and even mentioned in a few popular newsletters (most notably [JavaScript Weekly](http://javascriptweekly.com/archive/138.html)). Still, a decent amount of the feedback I received in the comments and on Twitter strongly disagreed with my approach. The most common criticism was: unit testing private functions is unnecessary and a mark of bad design.
 
 Admittedly, that article focused too much on the "how" of the technique and not enough on the "why".
 

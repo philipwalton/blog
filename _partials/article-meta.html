@@ -7,7 +7,7 @@
   {{#if tags.length}}
     <li>Tagged as:
       {{#each tags}}
-        <a href="{{linkTo page.permalink}}">{{value}}</a>{{#unless @last}}, {{/unless}}
+        <a href="{{page.permalink}}">{{value}}</a>{{#unless @last}}, {{/unless}}
       {{/each}}
     </li>
   {{/if}}

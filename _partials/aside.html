@@ -12,16 +12,16 @@
     <h3 class="widget__title">Popular Articles</h3>
     <ul>
       <li>
-        <a href="{{linkTo '/articles/what-no-one-told-you-about-z-index/'}}">What No One Told You About Z-Index</a>
+        <a href="/articles/what-no-one-told-you-about-z-index/">What No One Told You About Z-Index</a>
       </li>
       <li>
-        <a href="{{linkTo '/articles/decoupling-html-css-and-javascript/'}}">Decoupling Your HTML, CSS, and JavaScript</a>
+        <a href="/articles/decoupling-html-css-and-javascript/">Decoupling Your HTML, CSS, and JavaScript</a>
       </li>
       <li>
-        <a href="{{linkTo '/articles/introducing-html-inspector/'}}">Introducing HTML Inspector</a>
+        <a href="/articles/introducing-html-inspector/">Introducing HTML Inspector</a>
       </li>
       <li>
-        <a href="{{linkTo '/articles/css-architecture/'}}">CSS Architecture</a>
+        <a href="/articles/css-architecture/">CSS Architecture</a>
       </li>
     </ul>
   </div>
@@ -31,7 +31,7 @@
     <ul>
       {{#eachTag}}
         <li>
-          <a href="{{linkTo page.permalink}}">{{value}}</a>
+          <a href="{{page.permalink}}">{{value}}</a>
           ({{countArticlesWithTag value}})
         </li>
       {{/eachTag}}

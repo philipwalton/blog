@@ -15,7 +15,7 @@
   <ul>
     {{#each articles}}
       <li>
-        <a href="{{linkTo permalink}}">{{title}}</a>
+        <a href="{{permalink}}">{{title}}</a>
         (<time datetime="{{datetime date format='YYYY-MM-DDTHH:mm:ssZ'}}">{{datetime date format="M/D/YYYY"}}</time>)
       </li>
     {{/each}}

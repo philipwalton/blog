@@ -24,9 +24,9 @@
   {{#query}}
     <entry>
       <title>{{title}}</title>
-      <link href="{{linkTo permalink}}"/>
+      <link href="http://philipwalton.com{{permalink}}"/>
       <updated>{{datetime date format="YYYY-MM-DDTHH:mm:ssZ"}}</updated>
-      <id>{{linkTo permalink}}</id>
+      <id>http://philipwalton.com{{permalink}}</id>
     </entry>
   {{/query}}
 

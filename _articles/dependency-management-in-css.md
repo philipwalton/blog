@@ -5,8 +5,7 @@
   "date": "2014-01-30T21:06:39-08:00",
   "draft": true,
   "tags": [
-    "CSS",
-    "Architecture"
+    "CSS"
   ]
 }
 -->

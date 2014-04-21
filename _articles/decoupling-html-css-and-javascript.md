@@ -4,11 +4,11 @@
   "title": "Decoupling Your HTML, CSS, and JavaScript",
   "date": "2013-08-17T12:39:09-07:00",
   "tags": [
+    "Architecture",
     "HTML",
     "CSS",
     "JavaScript"
-  ],
-  "categories": ["foobar"]
+  ]
 }
 -->
 

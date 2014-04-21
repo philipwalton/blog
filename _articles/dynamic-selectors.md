@@ -6,7 +6,7 @@
   "tags": [
     "Architecture",
     "CSS",
-    "Sass"
+    "Preprocessors"
   ]
 }
 -->

@@ -6,8 +6,7 @@
   "tags": [
     "CSS",
     "OOCSS",
-    "Sass",
-    "JavaScript"
+    "Preprocessors"
   ]
 }
 -->

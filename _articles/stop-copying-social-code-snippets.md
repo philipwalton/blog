@@ -161,19 +161,14 @@ The Google Analytics developer documentation has an [unminified and commented ve
 To spoil the mystery, unless you're doing something custom, my version below will work just fine:
 
 ```javascript
-// Initialize the `ga` function and its properties.
 ga = function() {
   ga.q.push(arguments);
 };
-ga.q = [];
+ga.q = [['create', 'UA-XXXX-Y', 'auto'], ['send', 'pageview']];
 ga.l = 1 * new Date();
-
-// Create your tracker as usual.
-ga('create', 'UA-XXXX-Y', 'auto');
-ga('send', 'pageview');
 ```
 
-This updated snippet creates a `ga` function that, when invoked, pushes the arguments passed onto its `q` property. It then initializes the `q` property as an empty array and stores the current time on the `l` property.
+This updated snippet creates a `ga` function that, when invoked, pushes the arguments passed onto its `q` property. It then initializes the `q` property with your tracker data and stores the current time on the `l` property.
 
 This new code does the exact same thing as the original snippet, but it's vastly simplified since it doesn't try to support all possible custom use cases.
 

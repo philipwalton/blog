@@ -8,8 +8,7 @@
 
   "excludeFiles": [
     "bower.json",
-    "README.md",
-    "bin"
+    "README.md"
   ],
   "postTypes": ["article"],
   "taxonomyTypes": ["tag"],

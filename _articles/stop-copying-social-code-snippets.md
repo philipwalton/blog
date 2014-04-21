@@ -251,7 +251,7 @@ On the other hand, if your users have those social scripts cached (as many do) b
 
 I know that copying and pasting social code is dead simple. And I know that trying to figure out what each snippet is doing (and then optimizing it for your specific needs) will take time. But I hope this article gives you the courage and the motivation to try. At the very least, if you're going to use someone's pre-packaged code, you should have a good reason.
 
-In addition, I hope that more companies will follow the example set by Google Analytics and post an unminified, commented version on their snippets on their developer sites. There's no reason to force users into the lowest common denominator. Give your non-savvy users the simplest option, but don't assume your more technical users aren't capable of customizing the code to fit their needs.
+In addition, I hope that more companies will follow the example set by Google Analytics and post an unminified, commented version of their snippets on their developer sites. There's no reason to force users into the lowest common denominator. Give your non-savvy users the simplest option, but don't assume your more technical users aren't capable of customizing the code to fit their needs.
 
 ## Additional Resources
 

@@ -18,7 +18,7 @@ deploy: build
 		git add -A && \
 		git commit -m "Deploy site." && \
 		git branch -m gh-pages && \
-		git push origin gh-pages && \
+		git push origin gh-pages
 	@ echo ">>> Cleaning up..."
 	@ rm -rf _site _tmp
 	@ echo "*** Successfully deployed site!"

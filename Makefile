@@ -1,10 +1,16 @@
-preview:
-	@ echo ">>> Previewing site on port 4000..."
-	@ ingen serve -wi --env development
+ingen := ../ingen/bin/ingen
 
 build:
 	@ echo ">>> Building site..."
-	@ ingen build
+	@ $(ingen) build
+
+debug:
+	@ echo ">>> Debug site..."
+	@ node --debug-brk $(ingen) build
+
+preview:
+	@ echo ">>> Previewing site on port 4000..."
+	@ $(ingen) serve -wi --env development
 
 deploy: build
 	@ rm -rf '_tmp' && mkdir '_tmp'
@@ -23,4 +29,4 @@ deploy: build
 	@ rm -rf _site _tmp
 	@ echo "*** Successfully deployed site!"
 
-.PHONY: build preview
+.PHONY: build debug preview deploy

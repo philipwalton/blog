@@ -161,19 +161,14 @@ The Google Analytics developer documentation has an [unminified and commented ve
 To spoil the mystery, unless you're doing something custom, my version below will work just fine:
 
 ```javascript
-// Initialize the `ga` function and its properties.
 ga = function() {
   ga.q.push(arguments);
 };
-ga.q = [];
+ga.q = [['create', 'UA-XXXX-Y', 'auto'], ['send', 'pageview']];
 ga.l = 1 * new Date();
-
-// Create your tracker as usual.
-ga('create', 'UA-XXXX-Y', 'auto');
-ga('send', 'pageview');
 ```
 
-This updated snippet creates a `ga` function that, when invoked, pushes the arguments passed onto its `q` property. It then initializes the `q` property as an empty array and stores the current time on the `l` property.
+This updated snippet creates a `ga` function that, when invoked, pushes the arguments passed onto its `q` property. It then initializes the `q` property with your tracker data and stores the current time on the `l` property.
 
 This new code does the exact same thing as the original snippet, but it's vastly simplified since it doesn't try to support all possible custom use cases.
 
@@ -256,7 +251,7 @@ On the other hand, if your users have those social scripts cached (as many do) b
 
 I know that copying and pasting social code is dead simple. And I know that trying to figure out what each snippet is doing (and then optimizing it for your specific needs) will take time. But I hope this article gives you the courage and the motivation to try. At the very least, if you're going to use someone's pre-packaged code, you should have a good reason.
 
-In addition, I hope that more companies will follow the example set by Google Analytics and post an unminified, commented version on their snippets on their developer sites. There's no reason to force users into the lowest common denominator. Give your non-savvy users the simplest option, but don't assume your more technical users aren't capable of customizing the code to fit their needs.
+In addition, I hope that more companies will follow the example set by Google Analytics and post an unminified, commented version of their snippets on their developer sites. There's no reason to force users into the lowest common denominator. Give your non-savvy users the simplest option, but don't assume your more technical users aren't capable of customizing the code to fit their needs.
 
 ## Additional Resources
 

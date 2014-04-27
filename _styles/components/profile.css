@@ -1,0 +1,22 @@
+.Profile {
+  color: #555;
+  text-decoration: none;
+}
+
+.Profile-title {
+  font-size: 1em;
+  margin: 0 0 1em;
+}
+
+.Profile-figure {
+  border: 1px solid;
+  border-radius: 50%;
+  display: inline-block;
+  margin: 0 0 1em;
+  padding: 2px;
+}
+
+.Profile-figureImage {
+  border-radius: 50%;
+  display: block;
+}

@@ -1,6 +1,10 @@
 :root {
-  var-text-color: #404040;
-  var-accent-color: #f04040;
-  var-background-color: #f4f2f0;
-  var-border-color: #f4f2f0;
+  var-bg-color: #f4f2f0;
+  var-border-color: #ddd;
+
+  var-twitter-color: #55acee;
+  var-github-color: #171715;
+  var-rss-color: #F93;
+
+  var-space: 1.667em;
 }

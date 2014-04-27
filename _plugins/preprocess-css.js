@@ -36,7 +36,6 @@ module.exports = function() {
 
   events.on('afterBuild', function() {
     preprocess('_styles/style.css', '_site/assets/css/style.css')
-    preprocess('_styles/resume.css', '_site/assets/css/resume.css')
   })
 
 }

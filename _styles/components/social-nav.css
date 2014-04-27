@@ -1,0 +1,30 @@
+.SocialNav {
+  display: flex;
+  justify-content: center;
+  list-style: none;
+  margin: 0 0 1em;
+  padding: 0;
+}
+
+.SocialNav-icon {
+  width: var(space);
+  height: var(space);
+  margin: .2em;
+}
+
+.SocialNav-icon svg {
+  transition: all .2s ease;
+  fill: #ccc;
+}
+
+.SocialNav-icon--twitter:hover svg {
+  fill: var(twitter-color);
+}
+
+.SocialNav-icon--github:hover svg {
+  fill: var(github-color);
+}
+
+.SocialNav-icon--rss:hover svg {
+  fill: var(rss-color);
+}

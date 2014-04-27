@@ -1,0 +1,25 @@
+.Share {
+  align-items: center;
+  background: var(bg-color);
+  display: flex;
+  margin-top: 3em;
+  padding: 1.25em 1em;
+}
+
+.Share-figure {
+  font-size: 1.1em;
+  height: 1em;
+  width: 1.5em;
+}
+
+.Share-figure svg {
+  fill: #55acee;
+}
+
+.Share-pitch {
+  color: #666;
+  flex: 1;
+  font-size: .9em;
+  margin: 0;
+  padding-left: 1em;
+}

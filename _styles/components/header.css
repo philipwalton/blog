@@ -1,37 +1,12 @@
-.header {
-  extend: .clearfix;
-  background-color: var(background-color);
-}
-
-.header__title {
-  margin: 0;
-  color: var(text-color);
-  font: 400 5em/1 BebasNeueRegular;
-  line-height: 1;
-  text-shadow: 0 1px 0 white;
-}
-.header__title a {
-  color: inherit;
-}
-.header__title a:hover,
-.header__title a:active {
-  text-decoration: none;
-}
-@media (max-width: 23em) {
-  .header__title {
-    font-size:4em;
-  }
-}
-
-.header__description {
-  margin: 0;
-  font: 100 .85em sans-serif;
-  letter-spacing: .2em;
-  text-shadow: 0 1px 0 white;
-  text-transform: uppercase;
-}
-@media (max-width: 23em) {
-  .header__description {
-    font-size:.8em;
-  }
+.Header {
+  align-items: center;
+  border-right: 1px solid var(border-color);
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  justify-content: center;
+  padding: 3em;
+  position: fixed;
+  text-align: center;
+  width: 14em;
 }

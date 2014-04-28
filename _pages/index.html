@@ -1,14 +1,24 @@
 <!--
 {
-  "layout": "page",
+  "layout": "default",
   "title": "Home",
-  "heading": "Recent Articles",
   "permalink": "/",
   "query": {
     "type": "article",
-    "limit": 6
+    "limit": 50
   }
 }
 -->
 
-{{> article-excerpt-list}}
+<!--
+<header class="ContentHeader">
+  <h1 class="ContentHeader-title">Articles</h1>
+</header>
+-->
+
+<header class="ContentHeader">
+  <h1 class="ContentHeader-title2">Recent Articles</h1>
+</header>
+
+
+{{> article-list}}

@@ -17,7 +17,7 @@ p {
 }
 
 a {
-  color: hsl(135, 40%, 50%);
+  color: var(link-color);
   text-decoration: underline;
 }
 

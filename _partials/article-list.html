@@ -1,0 +1,35 @@
+
+<ul class="ArticleList">
+  {{# query }}
+    <li class="ArticleList-item">
+      <a class="ArticlePreview" href="{{permalink}}">
+        <time class="ArticlePreview-date" datetime="{{datetime date format="YYYY-MM-DDTHH:mm:ssZ"}}">
+          {{datetime date format="MMMM D, YYYY"}}
+        </time>
+        <h2 class="ArticlePreview-title">{{title}}</h2>
+        <p class="ArticlePreview-excerpt">{{{excerpt}}}&hellip;</p>
+      </a>
+    </li>
+  {{/ query }}
+</ul>
+
+
+
+{{#if paginated}}
+  <div class="callout paginator">
+    <span class="paginator__prev">
+      {{#if prevPage}}
+        <a href="{{prevPage.permalink}}">&laquo; Previous</a>
+      {{else}}
+        &laquo; Previous
+      {{/if}}
+    </span>
+    <span class="paginator__next">
+      {{#if nextPage}}
+        <a href="{{nextPage.permalink}}">Next &raquo;</a>
+      {{else}}
+        Next &raquo;
+      {{/if}}
+    </span>
+  </div>
+{{/if}}

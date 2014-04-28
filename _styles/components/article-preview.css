@@ -1,0 +1,36 @@
+.ArticlePreview {
+  color: inherit;
+  display: block;
+  padding: var(space) 0;
+  text-decoration: none;
+}
+
+.ArticlePreview-title {
+  display: block;
+  font-size: 1.4em;
+  letter-spacing: -.04em;
+  line-height: 1.1;
+  margin: .6em 0 .2em;
+  transition: color .2s ease;
+}
+
+.ArticlePreview-excerpt {
+  color: #999;
+  font-size: 1em;
+  font-weight: 300;
+  margin: 0;
+}
+
+.ArticlePreview-date {
+  color: #bbb;
+  font-size: .8em;
+  /letter-spacing: 0;
+  text-overflow: ellipsis;
+
+  ;
+}
+
+.ArticlePreview:hover .ArticlePreview-title {
+  color: var(link-color);
+}
+

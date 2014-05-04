@@ -48,7 +48,7 @@ Here's what the HTML and basic CSS look like. I've also included a visual demo (
 }
 ```
 
-<div class="codepen-wrapper">
+<div class="CodepenContainer">
   <pre class="codepen" data-height="250" data-type="result" data-href="ksBaI" data-user="philipwalton"><code></code></pre>
 </div>
 
@@ -62,7 +62,7 @@ To see if you can figure it out, click the *edit on Codepen* link above and play
 
 *Warning: Don't click on the CSS tab of the example below or it will give away the answer.*
 
-<div class="codepen-wrapper">
+<div class="CodepenContainer">
   <pre class="codepen" data-height="250" data-type="result" data-href="dfCtb" data-user="philipwalton" data-safe="true"><code></code></pre>
 </div>
 

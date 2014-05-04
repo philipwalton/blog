@@ -2,6 +2,8 @@ var _ = require('lodash-node/modern')
 
 module.exports = function() {
 
+  return
+
   var Page = this.Page;
   var pages = Page.all();
 

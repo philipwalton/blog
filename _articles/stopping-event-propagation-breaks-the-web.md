@@ -12,49 +12,21 @@
 }
 -->
 
-Imagine you have a leaky shower in your bathroom that desperately needs fixing. You search online to see if you can stop the leak yourself, and the top rated advice tells you to seal off the pipe that leads to the shower. So you get out your tools, seal the pipe, and sure enough it works!
+Imagine you have a leaky shower in your bathroom that desperately needs fixing. You search online to see if you can stop the leak yourself, and the top rated advice suggests you to seal off the pipe that leads to the shower. Easy enough, you think, so you get out your tools, seal the pipe, and sure enough the leak has stopped!
 
-Sounds crazy, right? Obviously the water in your bathroom needs to continue on, perhaps to the kitchen or the laundry room. Stopping it might fix one problem, but it will most likely create more down the road.
+Sounds crazy, right? I mean, there's the obvious problem that now you can't use your shower at all, but there are probably other issues as well. Maybe that pipe, after going to the shower, continued on to the kitchen or the laundry room. This "solution" has likely created more problems than it solved.
 
-This story might seem a bit unrealistic, but the truth is we developers do stuff like this all the time. We solve a problem with a quick and dirty solution without thinking of its larger consequences.
+This story might seem a bit unrealistic, but the truth is we developers do stuff like this all the time. We solve a problem with a trick we don't fully undertand without thinking of its larger consequences.
 
-One example of this I see far too often is developers unnecessarily stop event propagation.
+One example of this that I see far too often is when developers unnecessarily stop event propagation.
 
-## Event Propagation
+## An Age Old Problem
 
-Like a lot of things in JavaScript, DOM events are global. And as most people know, global variables make for messy, coupled code.
+If you're a web developer, at some point in your career you've probably needed made a dialog or a popup that is supposed to go away when the users clicks somewhere else on the page.
 
-Modifying the state or the behavior of a global variable might not seem like a big deal, but as developers depend more and more on third-party libraries (i.e. code they didn't write), altering global state and changing the expected behavior can lead to some disasterous bugs. Bugs that are impossible to defend against and a nightmare to track down.
+If you weren't using a third-party UI library, you had to figure out how to do this yourself, and chances are you came across this Stack Overflow question: [How to detect a click outside an element?](http://stackoverflow.com/questions/152975/how-to-detect-a-click-outside-an-element)
 
-When you stop an event from propagating up to the document, you're changing the game in a way that libraries authors can't predict or defend against. This problem is maginifed by the fact that event delegation is rapidly becoming the norm. More and more people are just listening for events on the document, so every time you stop an event from propagating up the DOM, you're potentially breaking someone else's code (or your own).
-
-## What Can Go Wrong?
-
-I imagine most people who've read this far have encountered this problem themselves. But in case you haven't, let me show you how easy it is to create a `stopPropagation` bug using two of today's most popular frameworks: [Bootstap](http://getbootstrap.com/) and [Rails](http://rubyonrails.org/).
-
-Bootstrap and Rails both come pre-packaged with JavaScript plugins. In the following example, Rails' [jquery-ujs](https://github.com/rails/jquery-ujs) library, which allows Rails to declaratively add remote ajax calls to links via the `data-remote` attribute, is preventing Bootstrap's dropdown menus from properly hiding.
-
-See for yourself:
-
-<div class="CodepenContainer">
-  <div class="codepen" data-height="250" data-slug-hash="KzHjc" data-default-tab="result"></div>
-</div>
-
-The [JavaScript code](https://github.com/twbs/bootstrap/blob/v3.1.1/js/dropdown.js#L141-L142) that is responsible for closing the dropdown menu is listening for click events on the document. But since jquery-ujs stops event propagation, that code doesn't get run for those clicks.
-
-The worst part about this bug is that there's absolutely nothing Bootstrap can do to prevent it from happening. If you're writing code that deals with the DOM, you're always at the mercy of the other code running on the page. Such is the nature of global variables.
-
-I'm not trying to pick on jquery-ujs, I just happen to know this problem exists because I [encountered it myself](https://github.com/rails/jquery-ujs/issues/327) and had to work around it. In truth, tons of other libraries stop event propagation (including Bootstrap) and it's often recommend in the highest voted answers on Stack Overflow.
-
-## But the Internet Told Me to Do It
-
-The dropdown example I showed above is great because its a classic problem most web developers have faced at some point in their career. It's easy to control an element with you click on it, but how do you know when you don't click on an element?
-
-To answer this question, most people turn to Google.
-
-If you do a quick search for a solution to this problem, you'll probably find this Stack Overflow question: [How to detect a click outside an element?](http://stackoverflow.com/questions/152975/how-to-detect-a-click-outside-an-element).
-
-I've reprinted the answer here for convenience:
+In case you don't like clicking links, here's the top answer:
 
 ```javascript
 $('html').click(function() {
@@ -68,7 +40,68 @@ $('#menucontainer').click(function(event){
 
 The above code basically says: If a click event propagates to the `<html>` element, hide the menu. If the click originated inside `#menucontainer`, stop the event so it never reaches `<html>`, thus only clicks outside of `#menucontainer` will close it.
 
-This is really, really terrible advice. It completely ignores the possibility that any other code could be running on the site that needs to detect click events. Unfortunately, it's the most upvoted answer, so this is what a lot of people do.
+This is really, really terrible advice. It's basically equivalent to turning off the water in my leaky shower example. This technique completely ignores the possibility that any other code could be running on the site that needs to detect click events.
+
+Unfortunately, it's the most upvoted answer, so this is what a lot of people do.
+
+### Event Propagation
+
+Like a lot of things in JavaScript, DOM events are global. And as most people know, global variables make for messy, coupled code.
+
+Modifying the state or the behavior of a global variable might not seem like a big deal, but as developers depend more and more on third-party libraries (i.e. code they didn't write), altering global state and changing the expected behavior can lead to some disasterous bugs. Bugs that are impossible to defend against and a nightmare to track down.
+
+When you stop an event from propagating up to the document, you're changing the game in a way that libraries authors can't predict or defend against. This problem is maginifed by the fact that event delegation is rapidly becoming the norm. More and more people are just listening for events on the document, so every time you stop an event from propagating up the DOM, you're potentially breaking someone else's code (or your own).
+
+## What Can Go Wrong?
+
+You might be saying to yourself: Who even writes code like this anymore? I use a UI library to do all this stuff so I can just stop reading, right?
+
+Unforunately stopping event propagation is not only found in bad Stack Overflow answers, but it's found in some of the most popular libraries in use today.
+
+Let me show you how easy it is to create a `stopPropagation` related bug using two of today's most popular frameworks: [Bootstap](http://getbootstrap.com/) and [Rails](http://rubyonrails.org/).
+
+Bootstrap and Rails both come pre-packaged with JavaScript plugins. In the following example, Rails' [jquery-ujs](https://github.com/rails/jquery-ujs) library, which allows Rails to declaratively add remote ajax calls to links via the `data-remote` attribute, is preventing Bootstrap's dropdown menus from properly hiding.
+
+See for yourself:
+
+<div class="CodepenContainer">
+  <div class="codepen" data-height="250" data-slug-hash="KzHjc" data-default-tab="result"></div>
+</div>
+
+The [JavaScript code](https://github.com/twbs/bootstrap/blob/v3.1.1/js/dropdown.js#L141-L142) that is responsible for closing the dropdown menu is listening for click events on the document. But since jquery-ujs stops event propagation, that code doesn't get run for those clicks.
+
+The worst part about this bug is that there's absolutely nothing Bootstrap can do to prevent it from happening. If you're writing code that deals with the DOM, you're always at the mercy of the other code running on the page. Such is the nature of global variables.
+
+I'm not trying to pick on jquery-ujs, I just happen to know this problem exists because I [encountered it myself](https://github.com/rails/jquery-ujs/issues/327) and had to work around it. In truth, tons of other libraries stop event propagation, including Bootstrap.
+
+## Why Do People Stop Event Propagation
+
+I already discussed how there's a lot of bad advice on the Internet recommending the use of `stopPropagation` when other methods are clearly better. But there are other reasons peopled do this.
+
+I'd wager a bet that a very large percentage of the time developer stop event propagation, they don't even realize they're doing it.
+
+### Return false
+
+In the olden days of inline event handlers you'd frequently see stuff like this in people's HTML code:
+
+```xml
+<a href="#" onclick="return false">Link</a>
+```
+
+Return false here is used to prevent the browser from doing to the URL '#', which would usually scroll the browser to the top of the page.
+
+But return false does more than preventing the browsers default action for an event, it also stops that event from propagating.
+
+Returning false is basically the same as:
+
+```javascript
+event.preventDefault();
+event.stopPropagation();
+```
+
+I'd recommend never returning false from any event handler. It's always better to be explicit with your intentions.
+
+**Note:** If you use CoffeeScript (which automatically returns the last expression) make sure you don't end your event handlers with anything the evaluates to `false`.
 
 ###  Performance
 
@@ -79,21 +112,6 @@ Peter Paul Koch of Quirksmode.org recommended this practice in an old article on
 > usually you want to turn all capturing and bubbling off to keep functions from interfering with each other. Besides, if your document structure is very complex (lots of nested tables and such) you may save system resources by turning off bubbling. The browser has to go through every single ancestor element of the event target to see if it has an event handler. Even if none are found, the search still takes time.
 
 With today's modern browsers, however, there is essentially no noticeable performance gain from stopping event propagation. Unless you absolutely know what you are doing and very strictly control all the code on your pages, I do not recommend this approach.
-
-### Return false
-
-Perhaps the most common reason people stop event propagation is by accident. Whenever you return false form an event handler you stop propagation and prevent the browsers default behavior from happening.
-
-Returning false is basically the same as:
-
-```javascript
-event.preventDefault();
-event.stopPropagation();
-```
-
-I'd recommend never returning false from any event handler.
-
-**Note:** If you use CoffeeScript (which automatically returns the last expression) make sure you don't end your event handlers with anything the evaluates to `false`.
 
 ## What To Do Instead
 

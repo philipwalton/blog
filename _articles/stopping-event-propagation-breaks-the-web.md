@@ -16,9 +16,9 @@ Imagine you have a leaky shower in your bathroom that desperately needs fixing. 
 
 Sounds crazy, right? I mean, there's the obvious problem that now you can't use your shower at all, but there are probably other issues as well. Maybe that pipe, after going to the shower, continued on to the kitchen or the laundry room. This "solution" has likely created more problems than it solved.
 
-This story might seem a bit unrealistic, but the truth is we developers do stuff like this all the time. We solve a problem with a trick we don't fully undertand without thinking of its larger consequences.
+This story might seem a bit unrealistic, but the truth is we developers do stuff like this all the time. We solve a problem with a trick we don't fully undertand without considering its larger consequences.
 
-One example of this that I see far too often is when developers unnecessarily stop event propagation.
+An example of this that happens much too frequently is unnecessarily stopping event propagation.
 
 ## An Age Old Problem
 
@@ -48,9 +48,9 @@ Unfortunately, it's the most upvoted answer, so this is what a lot of people do.
 
 Like a lot of things in JavaScript, DOM events are global. And as most people know, global variables make for messy, coupled code.
 
-Modifying the state or the behavior of a global variable might not seem like a big deal, but as developers depend more and more on third-party libraries (i.e. code they didn't write), altering global state and changing the expected behavior can lead to some disasterous bugs. Bugs that are impossible to defend against and a nightmare to track down.
+Modifying the state or the behavior of a global variable might not seem like a big deal, but as developers depend more and more on third-party libraries (or really any code they didn't write), altering global state and changing the expected behavior can lead to some disasterous bugs. Bugs that are impossible to defend against and a nightmare to track down.
 
-When you stop an event from propagating up to the document, you're changing the game in a way that libraries authors can't predict or defend against. This problem is maginifed by the fact that event delegation is rapidly becoming the norm. More and more people are just listening for events on the document, so every time you stop an event from propagating up the DOM, you're potentially breaking someone else's code (or your own).
+When you stop an event from propagating up to the document, you're changing the rules of the game in a way that libraries authors can't predict. This problem is maginifed by the fact that event delegation is rapidly becoming the norm. More and more people are just listening for events on the document, so every time you stop an event from propagating up the DOM, you're potentially breaking someone else's code (or your own).
 
 ## What Can Go Wrong?
 

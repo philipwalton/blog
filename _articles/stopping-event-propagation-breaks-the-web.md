@@ -12,21 +12,19 @@
 }
 -->
 
-Imagine you have a leaky shower in your bathroom that desperately needs fixing. You search online to see if you can stop the leak yourself, and the top rated advice suggests you to seal off the pipe that leads to the shower. Easy enough, you think, so you get out your tools, seal the pipe, and sure enough the leak has stopped!
+Imagine you have a leaky shower in your bathroom that desperately needs fixing. You search online to see if you can figure out how to do it yourself, and the top rated advice suggests you to seal off the pipe that leads to the shower. "I could do that!" you exclaim to yourself. So you get out your tools, seal the pipe, and voilà! The leak has stopped.
 
 Sounds crazy, right? I mean, there's the obvious problem that now you can't use your shower at all, but there are probably other issues as well. Maybe that pipe, after going to the shower, continued on to the kitchen or the laundry room. This "solution" has likely created more problems than it solved.
 
-This story might seem a bit unrealistic, but the truth is we developers do stuff like this all the time. We solve a problem with a trick we don't fully undertand without considering its larger consequences.
+This story might seem a bit unrealistic, but the truth is we all do stuff like this all the time. We solve a problem using a trick we don't fully undertand without considering its larger consequences.
 
-An example of this that happens much too frequently is unnecessarily stopping event propagation.
+A frequent (and unfortunate) example of this is when developers unnecessarily stop events from propagating through the DOM.
 
-## An Age Old Problem
+## A "Classic" Problem
 
-If you're a web developer, at some point in your career you've probably needed made a dialog or a popup that is supposed to go away when the users clicks somewhere else on the page.
+If you're a web developer, at some point in your career you've probably had to build a popup or dialog that dismissed itself when the user clicked somewhere else on the page. If you searched online for how to do this, chances are you came across this Stack Overflow question: [How to detect a click outside an element?](http://stackoverflow.com/questions/152975/how-to-detect-a-click-outside-an-element).
 
-If you weren't using a third-party UI library, you had to figure out how to do this yourself, and chances are you came across this Stack Overflow question: [How to detect a click outside an element?](http://stackoverflow.com/questions/152975/how-to-detect-a-click-outside-an-element)
-
-In case you don't like clicking links, here's the top answer:
+Here's what the highest voted answer recommends:
 
 ```javascript
 $('html').click(function() {
@@ -40,11 +38,11 @@ $('#menucontainer').click(function(event){
 
 The above code basically says: If a click event propagates to the `<html>` element, hide the menu. If the click originated inside `#menucontainer`, stop the event so it never reaches `<html>`, thus only clicks outside of `#menucontainer` will close it.
 
-This is really, really terrible advice. It's basically equivalent to turning off the water in my leaky shower example. This technique completely ignores the possibility that any other code could be running on the site that needs to detect click events.
+This code is simple, elegant, and clever all at the same time. Yet, unfortutely, it's absolutely horrible advice. It's basically the equivalent of turning off the water in the leaky shower example. This method completely ignores the possibility that any other code could be running on the site that needs to detect click events.
 
-Unfortunately, it's the most upvoted answer, so this is what a lot of people do.
+But it's the Interent, and it's the most upvoted answer, so this is what a lot of people do.
 
-### Event Propagation
+## The Problem with Events
 
 Like a lot of things in JavaScript, DOM events are global. And as most people know, global variables make for messy, coupled code.
 
@@ -56,9 +54,9 @@ When you stop an event from propagating up to the document, you're changing the 
 
 You might be saying to yourself: Who even writes code like this anymore? I use a UI library to do all this stuff so I can just stop reading, right?
 
-Unforunately stopping event propagation is not only found in bad Stack Overflow answers, but it's found in some of the most popular libraries in use today.
+No, unforunately stopping event propagation is not only found in bad Stack Overflow answers; it's also found in some of the most popular libraries in use today.
 
-Let me show you how easy it is to create a `stopPropagation` related bug using two of today's most popular frameworks: [Bootstap](http://getbootstrap.com/) and [Rails](http://rubyonrails.org/).
+Let me show you how easy it is to create a `stopPropagation` related bug using [Bootstap](http://getbootstrap.com/) and [Rails](http://rubyonrails.org/).
 
 Bootstrap and Rails both come pre-packaged with JavaScript plugins. In the following example, Rails' [jquery-ujs](https://github.com/rails/jquery-ujs) library, which allows Rails to declaratively add remote ajax calls to links via the `data-remote` attribute, is preventing Bootstrap's dropdown menus from properly hiding.
 
@@ -68,9 +66,9 @@ See for yourself:
   <div class="codepen" data-height="250" data-slug-hash="KzHjc" data-default-tab="result"></div>
 </div>
 
-The [JavaScript code](https://github.com/twbs/bootstrap/blob/v3.1.1/js/dropdown.js#L141-L142) that is responsible for closing the dropdown menu is listening for click events on the document. But since jquery-ujs stops event propagation, that code doesn't get run for those clicks.
+The [JavaScript code](https://github.com/twbs/bootstrap/blob/v3.1.1/js/dropdown.js#L141-L142) that is responsible for closing the dropdown menu is listening for click events on the document. But since jquery-ujs stops event propagation, that code never runs for those clicks.
 
-The worst part about this bug is that there's absolutely nothing Bootstrap can do to prevent it from happening. If you're writing code that deals with the DOM, you're always at the mercy of the other code running on the page. Such is the nature of global variables.
+The worst part about this bug is that there's absolutely nothing Bootstrap can do to prevent it from happening. If you're writing code that deals with the DOM, you're always at the mercy of whatever other code is running on the page. Such is the nature of global variables.
 
 I'm not trying to pick on jquery-ujs, I just happen to know this problem exists because I [encountered it myself](https://github.com/rails/jquery-ujs/issues/327) and had to work around it. In truth, tons of other libraries stop event propagation, including Bootstrap.
 

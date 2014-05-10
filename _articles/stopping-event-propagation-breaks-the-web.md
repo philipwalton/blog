@@ -14,7 +14,7 @@
 
 * Intro
 * A Classic Problem
-* The Trouble with Events
+  * The Trouble with Events
 * What Can Go Wrong?
 * Why Do People Stop Event Propagation?
   * Return False
@@ -53,7 +53,7 @@ This code is simple, elegant, and clever all at the same time. Yet, unfortutely,
 
 But it's the Interent, and it's the most upvoted answer, so this is what a lot of people do.
 
-## The Problem with Events
+### The Problem with Events
 
 Like a lot of things in JavaScript, DOM events are global. And as most people know, global variables make for messy, coupled code.
 

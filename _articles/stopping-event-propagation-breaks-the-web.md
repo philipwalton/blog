@@ -12,6 +12,17 @@
 }
 -->
 
+* Intro
+* A Classic Problem
+* The Trouble with Events
+* What Can Go Wrong?
+* Why Do People Stop Event Propagation?
+  * Return False
+  * Performance
+* Is It Ever Okay to Stop Event Propagation?
+  * Prevent Default
+* Conclusion
+
 Imagine you have a leaky shower in your bathroom that desperately needs fixing. You search online to see if you can figure out how to do it yourself, and the top rated advice suggests you to seal off the pipe that leads to the shower. "I could do that!" you exclaim to yourself. So you get out your tools, seal the pipe, and voilà! The leak has stopped.
 
 Sounds crazy, right? I mean, there's the obvious problem that now you can't use your shower at all, but there are probably other issues as well. Maybe that pipe, after going to the shower, continued on to the kitchen or the laundry room. This "solution" has likely created more problems than it solved.
@@ -72,7 +83,7 @@ The worst part about this bug is that there's absolutely nothing Bootstrap can d
 
 I'm not trying to pick on jquery-ujs, I just happen to know this problem exists because I [encountered it myself](https://github.com/rails/jquery-ujs/issues/327) and had to work around it. In truth, tons of other libraries stop event propagation, including Bootstrap.
 
-## Why Do People Stop Event Propagation
+## Why Do People Stop Event Propagation?
 
 I already discussed how there's a lot of bad advice on the Internet recommending the use of `stopPropagation` when other methods are clearly better. But there are other reasons peopled do this.
 
@@ -141,7 +152,7 @@ An example of that could be a situation where you've displayed a modal dialog on
 
 To reiterate the rule, stopping propagation is OK to stop events, not to stop event handlers. Event handlers should be responsible for determining whether or not to run on their own.
 
-## Prevent Default
+### Prevent Default
 
 Frequently an event handler will stop event propagation because it doesn't want a subsequent event handler to do something it shouldn't. Consider the following event handler that uses Google Analytics to track when your visitors click links to external domains:
 

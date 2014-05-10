@@ -124,7 +124,7 @@ With today's modern browsers, however, there is essentially no noticeable perfor
 
 ## What To Do Instead
 
-As a general rule of thumb, you should never stop an event from propagating unless you actually do not want the event to occur. Most of the time, however, people stop events because they do not want the handlers registered for an event to occur. There's a big difference.
+As a general rule of thumb, you should never stop an event from propagating unless you actually do not want the event to occur. Most of the time, however, people stop events because they do not want to invoke the handlers registered for that event. There's a big difference.
 
 Never stop an event from propagating because you won't want to run a handler. Instead, that logic within that handler needs to be responsible for determining what actions need to be taken.
 
@@ -148,7 +148,7 @@ This is simple enough to do without jQuery as well, but the implementation is no
 
 I mentioned above that you should never stop an event from propagating just because you don't want some event handler to run. The only time you should ever stop an event from propagating is if you want to make it like the event never happened in the first place.
 
-An example of that could be a situation where you've displayed a modal dialog on the page and set focus on the "OK" button of the dialog. If you user tries to click outside of the dialog at other links on the page or tries to use the tab key to escape the dialog, it's probably best to completely block those events. If you want to make it impossible to interact with the page outside of the dialog, it's perfectly reasonable to stop those events fro propagating, but that is a very different situation from simply not wanting to logic to run.
+An example of that could be a situation where you've displayed a modal dialog on the page and set focus on the "OK" button of the dialog. If you user tries to click outside of the dialog at other links on the page or tries to use the tab key to escape the dialog, it's probably best to completely block those events. If you want to make it impossible to interact with the page outside of the dialog, it's perfectly reasonable to stop those events from propagating, but that is a very different situation from simply not wanting that logic to run.
 
 To reiterate the rule, stopping propagation is OK to stop events, not to stop event handlers. Event handlers should be responsible for determining whether or not to run on their own.
 

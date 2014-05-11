@@ -23,8 +23,9 @@ a {
 
 pre {
   background: var(bg-color);
+  line-height: 1.4;
   margin: 0 0 var(space);
-  padding: 1.5em;
+  padding: 1em var(space);
   word-break: break-word;
 }
 
@@ -32,8 +33,8 @@ code {
   background: var(bg-color);
   display: inline-block;
   font-family: Monaco, monospace;
-  font-size: .9em;
-  padding: 0 5px;
+  font-size: .85em;
+  padding: 1px 5px;
 }
 
 pre code {

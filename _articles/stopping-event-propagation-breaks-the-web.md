@@ -19,17 +19,18 @@
 * Why Do People Stop Event Propagation?
   * Return False
   * Performance
-* Is It Ever Okay to Stop Event Propagation?
+* What to do Instead
+  * Is It Ever Okay to Stop Event Propagation?
   * Prevent Default
 * Conclusion
 
-Imagine you have a leaky shower in your bathroom that desperately needs fixing. You search online to see if you can figure out how to do it yourself, and the top rated advice suggests you to seal off the pipe that leads to the shower. "I could do that!" you exclaim to yourself. So you get out your tools, seal the pipe, and voilà! The leak has stopped.
+Imagine you have a leaky shower in your bathroom that desperately needs fixing. You search online to see if you can figure out how to do it yourself, and the top rated advice suggests you to seal off the pipe that leads to the shower. "I could do that!" you think to yourself. So you get out your tools, seal the pipe, and voilà! The leak has stopped.
 
-Sounds crazy, right? I mean, there's the obvious problem that now you can't use your shower at all, but there are probably other issues as well. Maybe that pipe, after going to the shower, continued on to the kitchen or the laundry room. This "solution" has likely created more problems than it solved.
+Sounds crazy, right? I mean, there's the obvious problem that now you can't use your shower at all, but that's probably not the only issue. Maybe that pipe, after going to the shower, continued on to the kitchen or the laundry room. This "solution" has likely created more problems than it solved.
 
-This story might seem a bit unrealistic, but the truth is we all do stuff like this all the time. We solve a problem using a trick we don't fully undertand without considering its larger consequences.
+This story might seem a bit unrealistic, but the truth is we developers do stuff like this all the time. We solve a problem using a trick we don't fully understand without considering its larger consequences.
 
-A frequent (and unfortunate) example of this is when developers unnecessarily stop events from propagating through the DOM.
+Perhaps no problem exemplifies this more than the widespread misuse of stopping event propagation.
 
 ## A "Classic" Problem
 
@@ -47,9 +48,9 @@ $('#menucontainer').click(function(event){
 });
 ```
 
-The above code can be summarized as follows: If a click event propagates to the `<html>` element, hide the menu. If the click originated inside `#menucontainer`, stop the event so it never reaches `<html>`, thus only clicks outside of `#menucontainer` will close it.
+This answer can be summarized as follows: If a click event propagates to the `<html>` element, hide the menu. If the click originated inside `#menucontainer`, stop the event so it never reaches `<html>`, thus only clicks outside of `#menucontainer` will close it.
 
-This code is simple, elegant, and clever all at the same time. Yet, unfortutely, it's absolutely horrible advice. It's basically the equivalent of turning off the water in the leaky shower example. This method completely ignores the possibility that any other code could be running on the site that needs to detect click events.
+This code is simple, elegant, and clever all at the same time. Yet, unfortutely, it's absolutely horrible advice. It's basically the equivalent of turning off the water in my leaky shower story. This solution completely ignores the possibility that any other code on the page might needs to know about that click.
 
 But it's the Interent, and it's the most upvoted answer, so this is what a lot of people do.
 
@@ -57,49 +58,47 @@ But it's the Interent, and it's the most upvoted answer, so this is what a lot o
 
 Like a lot of things in JavaScript, DOM events are global. And as most people know, global variables make for messy, coupled code.
 
-Modifying the state or the behavior of a global variable might not seem like a big deal, but as the use of third-party frameworks increases, altering browser-defined behavior can lead to some disasterous bugs. Bugs that are impossible to defend against and a nightmare to track down.
+Modifying the state or the behavior of a global variable might not seem like a big deal, but as the use of third-party frameworks increases, altering browser-defined behavior can lead to some disastrous bugs. Bugs that are impossible to defend against and a nightmare to track down.
 
-When you stop an event from propagating up to the document, you're changing the rules of the game in a way that libraries authors can't predict. This problem is maginifed by the fact that event delegation is rapidly becoming the norm. More and more libraries are just listening for events on the document, so every time you stop an event from bubbling up the DOM, you're potentially breaking someone else's code, or even your own.
+When you stop an event from propagating up to the document, you're changing the rules of the game in a way that libraries authors can't predict. This problem is magnified by the increasing popularity of [event delegation](http://www.nczonline.net/blog/2009/06/30/event-delegation-in-javascript/). Every time you stop an event from propagating through the DOM, you're potentially creating a bug in some other code on the page.
 
 ## What Can Go Wrong?
 
-You might be thinking to yourself: who even writes code like this anymore? I use Bootstrap (or, insert UI library here) to do all this stuff so I can just stop reading, right?
+You might be thinking to yourself: who even writes code like this anymore? I use Bootstrap (or some other UI library) to do all this stuff so I can just stop reading, right?
 
-Well, no. Unforunately stopping event propagation is not only found in bad Stack Overflow answers; it's also found in some of the most popular libraries in use today.
+Well, no. Unfortunately stopping event propagation is not just something recommended by bad Stack Overflow answers; it's also found in some of the most popular libraries in use today.
 
-Let me show you how easy it is to create a `stopPropagation` related bug using [Bootstap](http://getbootstrap.com/) and [Rails](http://rubyonrails.org/).
+To prove this, let me show you how easy it is to create a `stopPropagation` related bug by using [Bootstrap](http://getbootstrap.com/) in a [Rails](http://rubyonrails.org/) app.
 
-In the following example, Rails' [jquery-ujs](https://github.com/rails/jquery-ujs) library, which allows Rails to declaratively add remote ajax calls to links via the `data-remote` attribute, is preventing Bootstrap's dropdown menus from properly hiding.
+Rails ships with a JavaScript library called [jquery-ujs](https://github.com/rails/jquery-ujs) that allows developers to declaratively add remote ajax calls to links via the `data-remote` attribtue.
 
-See for yourself:
+In the following example, if you open the dropdown and click on the "Remote Link" nothing happens. If you click anywhere else on the page (including the regular link), the dropdown closes as you'd expect.
 
 <div class="CodepenContainer">
   <div class="codepen" data-height="250" data-slug-hash="KzHjc" data-default-tab="result"></div>
 </div>
 
-The [JavaScript code](https://github.com/twbs/bootstrap/blob/v3.1.1/js/dropdown.js#L141-L142) that is responsible for closing the dropdown menu is listening for click events on the document. But since jquery-ujs stops event propagation, that code never runs for those clicks.
+This bug happens because the Bootstrap code responsible for closing the dropdown menu is listening for click events on the document. But since jquery-ujs stops event propagation in its `date-remote` link handlers, the Bootstap dropdown closing code never runs for those clicks.
 
 The worst part about this bug is that there's absolutely nothing Bootstrap can do to prevent it from happening. If you're writing code that deals with the DOM, you're always at the mercy of whatever other code is running on the page. Such is the nature of global variables.
 
-I'm not trying to pick on jquery-ujs, I just happen to know this problem exists because I [encountered it myself](https://github.com/rails/jquery-ujs/issues/327) and had to work around it. In truth, tons of other libraries, including Bootstrap, stop event propagation.
+I'm not trying to pick on jquery-ujs, I just happen to know this problem exists because I [encountered it myself](https://github.com/rails/jquery-ujs/issues/327) and had to work around it. In truth, tons of other libraries, including Bootstrap, stop event propagation. It's a big problem.
 
 ## Why Do People Stop Event Propagation?
 
-I already discussed how there's a lot of bad advice on the Internet recommending the use of `stopPropagation` when other methods are clearly better. But this isn't the only reason developers do this.
+I already showed that there's a lot of bad advice on the Internet recommending the use of `stopPropagation`, but this isn't the only reason developers do this.
 
-I'd wager a bet that a very large percentage of the time developer stop event propagation, they don't even realize they're doing it.
+I'd wager a bet that a very large percentage of the time, developer stop event propagation without even realizing it.
 
 ### Return false
 
-In the olden days of inline event handlers you'd frequently see stuff like this in people's HTML code:
+In the olden days of inline event handlers you'd frequently see stuff like this in people's code:
 
 ```xml
 <a href="#" onclick="return false">Link</a>
 ```
 
-Return false here is used to prevent the browser from attempting to navigate to the URL '#', which, in most browsers, would scroll to the top of the page.
-
-But `return false` does more than preventing the browsers default action for an event, it also stops that event from propagating through the DOM.
+Return false here is used to prevent the browser from attempting to find an empty hash fragment on the page. But `return false` is actually doing more than just preventing this default behavior, it's also stopping the propagation of that event.
 
 Returning false is basically the same as:
 
@@ -116,45 +115,47 @@ I'd recommend never returning false from any event handler. It's always better t
 
 Back in the days of IE6 and other terribly slow browsers, a complicated DOM could really slow down your site. And since events travel through the entire DOM, the more nodes you have, the slower everything is.
 
-Peter Paul Koch of Quirksmode.org recommended this practice in an old article on JavaScript events:
+Peter Paul Koch of [Quirksmode.org](http://www.quirksmode.org/js/events_order.html) recommended this practice in an old article on JavaScript events:
 
-> usually you want to turn all capturing and bubbling off to keep functions from interfering with each other. Besides, if your document structure is very complex (lots of nested tables and such) you may save system resources by turning off bubbling. The browser has to go through every single ancestor element of the event target to see if it has an event handler. Even if none are found, the search still takes time.
+> if your document structure is very complex (lots of nested tables and such) you may save system resources by turning off bubbling. The browser has to go through every single ancestor element of the event target to see if it has an event handler. Even if none are found, the search still takes time.
 
 With today's modern browsers, however, there is essentially no noticeable performance gain from stopping event propagation. Unless you absolutely know what you are doing and very strictly control all the code on your pages, I do not recommend this approach.
 
 ## What To Do Instead
 
-As a general rule of thumb, you should never stop an event from propagating unless you actually do not want the event to occur. Most of the time, however, people stop events because they do not want to invoke the handlers registered for that event. There's a big difference.
+As a general rule, stopping event propagatin should never be the solution to a programming problem. It should only be used when you want to make it as if the event never happened.
 
-Never stop an event from propagating because you won't want to run a handler. Instead, that logic within that handler needs to be responsible for determining what actions need to be taken.
+In the "How to detect a click outside of an element?" example above, the purpose of calling `stopPropagation` isn't to get rid of the click event altogether, it's to avoid running the code that will hide the menu in one particular situation.
 
-To put that another way (and to once again reference the click outside example above), if you want to determine if a click happened outside of an element, you should register an event handler on the document, and within that handler's logic, inspect the event's target and see if it is a child of the element in question.
+In addition to this being a bad idea because it alters global behavior, it's a bad idea because it places the menu hiding logic in two different and unrelated places, making it less maintainable.
 
-Here's how you might do that using jQuery:
+A much better solution is to have a single event handler whose logic is fully ensapsulated and whose responsiblity is determining whether the menu should be hidden for a particular event.
+
+As it turns out, the better option ends up being less code:
 
 ```javascript
 $(document).on('click', function(event) {
-  if ($(event.target).closest('#menu').length) {
-    // This runs when the click was on or inside #menu
-  } else {
-    // This runs when the click was outside #menu
+  if (!$(event.target).closest('#menucontainer').length) {
+    // Hide the menu.
   }
 })
 ```
 
-This is simple enough to do without jQuery as well, but the implementation is not important. The point is that to keep your code decoupled and encapsulated, you shouldn't be altering the global state just for the sake of simplifying the logic of your event handler.
+The above code listens for clicks on the document and checks to see if the event target is `#menucontainer` or has `#menucontainer` as a parent. If it doesn't, then you hide the menu.
 
-## Is It Ever Okay to Stop Event Propagation?
+I'm sure some readers will notice that the above solution requires a bit more DOM traversal than the original. Hopefully I've convinced you that this is neglidgable, especially for something as infrequent as a click event.
 
-I mentioned above that you should never stop an event from propagating just because you don't want some event handler to run. The only time you should ever stop an event from propagating is if you want to make it like the event never happened in the first place.
-
-An example of that could be a situation where you've displayed a modal dialog on the page and set focus on the "OK" button of the dialog. If you user tries to click outside of the dialog at other links on the page or tries to use the tab key to escape the dialog, it's probably best to completely block those events. If you want to make it impossible to interact with the page outside of the dialog, it's perfectly reasonable to stop those events from propagating, but that is a very different situation from simply not wanting that logic to run.
-
-To reiterate the rule, stopping propagation is OK to stop events, not to stop event handlers. Event handlers should be responsible for determining whether or not to run on their own.
+I'd trade a few microseconds of DOM lookup for a few hours of debugging any day.
 
 ### Prevent Default
 
-Frequently an event handler will stop event propagation because it doesn't want a subsequent event handler to do something it shouldn't. Consider the following event handler that uses Google Analytics to track when your visitors click links to external domains:
+Frequently people use `stopPropagation` or `return false` when all they really want to do is prevent the browsers default behavior from happening.
+
+Let's say you have a link on your site that users can click on the share the page on Twitter. The actual link points to a URL on twitter.com but instead of going there you want to run some JavaScript code that opens a popup instead.
+
+In order to prevent the browser from actually navigation to twitter.com, you need to tell it to `preventDefault`.
+
+Imagine you also have some code on your site that uses Google Analytics to track link clicks to external domains. Maybe it looks like this:
 
 ```javascript
 $(document).on('click', 'a', function() {
@@ -164,11 +165,9 @@ $(document).on('click', 'a', function() {
 })
 ```
 
-But perhaps you have a tweet button that gracefully degrades to an external link but actually performs as a button. Maybe you want to track that separately and don't want it considered as an external link.
+If you want to exclude link clicks like the Twitter button that don't actually take you away from the current page, it might be tempting to stop those events from propagating. But a much better approach is to inspect the event to see if `preventDefault` has been called.
 
-Instead of using stop propagation on the tweet button to avoid the Google Analytics tracking, you should instead be checking for whether or not another handler called `preventDefault`.
-
-In order for the tweet button handler to avoid following the link, it must have called `event.preventDefault`. In the Google Analytics handler you can check for that and only track links when default has not been prevented.
+You know if the event target was a link and `preventDefault` was invoked, the browser wouldn't actually navigate to the URL, so instead of stopping event propagation, you can just inspect the event object.
 
 ```javascript
 $(document).on('click', 'a', function() {
@@ -181,12 +180,24 @@ $(document).on('click', 'a', function() {
 })
 ```
 
-I see very little code written that uses the `event.defaultPrevented` check, but it's actually quite useful. Almost all cases that I see using `stopPropagation` could be rewritten to use `defaultPrevented` in another handler.
+By doing it this way you correctly track only the link clicks you want without breaking other functionality on the page (e.g. an open Bootstrap dropdown).
 
-Be warned, though, that you shouldn't use `preventDefault` just to mark an event as "handled". You should only use `preventDefault` if you want to avoid invoking the browsers default behavior for the event.
+In my experience, a large portion of the code I see using `stopPropagation` could easily be rewritten to check `event.defaultPrevented` instead. The next time you're faced with this dilemma, think about what you're really trying to accomplish.
 
 ## Conclusion
 
 Pretty much everything I've said so far could be summed up with a few simple rules of thumb. Treat events as global variables. Don't alter them unless you really want them to be altered globally, for all other code on the site. Event handler logic should be limited in scope and should not depend on other event handlers to work.
 
-When stated like this it seems rather obvious, but a surprising amount of code is not written with consideration for what other code may also be running on the page.
+And if it's helpful, remember the Bootstrap dropdown example. This can be particularly help when writing event handlers for click events. If you're ever tempted to call `stopPropagation` in an event handler, just ask yourself: *if there were an open dropdown on this page, would stopping event propagation be a problem?*
+
+If the answer is "yes", and it frequently is, you should find another way.
+
+## When Stopping Event Propagation is Okay
+
+I said above that stopping event propagation should never be the solution to a programming problem. What I meant by that is stopping event propagation should never be used as a convient way to avoid some extra work
+
+The only reason to ever stop event propagation is if you want to make it like the event never happened. Since events are global occurrences, stopping event propagation for any other reason is irresponsible.
+
+When would you want to make it like an event never happened? Well, this is rare, but one possible example could be when you've displayed a modal dialog on your page and set focus on the dialog's "OK" button. If the user tries to click outside of the dialog at other links on the page or tries to use the tab key to remove focus from the dialog, it's sometimes best to completely block those events. If you want to make it impossible to interact with the page while the dialog is present, it might make sense to completely stop those events from propagating.
+
+This is very different from the click outside example mentioned earlier. In that case, stopping the event from propagating was for the sole purpose of preventing the execution of some code. It was a hack rather than a feature.

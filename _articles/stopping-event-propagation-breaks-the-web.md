@@ -68,28 +68,52 @@ As a quick disclaimer, I'm not trying to single out jquery-ujs, I just happen to
 
 I already showed that there's some bad advice on the Internet promoting the use of `stopPropagation`, but that isn't the only reason people do it.
 
-I'd bet that a very large percentage of the time, developers stop event propagation without even realizing it.
+Frequently, developers stop event propagation without even realizing it.
 
 ### Return false
 
-In the olden days of inline event handlers you'd frequently see stuff like this in people's code:
+There's a lot of confusion about what happens when you return `false` from an event handler. Consider the following three cases that all appear to do the same thing:
 
 ```xml
-<a href="#" onclick="return false">Link</a>
+<!-- Using an inline event handler. -->
+<a href="http://google.com" onclick="return false">Google</a>
 ```
-
-Return false here is used to prevent the browser from attempting to find an empty hash fragment on the page. But `return false` is actually doing more than just preventing this default behavior, it's also stopping the propagation of that event. And this doesn't just apply to inline event handlers, it applies to all event handlers.
-
-Returning false is basically the same as:
 
 ```javascript
-event.preventDefault();
-event.stopPropagation();
+// Using jQuery.
+$('a').on('click', function() {
+  return false;
+})
 ```
 
-In my opinion, you should never return false from any event handler, even if you intend for both of these to happen. It's better to be explicit, so your intentions are clear to other developers on your team.
+```javascript
+// Using plain ol' JavaScript.
+var link = document.querySelector('a');
+link.addEventListener('click', function() {
+  return false;
+})
+```
 
-**Note:** If you use CoffeeScript (which automatically returns the last expression in a function) make sure you don't end your event handlers with anything the evaluates to the Boolean `false`.
+They look like they should do the same thing, but the results are actually completely different. Here's what happens in each of these cases:
+
+1. Returning `false` from an inline event handler prevents the browser from navigating to the link address, but it doesn't stop the event from propagating through the DOM.
+2. Returning `false` from a jQuery event handler prevent the browser from navigating to the link address, and it also stops the event from propagating through the DOM.
+3. Returning `false` from a regular DOM event handler does absolutely nothing.
+
+If you're shaking your head in disbelief right now, you're not alone. These differences are incredibly confusing and annoying.
+
+Fortunately, the methods `stopPropagation` and `preventDefault` actually do work the same in both jQuery and native DOM event handlers. The following function could be passed to either jQuery's `on()` method or the browsers native `addEventListener()` method and the result would be the same:
+
+```javascript
+function stop(event) {
+  event.preventDefault();
+  event.stopPropagation();
+}
+```
+
+Because of the confusion around `return false`, I'd recommend never using it. Furthermore, since returning `false` from a jQuery event handler stops the event from propagating, doing so could easily lead to some of the problems described in this article.
+
+**Note:** If you use jQuery with CoffeeScript (which automatically returns the last expression in a function) make sure you don't end your event handlers with anything the evaluates to the Boolean `false` or you'll have the same issue.
 
 ###  Performance
 
@@ -123,11 +147,14 @@ $(document).on('click', function(event) {
 
 The above handler listens for clicks on the document and checks to see if the event target is `#menucontainer` or has `#menucontainer` as a parent. If it doesn't, you know the click originated from outside of `#menucontainer`, and you can hide the menus if they're visible.
 
-I'm sure some readers will notice that this solution requires a bit more DOM traversal than the original. Though, hopefully, I've convinced you that this cost is both negligible and worth it, especially for something as infrequent as a click event. I will gladly trade a few microseconds of DOM lookup today if it lowers the likelihood of spending a few hours tracking down bugs in the future.
+I'm sure some readers will notice that this solution requires a bit more DOM traversal than the original. Though, hopefully, I've convinced you that the benefits of this approach far outweigh the costs of such a small performance hit. I will gladly trade a few microseconds of DOM lookup today if it lowers the likelihood of spending a few hours tracking down bugs in the future.
 
 ### Prevent Default
 
-Frequently people use `stopPropagation` or `return false` when all they really want to do is prevent the browser's default behavior from happening.
+Developers frequently use `stopPropagation` or `return false` when what they really want to use is `preventDefault`.
+
+
+
 
 Let's say you have a link on your site that users can click on the share the current page on Twitter. The actual link points to a URL on twitter.com but rather than going there you want to run some JavaScript that opens a classic Twitter share popup instead.
 

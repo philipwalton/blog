@@ -30,11 +30,10 @@ pre {
 
 code {
   background: var(bg-color);
-  color: teal;
   display: inline-block;
   font-family: Monaco, monospace;
   font-size: .9em;
-  padding: 1px 2px 0;
+  padding: 0 5px;
 }
 
 pre code {

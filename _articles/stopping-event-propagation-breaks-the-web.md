@@ -149,6 +149,13 @@ The above handler listens for clicks on the document and checks to see if the ev
 
 I'm sure some readers will notice that this solution requires a bit more DOM traversal than the original. Though, hopefully, I've convinced you that the benefits of this approach far outweigh the costs of such a small performance hit. I will gladly trade a few microseconds of DOM lookup today if it lowers the likelihood of spending a few hours tracking down bugs in the future.
 
+### Default Prevented
+
+Frequently developers use `stopPropagation` because they've called `preventDefault` and they think later event handlers should no longer apply. But this isn't necessarily the case.
+
+
+
+
 ### Prevent Default
 
 Developers frequently use `stopPropagation` or `return false` when what they really want to use is `preventDefault`.

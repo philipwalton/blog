@@ -164,8 +164,10 @@ In my experience, a large portion of the code I see using `stopPropagation` coul
 
 ## Conclusion
 
-Pretty much everything I've said so far could be summed up with a few simple rules of thumb. Treat events as global variables. Don't alter them unless you really want them to be altered globally, for all other code on the site. Event handler logic should be limited in scope and should not depend on other event handlers to work.
+Hopefully this article has helped you think about DOM events in a new light. They're not isolated pieces that can be modified without consequence. They're global and interconnected and often affect far more code than you realize.
 
-If you're ever not sure what to do, just remember the Bootstrap dropdown example I showed earlier. Remind yourself that if you're writing a click handler that stops event propagation, an open Bootstrap dropdown will fail to close. So ask yourself, is that okay?
+To avoid bugs, it's almost always best to leave events alone and let them propagate as the browser intended.
 
-If the answer is "no" (and it usually is) you should find another way.
+If you're ever unsure about what do to, just ask yourself the following question: is it possible that some other code, either now or in the future, might want to know that this event happened? Whether it be as trivial as a Bootstrap modal or as critical event tracking analytics, if something might ever want to know about that event, it's better to leave it alone and find another solution.
+
+Another solution is always possible.

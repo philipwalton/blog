@@ -153,9 +153,6 @@ I'm sure some readers will notice that this solution requires a bit more DOM tra
 
 Developers frequently use `stopPropagation` or `return false` when what they really want to use is `preventDefault`.
 
-
-
-
 Let's say you have a link on your site that users can click on the share the current page on Twitter. The actual link points to a URL on twitter.com but rather than going there you want to run some JavaScript that opens a classic Twitter share popup instead.
 
 In order to prevent the browser from actually navigation to twitter.com, you need to tell it to `preventDefault`.
@@ -170,7 +167,7 @@ $(document).on('click', 'a', function() {
 });
 ```
 
-If you want to exclude link clicks like the Twitter button that don't actually take you away from the current page, it might be tempting to stop those events from propagating. But a much better approach is to inspect the event to see if `preventDefault` has been called.
+If you want to exclude link clicks (like the Twitter button) that don't actually navigate away from the current page, it might be tempting to stop those events from propagating. But a much better approach is to inspect the event to see if `preventDefault` has been called.
 
 You know if the event target was a link and `preventDefault` was invoked, the browser wouldn't actually navigate to the URL, so instead of stopping event propagation, you can just inspect the event object.
 

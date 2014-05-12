@@ -66,22 +66,22 @@ Frequently, developers stop event propagation without even realizing it.
 
 ### Return false
 
-There's a lot of confusion about what happens when you return `false` from an event handler. Consider the following three cases that all appear to do the same thing:
+There's a lot of confusion around what happens when you return `false` from an event handler. Consider the following three cases that all appear to do the same thing:
 
 ```xml
-<!-- Using an inline event handler. -->
+<!-- An inline event handler. -->
 <a href="http://google.com" onclick="return false">Google</a>
 ```
 
 ```javascript
-// Using jQuery.
+// A jQuery event handler.
 $('a').on('click', function() {
   return false;
 });
 ```
 
 ```javascript
-// Using native methods.
+// A native event handler.
 var link = document.querySelector('a');
 
 link.addEventListener('click', function() {
@@ -89,13 +89,15 @@ link.addEventListener('click', function() {
 });
 ```
 
-These three examples all look like they should do the same thing, but the results are actually quite different. Here's what happens in each of these cases:
+These three examples all look like they should do the same thing, but the results are actually quite different. Here's what happens in each of the above cases:
 
 1. Returning `false` from an inline event handler prevents the browser from navigating to the link address, but it doesn't stop the event from propagating through the DOM.
 2. Returning `false` from a jQuery event handler prevents the browser from navigating to the link address **and** it stops the event from propagating through the DOM.
 3. Returning `false` from a regular DOM event handler does absolutely nothing.
 
-If you're shaking your head in disbelief right now, you're not alone. These differences are incredibly confusing and annoying.
+When you expect something to happen and it doesn't, it's confusing, but you usually catch it right away. A much bigger problem is when you expect something to happen and it *does* but with unexpected side-effects. That's where nightmare bugs come from.
+
+In the jQuery example above, it's not clear that returning `false` stops event propagation in addition to preventing the default behavior. If you were expecting it to behave more like an inline event handler, you'd probably get bugs and have no idea why.
 
 Fortunately, the methods `stopPropagation` and `preventDefault` actually do work the same in both jQuery and native DOM event handlers. The following function could be passed to either jQuery's `on()` method or the browsers native `addEventListener()` method and the result would be the same:
 
@@ -108,13 +110,11 @@ function stop(event) {
 
 Because of the confusion around `return false`, I'd recommend never using it.
 
-Furthermore, since returning `false` from a jQuery event handler stops the event from propagating, doing so could easily cause some of the problems described in this article.
-
 **Note:** If you use jQuery with CoffeeScript (which automatically returns the last expression in a function) make sure you don't end your event handlers with anything that evaluates to the Boolean `false` or you'll have the same problem.
 
 ###  Performance
 
-Back in the days of IE6 and other terribly slow browsers, a complicated DOM could really slow down your site. And since events travel through the entire DOM, the more nodes you have, the slower everything is.
+Back in the days of IE6 and even older browsers, a complicated DOM could really slow down your site. And since events travel through the entire DOM, the more nodes you have, the slower everything gets.
 
 Peter Paul Koch of [quirksmode.org](http://www.quirksmode.org/js/events_order.html) recommended this practice in an old article on the subject:
 
@@ -144,7 +144,7 @@ $(document).on('click', function(event) {
 
 The above handler listens for clicks on the document and checks to see if the event target is `#menucontainer` or has `#menucontainer` as a parent. If it doesn't, you know the click originated from outside of `#menucontainer`, and you can hide the menus if they're visible.
 
-I'm sure some readers will notice that this solution requires a bit more DOM traversal than the original. Though, hopefully, I've convinced you that the benefits of this approach far outweigh the costs of such a small performance hit. I will gladly trade a few microseconds of DOM lookup today if it lowers the likelihood of spending a few hours tracking down bugs in the future.
+I'm sure some readers will notice that this solution requires a bit more DOM traversal than the original. Though, hopefully, I've convinced you that the benefits of this approach far outweigh the costs of such a small performance hit. I would gladly trade a few microseconds of DOM lookup today if it lowers the likelihood of spending a few hours tracking down bugs in the future.
 
 ### Default Prevented?
 
@@ -154,7 +154,7 @@ Consider the Bootstrap and Rails example shown above. `data-remote` link handler
 
 About a year ago I thought it would be valuable to create an event handling library that, instead of ever stopping propagation, would simply mark certain events as "handled". This would allow handlers registered farther up the DOM to inspect the event and, based on whether or not it had been "handled", determine if any further action was needed.
 
-This seemed nice in theory, but what I found was in all cases where I wanted to treat a "handled" event differently from an unhandled event, those events had also had their default action prevented. I realized that the DOM already provided such a method: `defaultPrevented`.
+This seemed nice in theory, but what I found was in all cases where I wanted to treat a "handled" event differently from an unhandled event, those events had also had their default action prevented. I realized I was creating a method that the DOM already provided: `defaultPrevented`.
 
 To make this more clear, imagine you're adding an event handler to the document to use Google Analytics to track when users click on links to external domains. It might look something like this:
 
@@ -166,7 +166,7 @@ $(document).on('click', 'a', function() {
 });
 ```
 
-The problem here, though, is that in the case of a link that points to an external domain, but whose default gets prevented (e.g. a Twitter share link), the user won't actually go to that URL and thus you don't want to track it (at least not in this category).
+The problem here, though, is that in the case of a link that points to an external domain, but whose default gets prevented (e.g. a Twitter share link), the user won't actually go to that URL and thus you don't want to track it (at least not here).
 
 The solution to this problem is actually pretty simple, and doesn't require stopping event propagation. All you have to do is check to see if the default action has been prevented:
 
@@ -192,6 +192,4 @@ Hopefully this article has helped you think about DOM events in a new light. The
 
 To avoid bugs, it's almost always best to leave events alone and let them propagate as the browser intended.
 
-If you're ever unsure about what to do, just ask yourself the following question: is it possible that some other code, either now or in the future, might want to know that this event happened? The answer to this question is usually yes. Whether it be as someting as trivial as a Bootstrap modal or as critical event tracking analytics, having access to events is important.
-
-When in doubt, don't stop propagation.
+If you're ever unsure about what to do, just ask yourself the following question: is it possible that some other code, either now or in the future, might want to know that this event happened? The answer to this question is usually yes. Whether it be as someting as trivial as a Bootstrap modal or as critical event tracking analytics, having access to events is important. When in doubt, don't stop propagation.

@@ -66,7 +66,7 @@ Frequently, developers stop event propagation without even realizing it.
 
 ### Return false
 
-There's a lot of confusion around what happens when you return `false` from an event handler. Consider the following three cases that all appear to do the same thing:
+There's a lot of confusion around what happens when you return `false` from an event handler. Consider the following three cases, each of which does nothing other than `return false`:
 
 ```xml
 <!-- An inline event handler. -->
@@ -89,26 +89,22 @@ link.addEventListener('click', function() {
 });
 ```
 
-These three examples all look like they should do the same thing, but the results are actually quite different. Here's what happens in each of the above cases:
+These three examples all appear to do the same thing, but the results are actually quite different. Here's what actually happens in each of the above cases:
 
 1. Returning `false` from an inline event handler prevents the browser from navigating to the link address, but it doesn't stop the event from propagating through the DOM.
 2. Returning `false` from a jQuery event handler prevents the browser from navigating to the link address **and** it stops the event from propagating through the DOM.
 3. Returning `false` from a regular DOM event handler does absolutely nothing.
 
-When you expect something to happen and it doesn't, it's confusing, but you usually catch it right away. A much bigger problem is when you expect something to happen and it *does* but with unexpected side-effects. That's where nightmare bugs come from.
+When you expect something to happen and it doesn't, it's confusing, but you usually catch it right away. A much bigger problem is when you expect something to happen and it *does* but with unanticipated side-effects. That's where nightmare bugs come from.
 
-In the jQuery example above, it's not clear that returning `false` stops event propagation in addition to preventing the default behavior. If you were expecting it to behave more like an inline event handler, you'd probably get bugs and have no idea why.
-
-Fortunately, the methods `stopPropagation` and `preventDefault` actually do work the same in both jQuery and native DOM event handlers. The following function could be passed to either jQuery's `on()` method or the browsers native `addEventListener()` method and the result would be the same:
+In the jQuery example above, it's not clear that returning `false` would behave any differently than the other two event handlers, but it does. [Under the hood](https://github.com/jquery/jquery/blob/2.1.1/src/event.js#L393-L396), it's actually invoking the following two statements:
 
 ```javascript
-function stop(event) {
-  event.preventDefault();
-  event.stopPropagation();
-}
+event.preventDefault();
+event.stopPropagation();
 ```
 
-Because of the confusion around `return false`, I'd recommend never using it.
+Because of the confusion around `return false`, and the fact that it stops event propagation in jQuery handlers, I'd recommend never using it. It's much better to be explicit with your intention and call those event methods directly.
 
 **Note:** If you use jQuery with CoffeeScript (which automatically returns the last expression in a function) make sure you don't end your event handlers with anything that evaluates to the Boolean `false` or you'll have the same problem.
 
@@ -150,7 +146,7 @@ I'm sure some readers will notice that this solution requires a bit more DOM tra
 
 Many developers will stop event propagation because they've called `preventDefault` and think that subsequent event handlers should no longer apply. But this usually isn't the case.
 
-Consider the Bootstrap and Rails example shown above. `data-remote` link handlers prevent default because they need to make an AJAX request instead of navigating to the link address. But clearly that doesn't mean an open Bootstrap dropdown shouldn't close when that link is clicked.
+Consider the Bootstrap and Rails example shown above. `data-remote` link handlers prevent default because they need to make an AJAX request instead of navigating to the link address. But clearly that doesn't mean an open Bootstrap dropdown shouldn't close when a `data-remote` link is clicked.
 
 About a year ago I thought it would be valuable to create an event handling library that, instead of ever stopping propagation, would simply mark certain events as "handled". This would allow handlers registered farther up the DOM to inspect the event and, based on whether or not it had been "handled", determine if any further action was needed.
 

@@ -188,4 +188,4 @@ Hopefully this article has helped you think about DOM events in a new light. The
 
 To avoid bugs, it's almost always best to leave events alone and let them propagate as the browser intended.
 
-If you're ever unsure about what to do, just ask yourself the following question: is it possible that some other code, either now or in the future, might want to know that this event happened? The answer to this question is usually yes. Whether it be as someting as trivial as a Bootstrap modal or as critical event tracking analytics, having access to events is important. When in doubt, don't stop propagation.
+If you're ever unsure about what to do, just ask yourself the following question: is it possible that some other code, either now or in the future, might want to know that this event happened? The answer to this question is usually yes. Whether it be for something as trivial as a Bootstrap modal or as critical as event tracking analytics, having access to events is important. When in doubt, don't stop propagation.

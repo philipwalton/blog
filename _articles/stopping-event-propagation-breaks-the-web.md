@@ -110,7 +110,7 @@ Because of the confusion around `return false`, and the fact that it stops event
 
 ###  Performance
 
-Every one in a while you'll see some advice (usually written a while ago) that recommends stopping propagation for performance reasons.
+Every so often you'll read some advice (usually written a while ago) that recommends stopping propagation for performance reasons.
 
 Back in the days of IE6 and even older browsers, a complicated DOM could really slow down your site. And since events travel through the entire DOM, the more nodes you have, the slower everything gets.
 
@@ -120,13 +120,13 @@ Peter Paul Koch of [quirksmode.org](http://www.quirksmode.org/js/events_order.ht
 
 With today's modern browsers, however, any performace gains you get from stopping event propagation will likely go unnoticed by your users. It's a micro-optimization and certainly not your performance bottleneck.
 
-I recommend not worrying about the fact that events propagation through your entire DOM. It's part of the specification, and browser have gotten very good at doing it.
+I recommend not worrying about the fact that events propagation through your entire DOM. It's part of the specification, and browsers have gotten very good at doing it.
 
 ## What To Do Instead
 
-As a general rule, stopping event propagation should never be a solution to a difficult coding challenge. Instead, stopping propagation should only ever be used for one purpose: to make it as if the event never happened.
+As a general rule, stopping event propagation should never be a solution to a problem. Stopping propagation should only ever be used for one purpose: to make it as if the event never happened. That is the reason the method exists, and it should only be used for that purpose.
 
-In the "How to detect a click outside of an element?" example above, the purpose of calling `stopPropagation` isn't to get rid of the click event altogether, it's to avoid running some code that will hide the menu in one particular situation.
+In the "How to detect a click outside of an element?" example above, the purpose of calling `stopPropagation` isn't to get rid of the click event altogether, it's to avoid running some other code on the page.
 
 In addition to this being a bad idea because it alters global behavior, it's also a bad idea because it puts the menu hiding logic in two different and unrelated places, making it far more fragile than necessary.
 
@@ -148,15 +148,11 @@ I'm sure some readers will notice that this solution requires a bit more DOM tra
 
 ### Default Prevented?
 
-Many developers will stop event propagation because they've called `preventDefault` and think that subsequent event handlers should no longer apply. But this usually isn't the case.
+About a year ago I start writing an event handling library to help deal with this problem. Instead of stopping event propagation, you would simply mark an event as "handled". This would allow event listeners registered farther up the DOM to inspect the event and, based on whether or not it had been "handled", determine if any further action was needed. The idea was that you could "stop event propagation" without actually stopping it.
 
-Consider the Bootstrap and Rails example shown above. `data-remote` link handlers prevent default because they need to make an AJAX request instead of navigating to the link address. But clearly that doesn't mean an open Bootstrap dropdown shouldn't close when a `data-remote` link is clicked.
+As it turned out, I never ended up needing this library. In 100% of the cases that I found myself wanting to know if the event hand been "handled", I notice that a previous handler had called `preventDefault`. And the DOM API already provides a way to inspect this: the `defaultPrevented` property.
 
-About a year ago I thought it would be valuable to create an event handling library that, instead of ever stopping propagation, would simply mark certain events as "handled". This would allow handlers registered farther up the DOM to inspect the event and, based on whether or not it had been "handled", determine if any further action was needed.
-
-This seemed nice in theory, but what I found was in all cases where I wanted to treat a "handled" event differently from an unhandled event, those events had also had their default action prevented. I realized I was creating a method that the DOM already provided: `defaultPrevented`.
-
-To make this more clear, imagine you're adding an event handler to the document to use Google Analytics to track when users click on links to external domains. It might look something like this:
+Let me clarify this with an example. Imagine you're adding an event listener to the document that will use Google Analytics to track when users click on links to external domains. It might look something like this:
 
 ```javascript
 $(document).on('click', 'a', function() {
@@ -166,9 +162,9 @@ $(document).on('click', 'a', function() {
 });
 ```
 
-The problem here, though, is that in the case of a link that points to an external domain, but whose default gets prevented (e.g. a Twitter share link), the user won't actually go to that URL and thus you don't want to track it (at least not here).
+The problem with this code is that not all links take you to other pages. Sometimes JavaScript will intercept the click, call `preventDefault` and do something else. The `data-remote` links described above are a prime example of that. Another example is a Twitter share link that opens a popup instead of going to twitter.com
 
-The solution to this problem is actually pretty simple, and doesn't require stopping event propagation. All you have to do is check to see if the default action has been prevented:
+To avoid tracking these kinds of clicks, it might be tempting to stop event propagation, but inspecting the event for `defaultPrevented` is a much better approach.
 
 ```javascript
 $(document).on('click', 'a', function() {
@@ -182,9 +178,7 @@ $(document).on('click', 'a', function() {
 });
 ```
 
-Since calling `preventDefault` in click handlers for links will always prevent the browser from navigating to that link's address, you can be 100% confident that if `defaultPrevented` is true, the user did not go to that address.
-
-In my experience, a large portion of the code I see using `stopPropagation` could easily be rewritten to check `event.defaultPrevented` instead. The next time you're faced with this dilemma, think about what you're really trying to accomplish.
+Since calling `preventDefault` in link click handler will always prevent the browser from navigating to that link's address, you can be 100% confident that if `defaultPrevented` is true, the user did not go to that address. This is both more reliable that `stopPropagation` and will no have side effects.
 
 ## Conclusion
 
@@ -192,4 +186,4 @@ Hopefully this article has helped you think about DOM events in a new light. The
 
 To avoid bugs, it's almost always best to leave events alone and let them propagate as the browser intended.
 
-If you're ever unsure about what to do, just ask yourself the following question: is it possible that some other code, either now or in the future, might want to know that this event happened? The answer to this question is usually yes. Whether it be for something as trivial as a Bootstrap modal or as critical as event tracking analytics, having access to events is important. When in doubt, don't stop propagation.
+If you're ever unsure about what to do, just ask yourself the following question: is it possible that some other code, either now or in the future, might want to know that this event happened? The answer is usually yes. Whether it be for something as trivial as a Bootstrap modal or as critical as event tracking analytics, having access to events is important. When in doubt, don't stop propagation.

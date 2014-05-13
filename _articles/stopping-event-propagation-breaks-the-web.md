@@ -110,13 +110,17 @@ Because of the confusion around `return false`, and the fact that it stops event
 
 ###  Performance
 
+Every one in a while you'll see some advice (usually written a while ago) that recommends stopping propagation for performance reasons.
+
 Back in the days of IE6 and even older browsers, a complicated DOM could really slow down your site. And since events travel through the entire DOM, the more nodes you have, the slower everything gets.
 
 Peter Paul Koch of [quirksmode.org](http://www.quirksmode.org/js/events_order.html) recommended this practice in an old article on the subject:
 
 > if your document structure is very complex (lots of nested tables and such) you may save system resources by turning off bubbling. The browser has to go through every single ancestor element of the event target to see if it has an event handler. Even if none are found, the search still takes time.
 
-With today's modern browsers, however, there is essentially no noticeable performance gain from stopping event propagation. Unless you absolutely know what you are doing and very strictly control all the code on your pages, I do not recommend this approach.
+With today's modern browsers, however, any performace gains you get from stopping event propagation will likely go unnoticed by your users. It's a micro-optimization and certainly not your performance bottleneck.
+
+I recommend not worrying about the fact that events propagation through your entire DOM. It's part of the specification, and browser have gotten very good at doing it.
 
 ## What To Do Instead
 

@@ -6,10 +6,15 @@
 
 body {
   color: #333;
-  font: 1.125em/1.333 jaf-bernino-sans, sans-serif;
+  font: 1.25em/1.333 freight-text-pro, Georgia, serif;
   -webkit-font-smoothing: antialiased;
-  letter-spacing: -0.03em;
+  xletter-spacing: -0.03em;
   text-rendering: optimizeLegibility;
+}
+
+h1, h2, h3 {
+  font-family: jaf-bernino-sans, sans-serif;
+  letter-spacing: -0.04em!important;
 }
 
 p {
@@ -23,7 +28,7 @@ a {
 
 pre {
   background: var(bg-color);
-  line-height: 1.4;
+  line-height: 1.6;
   margin: 0 0 var(space);
   padding: 1em var(space);
   word-break: break-word;
@@ -33,7 +38,7 @@ code {
   background: var(bg-color);
   display: inline-block;
   font-family: Monaco, monospace;
-  font-size: .85em;
+  font-size: 0.7em;
   padding: 1px 5px;
 }
 

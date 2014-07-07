@@ -124,7 +124,9 @@ I recommend not worrying about the fact that events propagation through your ent
 
 ## What To Do Instead
 
-As a general rule, stopping event propagation should never be a solution to a problem. Stopping propagation should only be used for one reason: to make it as if the event never happened. That's why the method exists, and that's the only time you should use it.
+As a general rule, stopping event propagation should never be a solution to a problem. If you have several event handlers that sometimes interfere with each other, and you discover that stopping propagation in one of them makes everything work, that's not good. It might fix your problem, but it's probably creating another one you're not aware of.
+
+`stopPropagation` should only ever be used intentionally. Perhaps you want to prevent a form submission or disallow focus to an area of the page. In these cases you're stopping propagation because you want to stop the event, not because you just don't want some handler to run.
 
 In the "How to detect a click outside of an element?" example above, the purpose of calling `stopPropagation` isn't to get rid of the click event altogether, it's to avoid running some other code on the page.
 
@@ -148,7 +150,7 @@ The above handler listens for clicks on the document and checks to see if the ev
 
 About a year ago I start writing an event handling library to help deal with this problem. Instead of stopping event propagation, you would simply mark an event as "handled". This would allow event listeners registered farther up the DOM to inspect the event and, based on whether or not it had been "handled", determine if any further action was needed. The idea was that you could "stop event propagation" without actually stopping it.
 
-As it turned out, I never ended up needing this library. In 100% of the cases I found myself checking to see if the event hand been "handled", I notice that a previous handler had called `preventDefault`. And the DOM API already provides a way to inspect this: the `defaultPrevented` property.
+As it turned out, I never ended up needing this library. In 100% of the cases I found myself checking to see if the event hand been "handled", I noticed that a previous handler had called `preventDefault`. And the DOM API already provides a way to inspect this: the `defaultPrevented` property.
 
 Let me clarify this with an example. Imagine you're adding an event listener to the document that will use Google Analytics to track when users click on links to external domains. It might look something like this:
 

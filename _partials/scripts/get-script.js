@@ -1,8 +1,15 @@
-var firstScriptEl = document.getElementsByTagName('script')[0];
+{{#is site.env 'production'}}
 
-function getScript(url) {
-  var scriptEl = document.createElement('script');
-  scriptEl.src = url;
-  // Insert this script before the first script to prevent blocking
-  firstScriptEl.parentNode.insertBefore(scriptEl, firstScriptEl);
-}
+  var getScript = (function() {
+
+    var fjs = document.getElementsByTagName('script')[0];
+
+    return function(url) {
+      var js = document.createElement('script');
+      js.src = url;
+      fjs.parentNode.insertBefore(js, fjs);
+    }
+
+  }());
+
+{{/is}}

@@ -32,7 +32,7 @@ module.exports = function() {
   }
 
   events.on('afterRenderContent', function(p) {
-    if (p.format == 'markdown') {
+    if (p.data.format == 'markdown') {
       // TODO: changing the extention should be automatically done
       // by the Permalink object.
       p.permalink = p.permalink.replace(/\.md$/, '.html')

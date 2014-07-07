@@ -6,7 +6,7 @@
 
 body {
   color: #333;
-  font: 1.125em/1.333 'jaf-bernino-sans', '' sans-serif;
+  font: 1.125em/1.333 jaf-bernino-sans, sans-serif;
   -webkit-font-smoothing: antialiased;
   letter-spacing: -0.03em;
   text-rendering: optimizeLegibility;

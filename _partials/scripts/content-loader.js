@@ -47,7 +47,12 @@
       showPage(title, pageCache[path], hash);
     }
     else {
-      get(path + '_index.html', function(xhr) {
+      var basename = /(\w+)\.html$/;
+      var url = basename.test(path)
+        ? path.replace(basename, '_$1.html')
+        : path + '_index.html';
+
+      get(url, function(xhr) {
         console.log('Loading content for: ' + path);
         pageCache[path] = xhr.responseText;
         showPage(title, xhr.responseText, hash);
@@ -73,6 +78,13 @@
   });
 
   linkClicked(function(event) {
+
+    // Don't attempt to AJAX in content if the link was click
+    // while the command (meta) or control key was pressed.
+    if (event.metaKey || event.ctrlKey) {
+      return;
+    }
+
     if (isInternalLinkOnDifferentPage(this)) {
       event.preventDefault();
 

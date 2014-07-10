@@ -19,7 +19,9 @@ var linkClicked = (function() {
       var e = event || window.event;
       var target = e.target || e.srcElement;
       var link = getLinkAncestor(target);
-      handler.call(link, event || window.event);
+      if (link) {
+        handler.call(link, event || window.event);
+      }
     });
   };
 

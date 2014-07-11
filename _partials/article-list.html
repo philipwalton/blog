@@ -13,18 +13,16 @@
   {{/ query }}
 </ul>
 
-
-
 {{#if paginated}}
-  <div class="callout paginator">
-    <span class="paginator__prev">
+  <div>
+    <span>
       {{#if prevPage}}
         <a href="{{prevPage.permalink}}">&laquo; Previous</a>
       {{else}}
         &laquo; Previous
       {{/if}}
     </span>
-    <span class="paginator__next">
+    <span>
       {{#if nextPage}}
         <a href="{{nextPage.permalink}}">Next &raquo;</a>
       {{else}}

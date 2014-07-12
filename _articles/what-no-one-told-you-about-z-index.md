@@ -3,7 +3,6 @@
   "layout": "article",
   "title": "What No One Told You About Z-Index",
   "date": "2012-12-22T21:17:39-08:00",
-  "codepen": true,
   "tags": [
     "CSS"
   ]
@@ -47,9 +46,8 @@ Here's what the HTML and basic CSS look like. I've also included a visual demo (
   background: blue;
 }
 ```
-
 <div class="CodepenContainer">
-  <pre class="codepen" data-height="250" data-type="result" data-href="ksBaI" data-user="philipwalton"><code></code></pre>
+  <iframe src="//codepen.io/philipwalton/embed/ksBaI?height=250&theme-id=5742" scrolling="no" frameborder="0" height="250" allowtransparency="true"></iframe>
 </div>
 
 **Here's the challenge:** try to see if you can make the red `<span>` element stack behind the blue and green `<span>` elements without breaking any of the following rules:
@@ -62,9 +60,11 @@ To see if you can figure it out, click the *edit on Codepen* link above and play
 
 *Warning: Don't click on the CSS tab of the example below or it will give away the answer.*
 
+
 <div class="CodepenContainer">
-  <pre class="codepen" data-height="250" data-type="result" data-href="dfCtb" data-user="philipwalton" data-safe="true"><code></code></pre>
+  <iframe src="//codepen.io/philipwalton/embed/dfCtb?height=250&theme-id=5742" scrolling="no" frameborder="0" height="250" allowtransparency="true"></iframe>
 </div>
+
 
 ## The Solution
 

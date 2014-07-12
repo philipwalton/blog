@@ -14,12 +14,14 @@ module.exports = function() {
     var curYear
 
     _.each(articles, function(article, i) {
-      if (curYear && curYear.year == article.data.date.substr(0,4)) {
+      // if (curYear && curYear.year == article.data.date.substr(0,4)) {
+      if (curYear && curYear.year == article.date.substr(0,4)) {
         curYear.articles.push(article)
       }
       else {
         curYear = {
-          year: article.data.date.substr(0,4),
+          // year: article.data.date.substr(0,4),
+          year: article.date.substr(0,4),
           articles: [article]
         }
         archive.push(curYear)

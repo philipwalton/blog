@@ -41,8 +41,7 @@ Almost every social snippet out there does the same two things:
 
 That's it. Don't believe me? Well, let's look at a few examples.
 
-*(If you do believe me and just want to skip to my recommendations, go to the section entitled [What To Do Instead
-](#what-to-do-instead).)*
+*(If you do believe me and just want to skip to my recommendations, go to the section entitled [What To Do Instead](#what-to-do-instead).)*
 
 ### Twitter
 

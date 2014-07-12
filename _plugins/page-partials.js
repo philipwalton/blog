@@ -4,16 +4,15 @@ var _ = require('lodash-node/modern');
 module.exports = function() {
 
   var Page = this.Page;
-  var pages = Page.all();
-
+  var Permalink = this.Permalink;
   var Template = this.Template;
+  var pages = Page.all();
 
   function replaceDefaultLayoutWithBlank(template) {
     if (template.layout) {
       template.layout = template.layout.clone();
-      template.layout.uuid = Math.random();
 
-      if (path.basename(template.layout.filename, '.html') == 'default') {
+      if (path.basename(template.layout.filename) == 'default.html') {
         delete template.layout;
         return;
       }
@@ -25,20 +24,17 @@ module.exports = function() {
 
     pages.forEach(function(p) {
 
-      var template = p.template.clone();
-      replaceDefaultLayoutWithBlank(template);
+      var page = p.clone();
+      var resolvedPermalink = page.permalink.toString();
 
-      // Remove the default layout from the template layout chain
-      // so create a partial
+      page.template = p.template.clone();
+      replaceDefaultLayoutWithBlank(page.template);
 
-      var page = new Page(template, p.config);
-      var filename = page.permalink.toString();
-      filename = !path.extname(filename)
-        ? filename + '_index.html'
-        : path.dirname(filename) + '_' + path.basename(filename);
+      resolvedPermalink = !path.extname(resolvedPermalink)
+        ? resolvedPermalink + '_index.html'
+        : path.dirname(resolvedPermalink) + '_' + path.basename(resolvedPermalink);
 
-      page.permalink = filename;
-
+      page.permalink = new Permalink(resolvedPermalink);
     });
 
   });

@@ -10,6 +10,9 @@
     "bower.json",
     "README.md"
   ],
+  "excludePlugins": [
+    "minify-html.js"
+  ],
   "postTypes": ["article"],
   "taxonomyTypes": ["tag"],
   "excerptLength": 16,

@@ -21,7 +21,7 @@
     "lodash-node": "*",
     "shelljs": "*",
     "html-minifier": "*",
-    "rework": "*",
+    "rework": "~0.20.2",
     "rework-importer": "~0.2.1",
     "rework-vars": "~2.0.2",
     "rework-shade": "*",

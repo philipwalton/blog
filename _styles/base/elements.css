@@ -31,6 +31,7 @@ pre {
   line-height: 1.6;
   margin: 0 0 var(space);
   padding: 1em var(space);
+  white-space: pre-wrap;
   word-break: break-word;
 }
 

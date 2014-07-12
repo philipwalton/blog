@@ -17,6 +17,5 @@
   "taxonomyTypes": ["tag"],
   "excerptLength": 16,
 
-  "googleAnalyticsTrackingID": "UA-21292978-1",
-  "disqusShortname": "philipwalton"
+  "googleAnalyticsTrackingID": "UA-21292978-1"
 }

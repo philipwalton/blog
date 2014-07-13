@@ -1,4 +1,3 @@
-
 <ul class="ArticleList">
   {{# query }}
     <li class="ArticleList-item">
@@ -12,22 +11,3 @@
     </li>
   {{/ query }}
 </ul>
-
-{{#if paginated}}
-  <div>
-    <span>
-      {{#if prevPage}}
-        <a href="{{prevPage.permalink}}">&laquo; Previous</a>
-      {{else}}
-        &laquo; Previous
-      {{/if}}
-    </span>
-    <span>
-      {{#if nextPage}}
-        <a href="{{nextPage.permalink}}">Next &raquo;</a>
-      {{else}}
-        Next &raquo;
-      {{/if}}
-    </span>
-  </div>
-{{/if}}

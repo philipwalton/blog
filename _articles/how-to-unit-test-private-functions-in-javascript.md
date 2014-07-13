@@ -6,7 +6,7 @@
   "tags": [
     "JavaScript"
   ],
-  "excerpt": "JavaScript's closures provide an excellent way to make variables and functions private, keeping them out of the global scope. This is particularly important in the browser because all scripts share the same scope, and it's quite easy to inadvertently pick a variable or function name used by another library."
+  "excerpt": "JavaScript's closures provide an excellent way to make variables and functions private, keeping them out of the global scope"
 }
 -->
 

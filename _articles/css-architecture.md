@@ -10,7 +10,7 @@
     "OOCSS",
     "HTML"
   ],
-  "excerpt": "To many Web developers, being good at CSS means you can take a visual mock-up and replicate it perfectly in code. You don't use tables, and you pride yourself on using as few images as possible. If you're really good, you use the latest and greatest techniques like media queries, transitions and transforms"
+  "excerpt": "To many Web developers, being good at CSS means you can take a visual mock-up and replicate it perfectly in code"
 }
 -->
 

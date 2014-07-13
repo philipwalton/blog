@@ -6,25 +6,42 @@
 }
 -->
 
-<header class="ContentHeader">
-  <h1 class="ContentHeader-title entry-title">{{title}}</h1>
-  <time class="ContentHeader-date published" datetime="{{datetime date format="YYYY-MM-DDTHH:mm:ssZ"}}">
-    {{datetime date format="MMMM D, YYYY"}}
-  </time>
-</header>
+<article role="article" class="hentry">
 
-<div class="entry-content">
-  {{{content}}}
-</div>
+  <header class="ContentHeader">
+    <h1 class="ContentHeader-title entry-title">{{title}}</h1>
+    <time class="ContentHeader-date published"
+        datetime="{{datetime date format="YYYY-MM-DDTHH:mm:ssZ"}}">
+      {{datetime date format="MMMM D, YYYY"}}
+    </time>
+  </header>
 
-<footer class="Share entry-unrelated">
-  <span class="Share-figure">
-    <svg viewBox="0 0 32 32">
-      <use xlink:href="#icon-twitter-bird"></use>
-    </svg>
-  </span>
-  <p class="Share-pitch">
-    If you liked this article and think others should read it, please
-    <a href="{{twitterShareLink}}">share it on Twitter</a>.
-  </p>
-</footer>
+  <div class="entry-content">
+    {{{content}}}
+  </div>
+
+  <footer class="entry-unrelated">
+
+    <p>
+    <em>Tagged as:
+      {{#each post.tags}}
+        <a href="{{page.permalink}}">{{value}}</a>{{#unless @last}}, {{/unless}}
+      {{/each}}
+    </em>
+    </p>
+
+    <div class="Share">
+      <span class="Share-figure">
+        <svg viewBox="0 0 32 32">
+          <use xlink:href="#icon-twitter-bird"></use>
+        </svg>
+      </span>
+      <p class="Share-pitch">
+        If you liked this article and think others should read it, please
+        <a href="{{twitterShareLink}}">share it on Twitter</a>.
+      </p>
+    </div>
+
+  </footer>
+
+</article>

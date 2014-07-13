@@ -25,6 +25,7 @@ If you're interested in my thoughts on something, let me know, and maybe it'll t
 
 ## Writing
 
+* [CSS Tricks](http://css-tricks.com/dangers-stopping-event-propagation/)
 * [CSS Tricks](http://css-tricks.com/interviewing-front-end-engineer-san-francisco/)
 * [Adobe Developer Connection](http://www.adobe.com/devnet/html5/articles/css-everything-is-global-and-how-to-deal-with-it.html)
 * [Codrops](http://tympanus.net/codrops/2013/01/22/defending-presentational-class-names/)

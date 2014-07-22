@@ -8,10 +8,9 @@
 .ArticlePreview-title {
   display: block;
   font-size: 1.4em;
-  letter-spacing: -.03em;
   line-height: 1.1;
   margin: .6em 0 .2em;
-  transition: color .2s ease;
+  transition: color .2s cubic-bezier(.4,0,.2,1);
 }
 
 .ArticlePreview-excerpt {
@@ -23,13 +22,9 @@
 .ArticlePreview-date {
   color: #aaa;
   font-size: .8em;
-  /letter-spacing: 0;
-  text-overflow: ellipsis;
-
-  ;
 }
 
 .ArticlePreview:hover .ArticlePreview-title {
-  color: var(link-color);
+  color: var(accent-color);
 }
 

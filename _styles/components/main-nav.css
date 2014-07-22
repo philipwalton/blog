@@ -5,8 +5,18 @@
   font-weight: bold;
 }
 
-.MainNav > li {
+.MainNav a {
   color: #999;
-  font-size: .8em;
-  padding: .2em 0;
+  display: block;
+  font-size: .85em;
+  line-height: 1.667;
+  text-decoration: none;
+  transition: color .2s cubic-bezier(.4,0,.2,1);
+  -webkit-font-smoothing: initial;
+}
+
+.MainNav a:hover,
+.MainNav a:focus,
+.MainNav a:active {
+  color: var(accent-color);
 }

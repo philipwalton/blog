@@ -3,9 +3,9 @@
 @import url(base/variables.css);
 @import url(base/elements.css);
 
-@import url(components/header.css);
-@import url(components/content.css);
+@import url(components/site.css);
 @import url(components/content-header.css);
+@import url(components/page-title.css);
 @import url(components/profile.css);
 @import url(components/social-nav.css);
 @import url(components/main-nav.css);

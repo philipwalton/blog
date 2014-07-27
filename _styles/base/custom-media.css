@@ -1,0 +1,4 @@
+@custom-media --break-sm (min-width: 420px);
+@custom-media --break-md (min-width: 570px);
+@custom-media --break-lg (min-width: 800px);
+@custom-media --break-xl (min-width: 1000px);

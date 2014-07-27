@@ -3,6 +3,13 @@
   font-size: .7em;
   letter-spacing: .15em;
   margin: 0;
+  text-align: center;
   text-transform: uppercase;
   word-spacing: .5em;
+}
+
+@media (--break-lg) {
+  .PageTitle {
+    text-align: inherit;
+  }
 }

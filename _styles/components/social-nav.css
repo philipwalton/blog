@@ -1,15 +1,29 @@
 .SocialNav {
   display: flex;
-  justify-content: center;
+  justify-content: inherit;
   list-style: none;
-  margin: 0 0 1em;
+  margin: 0;
   padding: 0;
 }
 
 .SocialNav-icon {
-  width: var(space);
-  height: var(space);
-  margin: .2em;
+  flex: 0 0 auto;
+  height: 24px;
+  width: 24px;
+}
+
+.SocialNav-icon + .SocialNav-icon {
+  margin-left: .2em;
+}
+
+@media (--break-sm) {
+  .SocialNav-icon {
+    height: var(--space);
+    width: var(--space);
+  }
+  .SocialNav-icon + .SocialNav-icon {
+    margin-left: .3em;
+  }
 }
 
 .SocialNav-icon svg {
@@ -18,13 +32,13 @@
 }
 
 .SocialNav-icon--twitter:hover svg {
-  fill: var(twitter-color);
+  fill: var(--twitter-color);
 }
 
 .SocialNav-icon--github:hover svg {
-  fill: var(github-color);
+  fill: var(--github-color);
 }
 
 .SocialNav-icon--rss:hover svg {
-  fill: var(rss-color);
+  fill: var(--rss-color);
 }

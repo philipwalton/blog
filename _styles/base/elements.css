@@ -4,8 +4,12 @@
   box-sizing: border-box;
 }
 
+html, body {
+  height: 100%;
+}
+
 body {
-  color: var(text-color);
+  color: var(--text-color);
   font: 1.25em/1.333 freight-text-pro, Georgia, serif;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
@@ -17,7 +21,7 @@ h1, h2, h3 {
 }
 
 p {
-  margin: 0 0 var(space);
+  margin: 0 0 var(--space);
 }
 
 a {
@@ -33,16 +37,16 @@ article a {
 }
 
 pre {
-  background: var(bg-color);
+  background: var(--bg-color);
   line-height: 1.6;
-  margin: 0 0 var(space);
-  padding: 1em var(space);
+  margin: 0 0 var(--space);
+  padding: 1em var(--space);
   white-space: pre-wrap;
   word-break: break-word;
 }
 
 code {
-  background: var(bg-color);
+  background: var(--bg-color);
   border-radius: 2px;
   display: inline-block;
   font-family: Monaco, monospace;
@@ -66,7 +70,7 @@ blockquote {
 }
 
 ol, ul {
-  margin: 0 0 var(space);
+  margin: 0 0 var(--space);
   padding-left: 2em;
 }
 

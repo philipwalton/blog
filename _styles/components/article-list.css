@@ -1,10 +1,16 @@
 .ArticleList {
   list-style: none;
   padding: 0;
-  margin: 2em 0 0;
+  margin: 1em 0 0;
 }
 
 .ArticleList-item {
   position: relative;
   border-top: 1px solid #eee;
+}
+
+@media (--break-md) {
+  .ArticleList {
+    margin-top: 1.5em;
+  }
 }

@@ -1,12 +1,12 @@
 :root {
-  var-text-color: #333;
-  var-accent-color: hsl(150, 40%, 50%);
-  var-bg-color: #f4f2f0;
-  var-border-color: #ddd;
+  --text-color: #333;
+  --accent-color: hsl(150, 40%, 50%);
+  --bg-color: #f4f2f0;
+  --border-color: #ddd;
 
-  var-twitter-color: #55acee;
-  var-github-color: #171715;
-  var-rss-color: #F93;
+  --twitter-color: #55acee;
+  --github-color: #171715;
+  --rss-color: #F93;
 
-  var-space: 1.5em;
+  --space: 1.5em;
 }

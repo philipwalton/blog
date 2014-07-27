@@ -1,7 +1,7 @@
 .ArticlePreview {
   color: inherit;
   display: block;
-  padding: var(space) 0;
+  padding: var(--space) 0;
   text-decoration: none;
 }
 
@@ -25,6 +25,6 @@
 }
 
 .ArticlePreview:hover .ArticlePreview-title {
-  color: var(accent-color);
+  color: var(--accent-color);
 }
 

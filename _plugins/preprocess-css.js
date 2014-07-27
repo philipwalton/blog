@@ -1,37 +1,27 @@
+var autoprefixer = require('autoprefixer');
 var fs = require('fs-extra')
-var rework = require('rework')
-var vars = require('rework-vars')
-var imprt = require('rework-importer')
-var shade = require('rework-shade')
-var autoprefixer = require('autoprefixer')
-var CleanCSS = require('clean-css')
+var rework = require('rework');
+var inline = require('rework-plugin-inline');
+var suit = require('rework-suit');
 
 module.exports = function() {
 
-  var events = this.events
+  var events = this.events;
 
   function preprocess(source, dest) {
-    var stylesheet = fs.readFileSync(source, 'utf-8')
-    var css = rework(stylesheet)
-      .use(imprt({path:'_styles'}))
-      .use(vars())
-      .use(rework.extend())
-      .use(rework.inline('assets/images', 'assets/fonts'))
-      .use(shade())
-      .toString()
+    var css = fs.readFileSync(source, 'utf-8')
 
-    // add prefixes
+    // Proproccess.
+    css = rework(css, {source: '_styles/style.css'})
+        .use(suit())
+        .use(inline('assets/images'))
+        .toString({compress: true});
+
+    // Prefix.
     css = autoprefixer('last 2 versions', '> 2%').process(css).css
 
-    // minify
-    var cleanCSS = new CleanCSS({
-      keepSpecialComments: 0,
-      processImport: false
-    })
-    css = cleanCSS.minify(css)
-
-    // save to the _site folder
-    fs.outputFileSync(dest, css)
+    // Save to the _site folder.
+    fs.outputFileSync(dest, css);
   }
 
   events.on('afterBuild', function() {

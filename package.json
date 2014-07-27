@@ -13,22 +13,18 @@
     "url": "https://github.com/philipwalton/blog/issues"
   },
   "devDependencies": {
-    "ingen": "*",
     "fs-extra": "*",
-    "marked": "*",
+    "he": "~0.3.6",
     "highlight.js": "^7.5.0",
-    "moment": "*",
-    "lodash-node": "*",
-    "shelljs": "*",
     "html-minifier": "*",
-    "rework": "~0.20.2",
-    "rework-importer": "~0.2.1",
-    "rework-vars": "~2.0.2",
-    "rework-shade": "*",
-    "autoprefixer": "*",
-    "clean-css": "*",
-    "uglify-js": "~2.4.8",
-    "colors": "~0.6.2",
-    "he": "~0.3.6"
+    "ingen": "*",
+    "lodash-node": "*",
+    "marked": "*",
+    "moment": "*",
+    "normalize.css": "^3.0.1",
+    "rework": "^1.0.0",
+    "rework-plugin-inline": "^1.0.1",
+    "rework-suit": "^4.0.0",
+    "uglify-js": "~2.4.8"
   }
 }

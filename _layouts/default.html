@@ -5,44 +5,21 @@
   </head>
   <body class="Site">
 
-    <header class="Site-header">
-
-      <a class="Profile" href="/">
-        <figure class="Profile-figure">
-          <img class="Profile-figureImage" src="http://www.gravatar.com/avatar/81173562da1e1c9ae2ddd0df69ec4f69.png">
-        </figure>
-        <h1 class="Profile-title">{{site.title}}</h1>
-      </a>
-
-      <nav>
-        <ul class="SocialNav">
-          <li class="SocialNav-icon SocialNav-icon--twitter">
-            <svg viewBox="0 0 32 32">
-              <use xlink:href="#icon-twitter"></use>
-            </svg>
-          </li>
-          <li class="SocialNav-icon SocialNav-icon--github">
-            <svg viewBox="0 0 32 32">
-              <use xlink:href="#icon-github"></use>
-            </svg>
-          </li>
-          <li class="SocialNav-icon SocialNav-icon--rss">
-            <svg viewBox="0 0 32 32">
-              <use xlink:href="#icon-rss"></use>
-            </svg>
-          </li>
-        </ul>
-
-        <ul class="MainNav">
-          <li><a href="/" title="Home">Home</a></li>
-          <li><a href="/articles/">Articles</a></li>
-          <li><a href="/articles/stop-copying-social-code-snippets/#the-anatomy-of-a-social-code-snippet">one</a></li>
-          <li><a href="/articles/stop-copying-social-code-snippets/#what-to-do-instead">two</a></li>
-          <li><a href="/about/">About</a></li>
-        </ul>
-      </nav>
-
-    </header>
+    <div class="Site-header">
+      <header class="Header">
+        <a href="/" class="Header-info">
+          <h1 class="Header-title">Philip Walton</h1>
+          <p class="Header-tagline">Engineer at Google</p>
+        </a>
+        <figure class="Header-photo"></figure>
+        <div class="Header-social">
+          {{> social-nav}}
+        </div>
+        <div class="Header-nav">
+          {{> main-nav}}
+        </div>
+      </header>
+    </div>
 
     <div class="Site-contentContainer">
       <main class="Site-content">

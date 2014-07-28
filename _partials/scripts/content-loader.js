@@ -6,7 +6,7 @@
   if (!(win.history && win.history.pushState)) return;
 
   // Store the container element to avoid multiple lookups.
-  var container = doc.getElementById('content');
+  var container = doc.querySelector('main');
 
   // Store the result of page content requests to avoid multiple
   // lookups when navigation to a previously seen page.
@@ -15,21 +15,12 @@
   // Add the current page to the cache.
   pageCache[loc.pathname] = container.innerHTML;
 
-  // Add history state initially so the first `popstate` event contains data.
-  win.history.replaceState({title: doc.title}, doc.title, loc.href);
 
   function getTitle(a) {
     var title = a.title || a.innerText;
     return title ? title + ' — Philip Walton' : null;
   }
 
-  /**
-   * Checks to see if the link is within the same domain, but not
-   * on the same page.
-   */
-  function isInternalLinkOnDifferentPage(a) {
-    return a.pathname != loc.pathname && a.href.indexOf(loc.host) >= 0;
-  }
 
   function get(url, success, error) {
     var xhr = new XMLHttpRequest();
@@ -42,9 +33,11 @@
     xhr.send();
   }
 
-  function loadPage(path, title, hash) {
+  function loadPage(urlData, cb) {
+    var path = urlData.pathname + urlData.search;
+
     if (pageCache[path]) {
-      showPage(title, pageCache[path], hash);
+      cb(pageCache[path]);
     }
     else {
       var basename = /(\w+)\.html$/;
@@ -53,46 +46,50 @@
         : path + '_index.html';
 
       get(url, function(xhr) {
-        console.log('Loading content for: ' + path);
         pageCache[path] = xhr.responseText;
-        showPage(title, xhr.responseText, hash);
+        cb(xhr.responseText);
       });
     }
   }
 
-  function showPage(title, content, hash) {
-    if (title) doc.title = title;
+  function showPage(content, next, current) {
     container.innerHTML = content;
-
-    // If there's a hash fragment, scroll to it,
-    // otherwise just scroll to the top.
-    if (hash) {
-      var target = document.getElementById(hash.slice(1));
-    }
-    win.scrollTo(0, target ? target.offsetTop : 0);
+    setScroll(next.hash)
   }
 
-  win.addEventListener('popstate', function(event) {
-    // console.log('popstate', pageCache[loc.pathname] ? 'cache exists' : 'nope')
-    loadPage(loc.pathname, event.state && event.state.title, loc.hash);
-  });
+  function setScroll(opt_hash) {
+    if (opt_hash) {
+      var target = doc.getElementById(opt_hash.slice(1));
+    }
+    var scrollPos = target ? target.offsetTop : 0;
+
+    // TODO: There's a weird chrome bug were sometime this function
+    // doesn't do anything if Chrome has already visited this page and
+    // thinks it has a scroll position in mind. Just chrome, weird...
+    win.scrollTo(0, scrollPos);
+  }
 
   linkClicked(function(event) {
+    // Don't do anything when clicking on links to the current URL.
+    if (this.href == location.href) event.preventDefault();
 
     // Don't attempt to AJAX in content if the link was click
     // while the command (meta) or control key was pressed.
-    if (event.metaKey || event.ctrlKey) {
-      return;
-    }
+    if (event.metaKey || event.ctrlKey) return;
 
-    if (isInternalLinkOnDifferentPage(this)) {
+    // If the clicked link is on the same site but the pathnames
+    // are different then add it to the history.
+    if ((this.pathname != loc.pathname) && (this.href.indexOf(loc.host) > -1)) {
       event.preventDefault();
-
-      var title = getTitle(this);
-      history.pushState({title: title}, title, this.href);
-
-      loadPage(this.pathname, title, this.hash);
+      history2.add(this.href, getTitle(this));
     }
   });
+
+  history2.change(function(next, current, state, event) {
+    loadPage(next, function(content) {
+      showPage(content, next, current, event);
+    });
+  });
+
 
 }(window, document, window.location));

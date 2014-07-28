@@ -72,7 +72,7 @@ Let's walk through what this code is doing.
 
 1. It declares the variables `js` and `fjs`, and assigns `fjs` to the first script element on the page.
 2. It then checks to see if the document already has an element with the ID "twitter-wjs". If it does, nothing happens. If it doesn't, it goes into the if conditional.
-3. It creates a new script element, assigns it to the `js` variable, and sets the ID to "twitter-wjs" and the `src` attribute to "https://platform.twitter.com/widgets.js".
+3. It creates a new script element, assigns it to the `js` variable, and sets the ID to `twitter-wjs` and the `src` attribute to `https://platform.twitter.com/widgets.js`.
 4. Finally, it inserts the script element into the DOM immediately before the first script element.
 
 This is actually very uncomplicated code. All it's doing is downloading an external script and running it on your page.

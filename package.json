@@ -17,7 +17,7 @@
     "fs-extra": "*",
     "he": "~0.3.6",
     "highlight.js": "^7.5.0",
-    "html-minifier": "*",
+    "html-minifier": "^0.6.6",
     "ingen": "*",
     "lodash-node": "*",
     "marked": "*",

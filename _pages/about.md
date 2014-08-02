@@ -16,14 +16,13 @@ If you're interested in my thoughts on something, let me know, and maybe it'll t
 
 * [E-mail](mailto:philip@philipwalton.com)
 * [Twitter](http://twitter.com/philwalton)
-* [Github](http://github.com/philipwalton)
 
 ## Projects
 
 * [Solved by Flexbox](http://philipwalton.github.io/solved-by-flexbox/)
 * [HTML Inspector](https://github.com/philipwalton/html-inspector)
 
-## Writing
+## Other Writing
 
 * [CSS Tricks](http://css-tricks.com/dangers-stopping-event-propagation/) *(May 2014)*
 * [CSS Tricks](http://css-tricks.com/interviewing-front-end-engineer-san-francisco/) *(Dec 2013)*

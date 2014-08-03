@@ -1,5 +1,7 @@
 var history2 = (function(window, document, location) {
 
+  if (!(window.history && window.history.pushState)) return;
+
   /**
    * Parse the given url and return the properties returned
    * by the `window.location` object (hash, href, pathname, and search).

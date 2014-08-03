@@ -1,15 +1,10 @@
 .SocialNav {
   display: flex;
   justify-content: inherit;
-  list-style: none;
-  margin: 0;
-  padding: 0;
 }
 
 .SocialNav-icon {
   flex: 0 0 auto;
-  height: 24px;
-  width: 24px;
 }
 
 .SocialNav-icon + .SocialNav-icon {
@@ -21,14 +16,13 @@
     height: var(--space);
     width: var(--space);
   }
-  .SocialNav-icon + .SocialNav-icon {
-    margin-left: .3em;
-  }
 }
 
 .SocialNav-icon svg {
-  transition: all .2s cubic-bezier(.4,0,.2,1);
+  height: 24px;
   fill: #ccc;
+  transition: all .2s cubic-bezier(.4,0,.2,1);
+  width: 24px;
 }
 
 .SocialNav-icon--twitter:hover svg {
@@ -41,4 +35,51 @@
 
 .SocialNav-icon--rss:hover svg {
   fill: var(--rss-color);
+}
+
+
+/* Legacy browser fallbacks
+   =============================================== */
+
+.is-legacy .SocialNav {
+  display: block;
+  font-weight: bold;
+  font-size: .8em;
+  line-height: 1.667;
+}
+
+.is-legacy .SocialNav-icon {
+  color: #999;
+  display: inline-block;
+
+  height: auto;
+  width: auto;
+}
+
+.is-legacy .SocialNav-icon:hover {
+  color: var(--accent-color);
+}
+
+.is-legacy .SocialNav-icon:after {
+  content: attr(data-alt);
+}
+
+.is-legacy .SocialNav-icon + .SocialNav-icon {
+  margin-left: 1em;
+}
+
+.is-legacy .SocialNav-icon svg {
+  display: none;
+}
+
+@media (--break-lg) {
+  .is-legacy .SocialNav {
+    text-align: center;
+  }
+  .is-legacy .SocialNav-icon {
+    display: block;
+  }
+  .is-legacy .SocialNav-icon + .SocialNav-icon {
+    margin-left: 0;
+  }
 }

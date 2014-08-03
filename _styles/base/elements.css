@@ -15,6 +15,12 @@ body {
   text-rendering: optimizeLegibility;
 }
 
+body.is-legacy {
+  font-family: serif;
+  -webkit-font-smoothing: initial;
+  text-rendering: initial;
+}
+
 h1, h2, h3 {
   font-family: jaf-bernino-sans, sans-serif;
   letter-spacing: -0.036em;
@@ -34,6 +40,11 @@ article a {
   background-position: 0 1.2em;
   background-repeat: repeat-x;
   background-size: 1px 1px;
+}
+
+.is-legacy article a {
+  background: 0;
+  text-decoration: underline;
 }
 
 pre {

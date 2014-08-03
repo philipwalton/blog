@@ -23,3 +23,10 @@
   margin: 0;
   padding-left: 1em;
 }
+
+/* Legacy browser fallbacks
+   =============================================== */
+
+.is-legacy .Share-figure {
+  display: none;
+}

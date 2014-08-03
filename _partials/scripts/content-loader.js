@@ -18,7 +18,7 @@
 
   function getTitle(a) {
     var title = a.title || a.innerText;
-    return title ? title + ' — Philip Walton' : null;
+    return title ? title + ' \u2014 Philip Walton' : null;
   }
 
 
@@ -86,7 +86,15 @@
   });
 
   history2.change(function(next, current, state, event) {
+
     loadPage(next, function(content) {
+
+      ga('set', {
+        location: next.href,
+        title: next.title
+      });
+      ga('send', 'pageview');
+
       showPage(content, next, current, event);
     });
   });

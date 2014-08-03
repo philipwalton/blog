@@ -114,7 +114,7 @@ Similar to `js-*` prefixed classes, I recommend using the prefix `is-*` to defin
 
 Notice that the state class (`is-visible`) is chained to the component class (`pop-up`); this is important. Since state rules describe the state of a component, they should not appear on their own. This distinction helps further differentiate state styling from default component styling.
 
-In addition, by using a prefix like `is-*` we can write tests to ensure that this convention is followed. One way to test these types of rules is using [CSSLint](http://csslint.net) and [HTML Inspector](http://philipwalton.com/articles/introducing-html-inspector/).
+In addition, by using a prefix like `is-*` we can write tests to ensure that this convention is followed. One way to test these types of rules is using [CSSLint](http://csslint.net) and [HTML Inspector](/articles/introducing-html-inspector/ 'Introducing HTML Inspector').
 
 More information about state specific classes can be found in the excellent [SMACSS](http://smacss.com/) book by [Jonathan Snook](http://snook.ca/).
 

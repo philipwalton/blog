@@ -129,6 +129,8 @@
 .is-legacy .Header {
   border-bottom: 1px solid var(--border-color);
   box-shadow: none;
+  display: table;
+  width: 100%;
 }
 .is-legacy .Header-photo,
 .is-legacy .Header-nav {
@@ -136,9 +138,8 @@
 }
 .is-legacy .Header-info,
 .is-legacy .Header-social {
-  display: inline-block;
+  display: table-cell;
   vertical-align: middle;
-  width: 49%;
 }
 .is-legacy .Header-social {
   text-align: right;
@@ -161,7 +162,9 @@
   .is-legacy .Header {
     border: 0;
     border-right: 1px solid var(--border-color);
+    display: block;
     padding: 4em 2em;
+    width: auto;
   }
   .is-legacy .Header-info,
   .is-legacy .Header-social {

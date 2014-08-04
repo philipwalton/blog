@@ -9,14 +9,19 @@ var history2 = (function(window, document, location) {
    * @return {Object} An object with the same keys as `window.location`.
    */
   var parseUrl = (function(a) {
+    var cache = {};
     return function parseUrl(url) {
-      a.href = url;
-      return {
-        hash: a.hash,
-        href: a.href,
-        pathname: a.pathname,
-        search: a.search
-      };
+      return cache[url]
+        ? cache[url]
+        : cache[a.href = url] = {
+            hash: a.hash,
+            href: a.href,
+            // Sometimes IE doesn't include the leading slash for pathname.
+            // http://stackoverflow.com/questions/956233/javascript-pathname-ie-quirk
+            pathname: a.pathname.charAt(0) == '/'
+              ? a.pathname : '/' + a.pathname,
+            search: a.search
+          };
     };
   }(document.createElement('a')));
 
@@ -26,7 +31,7 @@ var history2 = (function(window, document, location) {
 
 
   // Add history state initially so the first `popstate` event contains data.
-  window.history.replaceState(current, document.title, location.href);
+  window.history.replaceState(current, document.title, current.href);
 
 
   // Listen for popstate changes and log them.

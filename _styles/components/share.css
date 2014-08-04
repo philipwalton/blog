@@ -14,6 +14,9 @@
 
 .Share-figure svg {
   fill: #55acee;
+  /* width and height needed for IE10 sizing */
+  width: 1.5em;
+  height: 1em;
 }
 
 .Share-pitch {

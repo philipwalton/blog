@@ -10,6 +10,6 @@
 
 @media (--break-lg) {
   .PageTitle {
-    text-align: inherit;
+    text-align: left;
   }
 }

@@ -1,20 +1,21 @@
 <script>
   {{#uglify}}
-    (function(window, document) {
+    (function(window, document, body) {
 
+      {{> legacy-test}}
+      {{> google-analytics-setup}}
       {{> add-listener}}
       {{> link-clicked}}
       {{> history2}}
       {{> content-loader}}
       {{> get-script}}
-      {{> google-analytics-setup}}
 
       addListener('load', function() {
         {{> google-analytics-loader}}
         {{> track-external-clicks}}
       });
 
-    }(window, document));
+    }(window, document, body));
 
   {{/uglify}}
 </script>

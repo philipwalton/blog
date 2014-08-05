@@ -6,7 +6,7 @@ module.exports = function() {
         + encodeURIComponent(page.title)
         + '&url='
         + encodeURIComponent('http://philipwalton.com'
-        + page.permalink.toString())
+          + (page.originalPermalink || page.permalink.toString()))
         + '&via=philwalton'
     }
   })

@@ -25,14 +25,17 @@ module.exports = function() {
     pages.forEach(function(p) {
 
       var page = p.clone();
-      var resolvedPermalink = page.permalink.toString();
+
+      // Keep a reference to the original permalink so templates can use it.
+      var originalPermalink = page.permalink.toString();
+      page.originalPermalink = originalPermalink;
 
       page.template = p.template.clone();
       replaceDefaultLayoutWithBlank(page.template);
 
-      resolvedPermalink = !path.extname(resolvedPermalink)
-        ? resolvedPermalink + '_index.html'
-        : path.dirname(resolvedPermalink) + '_' + path.basename(resolvedPermalink);
+      var resolvedPermalink = !path.extname(originalPermalink)
+        ? originalPermalink + '_index.html'
+        : path.dirname(originalPermalink) + '_' + path.basename(originalPermalink);
 
       page.permalink = new Permalink(resolvedPermalink);
     });

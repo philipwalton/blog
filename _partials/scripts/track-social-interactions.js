@@ -6,8 +6,7 @@
     var socialNetwork = this.getAttribute('data-social-network');
     if (socialNetwork) {
       var socialAction = this.getAttribute('data-social-action');
-      var socialTarget = 'http://philipwalton.com'
-          + this.getAttribute('data-social-target');
+      var socialTarget = location.href;
 
       ga('send', 'social', socialNetwork, socialAction, socialTarget, {
         // `nonInteracdtion` prevents this event from affecting bounce rate.

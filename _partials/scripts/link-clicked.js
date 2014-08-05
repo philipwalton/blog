@@ -15,12 +15,12 @@ var linkClicked = (function() {
   }
 
   return function(handler) {
-    addListener('click', function(event) {
+    addListener(document, 'click', function(event) {
       var e = event || window.event;
       var target = e.target || e.srcElement;
       var link = getLinkAncestor(target);
       if (link) {
-        handler.call(link, event || window.event);
+        handler.call(link, e);
       }
     });
   };

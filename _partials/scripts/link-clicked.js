@@ -3,7 +3,7 @@ var linkClicked = (function() {
   // require addListener
 
   function isLink(el) {
-    return el.nodeName.toLowerCase() == 'a' && el.href;
+    return el.nodeName && el.nodeName.toLowerCase() == 'a' && el.href;
   }
 
   function getLinkAncestor(el) {

@@ -1,8 +1,8 @@
-function addListener(event, fn) {
-  if (window.addEventListener) {
-    window.addEventListener(event, fn, false);
+function addListener(element, event, fn) {
+  if (element.addEventListener) {
+    element.addEventListener(event, fn, false);
   }
-  else if (window.attachEvent) {
-    window.attachEvent('on' + event, fn);
+  else {
+    element.attachEvent('on' + event, fn);
   }
 }

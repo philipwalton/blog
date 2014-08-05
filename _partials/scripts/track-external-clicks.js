@@ -4,7 +4,9 @@
     // require linkClicked
 
     function isExternalLink(el) {
-      return el.href.indexOf(location.host) < 0;
+      // Compare `hostname` instead of `host` because of an IE8 bug that would
+      // report philipwalton:80 even though the URL didn't show a port.
+      return el.hostname != location.hostname;
     }
 
     linkClicked(function(event) {

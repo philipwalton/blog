@@ -79,7 +79,9 @@
 
     // If the clicked link is on the same site but the pathnames
     // are different then add it to the history.
-    if ((this.pathname != loc.pathname) && (this.href.indexOf(loc.host) > -1)) {
+    // Note, use `hostname` instead of `host` because of an IE8 bug that would
+    // report philipwalton:80 even though the URL didn't show a port.
+    if ((this.hostname == loc.hostname) && (this.pathname != loc.pathname)) {
       event.preventDefault();
       history2.add(this.href, getTitle(this));
     }

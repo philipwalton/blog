@@ -8,6 +8,8 @@ var history2 = (function(window, document, location) {
    * @param {string} url - The url to parse.
    * @return {Object} An object with the same keys as `window.location`.
    */
+  // TODO, abstract this into a generic URL parsing utility. Keep this in mind:
+  // http://blogs.msdn.com/b/ieinternals/archive/2011/02/28/internet-explorer-window-location-pathname-missing-slash-and-host-has-port.aspx
   var parseUrl = (function(a) {
     var cache = {};
     return function parseUrl(url) {

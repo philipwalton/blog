@@ -22,43 +22,47 @@
   }
 
 
-  function get(url, success, error) {
+  function get(urlData, onSuccess, onError) {
     var xhr = new XMLHttpRequest();
-    xhr.open('GET', url);
+    xhr.open('GET', urlData);
     xhr.onload = function() {
-      if (xhr.status >= 200 && xhr.status < 400){
-        success(xhr);
-      }
+      return xhr.status >= 200 && xhr.status < 400 ?
+          onSuccess(xhr) : onError(xhr);
+    };
+    xhr.onerror = function() {
+      onError(xhr)
     };
     xhr.send();
   }
 
-  function loadPage(urlData, cb) {
-    var path = urlData.pathname + urlData.search;
+  function loadPageContent(done) {
+    var path = this.next.path;
 
-    if (pageCache[path]) {
-      cb(pageCache[path]);
-    }
-    else {
-      var basename = /(\w+)\.html$/;
-      var url = basename.test(path)
-        ? path.replace(basename, '_$1.html')
-        : path + '_index.html';
+    if (pageCache[path]) return done();
 
-      get(url, function(xhr) {
-        pageCache[path] = xhr.responseText;
-        cb(xhr.responseText);
-      });
-    }
+    var basename = /(\w+)\.html$/;
+    var url = basename.test(path) ?
+        path.replace(basename, '_$1.html') : path + '_index.html';
+
+    get(url,
+        function(xhr) {
+          pageCache[path] = xhr.responseText;
+          done()
+        },
+        function(xhr) {
+          var message = '(' + xhr.status + ') ' + xhr.response;
+          done(new Error(message));
+        }
+    );
   }
 
-  function showPage(content, next, current) {
+  function showPageContent() {
+    var content = pageCache[this.next.path];
     container.innerHTML = content;
-    setScroll(next.hash)
   }
 
-  function setScroll(opt_hash) {
-    if (opt_hash) {
+  function setScroll() {
+    if (this.next.hash) {
       var target = doc.getElementById(opt_hash.slice(1));
     }
     var scrollPos = target ? target.offsetTop : 0;
@@ -69,37 +73,55 @@
     win.scrollTo(0, scrollPos);
   }
 
+  function trackPage() {
+    ga('set', {
+      location: this.next.href,
+      title: this.next.title
+    });
+    ga('send', 'pageview');
+
+  }
+
+  function trackError(error) {
+    var url = this.next.href;
+    ga('send', 'exception', {
+      exDescription: error.message,
+      exFatal: false,
+      hitCallback: function() {
+        // If there's an error, attempt to manually navigation to the
+        // page. If that fails Github pages will show the actual 404 page.
+        loc.href = url;
+      }
+    });
+  }
+
+
+  var history2 = new History2()
+      .use(loadPageContent)
+      .use(showPageContent)
+      .use(setScroll)
+      .use(trackPage)
+      .catch(trackError);
+
   linkClicked(function(event) {
+
+    var url = parseUrl(this.href);
+
     // Don't do anything when clicking on links to the current URL.
-    if (this.href == location.href) event.preventDefault();
+    if (url.href == location.href) event.preventDefault();
 
     // Don't attempt to AJAX in content if the link was click
     // while the command (meta) or control key was pressed.
     if (event.metaKey || event.ctrlKey) return;
 
-    // If the clicked link is on the same site but the pathnames
-    // are different then add it to the history.
-    // Note, use `hostname` instead of `host` because of an IE8 bug that would
-    // report philipwalton:80 even though the URL didn't show a port.
-    if ((this.hostname == loc.hostname) && (this.pathname != loc.pathname)) {
+    // If the clicked link is on the same site but has a different path,
+    // prevent the browser from navigating there and load the page via ajax.
+    if ((url.origin == loc.origin) && (url.path != loc.path)) {
       event.preventDefault();
-      history2.add(this.href, getTitle(this));
+      history2.add(url.href, getTitle(this));
     }
   });
 
-  history2.change(function(next, current, state, event) {
-
-    loadPage(next, function(content) {
-
-      ga('set', {
-        location: next.href,
-        title: next.title
-      });
-      ga('send', 'pageview');
-
-      showPage(content, next, current, event);
-    });
-  });
 
 
 }(window, document, window.location));

@@ -1,56 +1,127 @@
-var history2 = (function(window, document, location) {
+var History2 = (function(window, document, location) {
 
-  if (!(window.history && window.history.pushState)) return;
+  function History2() {
+
+    // Store the current url information.
+    this.current = parseUrl(location.href);
+    this.current.title = document.title;
+
+    this._queue = [];
+
+    // Add history state initially so the first `popstate` event contains data.
+    history.replaceState(this.current, document.title, this.current.href);
+
+    // Listen for popstate changes and log them.
+    addEventListener('popstate', function(event) {
+      var state = event.state;
+      var title = state && state.title;
+      this.add(location.href, title, state, event);
+    }.bind(this));
+  }
 
 
-  // Store the current url information.
-  var current = parseUrl(location.href);
+  History2.prototype.add = function(url, title, state, event) {
 
+    // Ignore urls pointing to the current address
+    if (url == this.current.href) return;
 
-  // Add history state initially so the first `popstate` event contains data.
-  window.history.replaceState(current, document.title, current.href);
+    this.next = parseUrl(url);
+    this.next.title = title;
+    this.next.state = state;
+    this.event = event;
 
-
-  // Listen for popstate changes and log them.
-  window.addEventListener('popstate', function(event) {
-    history2.add(location.href, document.title, event.state, event);
-  });
-
-
-  var history2 = {
-
-    add: function(url, title, state, popstateEvent) {
-
-      // Ignore urls pointing to the current address
-      if (url == current.href) return;
-
-      var next = parseUrl(url);
-      next.title = title;
-      next.state = state;
-
-      // Popstate triggered navigation is already handled by the browser,
-      // so we only add to the history when we manually trigger it.
-      if (!popstateEvent) {
-        history.pushState(state, title, url);
-      }
-
-      // If pathname or query are different, that means this resource
-      // points to a different page.
-      if (next.pathname != current.pathname || next.search != current.search) {
-        if (title) document.title = title;
-        if (this.change) this.change(next, current, popstateEvent);
-      }
-
-      // Update the last url to the current url
-      current = next;
-    },
-
-    change: function(cb) {
-      this.change = cb;
+    // If path is different this resource
+    // points to a different page.
+    if (this.next.path != this.current.path) {
+      this._processQueue();
     }
-
   };
 
-  return history2;
+
+  /**
+   * Register a plugin with the History2 instance.
+   * @param {Function(History2, done)} - A plugin that runs some task and
+   *     informs the next plugin in the queue when it's done.
+   */
+  History2.prototype.use = function(plugin) {
+    this._queue.push(plugin);
+
+    return this;
+  };
+
+  /**
+   * Register a handler to catch any errors.
+   * @param {Function(Error)} - The function to handle the error.
+   */
+  History2.prototype.catch = function(onError) {
+    this._onError = onError;
+
+    return this;
+  };
+
+
+  History2.prototype._processQueue = function() {
+    var self = this;
+    var i = 0;
+
+    (function next() {
+
+      var plugin = self._queue[i++];
+      var isSync = plugin && !plugin.length;
+
+      if (!plugin) return self._onComplete();
+
+      // The callback for async plugins.
+      function done(error) {
+        if (error) {
+          self._onError(error);
+        }
+        else {
+          next();
+        }
+      }
+
+      try {
+        plugin.apply(self, isSync ? [] : [done]);
+      }
+      catch(error) {
+        return self._onError(error);
+      }
+
+      // Sync plugins are done by now and can immediately process
+      // the next item in the queue.
+      if (isSync) next();
+
+    }());
+  };
+
+
+  History2.prototype._onError = function(error) {
+    // Left blank so calling `_onError` never fails.
+    console.error(error.stack);
+  };
+
+
+  History2.prototype._onComplete = function() {
+
+    // Popstate triggered navigation is already handled by the browser,
+    // so we only add to the history in non-popstate cases.
+    if (!(this.event && this.event.type == 'popstate')) {
+      history.pushState(this.next.state, this.next.title, this.next.href);
+    }
+
+    if (this.next.title) document.title = this.next.title;
+
+
+    // Update the last url to the current url
+    this.current = this.next;
+    this.next = null;
+
+    // Clear out the previous event
+    this.event = null
+  };
+
+
+  return History2;
 
 }(window, document, window.location));

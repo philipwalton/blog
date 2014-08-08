@@ -51,9 +51,11 @@ var History2 = (function(window, document, location) {
 
   /**
    * Register a handler to catch any errors.
+   * Note: In ES3 reserved words like "catch" couldn't be used as property names:
+   * http://kangax.github.io/compat-table/es5/#Reserved_words_as_property_names
    * @param {Function(Error)} - The function to handle the error.
    */
-  History2.prototype.catch = function(onError) {
+  History2.prototype['catch'] = function(onError) {
     this._onError = onError;
 
     return this;

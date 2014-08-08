@@ -3,24 +3,22 @@ var minify = require('html-minifier').minify;
 
 module.exports = function() {
 
+  // Don't minify in dev/test environments.
+  if (this.config.env != 'production') return;
+
   var events = this.events
 
-  // http://perfectionkills.com/experimenting-with-html-minifier/#options
+  // https://github.com/kangax/html-minifier
   var options = {
-    removeIgnored: false,
     removeComments: true,
-    removeCommentsFromCDATA: true,
-    removeCDATASectionsFromCDATA: true,
     collapseWhitespace: true,
     collapseBooleanAttributes: true,
     removeAttributeQuotes: true,
     removeRedundantAttributes: true,
     useShortDoctype: true,
     removeEmptyAttributes: true,
-    removeEmptyElements: false,
-    removeOptionalTags: false,
-    removeScriptTypeAttributes: true,
-    removeStyleLinkTypeAttributes: true
+    minifyJS: true,
+    minifyCSS: true
   }
 
   events.on('beforeWrite', function(page) {

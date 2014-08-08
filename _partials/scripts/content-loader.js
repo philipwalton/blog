@@ -44,16 +44,21 @@
     var url = basename.test(path) ?
         path.replace(basename, '_$1.html') : path + '_index.html';
 
-    get(url,
-        function(xhr) {
-          pageCache[path] = xhr.responseText;
-          done()
-        },
-        function(xhr) {
-          var message = '(' + xhr.status + ') ' + xhr.response;
-          done(new Error(message));
-        }
-    );
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', url);
+    xhr.onload = function() {
+      if (xhr.status >= 200 && xhr.status < 400) {
+        pageCache[path] = xhr.responseText;
+        done();
+      }
+      else {
+        done(new Error('(' + xhr.status + ') ' + xhr.response));
+      }
+    };
+    xhr.onerror = function() {
+      done(new Error('Error making request to:' + url));
+    };
+    xhr.send();
   }
 
   function showPageContent() {
@@ -95,30 +100,30 @@
     });
   }
 
-
   var history2 = new History2()
       .use(loadPageContent)
       .use(showPageContent)
       .use(setScroll)
       .use(trackPage)
-      .catch(trackError);
+      ['catch'](trackError);
 
   linkClicked(function(event) {
-
-    var url = parseUrl(this.href);
-
-    // Don't do anything when clicking on links to the current URL.
-    if (url.href == location.href) event.preventDefault();
 
     // Don't attempt to AJAX in content if the link was click
     // while the command (meta) or control key was pressed.
     if (event.metaKey || event.ctrlKey) return;
 
+    var page = parseUrl(loc.href);
+    var link = parseUrl(this.href);
+
+    // Don't do anything when clicking on links to the current URL.
+    if (link.href == page.href) event.preventDefault();
+
     // If the clicked link is on the same site but has a different path,
     // prevent the browser from navigating there and load the page via ajax.
-    if ((url.origin == loc.origin) && (url.path != loc.path)) {
+    if ((link.origin == page.origin) && (link.path != page.path)) {
       event.preventDefault();
-      history2.add(url.href, getTitle(this));
+      history2.add(link.href, getTitle(this));
     }
   });
 

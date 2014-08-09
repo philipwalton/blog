@@ -1,5 +1,8 @@
 ingen := ../ingen/bin/ingen
 
+test:
+	@ jshint --show-non-errors _scripts
+
 build:
 	@ echo ">>> Building site..."
 	@ $(ingen) build
@@ -29,4 +32,4 @@ deploy: build
 	@ rm -rf _site _tmp
 	@ echo "*** Successfully deployed site!"
 
-.PHONY: build debug preview deploy
+.PHONY: test build debug preview deploy

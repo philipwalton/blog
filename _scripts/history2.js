@@ -2,22 +2,28 @@ var parseUrl = require('./parse-url');
 
 function History2() {
 
-  var location = window.location;
+  if (window.history.state) {
+    this.currentPage = window.history.state;
+  }
+  else {
+    // Store the current url information.
+    this.currentPage = parseUrl(window.location.href);
+    this.currentPage.title = document.title;
 
-  // Store the current url information.
-  this.currentPage = parseUrl(location.href);
-  this.currentPage.title = document.title;
+    // Add history state initially so the first `popstate` event contains data.
+    history.replaceState(
+        this.currentPage,
+        this.currentPage.title,
+        this.currentPage.href);
+  }
 
   this._queue = [];
-
-  // Add history state initially so the first `popstate` event contains data.
-  history.replaceState(this.currentPage, document.title, this.currentPage.href);
 
   // Listen for popstate changes and log them.
   window.addEventListener('popstate', function(event) {
     var state = event.state;
     var title = state && state.title;
-    this.add(location.href, title, state, event);
+    this.add(window.location.href, title, state, event);
   }.bind(this));
 }
 
@@ -30,12 +36,11 @@ History2.prototype.add = function(url, title, state, event) {
   this.nextPage = parseUrl(url);
   this.nextPage.title = title;
   this.nextPage.state = state;
-  this.event = event;
 
   // If path is different this resource
   // points to a different page.
   if (this.nextPage.path != this.currentPage.path) {
-    this._processQueue();
+    this._processQueue(event);
   }
 };
 
@@ -70,30 +75,26 @@ History2.prototype._onError = function(error) {
 };
 
 
-History2.prototype._onComplete = function() {
+History2.prototype._onComplete = function(event) {
 
   // Popstate triggered navigation is already handled by the browser,
   // so we only add to the history in non-popstate cases.
-  if (!(this.event && this.event.type == 'popstate')) {
+  if (!(event && event.type == 'popstate')) {
     history.pushState(
-        this.nextPage.state,
+        this.nextPage,
         this.nextPage.title,
         this.nextPage.href);
   }
 
   if (this.nextPage.title) document.title = this.nextPage.title;
 
-
   // Update the last url to the current url
   this.currentPage = this.nextPage;
   this.nextPage = null;
-
-  // Clear out the previous event
-  this.event = null;
 };
 
 
-History2.prototype._processQueue = function() {
+History2.prototype._processQueue = function(event) {
   var self = this;
   var i = 0;
 
@@ -102,7 +103,7 @@ History2.prototype._processQueue = function() {
     var plugin = self._queue[i++];
     var isSync = plugin && !plugin.length;
 
-    if (!plugin) return self._onComplete();
+    if (!plugin) return self._onComplete(event);
 
     // The callback for async plugins.
     function done(error) {

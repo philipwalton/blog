@@ -4,18 +4,12 @@ var linkClicked = require('./link-clicked');
 var History2 = require('./history2');
 var parseUrl = require('./parse-url');
 
-// Only load external content via AJAX if the browser support pushState.
-if (!(history && history.pushState)) return;
-
-// Store the container element to avoid multiple lookups.
-var container = document.querySelector('main');
+// Cache the container element to avoid multiple lookups.
+var container;
 
 // Store the result of page content requests to avoid multiple
 // lookups when navigation to a previously seen page.
 var pageCache = {};
-
-// Add the current page to the cache.
-pageCache[location.pathname] = container.innerHTML;
 
 
 function getTitle(a) {
@@ -84,7 +78,7 @@ function trackPage() {
 function trackError(error) {
   var url = this.nextPage.href;
   ga('send', 'exception', {
-    exDescription: error.message,
+    exDescription: error.stack || error.message,
     exFatal: false,
     hitCallback: function() {
       // If there's an error, attempt to manually navigation to the
@@ -98,6 +92,14 @@ function trackError(error) {
 module.exports = {
 
   init: function() {
+
+    // Only load external content via AJAX if the browser support pushState.
+    if (!(window.history && window.history.pushState)) return;
+
+    // Add the current page to the cache.
+    container = document.querySelector('main');
+    pageCache[location.pathname] = container.innerHTML;
+
 
     var history2 = new History2()
         .use(loadPageContent)

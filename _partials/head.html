@@ -1,20 +1,18 @@
 <meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+<link rel="subresource" src="//use.typekit.net/ayq0lpd.js"/>
+<link rel="subresource" src="//www.google-analytics.com/analytics.js"/>
 
 <title>{{#if title }}{{ title }} &mdash; {{/if}}{{site.title}}</title>
 
-<!-- http://t.co/dKP3o1e -->
-<meta name="HandheldFriendly" content="True">
-<meta name="MobileOptimized" content="320">
-<meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0">
+<!--[if lt IE 9]><script src="/assets/javascript/html5shiv.js"></script><![endif]-->
+
+<!-- Put typekit in the head for the fastest possible download. -->
+<script async id="typekit" src="//use.typekit.net/ayq0lpd.js"></script>
+
+<meta name="description" content="{{#if post.excerpt}}{{post.excerpt}}{{else}}{{site.description}}{{/if}}">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
 <link href="/assets/css/style.css" rel="stylesheet">
 <link href="http://feeds.feedburner.com/philipwalton" rel="alternate" title="{{site.title}}" type="application/atom+xml">
-
-{{#if canonical}}<link rel="canonical" href="{{canonical}}">{{/if}}
-
-<meta name="description" content="Thoughts on web development, open source, software architecture, and the future.">
-
-<script type="text/javascript" src="//use.typekit.net/ayq0lpd.js"></script>
-<script type="text/javascript">try{Typekit.load();}catch(e){}</script>
-
-<!--[if lt IE 9]><script src="/assets/javascript/html5shiv.js"></script><![endif]-->

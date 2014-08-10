@@ -12,14 +12,23 @@ body {
   color: var(--text-color);
   font: 1.25em/1.333 freight-text-pro, Georgia, serif;
   -webkit-font-smoothing: antialiased;
+  opacity: 0;
   text-rendering: optimizeLegibility;
+  transition: opacity .5s cubic-bezier(.4,0,.2,1);
 }
 
-body.is-legacy {
+.wf-active body {
+  opacity: 1;
+}
+
+.is-legacy body {
   font-family: serif;
   -webkit-font-smoothing: initial;
+  opacity: 1;
   text-rendering: initial;
 }
+
+
 
 h1, h2, h3 {
   font-family: jaf-bernino-sans, sans-serif;

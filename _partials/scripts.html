@@ -1,33 +1,41 @@
 <script>
 (function(window, document, location) {
 
-  {{#if site.googleAnalyticsTrackingID}}
+  ga = function() { ga.q.push(arguments); };
+  ga.q = []; ga.l = 1 * new Date();
 
-    ga = function() { ga.q.push(arguments); };
-    ga.q = []; ga.l = 1 * new Date();
+  ga('create', 'UA-21292978-1', 'auto');
 
-    ga('create', '{{site.googleAnalyticsTrackingID}}', 'auto');
+  {{#is site.env 'development'}}
+    // In non-production mode, simply log GA hits to the console.
+    ga(function(tracker) {
+      tracker.set('sendHitTask', function(model) {
+        var payload = model.get('hitPayload');
+        console.log('%c' + model.get('hitType'), 'font-weight:bold;');
+        console.log(decodeURIComponent(payload).replace(/&/g, '\n&'));
 
-    {{#is site.env 'development'}}
-      // In non-production mode, simply log GA hits to the console.
-      ga(function(tracker) {
-        tracker.set('sendHitTask', function(model) {
-          var payload = model.get('hitPayload');
-          console.log('%c' + model.get('hitType'), 'font-weight:bold;');
-          console.log(decodeURIComponent(payload).replace(/&/g, '\n&'));
-
-          // Throw to stop subsequent tasks.
-          throw 'Abort tracking in non-production environments.'
-        });
+        // Throw to stop subsequent tasks.
+        throw 'Abort tracking in non-production environments.'
       });
-    {{/is}}
+    });
+  {{/is}}
 
-    // Note, tasks must be set before sending the first hit
-    ga('send', 'pageview');
+  // Track uncaught errors via Google Analytics.
+  window.onerror = function(message, url, line) {
+    var desc = message + ' (line: ' + line + ', url: ' + url + ')';
+    ga('send', 'exception', {
+      exDescription: desc,
+      exFatal: false
+    });
+  }
 
-  {{/if}}
+  // Note, tasks must be set before sending the first hit
+  ga('send', 'pageview');
 
   {{{inlineJavaScript}}}
 
 }(window, document, location));
 </script>
+
+<!-- Load GA after the `window.ga` is initialized or you'll get errors. -->
+<script async id="analytics" src="//www.google-analytics.com/analytics.js"></script>

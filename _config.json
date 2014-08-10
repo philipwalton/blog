@@ -1,7 +1,7 @@
 {
 
   "title": "Philip Walton",
-  "tagline": "On Web Development and Open-Source",
+  "description": "Thoughts on web development, open source, software architecture, and the future.",
 
   "baseURL": "http://philipwalton.com",
   "timezone": "America/Los_Angeles",
@@ -12,7 +12,5 @@
   ],
   "postTypes": ["article"],
   "taxonomyTypes": ["tag"],
-  "excerptLength": 16,
-
-  "googleAnalyticsTrackingID": "UA-21292978-1"
+  "excerptLength": 16
 }

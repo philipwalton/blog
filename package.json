@@ -13,7 +13,7 @@
     "url": "https://github.com/philipwalton/blog/issues"
   },
   "devDependencies": {
-    "autoprefixer": "^2.1.1",
+    "autoprefixer": "^2.2.0",
     "browserify": "^5.9.1",
     "fs-extra": "*",
     "he": "~0.3.6",

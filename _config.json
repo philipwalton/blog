@@ -7,8 +7,11 @@
   "timezone": "America/Los_Angeles",
 
   "excludeFiles": [
+    ".DS_Store",
+    "**/.DS_Store",
     "bower.json",
-    "README.md"
+    "README.md",
+    "karma.conf.js"
   ],
   "postTypes": ["article"],
   "taxonomyTypes": ["tag"],

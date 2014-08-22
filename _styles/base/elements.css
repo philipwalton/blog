@@ -10,7 +10,7 @@ html, body {
 
 body {
   color: var(--text-color);
-  font: 1.25em/1.333 freight-text-pro, Georgia, serif;
+  font: 1.25em/1.333 freight-text-pro, Cambria, Georgia, serif;
   -webkit-font-smoothing: antialiased;
   opacity: 0;
   text-rendering: optimizeLegibility;
@@ -21,17 +21,15 @@ body {
   opacity: 1;
 }
 
-.is-legacy body {
-  font-family: serif;
+.is-legacy body,
+.is-typekitError body {
   -webkit-font-smoothing: initial;
   opacity: 1;
   text-rendering: initial;
 }
 
-
-
 h1, h2, h3 {
-  font-family: jaf-bernino-sans, sans-serif;
+  font-family: jaf-bernino-sans, Helvetica Neue, sans-serif;
   letter-spacing: -0.036em;
 }
 
@@ -51,7 +49,8 @@ article a {
   background-size: 1px 1px;
 }
 
-.is-legacy article a {
+.is-legacy article a,
+.is-typekitError article a {
   background: 0;
   text-decoration: underline;
 }

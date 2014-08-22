@@ -1,6 +1,5 @@
-/* global Typekit */
-
 var supports = require('./supports');
+var typekit = require('./typekit');
 var outboundLinks = require('./outbound-links');
 var socialInteractions = require('./social-interactions');
 var contentLoader = require('./content-loader');
@@ -12,17 +11,8 @@ if (!supports.flexbox()) {
 }
 
 
-// Load typekit immediately if the script is download, otherwise queue it.
-// Note: Using IEs readyState isn't needed here because IE<10 doesn't
-// support <script async>, thus it will load blockingly.
-if (window.Typekit) {
-  Typekit.load();
-}
-else {
-  document.getElementById('typekit').onload = function() {
-    Typekit.load();
-  };
-}
+// Load the typekit fonts and trasition in, timeout if taking too long.
+typekit.init();
 
 
 // Track when the user clicks a link to an external site.

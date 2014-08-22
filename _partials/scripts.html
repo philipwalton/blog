@@ -24,7 +24,7 @@
   window.onerror = function(message, url, line) {
     var desc = message + ' (line: ' + line + ', url: ' + url + ')';
     ga('send', 'exception', {
-      exDescription: desc,
+      exDescription: 'window.onerror: ' + desc,
       exFatal: false
     });
   }

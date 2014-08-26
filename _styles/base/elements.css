@@ -17,15 +17,10 @@ body {
   transition: opacity .5s cubic-bezier(.4,0,.2,1);
 }
 
-.wf-active body {
-  opacity: 1;
-}
-
+.wf-active body,
 .is-legacy body,
 .is-typekitError body {
-  -webkit-font-smoothing: initial;
   opacity: 1;
-  text-rendering: initial;
 }
 
 h1, h2, h3 {

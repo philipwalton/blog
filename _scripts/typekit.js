@@ -1,12 +1,15 @@
 /* global Typekit, ga */
 
-var TIMEOUT_DURATION = 3000;
+var TIMEOUT_DURATION = 2000;
 var timeout;
 
 function loadTypeKit() {
   try {
-    Typekit.load();
-    clearTimeout(timeout);
+    Typekit.load({
+      active: function() {
+        clearTimeout(timeout);
+      }
+    });
   }
   catch(err) {
     addErrorClass();

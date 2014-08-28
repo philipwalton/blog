@@ -12,15 +12,7 @@ body {
   color: var(--text-color);
   font: 1.25em/1.333 freight-text-pro, Cambria, Georgia, serif;
   -webkit-font-smoothing: antialiased;
-  opacity: 0;
   text-rendering: optimizeLegibility;
-  transition: opacity .5s cubic-bezier(.4,0,.2,1);
-}
-
-.wf-active body,
-.is-legacy body,
-.is-typekitError body {
-  opacity: 1;
 }
 
 h1, h2, h3 {
@@ -44,8 +36,7 @@ article a {
   background-size: 1px 1px;
 }
 
-.is-legacy article a,
-.is-typekitError article a {
+.is-legacy article a {
   background: 0;
   text-decoration: underline;
 }

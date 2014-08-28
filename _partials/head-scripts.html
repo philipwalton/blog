@@ -1,0 +1,52 @@
+<!-- Put typekit in the head for the fastest possible download. -->
+<script src="//use.typekit.net/ayq0lpd.js"></script>
+
+<script>
+ga = function() { ga.q.push(arguments); };
+ga.q = []; ga.l = 1 * new Date();
+
+// Create the GA tracker before doing any logging.
+ga('create', 'UA-21292978-1', 'auto');
+
+
+{{#is site.env 'development'}}
+  // In non-production mode, simply log GA hits to the console.
+  ga(function(tracker) {
+    tracker.set('sendHitTask', function(model) {
+      var payload = model.get('hitPayload');
+      console.log('%c' + model.get('hitType'), 'font-weight:bold;');
+      console.log(decodeURIComponent(payload).replace(/&/g, '\n&'));
+
+      // Throw to stop subsequent tasks.
+      throw 'Abort tracking in non-production environments.'
+    });
+  });
+{{/is}}
+
+
+// Initialize typekit and track how frequently it fails.
+try {
+  Typekit.load();
+}
+catch(err) {
+  ga('send', 'exception', {
+    exDescription: err.stack || err.message,
+    exFatal: false
+  });
+}
+
+
+// Track uncaught errors via Google Analytics.
+window.onerror = function(message, url, line, col) {
+  var desc = message + ' (line: ' + line + ', url: ' + url + ', col: '
+      + col + ')';
+  ga('send', 'exception', {
+    exDescription: 'window.onerror: ' + desc,
+    exFatal: false
+  });
+};
+
+
+// Note, tasks must be set before sending the first hit
+ga('send', 'pageview');
+</script>

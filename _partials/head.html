@@ -8,11 +8,12 @@
 
 <!--[if lt IE 9]><script src="/assets/javascript/html5shiv.js"></script><![endif]-->
 
-<!-- Put typekit in the head for the fastest possible download. -->
-<script async id="typekit" src="//use.typekit.net/ayq0lpd.js"></script>
+{{> head-scripts}}
+
+<link href="/assets/css/style.css" rel="stylesheet">
+<link href="http://feeds.feedburner.com/philipwalton" rel="alternate" title="{{site.title}}" type="application/atom+xml">
 
 <meta name="description" content="{{#if post.excerpt}}{{post.excerpt}}{{else}}{{site.description}}{{/if}}">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<link href="/assets/css/style.css" rel="stylesheet">
-<link href="http://feeds.feedburner.com/philipwalton" rel="alternate" title="{{site.title}}" type="application/atom+xml">
+{{> icons}}

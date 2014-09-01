@@ -1,0 +1,9 @@
+.Callout {
+  background: var(--bg-color);
+  margin: 0 0 var(--space);
+  padding: 1em var(--space);
+}
+
+.Callout :last-child {
+  margin-bottom: 0;
+}

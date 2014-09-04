@@ -61,7 +61,7 @@
 }
 
 .is-legacy .SocialNav-icon:after {
-  content: attr(data-alt);
+  content: attr(title);
 }
 
 .is-legacy .SocialNav-icon + .SocialNav-icon {

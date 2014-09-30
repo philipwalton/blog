@@ -15,7 +15,7 @@ If you're interested in my thoughts on something, let me know, and maybe it'll t
 ## Contact
 
 * [E-mail](mailto:mail@philipwalton.com)
-* [Twitter](http://twitter.com/philwalton)
+* [Twitter](https://twitter.com/philwalton)
 
 ## Projects
 

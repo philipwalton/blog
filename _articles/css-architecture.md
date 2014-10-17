@@ -14,7 +14,7 @@
 }
 -->
 
-<p class="callout">
+<p class="Callout">
   This article was originally published on the <a href="http://engineering.appfolio.com/2012/11/16/css-architecture">AppFolio Engineering Technical Blog</a>. It has been reprinted here with permission.
 </p>
 

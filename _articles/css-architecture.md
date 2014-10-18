@@ -22,7 +22,7 @@ To many Web developers, being good at CSS means you can take a visual mock-up an
 
 Interestingly, we don't usually make this oversight with other languages. A Rails developer isn't considered good just because his code works to spec. This is considered baseline. Of course it must work to spec; its merit is based on other things: Is the code readable? Is it easy to change or extend? Is it decoupled from other parts of the application? Will it scale?
 
-These questions are natural when assessing other parts of the code base, and CSS shouldn't be any different. Today's web applications are larger than ever, and a poorly thought-out CSS architecture can cripple development. It's time to evaluate CSS the same way we evaluate every other part of the application. It cannot be an afterthought or written off as merely the "designer's" problem.
+These questions are natural when assessing other parts of the code base, and CSS shouldn't be any different. Today's web applications are larger than ever, and a poorly thought-out CSS architecture can cripple development. It's time to evaluate CSS the same way we evaluate every other part of the application. It cannot be an afterthought or written off as merely the *designer's* problem.
 
 ## The Goals of Good CSS Architecture
 
@@ -98,16 +98,16 @@ While technically true, the more I develop with CSS, the more I stay away from c
 ```css
 #main-nav ul li ul li div { }
 #content article h1:first-child { }
-#sidebar > div > h3 %2B p { }
+#sidebar > div > h3 + p { }
 ```
 
-All of the above examples make logical sense. The first is probably styling a dropdown menu, the second says that the article's main heading should look different than all other h1 elements, and the last example is likely adding some extra spacing for the first paragraph in the sidebar sections.
+All of the above examples make logical sense. The first is probably styling a dropdown menu, the second says that the article's main heading should look different from all other `<h1>` elements, and the last example is likely adding some extra spacing for the first paragraph in the sidebar sections.
 
-If this HTML were never going to change, an argument could be made for its merits, but how realistic is it to assume the HTML will never change? Overly complicated selectors can be impressive and they can rid the HTML of all presentational hooks, but they rarely help us achieve our goals for good CSS architecture.
+If this HTML were never going to change, an argument could be made for its merits, but how realistic is it to assume the HTML will never change? Overly complicated selectors can be impressive and they can go far to rid the HTML of presentational hooks, but they rarely help us achieve our goals for good CSS architecture.
 
 These examples above are not reusable at all. Since the selector is pointing to a very particular place in the markup, how could another component with a different HTML structure reuse those styles? Taking the first selector (the dropdown) as an example, what if a similar looking dropdown were needed on a different page and it wasn't inside of the `#main-nav` element? You'd have to recreate the entire style.
 
-These selectors are also very unpredictable if the HTML needs to change. Imagine that a devloper wanted to change the `div` in the third example to the HTML5 `section` tag, the whole rule would break.
+These selectors are also very unpredictable if the HTML needs to change. Imagine that a devloper wanted to change the `<div>` in the third example to the HTML5 `<section>` tag, the whole rule would break.
 
 Finally, since these selectors only work when the HTML remains constant, they're by definition not maintainable or scalable.
 
@@ -181,7 +181,7 @@ I believe, given the current state of HTML and CSS, it's necessary and often wis
 
 If your HTML and your CSS are going to work together to form the presentation layer of a web application, they need to do so in a way that promotes all of the principles of good CSS architecture.
 
-The best approach that I've found is for the CSS include as little HTML structure as possible. The CSS should define how a set of visual elements look and (in order to minimize coupling with the HTML) those elements should look as they're defined regardless of where they appear in the HTML. If a certain component needs to look different in a different scenario, it should be called something different and it's the HTML's responsibility to call it that.
+The best approach that I've found is for the CSS to assume as little HTML structure as possible. The CSS should define how a set of visual elements look and (in order to minimize coupling with the HTML) those elements should look as they're defined regardless of where they appear in the HTML. If a certain component needs to look different in a different scenario, it should be called something different and it's the HTML's responsibility to call it that.
 
 As an example, the CSS might define a button component via the `.button` class. If the HTML wants a particular element to look like a button, it should use that class. If there's a situation were the button needs to look different (perhaps larger and full-width), then the CSS needs to define that look as well with a new class, and the HTML can include that new class to employ the new look.
 

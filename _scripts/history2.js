@@ -2,20 +2,15 @@ var parseUrl = require('./parse-url');
 
 function History2() {
 
-  if (window.history.state) {
-    this.currentPage = window.history.state;
-  }
-  else {
-    // Store the current url information.
-    this.currentPage = parseUrl(window.location.href);
-    this.currentPage.title = document.title;
+  // Store the current url information.
+  this.currentPage = parseUrl(window.location.href);
+  this.currentPage.title = document.title;
 
-    // Add history state initially so the first `popstate` event contains data.
-    history.replaceState(
-        this.currentPage,
-        this.currentPage.title,
-        this.currentPage.href);
-  }
+  // Add history state initially so the first `popstate` event contains data.
+  history.replaceState(
+      this.currentPage,
+      this.currentPage.title,
+      this.currentPage.href);
 
   this._queue = [];
 
@@ -37,11 +32,7 @@ History2.prototype.add = function(url, title, state, event) {
   this.nextPage.title = title;
   this.nextPage.state = state;
 
-  // If path is different this resource
-  // points to a different page.
-  if (this.nextPage.path != this.currentPage.path) {
-    this._processQueue(event);
-  }
+  this._processQueue(event);
 };
 
 

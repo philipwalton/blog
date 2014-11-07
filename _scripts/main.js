@@ -1,7 +1,6 @@
-var supports = require('./supports');
-var outboundLinks = require('./outbound-links');
-var socialInteractions = require('./social-interactions');
+var analytics = require('./analytics');
 var contentLoader = require('./content-loader');
+var supports = require('./supports');
 
 
 // Add an `is-legacy` class on browsers that don't supports flexbox.
@@ -10,13 +9,9 @@ if (!supports.flexbox()) {
 }
 
 
-// Track when the user clicks a link to an external site.
-outboundLinks.track();
-
-
-// Track when the user clicks a social link.
-socialInteractions.track();
-
-
 // Load links via AJAX instead of full page loads in browsers with pushState.
 contentLoader.init();
+
+
+// Track various interations with Google Analytics
+analytics.track();

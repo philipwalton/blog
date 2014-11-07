@@ -44,8 +44,10 @@ function trackBreakpoints() {
 
 function trackOutboundLinks() {
   linkClicked(function() {
-    if (isLinkOutbound(this)) {
+    // Ignore outbound links on social buttons.
+    if (this.getAttribute('data-social-network')) return;
 
+    if (isLinkOutbound(this)) {
       // Opening links in an external tabs allows the ga beacon to send.
       // When following links directly, sometimes they don't make it.
       this.target = '_blank';

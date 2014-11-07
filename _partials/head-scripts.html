@@ -2,8 +2,11 @@
 <script src="//use.typekit.net/ayq0lpd.js"></script>
 
 <script>
-ga = function() { ga.q.push(arguments); };
-ga.q = []; ga.l = 1 * new Date();
+
+// Google Analytics async snippet:
+// http://goo.gl/3FPNDx
+window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+
 
 // Create the GA tracker before doing any logging.
 ga('create', 'UA-21292978-1', 'auto');
@@ -11,6 +14,7 @@ ga('create', 'UA-21292978-1', 'auto');
 
 {{#is site.env 'development'}}
   // In non-production mode, simply log GA hits to the console.
+  // Note, tasks must be set before sending the first hit
   ga(function(tracker) {
     tracker.set('sendHitTask', function() {
       // Throw to stop subsequent tasks.
@@ -42,7 +46,4 @@ window.onerror = function(message, url, line, col) {
   });
 };
 
-
-// Note, tasks must be set before sending the first hit
-ga('send', 'pageview');
 </script>

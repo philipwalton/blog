@@ -9,5 +9,8 @@
 {{#is site.env 'production'}}
   <script async src="//www.google-analytics.com/analytics.js"></script>
 {{else}}
+  <script>
+    // window.ga_debug = {trace: true};
+  </script>
   <script async src="//www.google-analytics.com/analytics_debug.js"></script>
 {{/is}}

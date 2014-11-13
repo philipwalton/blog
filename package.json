@@ -22,7 +22,6 @@
     "ingen": "*",
     "lodash-node": "*",
     "marked": "*",
-    "moment": "*",
     "normalize.css": "^3.0.1",
     "rework": "^1.0.0",
     "rework-plugin-inline": "^1.0.1",

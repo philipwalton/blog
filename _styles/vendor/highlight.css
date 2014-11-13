@@ -9,3 +9,9 @@
   -webkit-text-size-adjust: none;
   white-space: pre;
 }
+
+/* Allow for highlight specific parts of a code block. */
+.hljs em {
+  background-color: #fff080;
+  font-style: normal;
+}

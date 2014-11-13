@@ -1,5 +1,4 @@
 {
-
   "title": "Philip Walton",
   "description": "Thoughts on web development, open source, software architecture, and the future.",
 
@@ -10,8 +9,7 @@
     ".DS_Store",
     "**/.DS_Store",
     "bower.json",
-    "README.md",
-    "karma.conf.js"
+    "README.md"
   ],
   "postTypes": ["article"],
   "taxonomyTypes": ["tag"],

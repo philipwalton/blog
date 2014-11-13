@@ -1,14 +1,9 @@
 # OS or Editor folders
 .DS_Store
-Thumbs.db
-.cache
 
-# Temporary Files
-_tmp
-
-# Depedencies
+# Node stuff
 node_modules
-bower_components
+npm-debug.log
 
 # Static site output
 _site

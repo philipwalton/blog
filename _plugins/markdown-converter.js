@@ -28,7 +28,7 @@ module.exports = function() {
     // using `**` before and after
     code = code.replace(/\*\*(.+)?\*\*/g, '<em>$1</em>');
 
-    return '<pre class="highlight"><code' + cls + '>' + code + '</code></pre>';
+    return '<pre class="hljs"><code' + cls + '>' + code + '</code></pre>';
   };
 
   events.on('afterRenderContent', function(p) {

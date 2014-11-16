@@ -12,7 +12,7 @@
 }
 -->
 
-For about as long as people have been writing CSS, people have been writing CSS the same way. Our tools change, methodologies go in an out of fashion, but at the end of the day, we all pretty much serve one CSS file that styles our entire site.
+For about as long as people have been writing CSS, people have been writing CSS the same way. Our tools change, methodologies go in an out of fashion, but at the end of the day, most of us serve one CSS file that styles our entire site.
 
 This isn't a critique of our current best-practices, it simply the reality. When we say we write modular CSS we mean that nominally. All CSS rules are global and every rule has the potential to conflict with every other rule. This is just the way it is.
 
@@ -34,4 +34,11 @@ While this might seem like an oversimplification, I believe it's true. Every tru
 
 The situation exists because developers routinely come up with bad solutions to hard problem #2. They think they're being clever, but they're really just digging a whole they'll eventually fall into.
 
-Developers like to notice patterns, and they've been taught not to repeat themselves. So when a developer looks at a site and notices that every time an `<h3>` is followed by `<ul>` in the sidebar, there's a gap between the
+Developers like to notice patterns, and they've been taught not to repeat themselves. So when a developer looks at a site and notices that every time an `<h3>` is followed by `<ul>` in the sidebar, there's a 20px gap, what do you expect him to do? Most people who encounter this scenario write some form of the following rule:
+
+```css
+#sidebar h3 + ul {
+  margin-top: 20px;
+}
+```
+

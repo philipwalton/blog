@@ -67,11 +67,10 @@ function setScroll() {
 
 function trackPage() {
   ga('set', {
-    location: this.nextPage.href,
+    page: this.nextPage.pathname,
     title: this.nextPage.title
   });
   ga('send', 'pageview');
-
 }
 
 

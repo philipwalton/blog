@@ -12,6 +12,56 @@
 }
 -->
 
+I. Problems with CSS
+  A. It's not the properties
+    1. vertical centering
+    2. equal height columns
+    3. browser inconsistencies
+    3. tricks, hack, unintuitive property combinations, etc.
+  B. It's the selectors
+    1. Scoping styles
+    2. Specificity conflicts
+    3. Non-deterministic matching
+    4. Dependency management
+    5. Removing unused code
+  C. All of these problem stem from the lack of a real "module" system in CSS
+II. Modular CSS today
+  A. BEM, SMACSS, OOCSS (and a million new ones the creep up almost daily)
+    1. Principles
+      a. single classes (consistent specificity)
+      b. decouple layout from theme (structure from skin)
+      c. decouple content form container
+  B. Abstraction layer
+    1. Selectors
+      a. code reuse through comma-separated selectors
+      b. #sidebar, #footer, .item, .callout { ... }
+    2. HTML + CSS
+      a. CSS defineds small, modular class-based rules
+      b. The HTML templates contain many, many classes
+    3. Preprocessor + Selectors
+      a. A preprocessor defines modular styles via @mixin or @extend
+      b. Those modular styles are assigned to complex selectors
+      c. The HTML remains free of most
+  C. All of these strategies work to varying degrees, but at the end of the day they are brittle because the selectors are still global.
+III. How could CSS be better?
+  A. Style scoping
+  B. Abstracting implementation details
+III. Real CSS Modules
+  A. Shadow DOM
+    1. Two-way style boundary
+    2. The abstraction lives in a style tag inside the shadow root
+  B. Context
+    1. Selector context is hard to manage and comes with specificity problems, element context is more resuable, easier to reason about, easier to establish intent, and makes dependencies are clearer
+IV. Examples
+  A. Classes vs Components
+    1. Inheritence
+    2. Composition
+  B. Building a complex component from simple components.
+  C. Building a layout from layout primatives.
+V. Conclusion
+
+
+
 For about as long as people have been writing CSS, people have been writing CSS the same way. Our tools change, methodologies go in an out of fashion, but at the end of the day, most of us serve one CSS file that styles our entire site.
 
 This isn't a critique of our current best-practices, it simply the reality. When we say we write modular CSS we mean that nominally. All CSS rules are global and every rule has the potential to conflict with every other rule. This is just the way it is.
@@ -55,4 +105,15 @@ One of my favorite [Twitter exchanges](https://twitter.com/rstacruz/status/27276
 
 > [@simurai](https://twitter.com/simurai): "I think the problem with the 'never use IDs' debate is that both sides come from two different perspectives. Small site vs large site."
 > <br>[@rstacruz](https://twitter.com/rstacruz): "@simurai Where is this debate being held?"
-> <br>[@divya](https://twitter.com/divya): "@rstacruzon small sites.""
+> <br>[@divya](https://twitter.com/divya): "@rstacruz on small sites.""
+
+## Code Reuse
+
+### Inheritence
+
+```
+var root = this.createShadowRoot();
+var
+
+
+

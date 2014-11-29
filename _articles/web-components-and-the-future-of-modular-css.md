@@ -12,6 +12,7 @@
 }
 -->
 
+<!--
 I. Problems with CSS
   A. It's not the properties
     1. vertical centering
@@ -36,13 +37,15 @@ II. Modular CSS today
       a. code reuse through comma-separated selectors
       b. #sidebar, #footer, .item, .callout { ... }
     2. HTML + CSS
-      a. CSS defineds small, modular class-based rules
+      a. CSS defines small, modular class-based rules
       b. The HTML templates contain many, many classes
     3. Preprocessor + Selectors
       a. A preprocessor defines modular styles via @mixin or @extend
       b. Those modular styles are assigned to complex selectors
       c. The HTML remains free of most
-  C. All of these strategies work to varying degrees, but at the end of the day they are brittle because the selectors are still global.
+  C. Downsides
+    1. All of these strategies work to varying degrees, but at the end of the day they are brittle because the selectors are still global.
+    2. These systems are not interoperable as the conventions typically only work when *all* the code is following the convention.
 III. How could CSS be better?
   A. Style scoping
   B. Abstracting implementation details
@@ -51,14 +54,80 @@ III. Real CSS Modules
     1. Two-way style boundary
     2. The abstraction lives in a style tag inside the shadow root
   B. Context
-    1. Selector context is hard to manage and comes with specificity problems, element context is more resuable, easier to reason about, easier to establish intent, and makes dependencies are clearer
+    1. Selector context is hard to manage and comes with specificity problems, element context is more reusable, easier to reason about, easier to establish intent, and makes dependencies are clearer
 IV. Examples
   A. Classes vs Components
-    1. Inheritence
+    1. Inheritance
     2. Composition
   B. Building a complex component from simple components.
-  C. Building a layout from layout primatives.
+  C. Building a layout from layout primitives.
 V. Conclusion
+-->
+
+Developers love to complain about CSS.
+
+The tricks, the hacks, the unintuitive property combinations required to get seemingly simple things to work cross browser. For many, CSS is a necessary evil, and a replacement can't come soon enough.
+
+While a small number of these complaints are valid, the vast majority of them no longer apply. Common complaints like vertical centering and equal-height columns have been solved for years and work in all modern browsers. These are not the hard problems of CSS.
+
+If you're a front-end engineer or have ever been involved in making architectural front-end decisions, you know that CSS is actually much harder than its critics commonly claim.
+
+Here is a rough list of some of the truly hard problems in CSS:
+
+- Scoping styles
+- Specificity conflicts
+- Non-deterministic matching
+- Dependency management
+- Removing unused code
+
+If you look at this list, you may notice that all of these items have one thing in common: they all deal with CSS selectors.
+
+The common critique of CSS almost always attack its properties, but if you work on a large team with a lot of people touching the code, then you know the real challenge in CSS is dealing with selectors.
+
+Selectors are global, and like all globals in other languages, they become increasingly hard to manage as your codebase scales. But unlike globals in other languages, CSS doesn't have a module system or a way of creating scope to. You can't break down the global beast into its smaller pieces in a way that makes them easy to manage simpler to reason about.
+
+When developers talk about "modular" CSS today, they do so nominally. While the techniques typically proposed are incredibly valuable, they're just methodologies and conventions.
+
+## Modular CSS today
+
+I think the modular/object-oriented CSS movement has been one of the best things to come to front-end architecture in recent history. When building web applications, it's unfortunate that code, which has almost nothing to do with how an application functions, is so often the bottleneck in building new features.
+
+This should not be the case, nor do I think it's an overstatement. In almost every company I've ever worked at, I can distinctly remember a situation where we wanted to change or improve something, but we didn't for fear that *any* change to the CSS would have potentially disastrous, unforeseen consequences.
+
+Our selectors were paralyzing us.
+
+### Methodologies
+
+There is certainly no shortage of modular CSS methodologies to choose from today. The classics are BEM, SMACSS, and OOCSS, but it feels like a new one comes out every week. To simplify things, I'm going to lump them all into a single category, and my example are going to use BEM (specifically the SUIT flavor) because it's the most prescriptive.
+
+Ultimately, all modular CSS methodologies have the same fundamental goals in common:
+
+- **Prefer single class selectors:** single classes keep specificity low, consistent, and they will never match an element in the HTML that you haven't explicitly ask it to.
+- **Avoid contextual styling:** do not style components based on where appear in the DOM. Doing so is inherently less reusable and makes usage of these components unpredictable.
+- **Decouple layout from theme:** the way a component looks and the way it appears relative to the elements around it are two separate concerns. When you combine those concerns (e.g. adding margin or positioning properties to components) you make them less reusable.
+
+
+### Abstraction
+
+Every attempt to make code reusable requires an abstraction layer. In modular CSS, that can take many forms,
+
+  1. Selectors
+    a. code reuse through comma-separated selectors
+    b. #sidebar, #footer, .item, .callout { ... }
+  2. HTML + CSS
+    a. CSS defines small, modular class-based rules
+    b. The HTML templates contain many, many classes
+  3. Preprocessor + Selectors
+    a. A preprocessor defines modular styles via @mixin or @extend
+    b. Those modular styles are assigned to complex selectors
+    c. The HTML remains free of most
+
+
+### Downsides
+
+1. All of these strategies work to varying degrees, but at the end of the day they are brittle because the selectors are still global.
+2. These systems are not interoperable as the conventions typically only work when *all* the code is following the convention.
+
 
 
 

@@ -90,6 +90,80 @@ When developers talk about "modular" CSS today, they do so nominally. While the 
 
 ## Modular CSS today
 
+Generally speaking, the purpose of modular programming is to break a large problem down into smaller pieces that are easier to reason about. Modules should be self-contained and interchangeable, allowing you to affect one part of the system without fear of unintended consequences.
+
+In CSS, it could be said that a selector is a module's interface and a declaration (i.e. properties and values) its implementation. This conceptually works, and seems to be how the creators of CSS intended it to manifest; however, in practice CSS modules are more complicated than a single selector.
+
+In practice, modules in CSS correspond to individual parts of a design or interface. A button group, a volume slider, a dropdown menu. These are all conceptually modules in the world of CSS, and *all* of them require more than one selector to style.
+
+As such, modules aren't so much about selectors as they are about the relationships between selectors. A modules is a group of selectors and UI is a group of modules. In theory, the implementation of any single module should be able to be swapped out for another module with an identical interface, and the system (the UI) should still work.
+
+The problem (as I already alluded to), is that modules are typically comprised of more than one selector, which means they're also comprised of more than one DOM element. To swap out a modules implementation for another requires not only changing the CSS but changing the HTML as well.
+
+This means there's coupling.
+
+### A history of abstraction
+
+When CSS was first introduced, it *was* the abstraction layer. CSS allowed us to remove `<font>` tags and `align` attributes from our markup, define reusable collections of styles, and target elements to apply those styles to via selectors.
+
+While there's absolutely nothing wrong this this approach, it doesn't scale well on sites that have many developers all writing styles at the same time. As already mentioned, selectors are global and globals don't normally scale well.
+
+#### Methodologies
+
+Methodologies like OOCSS, SMACSS, and BEM emerged specifically to address the scalability issue. With these methodologies, the abstraction is split between the HTML and CSS.
+
+The CSS still contains the declarations:
+
+```css
+.MainNav { ... }
+.MainNav-item { ... }
+.MainNav-link { ... }
+```
+
+But the HTML contains many of the classes in an effort to reduce selector complexity. The abstraction layer is split across both:
+
+```html
+<ul class="MainNav">
+  <li class="MainNav-item">
+    <a class="MainNav-link"></a>
+  </li>
+  <li class="MainNav-item">
+    <a class="MainNav-link"></a>
+  </li>
+</ul>
+```
+
+As it turns out, this approach ends up being much easier to maintain on a large team (despite the repetition in the HTML), but there still is coupling. If the `MainNav` module needs to change, both the HTML and CSS must change with it.
+
+#### Preprocessors
+
+Some people try to deal with the issue of excess classes in the HTML by letting a preprocessor do a lot of the heavy lifting. Instead of defining modular styles as classes, you define them as abstract placeholders (if using Sass), and compose them inside your rule declarations:
+
+```css
+%roundedBox { ... }
+%verticallyCentered { ... }
+%standardSpacing { ... }
+
+.overlay .modal {
+  @extend %roundedBox;
+  @extend %verticallyCentered;
+  @extend %standardSpacing;
+}
+```
+
+This addresses the problem of classes in the HTML, but it comes at the expense of reintroducing the problem of global selectors.
+
+### Downsides
+
+Each of the examples above tries to be modular to an extent but they all hit up against the same walls&mdash;the limitations of CSS.
+
+
+
+
+
+
+
+
 I think the modular/object-oriented CSS movement has been one of the best things to come to front-end architecture in recent history. When building web applications, it's unfortunate that code, which has almost nothing to do with how an application functions, is so often the bottleneck in building new features.
 
 This should not be the case, nor do I think it's an overstatement. In almost every company I've ever worked at, I can distinctly remember a situation where we wanted to change or improve something, but we didn't for fear that *any* change to the CSS would have potentially disastrous, unforeseen consequences.
@@ -107,23 +181,11 @@ Ultimately, all modular CSS methodologies have the same fundamental goals in com
 - **Decouple layout from theme:** the way a component looks and the way it appears relative to the elements around it are two separate concerns. When you combine those concerns (e.g. adding margin or positioning properties to components) you make them less reusable.
 
 
-### Abstraction
-
-Every attempt to make code reusable requires an abstraction layer. In modular CSS, that can take many forms,
-
-  1. Selectors
-    a. code reuse through comma-separated selectors
-    b. #sidebar, #footer, .item, .callout { ... }
-  2. HTML + CSS
-    a. CSS defines small, modular class-based rules
-    b. The HTML templates contain many, many classes
-  3. Preprocessor + Selectors
-    a. A preprocessor defines modular styles via @mixin or @extend
-    b. Those modular styles are assigned to complex selectors
-    c. The HTML remains free of most
-
 
 ### Downsides
+
+The
+
 
 1. All of these strategies work to varying degrees, but at the end of the day they are brittle because the selectors are still global.
 2. These systems are not interoperable as the conventions typically only work when *all* the code is following the convention.

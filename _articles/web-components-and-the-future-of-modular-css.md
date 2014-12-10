@@ -46,6 +46,9 @@ II. Modular CSS today
   C. Downsides
     1. All of these strategies work to varying degrees, but at the end of the day they are brittle because the selectors are still global.
     2. These systems are not interoperable as the conventions typically only work when *all* the code is following the convention.
+      a. Conventions are great for your own code, but they typically fall apart if you're using any third party code.
+      b. Conformance
+
 III. How could CSS be better?
   A. Style scoping
   B. Abstracting implementation details
@@ -102,7 +105,7 @@ The problem (as I already alluded to), is that modules are typically comprised o
 
 This means there's coupling.
 
-### A history of abstraction
+### Abstraction
 
 When CSS was first introduced, it *was* the abstraction layer. CSS allowed us to remove `<font>` tags and `align` attributes from our markup, define reusable collections of styles, and target elements to apply those styles to via selectors.
 
@@ -157,11 +160,67 @@ This addresses the problem of classes in the HTML, but it comes at the expense o
 
 Each of the examples above tries to be modular to an extent but they all hit up against the same walls&mdash;the limitations of CSS.
 
+The problem is the abstraction has to go somewhere. Either it goes in the selector and you have the issue of a conflicting global namespace, or you develop a disciplined convention to manage the global namespace and the abstraction goes in your HTML templates.
+
+Another problem is interoperability. If one of the main selling points of modularity is the ability to swap out one implementation for another, your HTML and CSS need to be structured in a way that can make that happen. A selector-based approach makes this essentially impossible, since module authors can't predict your markup structure, and putting classes in the HTML makes this tedious unless your templates are already being dynamically generated in such a way as to allow for this.
+
+The bottom line is there is plenty of room for improvement.
+
+## How CSS could be better
+
+CSS is desperately missing the ability to scope styles, both from within and from without. The scoping we have today is selector based, e.g. `#sidebar .widget` scopes the widget styles to just the sidebar, but it doesn't prevent other styles on the page from styling the widget element itself (or its children). This type of scoping also comes at a price. When you add a container element to a selector you make it less reusable (what if you want to use those same styles somewhere else on the page?) and you make it more specific (now rules with simple selectors may no longer override on these elements).
+
+What is really needed is the ability to create a reusable CSS rule (or set of rules) and declare that it only apply to a particular DOM subtree without having to change the selector. The counterpoint to this is to be able to make that subtree independent from outside styles.
+
+The second piece largely missing from CSS (and HTML by association) is a true abstraction layer for building modules. I've already mentioned that most modules require more than one DOM element to construct, and today there is no simple way, with just HTML and CSS, to define the DOM structure that a module consists of.
+
+Consider a basic alert message with an icon and an "x" button in the top right corner to dismiss the message. The DOM structure may look something like this:
+
+```html
+<aside class="Alert">
+  <span class="Alert-icon"></span>
+  <div class="Alert-body">...</div>
+  <span class="Alert-dismiss"></span>
+</aside>
+```
+
+If you decided you wanted to change some of the class names, or the order of the elements in this alert widget, you'd have to update every occurrence of this alert in your templates.
+
+From a content perspective, the only thing that is important is the message inside the alert. Semantically speaking, all that's needed is this:
+
+```html
+<alert>...</alert>
+```
+
+And maybe if you support multiple types of alerts, you can have an optional type attribute:
+
+```html
+<alert type="info">...</alert>
+```
+
+The wrapper element in the alert body, the close button, and the alert icon. These are all just implementation details. Implantation details that should be interchangeable for another style of alert should you desire.
+
+If we're really separating content from presentation, we need a way to define not only our presentational styles, but our presentational markup as well.
+
+Fortunately, the future is already here. With Web Components (specifically Shadow DOM) we get both of these things.
+
+## Shadow DOM
 
 
 
 
 
+
+
+
+
+
+
+
+
+<!--
+
+***
 
 
 I think the modular/object-oriented CSS movement has been one of the best things to come to front-end architecture in recent history. When building web applications, it's unfortunate that code, which has almost nothing to do with how an application functions, is so often the bottleneck in building new features.
@@ -246,5 +305,6 @@ One of my favorite [Twitter exchanges](https://twitter.com/rstacruz/status/27276
 var root = this.createShadowRoot();
 var
 
+-->
 
 

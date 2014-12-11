@@ -101,9 +101,9 @@ In practice, modules in CSS correspond to individual parts of a design or interf
 
 As such, modules aren't so much about selectors as they are about the relationships between selectors. A modules is a group of selectors and UI is a group of modules. In theory, the implementation of any single module should be able to be swapped out for another module with an identical interface, and the system (the UI) should still work.
 
-The problem (as I already alluded to), is that modules are typically comprised of more than one selector, which means they're also comprised of more than one DOM element. To swap out a modules implementation for another requires not only changing the CSS but changing the HTML as well.
+The problem (as I already alluded to), is that modules are typically comprised of more than one selector, which means they're also comprised of more than one DOM element. To swap out a module's implementation for another requires not only changing the CSS but changing the HTML as well.
 
-This means there's coupling.
+This means there's coupling. And this, inherently, is the problem.
 
 ### Abstraction
 
@@ -111,32 +111,15 @@ When CSS was first introduced, it *was* the abstraction layer. CSS allowed us to
 
 While there's absolutely nothing wrong this this approach, it doesn't scale well on sites that have many developers all writing styles at the same time. As already mentioned, selectors are global and globals don't normally scale well.
 
-#### Methodologies
+### Methodologies
 
-Methodologies like OOCSS, SMACSS, and BEM emerged specifically to address the scalability issue. With these methodologies, the abstraction is split between the HTML and CSS.
+As web applications have grown in complexity and web development teams have grown in size, it became apparent that allowed anyone to write whatever selectors they wanted just doesn't work. At all.
 
-The CSS still contains the declarations:
+Conventions and best-practices arose around the idea that the the most predictable selector is the one that contains just a single class, which is applied directly to the element you want to style. Applying a single class to every element requires a lot more classes in your HTML, but it also makes your code much easier to reason about, and far more predictable. When you want to change how something looks, you just change that class selector's declaration, and you can be sure it will only affect the elements that use that class.
 
-```css
-.MainNav { ... }
-.MainNav-item { ... }
-.MainNav-link { ... }
-```
+By contrast, when you write selectors that expect a particular HTML structure, changing the selector or the HTML structure, evening in seemingly harmless ways, will always run the risk of breaking things.
 
-But the HTML contains many of the classes in an effort to reduce selector complexity. The abstraction layer is split across both:
-
-```html
-<ul class="MainNav">
-  <li class="MainNav-item">
-    <a class="MainNav-link"></a>
-  </li>
-  <li class="MainNav-item">
-    <a class="MainNav-link"></a>
-  </li>
-</ul>
-```
-
-As it turns out, this approach ends up being much easier to maintain on a large team (despite the repetition in the HTML), but there still is coupling. If the `MainNav` module needs to change, both the HTML and CSS must change with it.
+To deal with this, methodologies like BEM, SMACSS, and OOCSS have emerged and (for the most part) are extremely effective. It turns out that despite the need for a lot of repetition in the HTML, maintaining and abstracting HTML into templates and partials is far easier than managing global selector spaghetti.
 
 #### Preprocessors
 
@@ -155,6 +138,8 @@ Some people try to deal with the issue of excess classes in the HTML by letting 
 ```
 
 This addresses the problem of classes in the HTML, but it comes at the expense of reintroducing the problem of global selectors.
+
+Ultimately, any attempt to keep the abstraction layer in the CSS is going to run into the same problems.
 
 ### Downsides
 
@@ -198,7 +183,7 @@ And maybe if you support multiple types of alerts, you can have an optional type
 <alert type="info">...</alert>
 ```
 
-The wrapper element in the alert body, the close button, and the alert icon. These are all just implementation details. Implantation details that should be interchangeable for another style of alert should you desire.
+The wrapper element in the alert body, the close button, and the alert icon. These are all just implementation details. Implementation details that should be interchangeable for another style of alert should you desire.
 
 If we're really separating content from presentation, we need a way to define not only our presentational styles, but our presentational markup as well.
 

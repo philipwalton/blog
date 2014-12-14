@@ -67,38 +67,35 @@ IV. Examples
 V. Conclusion
 -->
 
-Developers who are new to CSS often complain about things that should be simple are unnecessarily complex, unintuitive, or hacky. Why do I have to use `border-color: transparent` to make a triangle? Why doesn't `vertical-align: center` ever work when I want it to? Why do I have to use JavaScript to make equal-height columns?
+Developers who are new to CSS often complain that things that should be simple are unnecessarily complex, unintuitive, or hacky. Why do I have to use `border-color: transparent` to make a triangle? Why doesn't `vertical-align: center` ever work when I want it to? Why do I have to use JavaScript to make equal-height columns?
 
-Sure these are annoyances, and yes being skilled at CSS does require an encyclopedic knowledge of hacks and tricks, but these issues have been almost entirely solved in newer versions of the specification.
+Sure these are annoyances, and yes being skilled at CSS does require an encyclopedic knowledge of hacks and tricks, but is this really why CSS is hard?
+The solutions to these problems can be easily Googled, and most of them have been solved by some of the newer features of CSS.
 
 To put it bluntly, these are not, nor have they ever been, the truly hard problems in CSS.
 
-In fact, the real hard problems in CSS have nothing to do with visual design at all. They have to do with code design, maintainability, and organization. If you've ever had to work in an existing CSS codebase, you'll be far too familiar with this situation:
+In fact, the real hard problems in CSS have nothing to do with visual design at all. They have to do with code design, maintainability, and organization. If you've ever had to work in an existing CSS codebase, you'll be all too familiar with this situation:
 
 * You can't write the rules you want because the existing rules trump them.
 * You can't change the existing rules because refactoring would take too long and risk breaking too many things.
 * Your hand is forced, so you end up writing rules you know are bad.
 * Now the problem is worse than when you started.
 
-Every company I've ever worked for or with has experienced this problem. Bad CSS can cripple development, prevent teams from updating designs they know have usability issues, and even block the shipping of new features.
+Every company I've ever worked for has dealt with this. Bad CSS can cripple development, prevent teams from updating designs they know have usability issues, and even block the shipping of new features.
 
 CSS should never be a bottleneck, yet so many times it is. And it's not because of vertical-centering woes or equal-height column hacks. If fact, it's not because of any property or value declaration.
 
-CSS is hard because its selectors are global.
+*CSS is hard because its selectors are global.*
 
-As with any language, global variables become increasingly hard to manage as your codebase scales. Yet unlike many other languages, CSS doesn't have a module system or a way to scope rules to a particular context without increasing specificity and preventing reuse.
+As with any language, global variables become increasingly hard to manage as your codebase scales. Yet unlike many other languages, CSS doesn't have a module system or a way to scope rules to a particular context without increasing specificity and thus preventing reuse.
 
 The rest of this article will discuss how modular CSS is used today to deal with the shortcomings of CSS, and it will explore how the Web Components will make writing truly modular CSS a reality in the future.
 
 ## Modular CSS today
 
-
-When developers talk about "modular" CSS today, they do so nominally. While the techniques typically proposed are incredibly valuable, they're just methodologies and conventions.
-
-
 Generally speaking, the purpose of modular programming is to break a large problem down into smaller pieces that are easier to reason about. Modules should be self-contained and interchangeable, allowing you to affect one part of the system without fear of unintended consequences.
 
-In CSS, it could be said that a selector is a module's interface and a declaration (i.e. properties and values) its implementation. This conceptually works, and seems to be how the creators of CSS intended it to manifest; however, in practice CSS modules are more complicated than a single selector.
+In CSS, it could be said that a selector is a module's interface and a declaration (the properties and values) its implementation. This conceptually works, and seems to be how the creators of CSS intended it to manifest; however, in practice CSS modules are more complicated than a single selector.
 
 In practice, modules in CSS correspond to individual parts of a design or interface. A button group, a volume slider, a dropdown menu. These are all conceptually modules in the world of CSS, and *all* of them require more than one selector to style.
 
@@ -108,25 +105,17 @@ The problem (as I already alluded to), is that modules are typically comprised o
 
 This means there's coupling. And this, inherently, is the problem.
 
-### Abstraction
+### The abstraction layer
 
 When CSS was first introduced, it *was* the abstraction layer. CSS allowed us to remove `<font>` tags and `align` attributes from our markup, define reusable collections of styles, and target elements to apply those styles to via selectors.
 
 While there's absolutely nothing wrong this this approach, it doesn't scale well on sites that have many developers all writing styles at the same time. As already mentioned, selectors are global and globals don't normally scale well.
 
-### Methodologies
+As web applications grew in complexity and web development teams grew in size, it became apparent that allowing anyone to write whatever selectors they wanted just doesn't work. At all. The abstraction layer needed to go somewhere else.
 
-As web applications have grown in complexity and web development teams have grown in size, it became apparent that allowed anyone to write whatever selectors they wanted just doesn't work. At all.
+### Preprocessors
 
-Conventions and best-practices arose around the idea that the the most predictable selector is the one that contains just a single class, which is applied directly to the element you want to style. Applying a single class to every element requires a lot more classes in your HTML, but it also makes your code much easier to reason about, and far more predictable. When you want to change how something looks, you just change that class selector's declaration, and you can be sure it will only affect the elements that use that class.
-
-By contrast, when you write selectors that expect a particular HTML structure, changing the selector or the HTML structure, evening in seemingly harmless ways, will always run the risk of breaking things.
-
-To deal with this, methodologies like BEM, SMACSS, and OOCSS have emerged and (for the most part) are extremely effective. It turns out that despite the need for a lot of repetition in the HTML, maintaining and abstracting HTML into templates and partials is far easier than managing global selector spaghetti.
-
-#### Preprocessors
-
-Some people try to deal with the issue of excess classes in the HTML by letting a preprocessor do a lot of the heavy lifting. Instead of defining modular styles as classes, you define them as abstract placeholders (if using Sass), and compose them inside your rule declarations:
+CSS preprocessors seemed like an obvious solution to reduce tedium and abstract away complexity. Instead of defining styles as classes you can define them as mixins or abstract rules (placeholders in Sass) that can be extended. For example:
 
 ```css
 %roundedBox { ... }
@@ -140,9 +129,17 @@ Some people try to deal with the issue of excess classes in the HTML by letting 
 }
 ```
 
-This addresses the problem of classes in the HTML, but it comes at the expense of reintroducing the problem of global selectors.
+This approach allows makes code reuse easier and decouples styles from selectors, but it doesn't solve the problem of specificity, nor does it eliminate unpredictability.
 
-Ultimately, any attempt to keep the abstraction layer in the CSS is going to run into the same problems.
+If you're writing selectors that depend on a particular DOM structure, you're going to have the same problems, with or without a preprocessor. Ultimately, any attempt to keep the abstraction layer in the CSS is going to fail.
+
+### Methodologies
+
+Conventions and best-practices arose around the idea that the the most predictable selector is the one that contains just a single class, which is applied directly to the element you want to style. Applying a single class to every element requires a lot more classes in your HTML, but it also makes your code much easier to reason about, and far more predictable. When you want to change how something looks, you just change that class selector's declaration, and you can be sure it will only affect the elements that use that class.
+
+By contrast, when you write selectors that expect a particular HTML structure, changing the selector or the HTML structure, evening in seemingly harmless ways, will always run the risk of breaking things.
+
+To deal with this, methodologies like BEM, SMACSS, and OOCSS have emerged and (for the most part) are extremely effective. It turns out that despite the need for a lot of repetition in the HTML, maintaining and abstracting HTML into templates and partials is far easier than managing global selector spaghetti. In other words, the abstraction is shared between the HTML and the CSS.
 
 ### Downsides
 
@@ -150,25 +147,60 @@ Each of the examples above tries to be modular to an extent but they all hit up 
 
 The problem is the abstraction has to go somewhere. Either it goes in the selector and you have the issue of a conflicting global namespace, or you develop a disciplined convention to manage the global namespace and the abstraction goes in your HTML templates.
 
-Another problem is interoperability. If one of the main selling points of modularity is the ability to swap out one implementation for another, your HTML and CSS need to be structured in a way that can make that happen. A selector-based approach makes this essentially impossible, since module authors can't predict your markup structure, and putting classes in the HTML makes this tedious unless your templates are already being dynamically generated in such a way as to allow for this.
+But as with any convention, it only works if you write all the code yourself, or if all of your third-party code abides by the same rules. Unfortunately, that's a pretty hard ask. This is particularly problematic if you use an sort of conformance tooling to enforce your conventions, as the use of third-party components will almost certainly throw errors.
 
-The bottom line is there is plenty of room for improvement.
+All of this boils down to interoperability. If the point of modularity is the ability to swap out one implementation for another, your HTML and CSS need to be structured in a way that can make that happen. A selector-based approach makes this essentially impossible, since module authors can't predict your markup structure, and putting classes in the HTML makes this tedious.
+
+In truth, modular CSS today isn't really modular at all. All talk of modularity if just nominal. This isn't to diminish the value of these methodologies and conventions; it's just to point out that there's plenty more to be desired.
 
 ## How CSS could be better
 
-Here is a rough list of some of the truly hard problems in CSS:
+I've spent much of my profession career talking about and trying to make it easier for me and my teams to deal with the problems and shortcomings of CSS. If you asked me to make a wish list of what I'd add or change about CSS to make it better, I probably would have said the following two things:
 
-* Scoping styles
-* Specificity conflicts
-* Non-deterministic matching
-* Dependency management
-* Removing unused code
+* Add two-way style encapsulation and scoping.
+* Implement a real abstraction layer so presentational elements don't need to be in the markup.
 
-CSS is desperately missing the ability to scope styles, both from within and from without. The scoping we have today is selector based, e.g. `#sidebar .widget` scopes the widget styles to just the sidebar, but it doesn't prevent other styles on the page from styling the widget element itself (or its children). This type of scoping also comes at a price. When you add a container element to a selector you make it less reusable (what if you want to use those same styles somewhere else on the page?) and you make it more specific (now rules with simple selectors may no longer override on these elements).
+### Two-way scoping
 
-What is really needed is the ability to create a reusable CSS rule (or set of rules) and declare that it only apply to a particular DOM subtree without having to change the selector. The counterpoint to this is to be able to make that subtree independent from outside styles.
+CSS is desperately missing the ability to scope styles, both from within and from without. The scoping we have today is selector based. For example `#sidebar .widget` scopes the widget styles to just the sidebar, but it doesn't prevent other styles on the page from styling the widget element itself (or its children). This type of scoping also comes at a price. When you add a container element to a selector you make it less reusable (what if you want to use those same styles somewhere else on the page?) and you make it more specific (now rules with simple selectors may no longer override on these elements).
 
-The second piece largely missing from CSS (and HTML by association) is a true abstraction layer for building modules. I've already mentioned that most modules require more than one DOM element to construct, and today there is no simple way, with just HTML and CSS, to define the DOM structure that a module consists of.
+What is really needed is the ability to create a reusable CSS rule (or set of rules) and declare that it only apply to a particular DOM subtree without having to change the selector. In addition, we need to be able to declare that a particular DOM subtree is shielded from outside styles.
+
+The following example illustrates how a lack of style encapsulation can be a problem. Consider the following markup and accompanying CSS:
+
+```html
+<div class="Widget">
+  <h3 class="Widget-title">Widget Title</h3>
+  <p class="Widget-content">...</p>
+</div>
+```
+
+```css
+/* Widget module styles */
+.Widget-title {
+  color: red;
+  font-size: 1.25em;
+  line-height: 1;
+}
+
+/* Somewhere else in the bundled CSS... */
+h3 {
+  border-bottom: 1px solid lightgray;
+  font: 1.5em/1.5 sans-serif;
+}
+```
+
+As you can see, the widget is setting the `font-size` and `line-height` explicitly on its title, but it's not specifying a border. This means the border style applied to the global `h3` type selector will also be applied to the widget's title.
+
+CSS does not have a way to prevent this from happening.
+
+### Presentational abstractions
+
+One of the original goals of CSS was to separate presentation from content. Unfortunately, CSS was never powerful or expressive enough to truly style content without extra, presentational markup like wrappers and containers.
+
+For true separation of presentation and content, you'd need the ability to abstract these presentational elements away for reuse just like you can abstract away single-element styles today.
+
+Since most UI components require more than one DOM element to construct, and today there is no simple way, with just HTML and CSS, to define the DOM structure that a module consists of.
 
 Consider a basic alert message with an icon and an "x" button in the top right corner to dismiss the message. The DOM structure may look something like this:
 
@@ -185,66 +217,17 @@ If you decided you wanted to change some of the class names, or the order of the
 From a content perspective, the only thing that is important is the message inside the alert. Semantically speaking, all that's needed is this:
 
 ```html
-<alert>...</alert>
+<my-alert>...</my-alert>
 ```
 
 And maybe if you support multiple types of alerts, you can have an optional type attribute:
 
 ```html
-<alert type="info">...</alert>
+<my-alert type="info">...</my-alert>
 ```
 
 The wrapper element in the alert body, the close button, and the alert icon. These are all just implementation details. Implementation details that should be interchangeable for another style of alert should you desire.
 
 If we're really separating content from presentation, we need a way to define not only our presentational styles, but our presentational markup as well.
 
-Fortunately, the future is already here. With Web Components (specifically Shadow DOM) we get both of these things.
-
-## Shadow DOM
-
-
-
-
-
-
-
-
-
-
-
-
-
-<!--
-
-***
-
-
-I think the modular/object-oriented CSS movement has been one of the best things to come to front-end architecture in recent history. When building web applications, it's unfortunate that code, which has almost nothing to do with how an application functions, is so often the bottleneck in building new features.
-
-This should not be the case, nor do I think it's an overstatement. In almost every company I've ever worked at, I can distinctly remember a situation where we wanted to change or improve something, but we didn't for fear that *any* change to the CSS would have potentially disastrous, unforeseen consequences.
-
-Our selectors were paralyzing us.
-
-### Methodologies
-
-There is certainly no shortage of modular CSS methodologies to choose from today. The classics are BEM, SMACSS, and OOCSS, but it feels like a new one comes out every week. To simplify things, I'm going to lump them all into a single category, and my example are going to use BEM (specifically the SUIT flavor) because it's the most prescriptive.
-
-Ultimately, all modular CSS methodologies have the same fundamental goals in common:
-
-- **Prefer single class selectors:** single classes keep specificity low, consistent, and they will never match an element in the HTML that you haven't explicitly ask it to.
-- **Avoid contextual styling:** do not style components based on where appear in the DOM. Doing so is inherently less reusable and makes usage of these components unpredictable.
-- **Decouple layout from theme:** the way a component looks and the way it appears relative to the elements around it are two separate concerns. When you combine those concerns (e.g. adding margin or positioning properties to components) you make them less reusable.
-
-
-
-### Downsides
-
-The
-
-
-1. All of these strategies work to varying degrees, but at the end of the day they are brittle because the selectors are still global.
-2. These systems are not interoperable as the conventions typically only work when *all* the code is following the convention.
-
--->
-
-
+## Real CSS Modules

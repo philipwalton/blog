@@ -23,20 +23,20 @@ function trackBreakpoints() {
   Object.keys(breakpoints).forEach(function(breakpoint) {
     var mql = window.matchMedia(breakpoints[breakpoint]);
 
-    // Set the breakpoint on pageload.
+    // Set the initial breakpoint on pageload.
     if (mql.matches) {
       ga('set', 'dimension1', breakpoint);
     }
 
     // Update the breakpoint as the matched media changes, and send an event.
     mql.addListener(function(mql) {
-        if (mql.matches) {
-          clearTimeout(timeout);
-          timeout = setTimeout(function() {
-            ga('set', 'dimension1', breakpoint);
-            ga('send', 'event', 'Breakpoint', 'change', breakpoint);
-          }, 1000);
-        }
+      if (mql.matches) {
+        clearTimeout(timeout);
+        timeout = setTimeout(function() {
+          ga('set', 'dimension1', breakpoint);
+          ga('send', 'event', 'Breakpoint', 'change', breakpoint);
+        }, 1000);
+      }
     });
   });
 }

@@ -17,7 +17,7 @@ function trackBreakpoints() {
   // Do nothing in browsers that don't support `window.matchMedia`.
   if (!window.matchMedia) return;
 
-  // Prevent rapid breakpoint changes for all firing at once.
+  // Prevent rapid breakpoint changes from all firing at once.
   var timeout;
 
   Object.keys(breakpoints).forEach(function(breakpoint) {

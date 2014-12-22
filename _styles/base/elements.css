@@ -36,6 +36,10 @@ article a {
   background-size: 1px 1px;
 }
 
+article sup a {
+  background: 0;
+}
+
 .is-legacy article a {
   background: 0;
   text-decoration: underline;

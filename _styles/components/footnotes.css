@@ -1,0 +1,17 @@
+.Footnotes {
+  color: #555;
+}
+
+.Footnotes-title {
+  font-size: .8em;
+  margin-bottom: .8em;
+}
+
+.Footnotes-items {
+  font-size: .8em;
+}
+
+.Footnotes-items li {
+  margin-bottom: .4em;
+}
+

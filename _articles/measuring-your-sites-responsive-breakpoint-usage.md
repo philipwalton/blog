@@ -2,7 +2,7 @@
 {
   "layout": "article",
   "title": "Measuring Your Site's Responsive Breakpoint Usage",
-  "date": "2014-12-18T09:37:36-08:00",
+  "date": "2014-12-22T09:37:36-08:00",
   "tags": [
     "JavaScript",
     "CSS"
@@ -18,7 +18,7 @@ If your site is built on device-less principles but its usage measured against d
 
 ## The device problem
 
-To illustrate this problem, consider the iPhone. The range of iPhone screen sizes can go from 320 pixels on a iPhone 5s in portrait mode to 960 pixels on an iPhone 6 plus in landscape mode. That's a *huge* range. In fact, on this site that range covers four out of the five total breakpoints.
+To illustrate this problem, consider the iPhone. The range of iPhone screen sizes can go from 320 pixels on an iPhone 5s in portrait mode to 960 pixels on an iPhone 6 plus in landscape mode. That's a *huge* range. In fact, on this site that range covers four out of the five total breakpoints.
 
 If you want to glean any useful information about the effectiveness of a design at a particular breakpoint, you can't do that with device data alone. In short, sites built responsively should be measuring breakpoint usage *in addition* to device usage.
 
@@ -243,6 +243,19 @@ Object.keys(breakpoints).forEach(function(breakpoint) {
   });
 });
 ```
+
+## Reporting breakpoint usage
+
+I don't want to spend too much time talking about how to view your data in Google Analytics, but since this article deals with custom dimensions, and reporting on custom dimensions is a slightly advanced topic, I think it warrants at least a mention.
+
+To view the custom dimension data you've collected in Google Analytics you'll need to create a [custom report](https://support.google.com/analytics/answer/1033013?hl=en&ref_topic=1012046). You can create a custom report following [these instructions](https://support.google.com/analytics/answer/1151300?hl=en&ref_topic=1012046). When asked, select a report type of either "Explorer" or "Flat Table". The metric you choose is up to you (pageviews is probably a good start), and the dimension will be whatever you named your custom dimension.
+
+If you want to create a custom report showing breakpoint change events, use the metric "Total Events", the dimension "Event Label", and add two filters so the "Event Category" is "breakpoint" and the "Event Action" is "change".
+
+Alternatively you can query the Google Analytics Core Reporting API to get the same data. The following two reports use the [Query Explorer](https://ga-dev-tools.appspot.com/explorer/) to access the API (these assume your custom dimension has an index of 1):
+
+- [Pageviews (by breakpoint)](https://ga-dev-tools.appspot.com/explorer/?dimensions=ga%253Adimension1&metrics=ga%253Asessions&sort=-ga%253Asessions&start-date=2014-12-01&end-date=2014-12-31)
+- [Breakpoint change events (by breakpoint)](https://ga-dev-tools.appspot.com/explorer/?dimensions=ga%253AeventLabel&metrics=ga%253AtotalEvents&filters=ga%253AeventCategory%253D%253DBreakpoint%252Cga%253AeventAction%253D%253Dchange&start-date=2014-12-01&end-date=2014-12-31)
 
 ## Wrapping up
 

@@ -2,7 +2,7 @@
 {
   "layout": "article",
   "title": "Measuring Your Site's Responsive Breakpoint Usage",
-  "date": "2014-12-22T09:37:36-08:00",
+  "date": "2014-12-22T22:38:36-08:00",
   "tags": [
     "JavaScript",
     "CSS"
@@ -12,9 +12,9 @@
 
 Most web analytics tools will give you a lot of information about your users' devices. These insights can be extremely useful for measuring trends and are particularly important if you have a separate mobile and desktop site or a different design for Android and iOS. But if you've built your site responsively, device information just doesn't tell the whole story.
 
-A responsive design aims to divorce itself from device or platform-specific factors. Instead, it adapts to device-agnostic properties like screen size, pixel density, and device orientation.
+Responsive design aims to divorce itself from device or platform-specific factors. Instead, it adapts to device-agnostic properties like screen size, pixel density, and device orientation.
 
-If your site is built on device-less principles but its usage measured against device-only metrics, you're going to get a mismatch&mdash;potentially a big one.
+If your site is built on device-less principles, but its usage is measured against device-only metrics, you're going to get a mismatch&mdash;potentially a big one.
 
 ## The device problem
 
@@ -126,7 +126,7 @@ ga('set', 'key', 'value');
 
 Since we're using a custom dimension, the key is going to be `'dimensionN'` where "N" is the index Google Analytics assigned to this particular custom dimension at creation time. (If this is the first custom dimension you've created for this Google Analytics [property](https://support.google.com/analytics/answer/2649554), it will be `'dimension1'`)
 
-The above code now becomes:
+The above code now becomes (changes highlighted):
 
 ```js
 Object.keys(breakpoints).forEach(function(breakpoint) {
@@ -246,7 +246,7 @@ Object.keys(breakpoints).forEach(function(breakpoint) {
 
 ## Reporting breakpoint usage
 
-I don't want to spend too much time talking about how to view your data in Google Analytics, but since this article deals with custom dimensions, and reporting on custom dimensions is a slightly advanced topic, I think it warrants at least a mention.
+I don't want to spend too much time talking about how to view your breakpoint data in Google Analytics, but since this article deals with custom dimensions, and reporting on custom dimensions is a slightly advanced topic, I think it warrants at least a mention.
 
 To view the custom dimension data you've collected in Google Analytics you'll need to create a [custom report](https://support.google.com/analytics/answer/1033013?hl=en&ref_topic=1012046). You can create a custom report following [these instructions](https://support.google.com/analytics/answer/1151300?hl=en&ref_topic=1012046). When asked, select a report type of either "Explorer" or "Flat Table". The metric you choose is up to you (pageviews is probably a good start), and the dimension will be whatever you named your custom dimension.
 

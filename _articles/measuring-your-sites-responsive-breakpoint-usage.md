@@ -36,7 +36,7 @@ Dimensions are how you subdivide your metrics into relevant categories. For exam
 
 Given this, it's hopefully clear that you'd want to track responsive breakpoints as a custom dimension. If your site had 1,000 pageviews on Tuesday, you may be curious to know how many of those pages were displayed at the smallest breakpoint verses the larger ones. For pretty much any metric you care about (users, sessions, pageviews, etc.), it's valuable to know what responsive breakpoint was active at that time of the interaction.
 
-If you've never created a custom dimension in Google Analytics, you can follow [these instructions](https://support.google.com/analytics/answer/2709829) from the Google Analytics Help Center. I chose to named my custom dimension "breakpoint" (you can choose whatever name you like), and since knowing the active breakpoint is useful for pretty much any interaction, I selected the scope "hit".
+If you've never created a custom dimension in Google Analytics, you can follow [these instructions](https://support.google.com/analytics/answer/2709829) from the Google Analytics Help Center. I chose to name my custom dimension "breakpoint" (you can choose whatever name you like), and since knowing the active breakpoint is useful for pretty much any interaction, I selected the scope "hit".
 
 Once you've created the custom dimension, you can use it just like you'd use any other dimension.
 

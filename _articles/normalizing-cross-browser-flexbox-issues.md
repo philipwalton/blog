@@ -10,6 +10,31 @@
 }
 -->
 
+<!--
+A. Introduction (explaining the problem)
+B. Case Study: sticky footer
+   1. Min-height
+      a. IE's max-height
+   2. Height
+      a. min-content inconsistencies
+B. What are the inconsistencies?
+   1. IE min-height bug
+   2. min-content spec changes
+      a. How do browsers calculate the height of a flex-item when there is not enough available space?
+         i. Flex-basis >> height/width >> ???
+        ii. Some browsers use the natural size of the content, and some don't.
+   3. IE flex-basis bug
+C. Dealing with the inconsistencies
+   1. Using height instead of min-height
+   2. Using `flex-shrink:1`
+   3. Using 0% instead of 0
+      a. Using `%` instead of `px` because most minifiers don't seem to strip %
+D. Conclusion
+   1. Almost every cross-browser issue can be easily worked-around
+-->
+
+
+
 A little over a year ago when I was building my [Solved by Flexbox](http://philipwalton.github.io/solved-by-flexbox/) demo site, I discovered and reported an [Internet Explorer bug](https://connect.microsoft.com/IE/feedback/details/802625/min-height-and-flexbox-flex-direction-column-dont-work-together-in-ie-10-11-preview) that prevented my [sticky footer](http://philipwalton.github.io/solved-by-flexbox/demos/sticky-footer/) example from working properly. Since a sticky footer layout is a perfect candidate for progressive enhancement (i.e. the content is still accessible even if the footer isn't sticking) I didn't worry too much about it. The demo worked in all browsers except Internet Explorer 10 and 11, and I was okay with that.
 
 Over the past year I've become more familiar with the nuances of the [flex layout algorithm](http://dev.w3.org/csswg/css-flexbox/#layout-algorithm) and the [flexibility](http://dev.w3.org/csswg/css-flexbox/#flexibility) properties, I've discovered that there is more than one way to stick a footer with flexbox.
@@ -62,15 +87,6 @@ flex-basis: 0%;
 In other words, the reason I couldn't get the sticky footer example to work with `height:100vh` is because I was unknowingly telling my content area to shrink when there wasn't enough room. If I changed the content area's `flex` value to `1 0 0%` or `1 0 auto`, everything just worked fine.
 
 Setting an explicit height on elements in CSS is usually a bad idea because of overflow issues and unintentional scroll bars, but in this case we're overflowing the body, so getting a scroll bar to appear is exactly what we want.
-
-
-3 IE Problems:
-
-1) min-height issue (bug, no real workaround)
-2) Unless flex-basis with flex shorthand: `flex: 1 0 0` is broken
-3) The default flex value for IE appears to be `none` instead of `initial` so shinking doesn't happen.
-
-
 
 
 https://github.com/Modernizr/Modernizr/issues/1301#issuecomment-46339336

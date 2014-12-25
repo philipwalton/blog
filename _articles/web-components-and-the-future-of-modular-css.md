@@ -117,14 +117,14 @@ As web applications grew in complexity and web development teams grew in size, i
 
 CSS preprocessors seemed like an obvious solution to reduce tedium and abstract away complexity. Instead of defining styles as classes you can define them as mixins or abstract rules (placeholders in Sass) that can be extended. For example:
 
-```css
+```scss
+%expandable { ... }
 %roundedBox { ... }
-%verticallyCentered { ... }
 %standardSpacing { ... }
 
-.overlay .modal {
+#sidebar .widget {
+  @extend %expandable;
   @extend %roundedBox;
-  @extend %verticallyCentered;
   @extend %standardSpacing;
 }
 ```

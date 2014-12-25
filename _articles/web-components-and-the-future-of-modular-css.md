@@ -231,3 +231,13 @@ The wrapper element in the alert body, the close button, and the alert icon. The
 If we're really separating content from presentation, we need a way to define not only our presentational styles, but our presentational markup as well.
 
 ## Real CSS Modules
+
+Fortunately, I'm not the only one who's made a wish list for CSS. Web Components, specifically shadow DOM, elegantly addresses both of the features I said above were missing from CSS.
+
+As a disclaimer, the rest of this article assumes you know a little bit about Web Components, Shadow DOM, and how to implement this stuff on your own. If you don't, I'd recommend familiarizing yourself first.
+
+### Shadow DOM
+
+Shadow DOM is a subtree of DOM nodes that you can create on any HTML element. The shadow subtree is ultimately rendered onto the page with the main DOM tree, but unlike the main DOM tree, shadow nodes can only be modified or styled from within.
+
+In short, shadow nodes are private, and they finally give us the ability to create components with a priavte and public API. A public API for the content and a private API for the presentation and impementation details.

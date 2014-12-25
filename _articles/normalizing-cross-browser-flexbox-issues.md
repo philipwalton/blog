@@ -37,7 +37,7 @@ In September of 2013, while testing the [sticky footer demo](http://philipwalton
 
 At first this really bothered me. Prior to flexbox, a sticky footer layout in pure CSS wasn't possible unless you knew the height of the header and footer. If either of those were unknown, the layout wouldn't work.
 
-After coming to terms with the issue, I realized it wasn't actually that big of a deal. My solution was actually perfect example of progressive enhancement at its best. If you were using a browsers that didn't support flexbox (or had bugs), you could still see all the content, you just wouldnt' see a footer stuck to the bottom of the page. No big deal.
+After coming to terms with the issue, I realized it wasn't actually that big of a deal. My solution was actually perfect example of progressive enhancement at its best. If you were using a browsers that didn't support flexbox (or had bugs), you could still see all the content, you just wouldn't see a footer stuck to the bottom of the page. No big deal.
 
 I've since come to discover that a cross-browser sticky footer layout using flexbox was always possible, I just wasn't looking hard enough.
 
@@ -81,11 +81,11 @@ What I didn't realize at the time was this was actually a Chrome bug, not an IE 
 
 ### Why height works too
 
-In CSS, you typcially choose to use `min-height` over `height` to protect yourself from the dreaded overflow. When there's too much content, an explicit `height` will mean there's either going to be clipping, overlapping, or a scroll bar. And in many situations, these are all undesirable.
+In CSS, you typically choose to use `min-height` over `height` to protect yourself from the dreaded overflow. When there's too much content, an explicit `height` will mean there's either going to be clipping, overlapping, or a scroll bar. And in many situations, these are all undesirable.
 
 However, when we're dealing with the body element, a scroll bar is no big deal. It's actually what we want. So if we define an explicit height of `100%` on the body and there's too much content, the end result is the same.
 
-This did work in older sticky footer solutions becuase not only did the body need to declare a height, but the content element inside it (`<main>` in my example) needed to also declare a height. This is what caused the problem. If the body's computed height is the height of the viewport, then the content area's computed height would be the same. The layout engine would then render the footer directly below that, and the overflowing content would overlap with the footer.
+This did work in older sticky footer solutions because not only did the body need to declare a height, but the content element inside it (`<main>` in my example) needed to also declare a height. This is what caused the problem. If the body's computed height is the height of the viewport, then the content area's computed height would be the same. The layout engine would then render the footer directly below that, and the overflowing content would overlap with the footer.
 
 This doesn't happen in the flexbox case because no height is declared on the content element. Instead, it's simply told to flex to fill the empty space.
 
@@ -93,13 +93,14 @@ So then the question becomes: *why doesn't this work in Chrome?*
 
 ### Minimum sizing
 
-When the contents of flex items inside a flex container are larger than the containers main size, thos items will shrink based on the values of their `flex-shrink` property.
+When the contents of flex items inside a flex container are larger than the containers main size, those items will shrink based on the values of their `flex-shrink` property.
 
 Since the version of the spec dated September 18, 2012, flex items (by default) items were not supposed to shrink below their minimum content size:
 
 > By default, flex items won’t shrink below their minimum content size (the length of the longest word or fixed-size element). To change this, set the min-width or min-height property.
 
-Chrome, however, seems to [ignore this instruction](http://lists.w3.org/Archives/Public/www-style/2014Dec/0249.html) and allow flex items to shrink to a main size of zero.
+Chrome, however, seems to [ignore this instruction](http://lists.w3.org/Archives/Public/www-style/2014Dec/0249.html) and allow flex items to shrink to a main size of zero. In the context of a sticky footer layout where there is more content than can fit on the screen, the header, footer, and content elements all squish in an undesirable way.
+
 
 
 
@@ -109,12 +110,12 @@ Chrome, however, seems to [ignore this instruction](http://lists.w3.org/Archives
 
 ### Spec ambiguity
 
-The answer to this question has to do with a previous ambiquity in the spec around the value of `auto` for `flex-basis`. A value of `auto` could mean one of two things:
+The answer to this question has to do with a previous ambiguity in the spec around the value of `auto` for `flex-basis`. A value of `auto` could mean one of two things:
 
-1. Fallback to whatever value is specified by the element's width/height.
+1. Fall back to whatever value is specified by the element's width/height.
 2. Automatically calculate the size based on the element's content.
 
-To illustate the confusion more clearly, consider the following CSS rule:
+To illustrate the confusion more clearly, consider the following CSS rule:
 
 ```css
 .item {
@@ -130,11 +131,32 @@ Another
 
 ## IE Bugs
 
-Prior to IE 10s release, the [spec at that time](http://www.w3.org/TR/2012/WD-css3-flexbox-20120322/#flexibility) stated that a flexbox item's prefered size required a unit when using the `flex` shorthand:
+Prior to IE 10s release, the [spec at that time](http://www.w3.org/TR/2012/WD-css3-flexbox-20120322/#flexibility) stated that a flexbox item's preferred size required a unit when using the `flex` shorthand:
 
 >  If the &lt;preferred-size&gt; is ‘0’, it must be specified with a unit (like ‘0px’) to avoid ambiguity; unitless zero will either be interpreted as as one of the flexibilities, or is a syntax error.
 
 
+## A cross-browser flexbox sticky footer solution
 
+The CSS solution I showed above will work in any full spec-compliant browser, and I stand by it as still being the simplest and most intuitive solution. But as I've shown, there are a lot of bugs in the wild, so it's necessary to make concessions.
 
+The following CSS address the issues I've brought up and works in all current browsers that support at least some version of flexbox (with proper vendor prefixes):
 
+```css
+/**
+ * 1. Avoid the IE10-11 `min-height` bug.
+ * 2. Explicitely set `flex-shrink` to 0 so the computed
+ *    main-size is never less than the element's min-content.
+ */
+body {
+  display: flex;
+  flex-direction: column;
+  height: 100vh; /* 1 */
+}
+header, footer {
+  flex-shrink: 0; /* 2 */
+}
+main {
+  flex: 1 0 auto; /* 2 */
+}
+```

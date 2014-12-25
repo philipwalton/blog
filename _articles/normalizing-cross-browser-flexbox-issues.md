@@ -91,7 +91,50 @@ This doesn't happen in the flexbox case because no height is declared on the con
 
 So then the question becomes: *why doesn't this work in Chrome?*
 
-### Flex Shrink
+### Minimum sizing
 
-The answer to this question has to do with a previous ambiquity in the spec around the process for calculating the
+When the contents of flex items inside a flex container are larger than the containers main size, thos items will shrink based on the values of their `flex-shrink` property.
+
+Since the version of the spec dated September 18, 2012, flex items (by default) items were not supposed to shrink below their minimum content size:
+
+> By default, flex items won’t shrink below their minimum content size (the length of the longest word or fixed-size element). To change this, set the min-width or min-height property.
+
+Chrome, however, seems to [ignore this instruction](http://lists.w3.org/Archives/Public/www-style/2014Dec/0249.html) and allow flex items to shrink to a main size of zero.
+
+
+
+
+
+
+
+### Spec ambiguity
+
+The answer to this question has to do with a previous ambiquity in the spec around the value of `auto` for `flex-basis`. A value of `auto` could mean one of two things:
+
+1. Fallback to whatever value is specified by the element's width/height.
+2. Automatically calculate the size based on the element's content.
+
+To illustate the confusion more clearly, consider the following CSS rule:
+
+```css
+.item {
+  flex-basis: auto;
+  height: 100px;
+}
+```
+
+What should the element's height be? 100 pixels or automatically sized based on the content?
+
+Another
+
+
+## IE Bugs
+
+Prior to IE 10s release, the [spec at that time](http://www.w3.org/TR/2012/WD-css3-flexbox-20120322/#flexibility) stated that a flexbox item's prefered size required a unit when using the `flex` shorthand:
+
+>  If the &lt;preferred-size&gt; is ‘0’, it must be specified with a unit (like ‘0px’) to avoid ambiguity; unitless zero will either be interpreted as as one of the flexibilities, or is a syntax error.
+
+
+
+
 

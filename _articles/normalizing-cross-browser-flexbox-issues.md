@@ -91,13 +91,13 @@ To reiterate the requirements, any solution to the problem should:
 
 * work in all current browsers, even those with bugs
 * continue to work as browsers fix broken behavior
-* not relay on any browser specific targeting
+* not rely on any browser specific targeting
 
 ### Using height instead of min-height
 
 If you've been around for a while, you may remember that Internet Explorer 6 never supported the min/max height or width properties; however, it treated `height:100%` the same way other browsers treated `min-height:100%`, so all the original sticky footer solutions would recommend setting `height:100%` in an IE-only stylesheet.
 
-Knowing this, setting `height:100vh` instead of `min-height:100vh` was one of the first workarounds I tried. It actualy did work in IE, but it didn't work in Chrome, so I immediately wrote it off.
+Knowing this, setting `height:100vh` instead of `min-height:100vh` was one of the first workarounds I tried. It actually did work in IE, but it didn't work in Chrome, so I immediately wrote it off.
 
 Turns out I should have read the spec closer instead of simply assuming Chrome was right and IE was wrong.
 
@@ -109,13 +109,13 @@ So then the question becomes: *why doesn't this work in Chrome?*
 
 Earlier I described a bug in Chrome and Safari where flex items were allowed to shrink to smaller than their minimum content size, resulting in content overlap.
 
-This is exactly what was going on in Chrome when I tried using `height:100vh` intead of `min-height:100vh` on the body element. In situations where there's more content than can fit on the screen, the browser should simply size the header, footer, and content area according to their default size, and let them overflow the body element, applying a vertical scroll bar since all UA stylesheets add a declaration of `overflow:auto` to the body.
+This is exactly what was going on in Chrome when I tried using `height:100vh` instead of `min-height:100vh` on the body element. In situations where there's more content than can fit on the screen, the browser should simply size the header, footer, and content area according to their default size, and let them overflow the body element, applying a vertical scroll bar since all UA stylesheets add a declaration of `overflow:auto` to the body.
 
 What's happening instead is Chrome and Safari are allowing the header, footer, and content elements to shrink to fit inside of the viewport, but since those elements have a lot of content, the overflow is happening to *them* (rather than to body). Since those elements all use the default `overflow` value of `visible`, the overflowing content overlaps other content on the page.
 
 Fortunately, there's an easy solution to this problem.
 
-Chrome and Safari are trying to shink the children of body because flex items have a default `flex-shrink` value of `1`. In situations where you *know* you don't want content to shrink, you can simply use a value of `0`, and all browsers will respect it.<sup>[[2]](#footnote-1)</sup>
+Chrome and Safari are trying to shrink the children of body because flex items have a default `flex-shrink` value of `1`. In situations where you *know* you don't want content to shrink, you can simply use a value of `0`, and all browsers will respect it.<sup>[[2]](#footnote-1)</sup>
 
 ### Avoiding unitless flex-basis
 
@@ -135,7 +135,7 @@ The following is a quick summary of the bugs I discussed in this article and the
 
 * `min-height` does not work on flex containers in IE 10/11, use `height` instead if possible.
 * Chrome/Safari do not honor the min-content size of flex items. Set `flex-shrink` to `0` to avoid unwanted shrinkage.
-* Do not use unitless `flex-basis` values in the `flex` shorthand becuase IE 10/11 will error. Also avoid `0px` as minifiers will often convert that to `0` (which is unitless and will have the same problem).
+* Do not use unitless `flex-basis` values in the `flex` shorthand because IE 10/11 will error. Also avoid `0px` as minifiers will often convert that to `0` (which is unitless and will have the same problem).
 
 With all these bug and workarounds in mind, the following an an alternative way to build a sticky footer. It may not be as clean or intuitive as the way I originally promoted, but it meets all of my original requirements for an alternative solution. It works in all current browsers, it is spec compliant so it should continue to work as bugs are fixed, and it does not use any specific browser-based hack.
 

@@ -12,24 +12,24 @@
 
 Way back in September of 2013, while testing my [Solved by Flexbox](//philipwalton.github.io/solved-by-flexbox/) project, I discovered a [bug]() in Internet Explorer 10 and 11 that was preventing my sticky footer from actually *sticking* to the bottom of the screen. I spent some time trying to work around the issue, but all my attempts failed.
 
-At first I was really annoyed. Before flexbox, it was impossible to build sticky footer layout using just CSS unless you knew the exact height of both the header and footer. Flexbox changed this&mdash;finally we had CSS solutions for today's modern, responsive layouts.
+At first I was really annoyed. Before flexbox, it was impossible to build a sticky footer layout using just CSS unless you knew the exact height of the header *and* the footer. Flexbox changed this&mdash;finally we had CSS solutions for today's modern, responsive layouts.
 
-After my initial disappointment, I eventually concluded that this really wasn't that big of a deal, and I released the project even with the buggy behavior. I mean, from a progressive enhancement standpoint, my solution was still pretty good. It worked in Chrome, Firefox, Opera, and Safari, and while it wasn't perfect in Internet Explorer, it wasn't completely broken either. The content was still accessible, and it would only render incorrectly on pages with minimal content. On longer pages, it looked just like every other browser.
+After my initial disappointment, I eventually concluded that this honestly wasn't that big of a deal, and I released the project even with the buggy behavior. I mean, from a progressive enhancement standpoint, my solution was still pretty good. It worked in Chrome, Firefox, Opera, and Safari, and while it wasn't perfect in Internet Explorer, it wasn't completely broken either. The content was still accessible, and it would only render incorrectly on pages with minimal content. On longer pages, it looked just like every other browser.
 
-A few weeks ago I received a [pull request](https://github.com/philipwalton/solved-by-flexbox/pull/36) on Github that fixed the sticky footer issue with an IE-only `@media` rule. This got me thinking about this again, and I was determined to find a solution that didn't involve any browser-specific hacks.
+A few weeks ago I received a [pull request](https://github.com/philipwalton/solved-by-flexbox/pull/36) on Github that fixed the sticky footer issue with an IE-only `@media` rule. This got me thinking about the problem again, and I was determined to find a solution that didn't require any browser-specific hacks.
 
-As it turns out, there is a solution! And it was possible all along; I just wasn't looking hard enough.
+As it turns out, there is a solution, and it was possible all along! I just wasn't looking hard enough.
 
-In this article, I'll explain the solution, walk you through how I got there, and talk about the browser bugs I discovered along the way. I'll also make some recommendations for how avoid these bugs in the flexbox code you write.
+In this article, I'll explain the solution, walk you through how I got there, and talk about the browser bugs I discovered along the way. I'll also make some recommendations for how to avoid these bugs in the flexbox code you write.
 
 ## So what are the bugs?
 
-The flexbox specification is not yet finalized, so there's naturally going to be some lag between the latest drafts and browser implementations. This article is not meant to point fingers at any parties; instead, it's meant to help front-end developers do what we do best&mdash;manage browser inconsistencies.
+The [flexbox specification](http://dev.w3.org/csswg/css-flexbox/) is not yet finalized, so there's naturally going to be some lag between the latest drafts and browser implementations. This article is not meant to point fingers at any parties for being behind; instead, it's meant to help front-end developers do what we do best&mdash;manage browser inconsistencies.
 
-The following are all bugs I've encountered while writing real flexbox code on real websites. While there are almost certainly bugs I'm not aware of, these hopefully cover the majority of common usage:
+The following is a list of bugs I've encountered while writing real flexbox code on real websites. While there are almost certainly more bugs that I'm not aware of, these hopefully cover the most common usage:
 
-* Internet Explorer 10 and 11 don't respect the `min-height` property on flex containers.
-* Chrome and Safari don't respect the minimum content sizing of flex items.
+* Internet Explorer 10 and 11 ignore the `min-height` property on flex containers.
+* Chrome and Safari don't honor the default minimum content sizing of flex items.
 * Internet Explorer doesn't allow unitless `flex-basis` values in the `flex` shorthand.
 
 ### The min-height bug

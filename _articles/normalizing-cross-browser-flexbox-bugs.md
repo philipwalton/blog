@@ -1,7 +1,7 @@
 <!--
 {
   "layout": "article",
-  "title": "Normalizing Cross-browser Flexbox Issues",
+  "title": "Normalizing Cross-browser Flexbox Bugs",
   "draft": true,
   "date": "2014-12-24T11:23:39-08:00",
   "tags": [

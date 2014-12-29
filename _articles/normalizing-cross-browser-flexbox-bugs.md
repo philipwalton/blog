@@ -12,25 +12,25 @@
 
 Way back in September of 2013, while testing my [Solved by Flexbox](//philipwalton.github.io/solved-by-flexbox/) project, I discovered a [bug]() in Internet Explorer 10 and 11 that was preventing my sticky footer from actually *sticking* to the bottom of the screen. I spent some time trying to work around the issue, but all my attempts failed.
 
-At first I was really annoyed. Before flexbox, it was impossible to build a sticky footer layout using just CSS unless you knew the exact height of the header *and* the footer. Flexbox changed this&mdash;finally we had CSS solutions for today's modern, responsive layouts.
+At first I was really annoyed. Before flexbox, it was impossible to build a sticky footer layout using just CSS unless you knew the exact height of both the header *and* the footer. Flexbox changed this&mdash;finally we had CSS solutions for today's modern, responsive layouts.
 
 After my initial disappointment, I eventually concluded that this honestly wasn't that big of a deal, and I released the project even with the buggy behavior. I mean, from a progressive enhancement standpoint, my solution was still pretty good. It worked in Chrome, Firefox, Opera, and Safari, and while it wasn't perfect in Internet Explorer, it wasn't completely broken either. The content was still accessible, and it would only render incorrectly on pages with minimal content. On longer pages, it looked just like every other browser.
 
 A few weeks ago I received a [pull request](https://github.com/philipwalton/solved-by-flexbox/pull/36) on Github that fixed the sticky footer issue with an IE-only `@media` rule. This got me thinking about the problem again, and I was determined to find a solution that didn't require any browser-specific hacks.
 
-As it turns out, there is a solution, and it was possible all along! I just wasn't looking hard enough.
+As it turns out, there was a solution, and it was possible all along! I just wasn't looking hard enough.
 
-In this article, I'll explain the solution, walk you through how I got there, and talk about the browser bugs I discovered along the way. I'll also make some recommendations for how to avoid these bugs in the flexbox code you write.
+In this article, I'll explain the solution, walk you through how I got there, and talk about the browser bugs I discovered along the way. I'll also make some recommendations for how write more cross-browser-compatible flexbox code.
 
 ## So what are the bugs?
 
 The [flexbox specification](http://dev.w3.org/csswg/css-flexbox/) is not yet finalized, so there's naturally going to be some lag between the latest drafts and browser implementations. This article is not meant to point fingers at any parties for being behind; instead, it's meant to help front-end developers do what we do best&mdash;manage browser inconsistencies.
 
-The following is a list of bugs I've encountered while writing real flexbox code on real websites. While there are almost certainly more bugs that I'm not aware of, these hopefully cover the most common usage:
+The following is a list of bugs I've encountered while writing real flexbox code on real websites. While there are almost certainly other bugs I'm not aware of, these hopefully cover the most people's usage:
 
-* Internet Explorer 10 and 11 ignore the `min-height` property on flex containers.
-* Chrome and Safari don't honor the default minimum content sizing of flex items.
-* Internet Explorer doesn't allow unitless `flex-basis` values in the `flex` shorthand.
+* IE 10-11 ignore the `min-height` property on flex containers.
+* All browsers (except Firefox and IE 12) fail to honor the default minimum content sizing of flex items.
+* IE 10-11 doesn't allow unitless `flex-basis` values in the `flex` shorthand.
 
 ### The min-height bug
 
@@ -40,13 +40,13 @@ Since min-height wasn't going to work, I needed to find another way.
 
 ### Minimum content sizing of flex items
 
-When flex items are too big to fit inside their container, those flex items are instructed (by the flex layout algorithm) to shrink, proportionally, according to their `flex-shink` property. These items, however, are not supposed to shrink indefinitely. They must always be at least as big as their minimum height or width properties declare, and if no minimum height or width properties are set, their minimum size should be the default minimum size of their contents.
+When flex items are too big to fit inside their container, those items are instructed (by the flex layout algorithm) to shrink, proportionally, according to their `flex-shink` property. But contrary to what most browsers allow, they're *not* supposed to shrink indefinitely. They must always be at least as big as their minimum height or width properties declare, and if no minimum height or width properties are set, their minimum size should be the default minimum size of their contents.
 
 According to the [flexbox specification](http://www.w3.org/TR/css-flexbox/#flex-common):
 
 > By default, flex items won’t shrink below their minimum content size (the length of the longest word or fixed-size element). To change this, set the min-width or min-height property.
 
-Chrome and Safari, however, seem to [ignore this instruction](http://lists.w3.org/Archives/Public/www-style/2014Dec/0249.html) and allow flex items to shrink to zero. As a result, you get content overlapping.
+Most browsers currently [ignore this instruction](http://lists.w3.org/Archives/Public/www-style/2014Dec/0249.html) and allow flex items to shrink to zero. As a result, you get content overlapping.
 
 ### Unitless flex-basis
 
@@ -58,27 +58,27 @@ This is no longer true in the spec, but IE 10-11 still treat it as true. If you 
 
 ## Finding an alternative sticky footer solution
 
-The sticky footer layout makes a great case study for this article because all three of the bug I've mentioned came into play while I was trying to find a cross-browser solution.
+I choose the sticky footer layout as the main example for this article because I encountered each and every one of these bugs while trying to find a cross-browser solution to it.
 
-But before I talk too much about this, let's make sure we're all on the same page. Here's the markup I'm using for my sticky footer layout:
+But before I go into too many specifics, let's make sure we're all on the same page. Here is the markup I'm using for my sticky footer layout:
 
 ```html
-<body>
-  <header>…</header>
-  <main>…</main>
-  <footer>…</footer>
+<body class="Site">
+  <header class="Site-header">…</header>
+  <main class="Site-content">…</main>
+  <footer class="Site-footer">…</footer>
 </body>
 ```
 
 And here's the CSS that will make the footer stick in any spec-compliant browser:
 
 ```css
-body {
+.Site {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
 }
-main {
+.Site-content {
   flex: 1;
 }
 ```
@@ -89,7 +89,7 @@ If you're an experienced front-end developer, you know that any solution to a cr
 
 *A solution that depends on buggy behavior is no solution at all.*
 
-To reiterate what I've said so far, here are my personal requirements for any acceptable alternative solution to this problem. It must:
+Based on everything I've said so far, here are my personal requirements for any acceptable alternative solution to the sticky footer layout problem. It must:
 
 * work in all browsers<sup>[[1]](#footnote-1)</sup>
 * continue to work as browsers fix broken behavior
@@ -105,51 +105,43 @@ As it turns out, I should have read the spec closer instead of simply assuming C
 
 In CSS, you typically choose to use `min-height` over `height` to protect yourself from the dreaded overflow. When there's too much content, an explicit `height` will mean there's either going to be clipping, overlapping, or a scroll bar. And in many situations, those are all bad. However, when we're dealing with the body element (as you are in a sticky footer layout), a scroll bar is no big deal. It's actually what you want. So if you define an explicit height of `100%` on the body and there's too much content, the end result should be the same.
 
-So then the question becomes: *why doesn't this work in Chrome?*
+So then the question is: *why didn't this work in Chrome?*
 
 ### Minimum sizing bugs
 
-Earlier I described a bug in Chrome and Safari where flex items were allowed to shrink to smaller than their minimum default content size, resulting in content overlap. This is exactly what was going on in Chrome when I tried using `height` instead of `min-height` on the body element.
+Previously, I mentioned that many browsers mistakenly allow flex items to shrink to less than their default minimum content size, resulting in content overlap. This is why swaping `min-height` for `height` didn't work when I tested it in Chrome.
 
-When there's more page content than can fit into the body at viewport height, and the header, footer, and content elements are already at their default minimum content size, what should happens is the body element's scroll bar should turn on, and they should scroll as normal.
+What should happen is the header, footer, and content elements should all shrink to their default minimum content size (but not less). If these elements (combined) have more content than can fit on the screen, the body element should overflow with a scroll bar like it usually does. The header, footer, and content elements should all render normally, one on top of the other, with no overlap.
 
-What's happening instead is Chrome and Safari are allowing the header, footer, and content elements to shrink to smaller than their default minimum content sizes and thus the body element is not overflowing. Instead, the header, footer, and content elements themselves are overflowing, and since their default overflow value is `visible`, their content is overflowing and overlapping each other.
+What was happening instead is Chrome was allowing the header, footer, and content elements to shrink to smaller than their default minimum content sizes. As a result, instead of the overflow happening on the body element, it was happening on the header, footer, and content elements themselves. And since the default overflow value of those elements is `visible`, their content was overlapping with each other. The footer was fixed to the bottom of the page, and the page content was overflowing below it.
 
-<!--
+Luckily, there's an easy solution to this problem.
 
-the browser should simply size the header, footer, and content area according to their default size, and let them overflow the body element, applying a vertical scroll bar since all UA stylesheets add a declaration of `overflow:auto` to the body.
-
-What's happening instead is Chrome and Safari are allowing the header, footer, and content elements to shrink to fit inside of the viewport, but since those elements have a lot of content, the overflow is happening to *them* (rather than to body). Since those elements all use the default `overflow` value of `visible`, the overflowing content overlaps other content on the page.
-
--->
-
-Fortunately, there's an easy solution to this problem.
-
-The flexbox spec defines an initial `flex-shrink` value of `1` but says items should not shrink below their default minimum content size. You can get pretty much this exact same behavior by using a `flex-shrink` value of `0` instead of the default `1`.<sup>[[2]](#footnote-1)</sup> If your element is already being sized based on the contents inside of it, and it's not using a `width`, `height`, or `flex-basis`, then setting `flex-shrink:1` will render the same as the default&mdash;but avoid the Chrome/Safari bug.
+The flexbox spec defines an initial `flex-shrink` value of `1` but says items should not shrink below their default minimum content size. You can get pretty much this exact same behavior by using a `flex-shrink` value of `0` instead of the default `1`.<sup>[[2]](#footnote-1)</sup> If your element is already being sized based on its children, and it hasn't set a `width`, `height`, or `flex-basis` value, then setting `flex-shrink:0` will render it the same way&mdash;but it will avoid this bug.
 
 ### Avoiding unitless flex-basis
 
 The unitless `flex-basis` bug is by far the easiest of the three to work around, but it's arguably the hardest one to track down when encountered in the wild.
 
-My original solution to the sticky footer problem applied a declaration of `flex:1` to the `<main>` element. Since a `flex` value of `1` is shorthand for `1 1 0px`<sup>[[3]](#footnote-2)</sup>, and since I knew I didn't want any shrinking going on, I decided to use `1 0 0px` instead.
+My original solution to the sticky footer problem applied a declaration of `flex:1` to the main content element. Since a `flex` value of `1` is shorthand for `1 1 0px`<sup>[[3]](#footnote-2)</sup>, and since I knew I didn't want any shrinkage going on, I decided to use `1 0 0px` instead.
 
 This worked just fine until I tested it in IE.
 
-The problem ended up being a combination of the IE bug and my CSS minifier: the minifier was converting `1 0 0px` to `1 0 0`, which has a unitless `flex-basis` value; as such, IE 10-11 ignored this declaration entirely.
+The problem ended up being a combination of this IE bug and my CSS minifier: the minifier was converting `1 0 0px` to `1 0 0` (which has a unitless `flex-basis` value), so IE 10-11 ignored this declaration entirely.
 
-Once I finally discovered the root of the problem, the fix was trivial. Either set an explicit `flex-basis` value or use `1 0 0%` for your `flex` shorthand since most minifiers won't convert `0%` to `0`.
+Once I finally discovered the root of the problem, the fix was trivial. Either set an explicit `flex-basis` value or use `0%` in the `flex` shorthand. Note, using `0%` is better than `0px` since most minifiers won't touch percentage values for other reasons.
 
 ## Putting it all together
 
-The following is a quick summary of the bugs I discussed in this article and their solutions:
+The following is a quick summary of the bugs discussed in this article and their respective solutions:
 
 * `min-height` does not work on flex containers in IE 10-11. Use `height` instead if possible.
-* Chrome/Safari do not honor the default min-content size of flex items. Set `flex-shrink` to `0` to avoid unwanted shrinkage.
+* Most browsers do not honor the default min-content size of flex items. Set `flex-shrink` to `0` (instead of the default `1`) to avoid unwanted shrinkage.
 * Do not use unitless `flex-basis` values in the `flex` shorthand because IE 10-11 will error. Also use `0%` instead of `0px` since minifiers will often convert `0px` to `0` (which is unitless and will have the same problem).
 
 With all these bug and workarounds in mind, the following is an alternative way to build a sticky footer. It may not be as clean or intuitive as the way I originally promoted, but it does meet all of my requirements for an alternative solution: It works in all browsers; it's spec compliant, so it should continue to work as bugs are fixed; and it does not use any browser-specific hacks.
 
-So, in conclusion, there's more than one way to stick a footer:
+The following is the CSS for a cross-browser sticky footer layout with flexbox:
 
 ```css
 /**
@@ -157,15 +149,16 @@ So, in conclusion, there's more than one way to stick a footer:
  * 2. Set `flex-shrink` to `0` to prevent Chrome/Safari from letting these
  *    items shrink to smaller than their content's default minimum size.
  */
-body {
+.Site {
   display: flex;
   flex-direction: column;
   height: 100vh; /* 1 */
 }
-header, footer {
-  flex: none ; /* 2 */
+.Site-header,
+.Site-footer {
+  flex: none; /* 2 */
 }
-main {
+.Site-content {
   flex: 1 0 auto; /* 2 */
 }
 ```

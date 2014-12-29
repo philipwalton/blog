@@ -109,7 +109,7 @@ So then the question is: *why didn't this work in Chrome?*
 
 ### Minimum sizing bugs
 
-Previously, I mentioned that many browsers mistakenly allow flex items to shrink to less than their default minimum content size, resulting in content overlap. This is why swaping `min-height` for `height` didn't work when I tested it in Chrome.
+Previously, I mentioned that many browsers mistakenly allow flex items to shrink to less than their default minimum content size, resulting in content overlap. This is why swapping `min-height` for `height` didn't work when I tested it in Chrome.
 
 What should happen is the header, footer, and content elements should all shrink to their default minimum content size (but not less). If these elements (combined) have more content than can fit on the screen, the body element should overflow with a scroll bar like it usually does. The header, footer, and content elements should all render normally, one on top of the other, with no overlap.
 

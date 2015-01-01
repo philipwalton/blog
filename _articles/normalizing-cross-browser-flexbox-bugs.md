@@ -20,7 +20,7 @@ A few weeks ago I received a [pull request](https://github.com/philipwalton/solv
 
 As it turns out, there was a solution, and it was possible all along! I just wasn't looking hard enough.
 
-In this article, I'll explain the solution, walk you through how I got there, and talk about the browser bugs I discovered along the way. I'll also make some recommendations for how write more cross-browser-compatible flexbox code in the future.
+In this article, I'll explain the solution, walk you through how I got there, and talk about the browser bugs I discovered along the way. I'll also make some recommendations for how to write more cross-browser-compatible flexbox code in the future.
 
 ## So what are the bugs?
 

@@ -26,7 +26,7 @@ In this article, I'll explain the solution, walk you through how I got there, an
 
 The [flexbox specification](http://dev.w3.org/csswg/css-flexbox/) is not yet finalized, so there's naturally going to be some lag between the latest drafts and browser implementations. This article is not meant to point fingers at any parties for being behind; instead, it's meant to help front-end developers do what we do best&mdash;manage browser inconsistencies.
 
-The following is a list of bugs I've encountered while writing real flexbox code on real websites. While there are almost certainly other bugs I'm not aware of, these hopefully cover the majority of usage:
+The following is a list of bugs I encountered while trying to get my sticky footer demo to work cross-browser:
 
 * IE 10-11 ignore the `min-height` property on flex containers.
 * All browsers (except Firefox and IE 12) fail to honor the default minimum content sizing of flex items.
@@ -142,7 +142,7 @@ The following is a quick summary of the bugs discussed in this article and their
 With all these bug and workarounds in mind, here is the final, alternative solution I came up with. It may not be as clean or intuitive as the way I originally promoted, but it does meet all of my requirements for an alternative solution:
 
 * It works in all browsers.
-* it's spec compliant, so it should continue to work as bugs are fixed.
+* It's spec compliant, so it should continue to work as bugs are fixed.
 * It does not use any browser-specific hacks.
 
 I've added comments to the CSS to clarify which parts are workarounds:

@@ -20,6 +20,7 @@ If you're interested in my thoughts on something, let me know, and maybe it'll t
 ## Projects
 
 * [Solved by Flexbox](http://philipwalton.github.io/solved-by-flexbox/)
+* [Flexbugs](https://github.com/philipwalton/flexbugs)
 * [HTML Inspector](https://github.com/philipwalton/html-inspector)
 
 ## Other Writing

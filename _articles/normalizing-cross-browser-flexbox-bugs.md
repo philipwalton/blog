@@ -155,9 +155,9 @@ I've added comments to the CSS to clarify which parts are workarounds:
 ```css
 /**
  * 1. Avoid the IE 10-11 `min-height` bug.
- * 2. Set `flex-shrink` to `0` to prevent these items from shrinking to
- *    smaller than their content's default minimum size in Chrome,
- *    Opera, and Safari.
+ * 2. Set `flex-shrink` to `0` to prevent Chrome, Opera, and Safari from
+ *    letting these items shrink to smaller than their content's default
+ *    minimum size.
  */
 .Site {
   display: flex;

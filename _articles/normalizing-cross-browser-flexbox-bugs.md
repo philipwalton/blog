@@ -2,15 +2,14 @@
 {
   "layout": "article",
   "title": "Normalizing Cross-browser Flexbox Bugs",
-  "draft": true,
-  "date": "2014-12-24T11:23:39-08:00",
+  "date": "2015-01-04T17:44:38-08:00",
   "tags": [
     "CSS"
   ]
 }
 -->
 
-Way back in September of 2013, while testing my [Solved by Flexbox](//philipwalton.github.io/solved-by-flexbox/) project, I discovered a [bug]() in Internet Explorer 10 and 11 that was preventing my sticky footer from actually *sticking* to the bottom of the page. I spent some time trying to work around the issue, but all my attempts failed.
+Way back in September of 2013, while testing my [Solved by Flexbox](//philipwalton.github.io/solved-by-flexbox/) project, I discovered a [bug](https://connect.microsoft.com/IE/feedback/details/802625/min-height-and-flexbox-flex-direction-column-dont-work-together-in-ie-10-11-preview) in Internet Explorer 10 and 11 that was preventing my sticky footer from actually *sticking* to the bottom of the page. I spent some time trying to work around the issue, but all my attempts failed.
 
 At first I was really annoyed. Before flexbox, it was impossible to build a sticky footer layout using just CSS unless you knew the exact height of both the header *and* the footer. Flexbox changed this&mdash;finally we had CSS solutions for today's modern, responsive layouts.
 
@@ -28,19 +27,21 @@ The [flexbox specification](http://dev.w3.org/csswg/css-flexbox/) is not yet fin
 
 The following is a list of bugs I encountered while trying to get my sticky footer demo to work cross-browser:
 
-* IE 10-11 ignore the `min-height` property on flex containers.
-* All browsers (except Firefox and IE 12) fail to honor the default minimum content sizing of flex items.
+* In IE 10-11, flex items ignore their parent container's height if it's set via the `min-height` property.
+* All browsers (except Firefox) fail to honor the default minimum content sizing of flex items.
 * IE 10-11 doesn't allow unitless `flex-basis` values in the `flex` shorthand.
 
 ### The min-height bug
 
-In Internet Explorer 10 and 11, the `min-height` property does not work to size a flex container. This was a problem for my sticky footer demo since sticky footer layouts traditionally require a `min-height` declaration of `100%` (or `100vh`) to ensure that the content area is *at least* as tall as the browser window.
+In Internet Explorer 10 and 11, the `min-height` property can be used to size a flex container in the column direction, but that container's flex item children will act as if they don't know the size of their parent&mdash;as if no height has been set at all.
+
+This is a problem for my sticky footer demo since sticky footer layouts traditionally require a `min-height` declaration of `100%` (or `100vh`) to ensure that the content area is *at least* as tall as the browser window.
 
 Since min-height wasn't going to work, I needed to find another way.
 
 ### Minimum content sizing of flex items
 
-When flex items are too big to fit inside their container, those items are instructed (by the flex layout algorithm) to shrink, proportionally, according to their `flex-shink` property. But contrary to what most browsers allow, they're *not* supposed to shrink indefinitely. They must always be at least as big as their minimum height or width properties declare, and if no minimum height or width properties are set, their minimum size should be the default minimum size of their content.
+When flex items are too big to fit inside their container, those items are instructed (by the flex layout algorithm) to shrink, proportionally, according to their `flex-shrink` property. But contrary to what most browsers allow, they're *not* supposed to shrink indefinitely. They must always be at least as big as their minimum height or width properties declare, and if no minimum height or width properties are set, their minimum size should be the default minimum size of their content.
 
 According to the [flexbox specification](http://www.w3.org/TR/css-flexbox/#flex-common):
 
@@ -135,7 +136,7 @@ Once I finally discovered the root of the problem, the fix was trivial. Either s
 
 The following is a quick summary of the bugs discussed in this article and their respective solutions:
 
-* `min-height` does not work on flex containers in IE 10-11. Use `height` instead if possible.
+* `min-height` on a column flex container won't apply to its flex item children in IE 10-11. Use `height` instead if possible.
 * Most browsers do not honor the default min-content size of flex items. Set `flex-shrink` to `0` (instead of the default `1`) to avoid unwanted shrinkage.
 * Do not use unitless `flex-basis` values in the `flex` shorthand because IE 10-11 will error. Also use `0%` instead of `0px` since minifiers will often convert `0px` to `0` (which is unitless and will have the same problem).
 
@@ -160,7 +161,7 @@ I've added comments to the CSS to clarify which parts are workarounds:
 }
 .Site-header,
 .Site-footer {
-  flex: none; /* 2 */
+  flex-shrink: 0; /* 2 */
 }
 .Site-content {
   flex: 1 0 auto; /* 2 */

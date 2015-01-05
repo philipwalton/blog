@@ -32,7 +32,7 @@ The [flexbox specification](http://dev.w3.org/csswg/css-flexbox/) is not yet fin
 The following is a list of bugs I encountered while trying to get my sticky footer demo to work cross-browser:
 
 * In IE 10-11, flex items ignore their parent container's height if it's set via the `min-height` property.
-* All browsers (except Firefox) fail to honor the default minimum content sizing of flex items.
+* Chrome, Opera, and Safari fail to honor the default minimum content sizing of flex items.
 * IE 10-11 don't allow unitless `flex-basis` values in the `flex` shorthand.
 
 ### The min-height bug
@@ -45,13 +45,13 @@ Since `min-height` wasn't going to work, I needed to find another way.
 
 ### Minimum content sizing of flex items
 
-When flex items are too big to fit inside their container, those items are instructed (by the flex layout algorithm) to shrink, proportionally, according to their `flex-shrink` property. But contrary to what most browsers allow, they're *not* supposed to shrink indefinitely. They must always be at least as big as their minimum height or width properties declare, and if no minimum height or width properties are set, their minimum size should be the default minimum size of their content.
+When flex items are too big to fit inside their container, those items are instructed (by the flex layout algorithm) to shrink, proportionally, according to their `flex-shrink` property. But contrary to what many browsers allow, they're *not* supposed to shrink indefinitely. They must always be at least as big as their minimum height or width properties declare, and if no minimum height or width properties are set, their minimum size should be the default minimum size of their content.
 
 According to the [flexbox specification](http://www.w3.org/TR/css-flexbox/#flex-common):
 
 > By default, flex items won’t shrink below their minimum content size (the length of the longest word or fixed-size element). To change this, set the min-width or min-height property.
 
-Most browsers currently [ignore this instruction](http://lists.w3.org/Archives/Public/www-style/2014Dec/0249.html) and allow flex items to shrink to zero. As a result, you get content overlapping.
+Chrome, Opera, and Safari currently [ignore this instruction](http://lists.w3.org/Archives/Public/www-style/2014Dec/0249.html) and allow flex items to shrink to zero. As a result, you get content overlapping.
 
 ### Unitless flex-basis
 
@@ -114,7 +114,7 @@ So then the question is: *why didn't this work in Chrome?*
 
 ### Minimum sizing bugs
 
-Previously, I mentioned that many browsers mistakenly allow flex items to shrink to less than their default minimum content size, resulting in content overlap. This is why swapping `min-height` for `height` didn't work when I tested it in Chrome.
+Previously, I mentioned that some browsers mistakenly allow flex items to shrink to less than their default minimum content size, resulting in content overlap. This is why swapping `min-height` for `height` didn't work when I tested it in Chrome.
 
 What should happen is the header, footer, and content elements should all shrink to their default minimum content size (but not less). If these elements (combined) have more content than can fit on the screen, the body element should overflow with a scroll bar like it usually does. The header, footer, and content elements should all render normally, one on top of the other, with no overlap.
 
@@ -141,7 +141,7 @@ Once I finally discovered the root of the problem, the fix was trivial. Either s
 The following is a quick summary of the bugs discussed in this article and their respective solutions:
 
 * `min-height` on a column flex container won't apply to its flex item children in IE 10-11. Use `height` instead if possible.
-* Most browsers do not honor the default min-content size of flex items. Set `flex-shrink` to `0` (instead of the default `1`) to avoid unwanted shrinkage.
+* Chrome, Opera, and Safari do not honor the default min-content size of flex items. Set `flex-shrink` to `0` (instead of the default `1`) to avoid unwanted shrinkage.
 * Do not use unitless `flex-basis` values in the `flex` shorthand because IE 10-11 will error. Also use `0%` instead of `0px` since minifiers will often convert `0px` to `0` (which is unitless and will have the same problem).
 
 With all these bug and workarounds in mind, here is the final, alternative solution I came up with. It may not be as clean or intuitive as the way I originally promoted, but it does meet all of my requirements for an alternative solution:
@@ -156,7 +156,8 @@ I've added comments to the CSS to clarify which parts are workarounds:
 /**
  * 1. Avoid the IE 10-11 `min-height` bug.
  * 2. Set `flex-shrink` to `0` to prevent these items from shrinking to
- *    smaller than their content's default minimum size.
+ *    smaller than their content's default minimum size in Chrome,
+ *    Opera, and Safari.
  */
 .Site {
   display: flex;

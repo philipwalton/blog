@@ -2,18 +2,22 @@
 {
   "layout": "article",
   "title": "Normalizing Cross-browser Flexbox Bugs",
-  "date": "2015-01-04T17:44:38-08:00",
+  "date": "2015-01-01T17:44:38-08:00",
   "tags": [
     "CSS"
   ]
 }
 -->
 
+<div class="Callout">
+  <p><strong>Update:</strong> as a follow-up to this article, I've created the Github repo [Flexbugs](https://github.com/philipwalton/flexbugs): a community curated list of cross-browser flexbox issues and their known workarounds. The goals is if you're building a website using flexbox, and something isn't working as you'd expect, you can find the solution there.</p>
+</div>
+
 Way back in September of 2013, while testing my [Solved by Flexbox](//philipwalton.github.io/solved-by-flexbox/) project, I discovered a [bug](https://connect.microsoft.com/IE/feedback/details/802625/min-height-and-flexbox-flex-direction-column-dont-work-together-in-ie-10-11-preview) in Internet Explorer 10 and 11 that was preventing my sticky footer from actually *sticking* to the bottom of the page. I spent some time trying to work around the issue, but all my attempts failed.
 
-At first I was really annoyed. Before flexbox, it was impossible to build a sticky footer layout using just CSS unless you knew the exact height of both the header *and* the footer. Flexbox changed this&mdash;finally we had CSS solutions for today's modern, responsive layouts.
+At first I was really annoyed. Before flexbox, it was impossible to build a sticky footer layout using just CSS unless you knew the exact height of both the header *and* the footer. Flexbox changed this&mdash;finally we had CSS solutions to today's modern, responsive layouts.
 
-After my initial disappointment, I eventually concluded that this honestly wasn't that big of a deal, and I released the project even with the buggy behavior. I mean, from a progressive enhancement standpoint, my solution was still pretty good. It worked in Chrome, Firefox, Opera, and Safari, and while it wasn't perfect in Internet Explorer, it wasn't completely broken either. The content was still accessible, and it would only render incorrectly on pages with minimal content. On longer pages, it looked just like every other browser.
+After my initial disappointment, I eventually concluded that this honestly wasn't that big of a deal, and I released the project, despite the buggy behavior. I mean, from a progressive enhancement standpoint, my solution was still pretty good. It worked in Chrome, Firefox, Opera, and Safari, and while it wasn't perfect in Internet Explorer, it wasn't completely broken either. The content was still accessible, and it would only render incorrectly on pages with minimal content. On longer pages, it looked just like every other browser.
 
 A few weeks ago I received a [pull request](https://github.com/philipwalton/solved-by-flexbox/pull/36) on Github that fixed the sticky footer issue with an IE-only `@media` rule. This got me thinking about the problem again, and I was determined to find a solution that didn't require any browser-specific hacks.
 
@@ -29,7 +33,7 @@ The following is a list of bugs I encountered while trying to get my sticky foot
 
 * In IE 10-11, flex items ignore their parent container's height if it's set via the `min-height` property.
 * All browsers (except Firefox) fail to honor the default minimum content sizing of flex items.
-* IE 10-11 doesn't allow unitless `flex-basis` values in the `flex` shorthand.
+* IE 10-11 don't allow unitless `flex-basis` values in the `flex` shorthand.
 
 ### The min-height bug
 
@@ -37,7 +41,7 @@ In Internet Explorer 10 and 11, the `min-height` property can be used to size a 
 
 This is a problem for my sticky footer demo since sticky footer layouts traditionally require a `min-height` declaration of `100%` (or `100vh`) to ensure that the content area is *at least* as tall as the browser window.
 
-Since min-height wasn't going to work, I needed to find another way.
+Since `min-height` wasn't going to work, I needed to find another way.
 
 ### Minimum content sizing of flex items
 
@@ -98,13 +102,13 @@ Based on everything I've said so far, here are my personal requirements for any 
 
 ### Using height instead of min-height
 
-If you've been around for a while, you may remember that Internet Explorer 6 never supported the `min-height` (or width) property; however, it did treat `height:100%` the same way other browsers treated `min-height:100%`, so all the original sticky footer solutions would recommend setting `height:100%` in an IE 6-only stylesheet.
+If you've been around for a while, you may remember that Internet Explorer 6 never supported the `min-height` (or width) property. It did, however, treat `height:100%` the same way other browsers treated `min-height:100%`, so all the original sticky footer solutions would recommend setting `height:100%` in an IE 6-only stylesheet.
 
 Knowing this, using `height:100vh` instead of `min-height:100vh` was one of the first workarounds I tried. It actually did work in IE, but it didn't work in Chrome, so I immediately wrote it off.
 
 As it turns out, I should have read the spec closer instead of simply assuming Chrome was right and IE was wrong.
 
-In CSS, you typically choose to use `min-height` over `height` to protect yourself from the dreaded overflow. When there's too much content, an explicit `height` will mean there's either going to be clipping, overlapping, or a scroll bar. And in many situations, those are all bad. However, when we're dealing with the body element (as you are in a sticky footer layout), a scroll bar is no big deal. It's actually what you want. So if you define an explicit height of `100vh` on the body and there's too much content, the end result should be the same.
+In CSS, you typically choose to use `min-height` over `height` to protect yourself from the dreaded overflow. When there's too much content, an explicit height will mean there's either going to be clipping, overlapping, or a scroll bar. And in many situations, those are all bad. However, when you're dealing with the body element (as you are in a sticky footer layout), a scroll bar is no big deal. It's actually what you want. So if you define an explicit height of `100vh` on the body and there's too much content, the end result should be the same.
 
 So then the question is: *why didn't this work in Chrome?*
 
@@ -169,7 +173,6 @@ I've added comments to the CSS to clarify which parts are workarounds:
 ```
 
 Too see this new solution in action, check out the updated Solved by Flexbox [sticky footer demo](http://philipwalton.github.io/solved-by-flexbox/demos/sticky-footer/).
-
 
 <aside class="Footnotes">
   <h1 class="Footnotes-title">Footnotes:</h1>

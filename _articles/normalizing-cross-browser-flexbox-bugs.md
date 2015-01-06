@@ -15,7 +15,7 @@
 
 Way back in September of 2013, while testing my [Solved by Flexbox](//philipwalton.github.io/solved-by-flexbox/) project, I discovered a [bug](https://connect.microsoft.com/IE/feedback/details/802625/min-height-and-flexbox-flex-direction-column-dont-work-together-in-ie-10-11-preview) in Internet Explorer 10 and 11 that was preventing my sticky footer from actually *sticking* to the bottom of the page. I spent some time trying to work around the issue, but all my attempts failed.
 
-At first I was really annoyed. Before flexbox, it was impossible to build a sticky footer layout using just CSS unless you knew the exact height of both the header *and* the footer. Flexbox changed this&mdash;finally we had CSS solutions to today's modern, responsive layouts.
+At first I was really annoyed. Before flexbox, it was impossible to build a sticky footer layout with just CSS unless you knew the exact dimensions of both the header *and* footer.<sup>[[1]](#footnote-1)</sup> Flexbox changed this&mdash;finally we had respectable CSS solutions to today's modern, responsive layouts.
 
 After my initial disappointment, I eventually concluded that this honestly wasn't that big of a deal, and I released the project, despite the buggy behavior. I mean, from a progressive enhancement standpoint, my solution was still pretty good. It worked in Chrome, Firefox, Opera, and Safari, and while it wasn't perfect in Internet Explorer, it wasn't completely broken either. The content was still accessible, and it would only render incorrectly on pages with minimal content. On longer pages, it looked just like every other browser.
 
@@ -96,7 +96,7 @@ If you're an experienced front-end developer, you know that any solution to a cr
 
 Based on everything I've said so far, here are my personal requirements for any acceptable alternative solution to the sticky footer layout problem. It must:
 
-* work in all browsers<sup>[[1]](#footnote-1)</sup>
+* work in all browsers<sup>[[2]](#footnote-2)</sup>
 * continue to work as browsers fix broken behavior
 * not rely on any browser-specific hack
 
@@ -122,13 +122,13 @@ What was happening instead is Chrome was allowing the header, footer, and conten
 
 Luckily, there's an easy solution to this problem.
 
-The flexbox spec defines an initial `flex-shrink` value of `1` but says items should not shrink below their default minimum content size. You can get pretty much this exact same behavior by using a `flex-shrink` value of `0` instead of the default `1`.<sup>[[2]](#footnote-1)</sup> If your element is already being sized based on its children, and it hasn't set a `width`, `height`, or `flex-basis` value, then setting `flex-shrink:0` will render it the same way&mdash;but it will avoid this bug.
+The flexbox spec defines an initial `flex-shrink` value of `1` but says items should not shrink below their default minimum content size. You can get pretty much this exact same behavior by using a `flex-shrink` value of `0` instead of the default `1`.<sup>[[3]](#footnote-3)</sup> If your element is already being sized based on its children, and it hasn't set a `width`, `height`, or `flex-basis` value, then setting `flex-shrink:0` will render it the same way&mdash;but it will avoid this bug.
 
 ### Avoiding unitless flex-basis
 
 The unitless `flex-basis` bug is by far the easiest of the three to work around, but it's arguably the hardest one to track down when encountered in the wild.
 
-My original solution to the sticky footer problem applied a declaration of `flex:1` to the main content element. Since a `flex` value of `1` is shorthand for `1 1 0px`,<sup>[[3]](#footnote-2)</sup> and since I knew I didn't want any shrinkage going on, I decided to use `1 0 0px` instead.
+My original solution to the sticky footer problem applied a declaration of `flex:1` to the main content element. Since a `flex` value of `1` is shorthand for `1 1 0px`,<sup>[[4]](#footnote-4)</sup> and since I knew I didn't want any shrinkage going on, I decided to use `1 0 0px` instead.
 
 This worked just fine until I tested it in IE.
 
@@ -178,9 +178,10 @@ Too see this new solution in action, check out the updated Solved by Flexbox [st
 <aside class="Footnotes">
   <h1 class="Footnotes-title">Footnotes:</h1>
   <ol class="Footnotes-items">
-    <li id="footnote-1">When I say "all browsers" I mean all browsers that implement a version of the flexbox specification dated [March 2012](http://www.w3.org/TR/2012/WD-css3-flexbox-20120322/) or newer. In other words, it should work in all [browsers that claim to support modern flexbox](http://caniuse.com/#feat=flexbox) .</li>
-    <li id="footnote-2">Using `flex-basis:0` solves the vast majority of problems associated with this bug, but not all of them. If you want your flex-items to shrink *and* you want them to not shrink past the default content size, this solution will not work.</li>
-    <li id="footnote-3">The [March 2014](http://www.w3.org/TR/2014/WD-css-flexbox-1-20140325/) update to the flexbox spec changed the meaning of the `flex:1` shorthand from `1 1 0px` to `1 1 0%`.</li>
+    <li id="footnote-1">Technically, if you don't need to support IE 7 and older, you can build a [sticky footer layout](http://galengidman.com/2014/03/25/responsive-flexible-height-sticky-footers-in-css/) using `display:table` that allows for unknown header/footer heights. Though clearly this is more of a hack that just happens to work cross-browser rather than an actual, forward-facing solution.
+    <li id="footnote-2">When I say "all browsers" I mean all browsers that implement a version of the flexbox specification dated [March 2012](http://www.w3.org/TR/2012/WD-css3-flexbox-20120322/) or newer. In other words, it should work in all [browsers that claim to support modern flexbox](http://caniuse.com/#feat=flexbox) .</li>
+    <li id="footnote-3">Using `flex-basis:0` solves the vast majority of problems associated with this bug, but not all of them. If you want your flex-items to shrink *and* you want them to not shrink past the default content size, this solution will not work.</li>
+    <li id="footnote-4">The [March 2014](http://www.w3.org/TR/2014/WD-css-flexbox-1-20140325/) update to the flexbox spec changed the meaning of the `flex:1` shorthand from `1 1 0px` to `1 1 0%`.</li>
   </ol>
 </aside>
 

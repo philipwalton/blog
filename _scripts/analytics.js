@@ -65,7 +65,7 @@ function trackSocialInteractions() {
       var socialAction = this.getAttribute('data-social-action');
       var socialTarget = location.href;
 
-      // Opening links in an external tabs allows the ga beacon to send.
+      // Opening links in an external tab allows the ga beacon to send.
       // When following links directly, sometimes they don't make it.
       this.target = '_blank';
 

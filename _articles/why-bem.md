@@ -164,7 +164,7 @@ While it's true that neither of the above rules will affect `.title` elements no
 </div>
 ```
 
-As you can see, the border style from the `.widget .title` rule is going to apply to the `.media .title` element, even though it's qualified. The reality is that qualifying selectors prevents styles from leaking out, but it does nothing to prevent styles from leaking in.
+As you can see, the border style from the `.widget .title` rule is going to apply to the `.media .title` element, even though it's qualified. The reality is that qualifying selectors prevents styles from leaking out, but it does nothing to prevent styles from leaking in, and in tree structures like the DOM, this is inevitable.
 
 ### Naming collisions
 
@@ -174,22 +174,17 @@ This can happen as a top level class selector, but it often happens in nested co
 
 ## How BEM eliminates side effects
 
-I said above that all CSS rules are global and every rule has the potential to conflict with every other rule on the page. This means side effects cannot be prevented by the language; however, they *can* be prevented through disciplined and enforceable naming conventions.
+I said above that all CSS rules are global and every rule has the potential to conflict with every other rule on the page. This means side effects cannot be prevented by the language; however, they *can* be prevented through disciplined and enforceable naming conventions. And that's exactly what BEM does.
 
-CSS selectors are extremely flexible. They can match anything from a single element (via an ID selector) to all elements (via the universal selector). The more restrictions you're willing to apply to your selectors, the more predictable they will become.
+### Implicit verses explicit matching
 
-For example, if you only ever use class selectors, then you'll only ever match elements with those classes applied to them. On the other hand, if you use tag selectors (e.g. `p`, `h3`, `header`) you run the risk of matching an element you didn't intend.
+BEM conventions require the explicit use of class selectors. This means that developers can only style elements by adding a class to them. This *greatly* reduces accidental styling, as most developers understand that when add a class to an element, it's probably going to style it, and they should check to make sure the style is correct.
 
-One way BEM eliminates side effects is by requiring the exclusive use of class selectors.
+### Subtree matching
 
-Only using class selectors solves the problem of accidentally matching elements you didn't intend, but it doesn't solve the problems of naming clashes or sub-tree matches.
+The example above used the selectors `.widget .title` and `.media .title`, and since the class name "title" is used in both, there's a risk of subtree matching. BEM avoids this issue completely by requiring all subtree element classes to have the block name as a prefix. The BEM equivalents of these two title selectors would be `.Widget-title` and `.Media-title`. Since the class names are different, its impossible for styles from one rule to inadvertently apply to subtree elements of the other.
 
+### Naming collisions
 
-
-
-
-
-
-
-
+In BEM, every class selector starts with the name of the block, and the rules for each block live in a dedicated file. Since file systems do not allow two files to have the same name, the OS is actually helping to prevent accidental duplication. If you follow all of the naming conventions, and you always put all block code in its own file, there's zero chance of naming collisions.
 

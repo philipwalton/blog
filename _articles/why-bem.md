@@ -23,11 +23,26 @@
    b. Subtree matching
    c. Name collisions
 4. How BEM is side-effect free
-5. Conclusion
+5. Learning from JavaScript
+6. Conclusion
    a. Are there downsides to BEM?
       i. Yes, it's verbose and requires a lot of classes in the HTML
      ii. But the confidence you get when writing with just BEM is well worth the extra work.
     iii. Until the web platform evolves to support
+
+
+[BEM](http://bem.info/)
+[OOCSS](https://github.com/stubbornella/oocss/wiki)
+[SMACSS](http://smacss.com/)
+[ACSS](http://www.smashingmagazine.com/2013/10/21/challenging-css-best-practices-atomic-approach/)
+[AMCSS](http://amcss.github.io/)
+[FUNCSS](http://benfrain.com/fun-css-naming-convention-explained/)
+
+
+
+
+
+
 -->
 
 There's been a lot of talk lately about the rapidly increasing speed at which things are changing on the front-end. It seems like every week something new comes out, and it can feel pointless to jump on the latest and greatest trend because something even better is almost certainly right around the corner.
@@ -176,15 +191,54 @@ This can happen as a top level class selector, but it often happens in nested co
 
 I said above that all CSS rules are global and every rule has the potential to conflict with every other rule on the page. This means side effects cannot be prevented by the language; however, they *can* be prevented through disciplined and enforceable naming conventions. And that's exactly what BEM does.
 
-### Implicit verses explicit matching
+- **Implicit verses explicit matching:**<br>
+  BEM conventions require the explicit use of class selectors. This means that developers can only style elements by adding a class to them. This *greatly* reduces accidental styling, as most developers understand that when add a class to an element, it's probably going to style it, and they should check to make sure the style is correct.
 
-BEM conventions require the explicit use of class selectors. This means that developers can only style elements by adding a class to them. This *greatly* reduces accidental styling, as most developers understand that when add a class to an element, it's probably going to style it, and they should check to make sure the style is correct.
+- **Subtree matching:**<br>
+  The example above used the selectors `.widget .title` and `.media .title`, and since the class name "title" is used in both, there's a risk of subtree matching. BEM avoids this issue completely by requiring all subtree element classes to have the block name as a prefix. The BEM equivalents of these two title selectors would be `.Widget-title` and `.Media-title`. Since the class names are different, its impossible for styles from one rule to inadvertently apply to subtree elements of the other.
 
-### Subtree matching
+- **Naming collisions:**<br>
+  In BEM, every class selector starts with the name of the block, and the rules for each block live in a dedicated file. Since file systems do not allow two files to have the same name, the OS is actually helping to prevent accidental duplication. If you follow all of the naming conventions, and you always put all block code in its own file, there's zero chance of naming collisions.
 
-The example above used the selectors `.widget .title` and `.media .title`, and since the class name "title" is used in both, there's a risk of subtree matching. BEM avoids this issue completely by requiring all subtree element classes to have the block name as a prefix. The BEM equivalents of these two title selectors would be `.Widget-title` and `.Media-title`. Since the class names are different, its impossible for styles from one rule to inadvertently apply to subtree elements of the other.
+I mentioned that following BEM conventions prevents side effect, but how do you make sure the conventions are followed? If the return of side effects is as easy as a new developer not knowing (or fully understanding) the conventions, how is that any better than before?
 
-### Naming collisions
+Luckily, unlike most CSS naming conventions, proper usage of BEM very easy to test and enforce, both on the CSS side and on the HTML side. Without going into too much detail, here's the gist:
 
-In BEM, every class selector starts with the name of the block, and the rules for each block live in a dedicated file. Since file systems do not allow two files to have the same name, the OS is actually helping to prevent accidental duplication. If you follow all of the naming conventions, and you always put all block code in its own file, there's zero chance of naming collisions.
+In the CSS:
+
+- All .css files (or .scss, or whatever) must only contain selectors that begin with the name of the file itself.
+- Rules with nested selectors are only allowed if the root selector is a modifier.
+
+In the HTML:
+
+- Any element with a class that matches the format for an element must be a descendant of a block by the same name.
+- Any element that contains a modifier class must also contain a block class by the same name.
+
+In the real world, there are cases where exceptions must be made, so when choosing your enforcement tools, make sure they allow for real world exception.
+
+## Are there downsides to BEM?
+
+Obviously there are downsides to any methodology, particularly in CSS. All methodologies maximize for certain use cases at the expense of other things, and BEM is no exception.
+
+BEM maximizes for code that is predictable, reusable, maintainable, and scalable. It's the only convention that can guarantee that a change in one file will *never* affect an unrelated part of the codebase.
+
+This guarantee comes with a cost, and that cost is verbosity in both the naming of classes as well as in the markup. There are cases where the use of BEM is either impractical or impossible. One obvious example is if you don't have control over the HTML.
+
+On most development teams, however, you have complete control over the code, and given the choice between "clean" looking markup and a guarantee of zero side effects, I'll throw "clean" markup out the window in a heartbeat. Typing a few extra characters takes a couple of seconds, but checking every single page of your application to make sure you changes didn't break anything can take hours or even days.
+
+And after writing BEM for a couple of years, I can honestly say that my perspective on "clean" markup has completely changed. BEM markup may not read like a novel, but its incredibly self-documenting. I love that I can look at an HTML file and know exactly where to look for its corresponding styles. Not only do I know where its styles are, but I can be completely confident that aren't other styles I'm not aware of that are going to affect this particular element.
+
+## Learning from JavaScript
+
+In the bad old days of JavaScript, it was common for library authors to add methods to the native prototypes of global types like `Object`, `Array`, `String`, and `Function`. At first it seemed like a convienence, but developers quickly realized it was a nightmare. If two different libraries add the same method to `Array.prototype`, each with a slightly different signature or behavior, it would lead to bugs that were almost impossible to track down.
+
+These days, almost no libraries modify native prototypes. In fact, I've seen some libraries publicly shamed for even trying. If we've learned our lesson in JavaScript, why haven't we learned it in CSS?
+
+Every single one of the most popular CSS frameworks today uses absolutely terrible class names. They've choosen the most common names for the most common UI elements and globally reserved them with no consideration for the host environment.
+
+Consider Bootstrap. Every single one of its JavaScript plugins uses a namespace and comes with a `.noConflict()` method to avoid naming collisions. It does this in JavaScript, but its CSS class names make no such effort, despite [numerous](https://github.com/twbs/bootstrap/issues/1235) [requests](https://github.com/twbs/bootstrap/issues/1287) for it, and [easy solutions](/articles/dynamic-selectors/) that I, and other developers, suggested years ago.
+
+I don't mean to call about Bootstrap specifically because pretty much every framework does this. I just hope the CSS community would realize that practices like this are just as risky and damaging as modifying native prototypes in JavaScript.
+
+## Wrapping up
 

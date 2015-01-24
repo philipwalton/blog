@@ -13,8 +13,8 @@
     "url": "https://github.com/philipwalton/blog/issues"
   },
   "devDependencies": {
-    "autoprefixer": "^2.2.0",
     "browserify": "^5.9.1",
+    "cssnext": "^0.6.6",
     "fs-extra": "*",
     "he": "~0.3.6",
     "highlight.js": "^8.3.0",
@@ -23,9 +23,8 @@
     "lodash-node": "*",
     "marked": "*",
     "normalize.css": "^3.0.1",
-    "rework": "^1.0.0",
-    "rework-plugin-inline": "^1.0.1",
-    "rework-suit": "^4.0.0",
+    "postcss": "^3.0.7",
+    "postcss-url": "^1.2.3",
     "shelljs": "^0.3.0"
   }
 }

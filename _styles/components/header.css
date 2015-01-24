@@ -6,7 +6,7 @@
 }
 
 .Header-photo {
-  background: inline('headshot-thumb.jpg') no-repeat 2px 2px;
+  background: url('../../assets/images/headshot-thumb.jpg') no-repeat 2px 2px;
   background-size: 40px;
   border: 1px solid #555;
   border-radius: 50%;

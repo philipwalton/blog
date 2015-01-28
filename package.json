@@ -22,7 +22,7 @@
     "ingen": "*",
     "lodash-node": "*",
     "marked": "*",
-    "normalize.css": "^3.0.1",
+    "normalize.css": "^3.0.2",
     "postcss": "^3.0.7",
     "postcss-url": "^1.2.3",
     "shelljs": "^0.3.0"

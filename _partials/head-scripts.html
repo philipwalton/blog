@@ -1,6 +1,3 @@
-<!-- Put typekit in the head for the fastest possible download. -->
-<script id="typekit" src="//use.typekit.net/ayq0lpd.js"></script>
-
 <script id="ga-setup">
 
 // Google Analytics async snippet:
@@ -22,19 +19,6 @@ ga('create', 'UA-21292978-1', 'auto');
     });
   });
 {{/is}}
-
-
-// Initialize typekit and track how frequently it fails.
-try {
-  Typekit.load();
-}
-catch(err) {
-  ga('send', 'exception', {
-    exDescription: err.stack || err.message,
-    exFatal: false
-  });
-}
-
 
 // Track uncaught errors via Google Analytics.
 window.onerror = function(message, url, line, col) {

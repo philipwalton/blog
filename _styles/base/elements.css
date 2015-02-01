@@ -10,14 +10,14 @@ html, body {
 
 body {
   color: var(--text-color);
-  font: 1.25em/1.333 freight-text-pro, Cambria, Georgia, serif;
+  font: 1.25em/1.333 'Times New Roman', serif;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
 
 h1, h2, h3 {
-  font-family: jaf-bernino-sans, Helvetica Neue, sans-serif;
-  letter-spacing: -0.036em;
+  font-family: Helvetica Neue, sans-serif;
+  letter-spacing: -0.02em;
 }
 
 p {
@@ -31,7 +31,7 @@ a {
 
 article a {
   background-image: linear-gradient(to top, currentColor, currentColor);
-  background-position: 0 1.2em;
+  background-position: 0 1em;
   background-repeat: repeat-x;
   background-size: 1px 1px;
 }

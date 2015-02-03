@@ -1,8 +1,12 @@
 :root {
+  --serif-font: 'Halant', Georgia, serif;
+  --sans-serif-font: 'Open Sans', 'Helvetica Neue', sans-serif;
+
   --text-color: #333;
   --accent-color: hsl(150, 40%, 50%);
-  --bg-color: #f4f2f0;
   --border-color: #ddd;
+  --bg-color: hsl(30, 15%, 95%);
+  --code-bg-color: hsl(30, 15%, 96%);
 
   --twitter-color: #55acee;
   --github-color: #171715;

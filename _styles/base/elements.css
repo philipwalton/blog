@@ -10,14 +10,14 @@ html, body {
 
 body {
   color: var(--text-color);
-  font: 1.25em/1.333 'Times New Roman', serif;
+  font: 1.25em/1.3 var(--serif-font);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
 
 h1, h2, h3 {
-  font-family: Helvetica Neue, sans-serif;
-  letter-spacing: -0.02em;
+  font-family: var(--sans-serif-font);
+  letter-spacing: -0.04em;
 }
 
 p {
@@ -31,7 +31,7 @@ a {
 
 article a {
   background-image: linear-gradient(to top, currentColor, currentColor);
-  background-position: 0 1em;
+  background-position: 0 1.2em;
   background-repeat: repeat-x;
   background-size: 1px 1px;
 }
@@ -46,12 +46,12 @@ article sup a {
 }
 
 code {
-  background: var(--bg-color);
+  background: var(--code-bg-color);
   border-radius: 2px;
   display: inline-block;
   font-family: Monaco, monospace;
   font-size: 0.7em;
-  padding: 2px 5px 1px;
+  padding: 2px 3px 1px;
   -webkit-font-smoothing: initial;
 }
 

@@ -38,16 +38,11 @@
 [AMCSS](http://amcss.github.io/)
 [FUNCSS](http://benfrain.com/fun-css-naming-convention-explained/)
 
-
-
-
-
-
 -->
 
 There's been a lot of talk lately about the rapidly increasing speed at which things are changing on the front-end. It seems like every week something new comes out, and it can feel pointless to jump on the latest and greatest trend because something even better is almost certainly right around the corner.
 
-A few weeks ago, Chris Coyier wrote a post called [CSS: Just Try and Do a Good Job](http://css-tricks.com/just-try-and-do-a-good-job/) where he offers some very balanced suggestions for how to approach writing good CSS. I don't disagree with what Chris said, and in general I think that's pretty good adivce, for both CSS and life. But in this case, I want to take the opposite approach. I feel pretty strongly about this, so I want to take a firm stance and try to back it up with evidence. So here goes:
+A few weeks ago, Chris Coyier wrote a post called [CSS: Just Try and Do a Good Job](http://css-tricks.com/just-try-and-do-a-good-job/) where he offers some very balanced suggestions for how to approach writing good CSS. I don't disagree with what Chris said, and in general I think it's pretty good adivce, for both CSS and life. But in this case, I want to take the opposite approach. I feel pretty strongly about this, so I want to take a firm stance and try to back it up with evidence. So here goes:
 
 *BEM is, without a doubt, the best methodology for writing CSS today.*
 
@@ -57,12 +52,12 @@ Actually, no, this is not just about preference or context. The reason BEM is th
 
 ## It's not about preference, it's about solving problems
 
-A lot of people who write CSS are designers, and when people talk about design they like to use words like "clean" and "elegant". It's no wonder the names of classes in frameworks like [Semantic UI](http://semantic-ui.com/) are so popular. When looking at the website source, you see markup like this:
+A lot of people who write CSS are designers, and when people talk about design they like to use words like "clean" and "elegant". It's no wonder class-naming patterns like those found in [Semantic UI](http://semantic-ui.com/) are so popular. When looking at the Semantic UI documentation site source, you see markup like this:
 
 ```html
 <div class="full height">…</div>
 <div class="four wide column">…</div>
-<div class="ui stackable inverted divided relaxed grid">…</div>
+<div class="stackable inverted divided relaxed grid">…</div>
 ```
 
 At first glance, this looks awesome. The classes are so readable and self-documenting. It's as if the code is expressing itself to the reader.
@@ -80,17 +75,20 @@ By contrast, BEM is often considered ugly and verbose:
   <span class="Excerpt-close"></span>
 </article>
 ```
-I mean, is it really necessary to repeat the word "Excerpt" so many times? And what's with the mixture of single dashes, double dashes, and camelCase (some [flavors of BEM](https://github.com/philipwalton/html-inspector/blob/0.8.1/src/rules/convention/bem-conventions.js#L1-L27) mix dashes and underscores)? Isn't this way more confusing?
+I mean, c'mon BEM. Is it really necessary to repeat the word "Excerpt" so many times? And what's with the mixture of single dashes, double dashes, and camelCase (some [flavors of BEM](https://github.com/philipwalton/html-inspector/blob/0.8.1/src/rules/convention/bem-conventions.js#L1-L27) mix dashes and underscores)? Isn't this way more confusing?
 
 The phrase "is this really necessary?" pretty well sums up most people's reaction to seeing BEM for the first time. But I assure you, everything in the above code exists for a reason, and none of it is unnecessary.
 
-The BEM conventions [evolved over time](https://bem.info/method/history/), and they exist to address the fact that writing CSS for anything other than the most trivial website is actually really hard.
+The BEM conventions [evolved over time](https://bem.info/method/history/), and they exist to address the fact that writing CSS for anything other than the most trivial of websites is actually really hard.
 
-*Note: as I hinted above, there are several different variations on the traditional BEM naming conventions. I personally prefer the flavor used in MontageJS and SUIT CSS.*
+*Note: as I hinted above, there are several different variations on the traditional BEM naming conventions. I personally prefer the flavor [advocated for](https://github.com/suitcss/suit/issues/80) by [MontageJS](https://github.com/montagejs/montage) and [SUIT CSS](http://suitcss.github.io/).*
 
-## The hardest problem in CSS
+## The two hardest problems in CSS
 
-There are a lot of problems with CSS; no one would deny that. But the problems that get the most attentionare not the
+There are a lot of problems with CSS; no one would deny that. But the problems that get the most attention are usually not the problems that are actually hard. The usual complaints are over things that are either unintuitative, unsupported, or overly complex, but again, that doesn't make these problems hard.
+
+Real hard problems are the ones that make you pull your hair out or wake up in a cold sweat in the middle of the night because you made a one-line change to `main.css` and you have no idea whether it broke something or not.
+
 
 There are two types of problems in CSS: cosmetic problems and architectural problems. Cosmetic problems&mdash;issues like vertical centering or equal-height columns&mdash;usually engender the most vocal complaints, but architectural problems are actually far more egregious.
 

@@ -298,7 +298,7 @@ These days most people write CSS with hyphens as word separators. But hyphens al
 
 From looking at the above classes, it's impossible to tell what type of rule they apply to. This not only increases confusion during development, but it also makes it harder to test your CSS and HTML in an automated way. A structured naming convention allows you to look at a class name and know exactly what its relationship is to other classes and where it should appear in the HTML &mdash; making naming easier and testing possible where it previously was not.
 
-```bash
+```
 # Templates Rules (using Sass placeholders)
 %template-name { }
 %template-name--modifier-name { }

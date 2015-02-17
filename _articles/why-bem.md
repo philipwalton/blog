@@ -40,19 +40,23 @@
 
 -->
 
-There's been a lot of talk lately about the rapidly increasing speed at which things are changing on the front-end. It seems like every week something new comes out, and it can feel pointless to jump on the latest and greatest trend because something even better is almost certainly right around the corner.
+There's been a lot of talk lately about the rapidly increasing speed at which things are changing on the front-end. New tools, methodologies, and conventions are coming out all the time, and it can be hard to keep up.
 
-A few weeks ago, Chris Coyier wrote a post called [CSS: Just Try and Do a Good Job](http://css-tricks.com/just-try-and-do-a-good-job/) where he offers some very balanced suggestions for how to approach writing good CSS. I don't disagree with what Chris said, and in general I think it's pretty good adivce, for both CSS and life. But in this case, I want to take the opposite approach. I feel pretty strongly about this, so I want to take a firm stance and try to back it up with evidence. So here goes:
+On the CSS side of things, you have frameworks like [Bootstrap](http://getbootstrap.com/) and [Foundation](http://foundation.zurb.com/), you have tools like [Less](http://lesscss.org/) and [Sass](http://sass-lang.com/), you have methodologies like [OOCSS](https://github.com/stubbornella/oocss/wiki), [SMACSS](https://smacss.com/), and [BEM](http://bem.info/), and it seems like there are a million differing viewpoints out there as to what constitutes a "best practice".
 
-*BEM is, without a doubt, the best methodology for writing CSS today.*
+Recently it seems like the trend has been to shy away from bandwagon jumping in favor of a more personalized, pragmatic approach. As a prime example, Chris Coyier wrote a great article a few months ago where he describes his approach to good CSS. In the post, [CSS: Just Try and Do a Good Job](http://css-tricks.com/just-try-and-do-a-good-job/), he offers some very balanced suggestions that honestly apply to both CSS and professional life in general.
 
-You might think this is an impossible statement to defend. After all, isn't this primarily about personal preference? And isn't it true that what works in one context may not work in another?
+While I don't necessarily disagree with the article or this emerging sentiment, I think it's important to understand the rationale behind some of these methodologies before making a choice to use them or not use them. I use BEM, and I think it's the best methodology for writing CSS today, so I thought I'd take the time to defend it. If you've never thought about the *why* behind some of these conventions, hopefully this article will help you realize that this isn't just a matter of taste or personal preference.
 
-Actually, no, this is not just about preference or context. The reason BEM is the best is because it's the only methodology that solves the hardest problems in CSS, and it's the only methodology that is 100% effective at doing so.
+I use BEM because it's the only methodology that doesn't just minimize the issues and hard problems in CSS; it actually eliminates them. And it does so 100% of the time with zero risk of side-effects.
 
 ## It's not about preference, it's about solving problems
 
-A lot of people who write CSS are designers, and when people talk about design they like to use words like "clean" and "elegant". It's no wonder class-naming patterns like those found in [Semantic UI](http://semantic-ui.com/) are so popular. When looking at the Semantic UI documentation site source, you see markup like this:
+The majority of people who write CSS value good design. They're either designers themselves or they have strong aesthetic sensibilities and care deeply about form, elegance, and craftsmanship. Unfortunately, these are the people who seem to hate BEM the most.
+
+While I definitely consider myself firmly in the group I just described, I've written enough CSS in my day, and worked on large enough projects that I know from experience, and from repeatedly screwing up, that predictable code is far better than elegant code. Especially when that elegance is never seen by the end user.
+
+Consider the following two examples. This first sample is from [Semantic UI](http://semantic-ui.com/) and is the poster child of what I'd consider "clean" and "elagant" naming schemes:
 
 ```html
 <div class="full height">…</div>
@@ -60,93 +64,72 @@ A lot of people who write CSS are designers, and when people talk about design t
 <div class="stackable inverted divided relaxed grid">…</div>
 ```
 
-At first glance, this looks awesome. The classes are so readable and self-documenting. It's as if the code is expressing itself to the reader.
-
-By contrast, BEM is often considered ugly and verbose:
+The classes are so readable and self-documenting. It's as if the code is expressing itself to the reader. By contrast, here's an example of BEM, which is quite verbose and perhaps "ugliy" by comparison:
 
 ```html
-<article class="Excerpt Excerpt--promoted">
-  <img class="Excerpt-thumbnail">
-  <div class="Excerpt-body">
-    <h1 class="Excerpt-title">…</h1>
-    <p class="Excerpt-text">…</p>
-    <span class="Excerpt-readMore">…</span>
+<article class="ArticleExcerpt ArticleExcerpt--promoted">
+  <img class="ArticleExcerpt-thumbnail">
+  <div class="ArticleExcerpt-body">
+    <h1 class="ArticleExcerpt-title">…</h1>
+    <p class="ArticleExcerpt-content">…</p>
+    <span class="ArticleExcerpt-readMore">…</span>
   </div>
-  <span class="Excerpt-close"></span>
+  <span class="ArticleExcerpt-close"></span>
 </article>
 ```
-I mean, c'mon BEM. Is it really necessary to repeat the word "Excerpt" so many times? And what's with the mixture of single dashes, double dashes, and camelCase (some [flavors of BEM](https://github.com/philipwalton/html-inspector/blob/0.8.1/src/rules/convention/bem-conventions.js#L1-L27) mix dashes and underscores)? Isn't this way more confusing?
+I mean, c'mon BEM. Is it really necessary to repeat the text "ArticleExcerpt" so many times? And what's with the mixture of single dashes, double dashes, camelCase and PascalCase? Does that makes things *more* confusing?
 
-The phrase "is this really necessary?" pretty well sums up most people's reaction to seeing BEM for the first time. But I assure you, everything in the above code exists for a reason, and none of it is unnecessary.
+The phrase "is all this really necessary?" pretty well sums up most people's reaction to seeing BEM for the first time. But I assure you, everything in the above code exists for a reason, and none of it is unnecessary.
 
 The BEM conventions [evolved over time](https://bem.info/method/history/), and they exist to address the fact that writing CSS for anything other than the most trivial of websites is actually really hard.
 
-*Note: as I hinted above, there are several different variations on the traditional BEM naming conventions. I personally prefer the flavor [advocated for](https://github.com/suitcss/suit/issues/80) by [MontageJS](https://github.com/montagejs/montage) and [SUIT CSS](http://suitcss.github.io/).*
+## The hardest problem in CSS
 
-## The two hardest problems in CSS
+There are two types of problems in CSS: cosmetic problems and architectural problems. Cosmetic problems&mdash;issues like vertical centering or equal-height columns&mdash;usually engender the most vocal complaints. They make it challenging to replicate a visual design in code, but they're almost never show-stoppers.
 
-There are a lot of problems with CSS; no one would deny that. But the problems that get the most attention are usually not the problems that are actually hard. The usual complaints are over things that are either unintuitative, unsupported, or overly complex, but again, that doesn't make these problems hard.
+Architectural problems, on the other hand, can cripple development. I can remember distinct cases, at each of the companies I've worked for, where we postponed developing a new feature because we were too afraid to make *any* changes to the CSS. CSS is global, and every rule you write has the potential to affect completely unrelated parts of the site. It's this unpredictability that makes writing CSS so challenging.
 
-Real hard problems are the ones that make you pull your hair out or wake up in a cold sweat in the middle of the night because you made a one-line change to `main.css` and you have no idea whether it broke something or not.
-
-
-There are two types of problems in CSS: cosmetic problems and architectural problems. Cosmetic problems&mdash;issues like vertical centering or equal-height columns&mdash;usually engender the most vocal complaints, but architectural problems are actually far more egregious.
-
-Cosmetic problems can make it hard to replicate a design in code, but architectural problems can cripple development. At every company I've worked at, I can remember a time where we passed on building something new because we were afraid to change *any* of the CSS.
-
-At the end of the day, there's one hard problem in CSS that's harder than all the rest of the problems:
+To reemphasize this point, there is one problem in CSS that's harder to solve than all the rest:
 
 *Getting your rules to match the elements you want, without them accidentally matching the elements you don't.*
 
-It's this notion of accidental matches that makes CSS truly hard. Since all rules in CSS exist in the same global space, every rule can potentially effect or override every other rule on the page.[[1]](#footnote-1) To put that another way, any change, no matter how small, can have disastrous side effects.
+This is why BEM is better than any other CSS methodology in use today. It solves this problem by eliminating the potential for side-effects.
 
-The reason I say BEM is the best methodology is because it's the only methodology that completely solves this problem. Other modular CSS methodologies offer suggestions to minimize side effects and accidental matching, but BEM eliminates it.
+## Side effects in CSS
 
-## Three forms of side effects
+Most programming languages have a concept of scope, a way to prevent a variable defined in a particular module or package from conflicting with a variable defined in another.
 
+For scope to be fool-proof, it must be two-way. In other words, what's defined inside the scope must not be able to affect the outside world, and at the same time what's defined in the outside world must not be allowed to affect what's inside the scope; that is, without developers explicitly allowing things in and out.
 
-### Implicit verses explicit matching
+CSS has one-way scoping. Child and descendant combinators can be used in selectors to isolate a ruleset to a particular subtree, but there's no way to prevent outside styles from applying to the contents of that subtree.
 
-There are a finite number of HTML tags but an infinite number of possible class names.[[2]](#footnote-3) If you use class selectors to style elements, you can choose unique names to avoid conflicts, but if you use tag selectors (e.g. `h1`, `ul`, `p`), you're eventually going to have rules that apply to elements that you didn't intend.
+In CSS unwanted style matching, or side effects come in three forms:
 
-Since developers *have* to use tags to write HTML, it's extremely likely that someone will use a tag without realizing that styles come with it. On the other hand, when you add a class to an element, you expect styles to come with it.
+- Base/default rule changes
+- Naming collisions
+- Subtree matching
+
+### Base/default rule changes
+
+Developers *have* to use HTML tags to write HTML, and there are a finite number of tags to choose from.<sup>[[2](#footnote-2)]</sup> If your CSS contains tag selectors (technically they're called type selectors), you're necessarily breaking two-scoping rules. When first building a site, this might not seem like a problem, but as soon as you decide you want your `<h1>` elements to be a slightly larger font size, or your `<p>` elements to have a slightly larger bottom margin, you're taking a big risk.
+
+It's possible your changes won't cause any problems, but how can you know for sure? It's extremely likely that other rules in your stylesheet were counting on those base rules being *exactly* what they were.
+
+When rules in your stylesheets depend on other rules, and there's not a clear dependency relationship established, there are bound to be side effects when changes happen.
+
+### Naming collisions
+
+CSS, as a language, will not warning you or fail to build if you pick a class name that already exists. In fact, the ability to override rules is actually one of the "features" of the language. As a result, without a convention in place to avoid this, or a build-time check, there's no good way to know whether the class name you picked is already in use.
+
+When multiple developers are committing to the same code base, the chances of two people choosing the same name and not knowing it is extremely high. This is especially true of common name choices like "button", "content" or "title".
 
 ### Subtree matching
 
-Developers often think that using tag selectors is safe as long as they're scoped to a particular module. While this does offer some protection, it's not guaranteed.
+Most developers are aware of the above two forms of CSS side effects. As such, you'll often see people do what I mentioned above use a child or descendent selector to limit the reach of the rules they're writing, e.g. `#homepage .header` or `.some-widget .title`.
 
-Scoping tag selectors to a parent module prevents those styles from affecting the rest of the page, but it doesn't prevent outside changes from creeping in, nor does it prevent other elements in the subtree from matching those rules.
+While this approach is slightly safer, it doesn't cover 100% of cases. The problem is that limiting the reach of a selector to a particular DOM subtree does guarantee that it won't affect outside trees, but it doesn't guarantee that it won't unintentionally affect elements within that subtree.
 
 Consider the following example:
-
-
-```
-/* In elements.css */
-a {
-  color: red;
-  text-decoration: underline;
-}
-
-/* In widget.css */
-.footer a {
-  color: inherit;
-  text-decoration: none;
-}
-```
-
-In this example, links in the footer override their default `color` and `text-decoration` properties. This works for now, but what happens when another developer decides they want to update the base link rules as follows:
-
-```
-a {
-  border-bottom: 1px solid;
-  color: red;
-  text-decoration: none;
-}
-```
-
-There's a good chance that the author of this change didn't realize he was `.footer` module.
-
-And while using a tag selectors makes this situation way more dangerous, it still exists if you use classes. The next example shows two modules that can still be problematic, despite the fact that they only use class selectors.
 
 ```
 /* in widget.css */
@@ -162,7 +145,7 @@ And while using a tag selectors makes this situation way more dangerous, it stil
 }
 ```
 
-While it's true that neither of the above rules will affect `.title` elements not found within the `.widget` or `.media` modules, but still not 100% safe. In real-world development, module after nested within other modules all the time, so the above rules are still of problematic potential.
+While it's true that `.title` elements not found within the `.widget` or `.media` modules will not get either of these styles, there's still that chance that a `.title` element will be found within *both*  the `.widget` and `.media` modules at the same time.
 
 ```html
 <div class="widget">
@@ -177,26 +160,22 @@ While it's true that neither of the above rules will affect `.title` elements no
 </div>
 ```
 
-As you can see, the border style from the `.widget .title` rule is going to apply to the `.media .title` element, even though it's qualified. The reality is that qualifying selectors prevents styles from leaking out, but it does nothing to prevent styles from leaking in, and in tree structures like the DOM, this is inevitable.
-
-### Naming collisions
-
-Another common cause of side effects is naming collisions. CSS happily allows you to define rules with the same class names in different parts of a stylesheet. As a result, there's no easy way to know if your rule is overriding a rule that already exists with the same class name.
-
-This can happen as a top level class selector, but it often happens in nested contexts as well, usually with common class names like "button" or "content" or "title" as in the example above. When multiple developers are committing to the same code base, the chances of two people choosing the same name and not knowing it is extremely high.
+In real-world development, HTML structures are complex and if multiple people are all writing CSS modules this way, it's only a matter of time before two of them pick the same name.
 
 ## How BEM eliminates side effects
 
 I said above that all CSS rules are global and every rule has the potential to conflict with every other rule on the page. This means side effects cannot be prevented by the language; however, they *can* be prevented through disciplined and enforceable naming conventions. And that's exactly what BEM does.
 
-- **Implicit verses explicit matching:**<br>
-  BEM conventions require the explicit use of class selectors. This means that developers can only style elements by adding a class to them. This *greatly* reduces accidental styling, as most developers understand that when add a class to an element, it's probably going to style it, and they should check to make sure the style is correct.
-
-- **Subtree matching:**<br>
-  The example above used the selectors `.widget .title` and `.media .title`, and since the class name "title" is used in both, there's a risk of subtree matching. BEM avoids this issue completely by requiring all subtree element classes to have the block name as a prefix. The BEM equivalents of these two title selectors would be `.Widget-title` and `.Media-title`. Since the class names are different, its impossible for styles from one rule to inadvertently apply to subtree elements of the other.
+- **Base/default rule changes:**<br>
+  Strict BEM conventions require the explicit use of class selectors, which means that developers can only style elements by adding a class to them. This means that all styling is opt-in via classes rather than de facto via tag selectors.
 
 - **Naming collisions:**<br>
   In BEM, every class selector starts with the name of the block, and the rules for each block live in a dedicated file. Since file systems do not allow two files to have the same name, the OS is actually helping to prevent accidental duplication. If you follow all of the naming conventions, and you always put all block code in its own file, there's zero chance of naming collisions.
+
+- **Subtree matching:**<br>
+  The subtree matching example in the previous section used the selectors `.widget .title` and `.media .title`, and since the class name "title" was used in both cases, there's a risk of subtree matching. BEM avoids this issue by requiring all element classes to have the block name as a prefix. The BEM equivalents of these two title selectors would be `.Widget-title` and `.Media-title`. Since the class names are different, its impossible for styles from one rule to inadvertently apply to subtree elements of the other.
+
+### Enforcing conventions
 
 I mentioned that following BEM conventions prevents side effect, but how do you make sure the conventions are followed? If the return of side effects is as easy as a new developer not knowing (or fully understanding) the conventions, how is that any better than before?
 
@@ -212,7 +191,7 @@ In the HTML:
 - Any element with a class that matches the format for an element must be a descendant of a block by the same name.
 - Any element that contains a modifier class must also contain a block class by the same name.
 
-In the real world, there are cases where exceptions must be made, so when choosing your enforcement tools, make sure they allow for real world exception.
+In the real world, there are cases where exceptions must be made, so when choosing your enforcement tools, make sure they allow for real world exceptions.
 
 ## Are there downsides to BEM?
 
@@ -228,11 +207,11 @@ And after writing BEM for a couple of years, I can honestly say that my perspect
 
 ## Learning from JavaScript
 
-In the bad old days of JavaScript, it was common for library authors to add methods to the native prototypes of global types like `Object`, `Array`, `String`, and `Function`. At first it seemed like a convienence, but developers quickly realized it was a nightmare. If two different libraries add the same method to `Array.prototype`, each with a slightly different signature or behavior, it would lead to bugs that were almost impossible to track down.
+In the bad old days of JavaScript, it was common for library authors to add methods to the native prototypes of global types like `Object`, `Array`, `String`, and `Function`. At first it seemed like a convenience, but developers quickly realized it was a nightmare. If two different libraries add the same method to `Array.prototype`, each with a slightly different signature or behavior, it would lead to bugs that were almost impossible to track down.
 
 These days, almost no libraries modify native prototypes. In fact, I've seen some libraries publicly shamed for even trying. If we've learned our lesson in JavaScript, why haven't we learned it in CSS?
 
-Every single one of the most popular CSS frameworks today uses absolutely terrible class names. They've choosen the most common names for the most common UI elements and globally reserved them with no consideration for the host environment.
+Every single one of the most popular CSS frameworks today uses absolutely terrible class names. They've chosen the most common names for the most common UI elements and globally reserved them with no consideration for the host environment.
 
 Consider Bootstrap. Every single one of its JavaScript plugins uses a namespace and comes with a `.noConflict()` method to avoid naming collisions. It does this in JavaScript, but its CSS class names make no such effort, despite [numerous](https://github.com/twbs/bootstrap/issues/1235) [requests](https://github.com/twbs/bootstrap/issues/1287) for it, and [easy solutions](/articles/dynamic-selectors/) that I, and other developers, suggested years ago.
 
@@ -240,3 +219,12 @@ I don't mean to call about Bootstrap specifically because pretty much every fram
 
 ## Wrapping up
 
+
+
+<aside class="Footnotes">
+  <h1 class="Footnotes-title">Footnotes:</h1>
+  <ol class="Footnotes-items">
+    <li id="footnote-1">There are several [different variations]((https://github.com/philipwalton/html-inspector/blob/0.8.2/src/rules/convention/bem-conventions.js#L1-L27) on the traditional BEM naming conventions. I personally prefer the flavor advocated for by [MontageJS](https://github.com/montagestudio/docs.montagestudio.com/blob/master/montagejs/naming-conventions.md) and [SUIT CSS](https://github.com/suitcss/suit/issues/80).</li>
+    <li id="footnote-2">With custom elements, you can create additional tags, which partially solves this problem.</li>
+  </ol>
+</aside>

@@ -1,6 +1,6 @@
 @font-face {
   font-family: 'Hyphens';
-  src: local('Palatino'), local('Times');
+  src: local('Times');
   /* Use "Times" for hyphens. */
   unicode-range: U+002D;
 }

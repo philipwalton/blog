@@ -30,7 +30,7 @@ a {
 }
 
 article a {
-  background-image: linear-gradient(to top, currentColor, currentColor);
+  background-image: linear-gradient(to top, #777, #777);
   background-position: 0 1.2em;
   background-repeat: repeat-x;
   background-size: 1px 1px;
@@ -58,6 +58,7 @@ code {
 pre code {
   background: inherit;
   color: inherit;
+  display: block;
   padding: 0;
 }
 
@@ -66,7 +67,7 @@ blockquote {
   color: #666;
   font-style: italic;
   margin: 0;
-  padding: 0 0 0 1.333em;
+  padding: 0 0 0 1em;
 }
 
 ol, ul {

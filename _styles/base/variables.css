@@ -1,5 +1,19 @@
+@font-face {
+  font-family: 'Hyphens';
+  src: local('Palatino'), local('Times');
+  /* Use "Times" for hyphens. */
+  unicode-range: U+002D;
+}
+
+@font-face {
+  font-family: 'Puncuation';
+  src: local('Times New Roman');
+  /* Use "Times New Roman" for commas, dashes and quote marks. */
+  unicode-range: U+002C, U+2013-201E;
+}
+
 :root {
-  --serif-font: 'Halant', Georgia, serif;
+  --serif-font: 'Puncuation', 'Hyphens', 'Halant', 'Times New Roman', serif;
   --sans-serif-font: 'Open Sans', 'Helvetica Neue', sans-serif;
 
   --text-color: #333;
@@ -12,5 +26,5 @@
   --github-color: #171715;
   --rss-color: #F93;
 
-  --space: 1.5em;
+  --space: 1.25em;
 }

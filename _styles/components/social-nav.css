@@ -8,23 +8,21 @@
 }
 
 .SocialNav-icon {
+  display: flex;
   flex: 0 0 auto;
+  height: var(--icon-size);
+  width: var(--icon-size);
 }
 
 .SocialNav-icon + .SocialNav-icon {
   margin-left: .4em;
 }
 
-.SocialNav-icon {
-  height: var(--icon-size);
-  width: var(--icon-size);
-}
-
 .SocialNav-icon svg {
-  height: 100%;
   fill: #ccc;
+  height: var(--icon-size);
   transition: all .2s cubic-bezier(.4,0,.2,1);
-  width: 100%;
+  width: var(--icon-size);
 }
 
 .SocialNav-icon--twitter:hover svg {
@@ -53,7 +51,6 @@
 .is-legacy .SocialNav-icon {
   color: #999;
   display: inline-block;
-
   height: auto;
   width: auto;
 }

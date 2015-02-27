@@ -1,6 +1,7 @@
 .MainNav {
   font-size: .8em;
   -webkit-font-smoothing: initial;
+  -moz-osx-font-smoothing: initial;
 }
 
 .MainNav a {

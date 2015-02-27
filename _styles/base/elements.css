@@ -10,8 +10,9 @@ html, body {
 
 body {
   color: var(--text-color);
-  font: 1.0625em/1.5 var(--serif-font);
+  font: 1.0625em/1.47 var(--serif-font);
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
 }
 
@@ -55,6 +56,7 @@ code {
   font-size: 0.8em;
   padding: 2px 3px 1px;
   -webkit-font-smoothing: initial;
+  -moz-osx-font-smoothing: initial;
 }
 
 pre code {

@@ -7,24 +7,25 @@
 
 .ArticlePreview-title {
   display: block;
-  font-size: 1.4em;
+  font-size: 1.6em;
   line-height: 1.1;
-  margin: .6em 0 .2em;
+  margin: .667em 0 .333em;
   transition: color .2s cubic-bezier(.4,0,.2,1);
 }
 
 .ArticlePreview-excerpt {
-  color: #aaa;
-  font-size: 1em;
+  color: #999;
+  font-family: var(--sans-serif-font);
+  font-size: .9em;
+  line-height: 1.4;
   margin: 0;
 }
 
 .ArticlePreview-date {
-  color: #aaa;
+  color: #bbb;
   font-size: .8em;
 }
 
 .ArticlePreview:hover .ArticlePreview-title {
   color: var(--accent-color);
 }
-

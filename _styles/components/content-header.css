@@ -3,7 +3,7 @@
 }
 
 .ContentHeader-title {
-  font-size: 1.667em;
+  font-size: 2em;
   line-height: 1;
   letter-spacing: -.04em;
   margin: 0;
@@ -18,6 +18,6 @@
 
 @media (--break-lg) {
   .ContentHeader-title {
-    font-size: 2.5em;
+    font-size: 3em;
   }
 }

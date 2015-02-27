@@ -1,12 +1,12 @@
 .MainNav {
-  font-weight: bold;
   font-size: .8em;
-  line-height: 1.667;
+  -webkit-font-smoothing: initial;
 }
 
 .MainNav a {
   color: #999;
   display: block;
+  padding: .2em 0;
   text-decoration: none;
   transition: color .2s cubic-bezier(.4,0,.2,1);
 }

@@ -14,5 +14,5 @@
   ],
   "postTypes": ["article"],
   "taxonomyTypes": ["tag"],
-  "excerptLength": 16
+  "excerptLength": 30
 }

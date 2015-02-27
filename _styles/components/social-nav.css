@@ -1,3 +1,7 @@
+:root {
+  --icon-size: 24px;
+}
+
 .SocialNav {
   display: flex;
   justify-content: inherit;
@@ -8,21 +12,19 @@
 }
 
 .SocialNav-icon + .SocialNav-icon {
-  margin-left: .2em;
+  margin-left: .4em;
 }
 
-@media (--break-sm) {
-  .SocialNav-icon {
-    height: var(--space);
-    width: var(--space);
-  }
+.SocialNav-icon {
+  height: var(--icon-size);
+  width: var(--icon-size);
 }
 
 .SocialNav-icon svg {
-  height: 24px;
+  height: 100%;
   fill: #ccc;
   transition: all .2s cubic-bezier(.4,0,.2,1);
-  width: 24px;
+  width: 100%;
 }
 
 .SocialNav-icon--twitter:hover svg {

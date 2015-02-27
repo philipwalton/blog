@@ -12,7 +12,7 @@
 
 .Site-content {
   margin: 0 auto;
-  max-width: 36em;
+  max-width: 42em;
 }
 
 @media (--break-md) {
@@ -32,11 +32,11 @@
     left: 0;
     position: fixed;
     top: 0;
-    width: 11em;
+    width: 12em;
   }
 
   .Site-contentContainer {
-    margin-left: 11em;
+    margin-left: 12em;
     padding: 5em 3em 3em;
   }
 }
@@ -44,11 +44,11 @@
 @media (--break-xl) {
 
   .Site-header {
-    width: 14em;
+    width: 16em;
   }
 
   .Site-contentContainer {
-    margin-left: 14em;
-    padding: 5em 4em 3em;
+    margin-left: 16em;
+    padding: 6em 5em 4em;
   }
 }

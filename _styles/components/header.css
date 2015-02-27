@@ -28,7 +28,7 @@
   flex: 1 1 50%;
 }
 .Header-title {
-  font-size: .9em;
+  font-size: 1em;
   line-height: 1;
   margin: 0;
   max-width: 6em;
@@ -67,7 +67,7 @@
     padding: 1.25em 2em;
   }
   .Header-title {
-    font-size: 1em;
+    font-size: 1.167em;
   }
   .Header-photo {
     background-size: 50px;
@@ -88,11 +88,10 @@
 
   .Header-info {
     flex: 0 0 auto;
-    margin-bottom: 1em;
+    margin-bottom: 1.25em;
   }
 
   .Header-title {
-    font-size: 1em;
     margin-bottom: .1em;
   }
 
@@ -100,7 +99,7 @@
     background-size: 80px;
     flex: 0 0 auto;
     height: 80px;
-    margin: 0 0 1em;
+    margin: 0 0 1.25em;
     order: -1;
     width: 80px;
   }
@@ -114,7 +113,7 @@
 
   .Header-social {
     flex: 0 0 auto;
-    margin-bottom: 1em;
+    margin-bottom: 1.25em;
   }
 
   .Header-nav {
@@ -146,7 +145,7 @@
 }
 
 .is-legacy .Header-title {
-  font-size: .9em;
+  font-size: 1em;
   line-height: 1;
   margin: 0;
   max-width: 100%;

@@ -19,18 +19,7 @@ h1, h2, h3 {
   color: var(--heading-color);
   font-family: var(--sans-serif-font);
   letter-spacing: -0.04em;
-}
-
-h1 {
-  font-size: 2.4em;
-}
-
-h2 {
-  font-size: 1.75em;
-}
-
-h3 {
-  font-size: 1.4em;
+  line-height: 1.1;
 }
 
 p {

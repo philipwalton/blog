@@ -14,15 +14,16 @@
 }
 
 .ArticlePreview-excerpt {
-  color: #999;
+  color: #aaa;
   font-family: var(--sans-serif-font);
   font-size: .9em;
+  letter-spacing: -.02em;
   line-height: 1.4;
   margin: 0;
 }
 
 .ArticlePreview-date {
-  color: #bbb;
+  color: #aaa;
   font-size: .8em;
 }
 

@@ -1,8 +1,8 @@
 <!--
 {
   "layout": "article",
-  "title": "Why BEM",
-  "date": "2015-01-16T07:57:26-08:00",
+  "title": "Side Effects in CSS",
+  "date": "2015-02-28T09:19:06-08:00",
   "draft": true,
   "tags": [
     "CSS"
@@ -10,125 +10,19 @@
 }
 -->
 
-<!--
+It feels like every few days I read about some shiny, new way people are writing CSS. Many of these "new" ways are not actually new, they're just variations on an existing, well-known methodology modified to meet the needs (or wants) of some developer or team.
 
-1. CSS Methodologies shouldn't be about being pretty or elegant they should be about solving problems
-   a. simple, "clean" class names
-   b. readable, "elegant" pairings
-2. The hardest problem in CSS
-   a. writing selectors that match the elements you want without accidentally matching the elements you don't want.
-   b. BEM is the only methodology that allows you to be 100% sure you won't have unintended side-effects.
-3. Three forms of side effects
-   a. Implicit rather than explicit matching
-   b. Subtree matching
-   c. Name collisions
-4. How BEM is side-effect free
-5. Learning from JavaScript
-6. Conclusion
-   a. Are there downsides to BEM?
-      i. Yes, it's verbose and requires a lot of classes in the HTML
-     ii. But the confidence you get when writing with just BEM is well worth the extra work.
-    iii. Until the web platform evolves to support
+Now I'm certainly not against progress or improving on the old ways of doing things. The problem is that many of these new ways are not better. In fact, many of them are much worse, and the reasons they're worse are not immediately obvious, so in addition to being worse, they're dangerous.
 
+I personally believe [BEM](http://www.smashingmagazine.com/2012/04/16/a-new-front-end-methodology-bem/) is the best methodology for writing CSS today. I've been using BEM exclusively for over three years, and nothing I've seen since has convinced me to change.
 
-[OOCSS](https://github.com/stubbornella/oocss/wiki)
-[SMACSS](http://smacss.com/)
-[BEM](http://bem.info/)
-[ACSS](http://www.smashingmagazine.com/2013/10/21/challenging-css-best-practices-atomic-approach/)
-[AMCSS](http://amcss.github.io/)
-[FUNCSS](http://benfrain.com/fun-css-naming-convention-explained/)
-[BEVM](http://webuild.envato.com/blog/chainable-bem-modifiers/)
+I first discovered BEM shortly after being introduced to [OOCSS](https://github.com/stubbornella/oocss/wiki) and [SMACSS](http://smacss.com/). Since I liked and had started using a lot of these concepts, I simply added ideas from BEM to the mix creating my own personalize way of writing CSS. As time went by, I came to realize that BEM is feature complete on its own. Most of the contentions I was using that weren't strict BEM were just getting in the way.
 
--->
+Interestingly, most of the "new" methodologies out there do this same thing. They're based on BEM but with extra features sprinkled on top. They add traits or variations in addition to modifiers, they use attributes instead of classes, they mix in concepts like state and helpers from other methodologies, and they use preprocessors to abstract away the parts they don't like.
 
+Again, I'm not trying to suggest that these ideas are necessarily bad, but they do all seem to have a common theme: they change BEM conventions to satisfy user preference rather than to solve any real problems.
 
-
-
-There's been a lot of talk lately about the rapidly increasing pace at which things are changing on the front-end. New tools, techniques, and libraries are coming out all the time, and it can be hard to keep up.
-
-Just on the CSS sinde of things you have frameworks like [Bootstrap](http://getbootstrap.com/) and [Foundation](http://foundation.zurb.com/), you have preprocessors like [Less](http://lesscss.org/) and [Sass](http://sass-lang.com/), you have tools like [Autoprefixer](#) and [Compass](#), and you have new methodologies for naming and structuring your CSS on a seemingly weekly basis. Just off the top of my head, here is a list of methodologies I've seen written about or promoted in major web publications within the past few months. Some of them are old, and some of them are brand new: [OOCSS](https://github.com/stubbornella/oocss/wiki), [SMACSS](http://smacss.com/), [BEM](http://bem.info/),
-[SUIT](http://suitcss.github.io/), [ACSS](http://www.smashingmagazine.com/2013/10/21/challenging-css-best-practices-atomic-approach/), [AMCSS](http://amcss.github.io/), [FUNCSS](http://benfrain.com/fun-css-naming-convention-explained/), and [BEVM](http://webuild.envato.com/blog/chainable-bem-modifiers/).
-
-In fact, there are so many methodologies that I think many people are starting to get turned off to the idea of using a methodology at all.
-
-The question of whether or use a CSS methodology, and if so which one to pick, can be daunting, even to experienced developers. So in this article I wanted to try my hand at answering the three most commonly asked questions on this subject:
-
-- Should I use a methodology?
-- How do I decide?
-- Which one should I pick?
-
-I'll start with the last question since you've probably already guessed my answer from the title. I exclusively use BEM conventions and have been on every project I've worked on for about three years. I've researched or tried all major alternatives, and while I think most of them are just fine, I think BEM clearly stands out above the rest.
-
-Most CSS methodologies exist to address the hardest parts of writing CSS at scale. But BEM is the only methodology that doesn't simply address the problems, it eliminates them, and it does so with zero risk of side-effects.
-
-That may sound like a hard claim to defend, but I believe I can prove it.
-
-## What is BEM?
-
-If you're commpletely unfamiliar with BEM conventions, I'd recommend [reading up on them](http://www.smashingmagazine.com/2012/04/16/a-new-front-end-methodology-bem/) before continuing. This article isn't meant to teach you BEM, but I do think it's worth briefly covering the basics.
-
-The most fundamental tenant of the BEM methodology is that CSS rules may only use class selectors. (If this seems unnecessarily burdensome to you, hopefully the rational will soon become clear.) And these class selectors must follow a strict naming convention.
-
-Every class selector is either a block, and element, or a modifier, and the naming convention looks like this:<sup>[[1](#footnote-1)]</sup>
-
-```css
-.BlockName { }
-.BlockName-elementName { }
-.BlockName--modifierName { }
-```
-
-### Block
-
-A block is a visual element. It can be either a single element or a subtree or elements, but the block is always the root node. Blocks are similar to "objects", "components" or "modules" in other CSS methodologies.
-
-### Element
-
-If the block is not just a single DOM element, any descendent nodes that are visually part of the block are considered elements. For example, if the block is a `<div>` that wraps a form row consisting of a `<label>` and and `<input>`, the `<div>` would be the block and it might have the class `.FormRow`, and the `<label>` and `<input>` would be the elements and contain class names such as `.FormRow-label` and `.FormRow-field` respectively.
-
-It's important to note that simply being a descendent in the HTML does not make something an element. It has to be visually part of the block and unable to stand on its own outside of the block.
-
-### Modifier
-
-A modifier is a class applied to the block node that may alter the appearance of the block and/or its elements. A modifier can be though of as a subclass or a mixin as it builds on top of existing styles rather than being its own thing.
-
-When a modifier needs to alter the look of an element, a descendent or child combinator may be used. Note that this is the only time nested selectors are allowed in BEM.
-
-```css
-.BlockName--modifierName .BlockName-elementName { }
-```
-
-## It's not about preference, it's about solving problems
-
-The majority of people who write CSS value good design. They're either designers themselves or they have strong aesthetic sensibilities and care deeply about form, elegance, and craftsmanship. Unfortunately, these are the people who seem to hate BEM the most.
-
-While I definitely consider myself firmly in the above group, I've written enough CSS in my day, and worked on large enough projects that I know from experience, and from repeatedly screwing up, that predictable code is far better than elegant code. Especially when that elegance is never seen by the end user.
-
-Consider the following two examples. This first sample is from [Semantic UI](http://semantic-ui.com/) and is the poster child of what I'd consider a "clean" and "elagant" naming scheme:
-
-```html
-<div class="full height">…</div>
-<div class="four wide column">…</div>
-<div class="stackable inverted divided relaxed grid">…</div>
-```
-
-The classes are so readable and self-documenting. It's as if the code is speaking it's design to the reader. By contrast, here's an example of BEM, which is quite verbose and perhaps "ugliy" by comparison:
-
-```html
-<article class="ArticleExcerpt ArticleExcerpt--promoted">
-  <img class="ArticleExcerpt-thumbnail">
-  <div class="ArticleExcerpt-body">
-    <h1 class="ArticleExcerpt-title">…</h1>
-    <p class="ArticleExcerpt-content">…</p>
-    <span class="ArticleExcerpt-readMore">…</span>
-  </div>
-  <span class="ArticleExcerpt-close"></span>
-</article>
-```
-I mean, c'mon BEM. Is it really necessary to repeat the text "ArticleExcerpt" so many times? And what's with the mixture of single dashes, double dashes, camelCase and PascalCase? Does that makes things *more* confusing?
-
-The phrase "is all this really necessary?" pretty well sums up most people's reaction to seeing BEM for the first time. But I assure you, everything in the above code exists for a reason, and none of it is unnecessary.
-
-The BEM conventions [evolved over time](https://bem.info/method/history/), and they exist to address the fact that writing CSS for anything other than the most trivial of websites is actually really hard.
+CSS is full of problems&mdash;things that make writing CSS at scale incredibly hard. In my experience, strict BEM is the only methodology that not only minimizes these problems, it eliminates them.
 
 ## The hardest problem in CSS
 
@@ -136,25 +30,28 @@ There are two types of problems in CSS: cosmetic problems and architectural prob
 
 Architectural problems, on the other hand, can cripple development. I can remember distinct cases, at each of the companies I've worked for, where we postponed developing a new feature because we were too afraid to make *any* changes to the CSS. CSS is global, and every rule you write has the potential to affect entirely unrelated parts of the site. It's this unpredictability that makes writing CSS so challenging.
 
-To reemphasize this point, there is one problem in CSS that's harder to solve than all the rest:
+If I had to choose between hiring an amazing designer who could replicate even the most complicated visual challenges easily in code and someone who understood the nuances of writing predictable and maintainable CSS, I'd choose the latter in a heartbeat.
+
+Cosmetic problems pale in comparison to architectural problems, and the hardest architectural problem of all can be summed up in this single sentence:
 
 *Getting your rules to match the elements you want, without them accidentally matching the elements you don't.*
 
-This is where BEM shines. It solves this problem by eliminating the potential for side-effects. No other methodology can make that guarantee.
+To put this in terms that may be more familiar to those with a programming background, the hardest problem in CSS is prevent side effects.
 
 ## Side effects in CSS
 
-Most programming languages have a concept of scope, a way to prevent a variable defined in a particular module or package from conflicting with a variable defined in another.
+Side effects in computer science happen when a function, in addition to doing its job, modifies or changes the state of the outside world.
 
-For scope to be fool-proof, it must be two-way. In other words, what's defined inside the scope must not be able to affect the outside world, and at the same time what's defined in the outside world must not be allowed to affect what's inside the scope. Of course, that is without developers explicitly allowing things in and out.
+Side effects aren't always accidental. Frequently side effects are done intentionally because the change to the outside world is needed to make the program work. The problem is that someone else may need to run this function at a later time and not realize that changes to the outside world are being made.
 
-CSS has one-way scoping. Child and descendant combinators can be used in selectors to isolate a ruleset to a particular subtree, but there's no way to prevent outside styles from applying to the contents of that subtree.
+Because all CSS rules live in the same global scope[1], side effects are extremely common. Since most stylesheets consist of an extremely fragile collection of highly-coupled rules, all intimately dependent on presence, order, and specificity of other rules, even the smallest changes usually come with unforeseen consequences.
 
-In CSS unwanted style matching, or side effects come in three forms:
+In CSS, these consequences (side effects) come in four main forms:
 
 - Base/default rule changes
 - Naming collisions
 - Subtree matching
+- Non-deterministic cascading
 
 ### Base/default rule changes
 
@@ -282,3 +179,41 @@ And after writing BEM for a couple of years, I can honestly say that my perspect
     <li id="footnote-2">With custom elements, you can create additional tags, which partially solves this problem.</li>
   </ol>
 </aside>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## BEM Praise
+
+I frequently hear people who've switched to BEM raving about how much more maintainable their code is. It's easier to organize, easier to find where rules are defined, easier to look at markup and understand what's going on.
+
+But I pretty much never hear anyone praise what I consider to be BEM's single best feature: *it eliminates side effects*.
+
+## Scope in CSS
+
+Most programming languages have a concept of scope, a way to prevent a variable defined in a particular module or package from conflicting with a variable defined in another.
+
+For scope to be fool-proof, it must be two-way. In other words, what's defined inside the scope must not be able to affect the outside world, and at the same time what's defined in the outside world must not be allowed to affect what's inside the scope. Of course, that is without developers explicitly allowing things in and out.
+
+CSS has one-way scoping. Child and descendant combinators can be used in selectors to isolate a ruleset to a particular subtree, but there's no way to prevent outside styles from applying to the contents of that subtree.

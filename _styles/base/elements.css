@@ -23,6 +23,11 @@ h1, h2, h3 {
   line-height: 1.1;
 }
 
+b,
+strong {
+  color: var(--heading-color);
+}
+
 p {
   margin: 0 0 var(--space);
 }

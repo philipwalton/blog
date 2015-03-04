@@ -173,7 +173,7 @@ If your exceptions are limited to just one area of your site (say, the content a
 
 While I haven't tested this approach in a real-world scenario, I mention it because it's an example of a variation on BEM conventions that doesn't compromise its guarantee of no side effects. Since all BEM blocks are styled via classes, styling elements that don't have a class is "safe", at least from conflict with the rest of your CSS (obviously if you're using classes for other things, this can still be risky as adding a class to such an element would prevent it from matching the selector).
 
-Another example I encounter frequently is using site-wide state or support classes. [Modernizr](http://modernizr.com/) is a good example. Though not technically within BEM's rules, the following pattern does not increase the risk of side effects as long as the rest of the rules are followed.
+Another example I encounter frequently is using site-wide state or support classes. [Modernizr](http://modernizr.com/) is a good example. Though this technique *does* increase the specificity of the selectors it's used on, the increased specificity should only affect other rules defined within the same block file (assuming you've followed all the other BEM conventions).
 
 ```css
 .GridRow {
@@ -185,6 +185,8 @@ Another example I encounter frequently is using site-wide state or support class
   display: table;
 }
 ```
+
+Of course, if you're able to write components that can manage their own state via BEM modifiers, that will always be preferable to relying on site-wide state rules.
 
 ## Learning from JavaScript
 
@@ -214,6 +216,6 @@ In my opinion if your team is larger than just you, the risk is not worth the re
     <li id="footnote-1">[Shadow DOM](http://w3c.github.io/webcomponents/spec/shadow/) brings real, two-way subtree scoping to CSS, though it's not currently supported by all browsers.</li>
     <li id="footnote-2">With [custom elements](http://w3c.github.io/webcomponents/spec/custom/), you can create additional tags, which partially solves this problem.</li>
     <li id="footnote-3">The only exception to this is [inheritable properties](http://dev.w3.org/csswg/css-cascade/#inheriting) like `font-size` and `line-height`. Blocks may depend on these styles being defined outside of the block because it allows them to be more adaptable to their host environment. If blocks choose to not reset inheritable properties, they should be flexible enough to adapt to whatever properties they may receive.</li>
-    <li id="footnote-4">There are several [different variations]((https://github.com/philipwalton/html-inspector/blob/0.8.2/src/rules/convention/bem-conventions.js#L1-L27) on the traditional BEM naming conventions. I personally prefer the flavor [advocated for]((https://github.com/suitcss/suit/issues/80) by [SUIT CSS](https://suitcss.github.io).</li>
+    <li id="footnote-4">There are several [different variations](https://github.com/philipwalton/html-inspector/blob/0.8.2/src/rules/convention/bem-conventions.js#L1-L27) on the traditional BEM naming conventions. I personally prefer the flavor [advocated for](https://github.com/suitcss/suit/issues/80) by [SUIT CSS](https://suitcss.github.io).</li>
   </ol>
 </aside>

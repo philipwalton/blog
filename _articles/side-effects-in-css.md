@@ -2,8 +2,7 @@
 {
   "layout": "article",
   "title": "Side Effects in CSS",
-  "date": "2015-02-28T09:19:06-08:00",
-  "draft": true,
+  "date": "2015-03-03T21:25:06-08:00",
   "tags": [
     "CSS"
   ]

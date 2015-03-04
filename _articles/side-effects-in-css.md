@@ -15,7 +15,7 @@ Now, I'm certainly not against change, nor trying to make improvements on curren
 
 I've been saying for a long time that I think [BEM](http://www.smashingmagazine.com/2012/04/16/a-new-front-end-methodology-bem/) is the best methodology for writing CSS, and since many of these new methodologies are based on BEM, I've taken the time to check them out. What I find is that most of them make the same mistakes I made when I first started trying to write modular CSS. They take their favorite parts of all the popular methodologies and mix them together to form their own, personalized approach.
 
-The problem with mixing non-BEM features in with BEM is they can often destroy the safety net BEM creates for you. BEM is effective not because it gives you a bunch of options, but because it limits what you're allowed to do. It prevents you from shooting yourself in the foot. All of BEM's rules exist for good reason, and if you're going to suggest changing them, you'd better have a solid understanding of what those reasons are.
+The problem with mixing non-BEM features in with BEM is they can often destroy the safety net BEM creates for you. BEM is effective not because it gives you a bunch of options, but because it limits what you're allowed to do. It prevents you from shooting yourself in the foot. All of BEM's rules exist for good reason, and if you're going to suggest changing them, you'd better know what those reasons are.
 
 Lots of frameworks provide structure and organization to your code, and consistency to your class names. If you think that's all BEM does, you're missing out on its single, most important feature.
 
@@ -41,7 +41,7 @@ To put that in terms that may be more familiar to programmers, the hardest probl
 
 In computer science, you say a function has side effects if, in addition to returning a value, it also modifies some state of the outside world.
 
-To put this more generally, side effects describe the phenomenon in which something that appears to only affect things in a very limited scope, will in actuality affect a much broader range of things, and do so in a way that may not be obvious to the person performing the action.
+To put this more generally, side effects describe the phenomenon in which something that appears to only affect things in a very limited scope, actually affects a much broader range of things, and does so in a way that may not be obvious to the person performing the action.
 
 Because all CSS rules live in the global scope,<sup>[[1]](#footnote-1)</sup> side effects are extremely common. And since your average stylesheet usually consist of an extremely fragile collection of highly-coupled rules, all intimately dependent on the presence, order, and specificity of other rules, even the most unassuming changes can have unforeseen consequences.
 
@@ -49,15 +49,15 @@ In CSS, side effects come in three main forms:
 
 - Base rule changes
 - Naming collisions
-- Subtree matching
+- Subtree matches
 
 ### Base rule changes
 
-Developers *have* to use HTML tags to write HTML, and there are a finite number of tags to choose from.<sup>[[2]](#footnote-2)</sup> While it can be tempting to define a lot of base styles with tag selectors (technically they're called [type selectors](http://www.w3.org/TR/CSS21/selector.html#type-selectors)) in order to avoid having to class everything, doing so necessarily creates an undeclared dependency between those rules and all of your components.
+Developers *have* to use HTML tags to write HTML, and there are a finite number of tags to choose from.<sup>[[2]](#footnote-2)</sup> While it can be tempting to define a lot of base styles using tag selectors (technically they're called [type selectors](http://www.w3.org/TR/CSS21/selector.html#type-selectors)) in order to avoid having to add classes to all your content elements, doing so necessarily creates an undeclared dependency between those rules and all of your components.
 
-When first building a website, this doesn't usually seem like a big deal, in fact it feels natural and DRY. You create some base, foundational styles (margins, font sizes, colors, etc.), so your components don't have to redefine all that stuff later.
+When first building a website, this doesn't usually seem like a big deal, in fact it feels natural and DRY. You create some base, foundational styles (margins, font sizes, colors, etc.), and then your components build on top of them&mdash;so they don't have to rewrite the shared rules.
 
-The problem is this approach only saves you time if you never change your base rules. But in practice, site designs can and do change. You might decide to make the font size of your headings a little larger, or use different default margins on your paragraphs, or maybe you realize you prefer borders instead of underlines for your links. If your `.article-title`, `.alert-content`, and `.footer-link` components depend on these base styles, you'll quickly realize how coupled and fragile your code is.
+The problem is this approach only saves you time if you never change your base rules. But in practice, site designs can and do change. You might decide to make the font size of your headings a little larger, or use different default margins on your paragraphs, or maybe you realize you prefer borders instead of underlines for links. If your `.article-title`, `.alert-content`, and `.footer-link` components depend on those base rules, you'll quickly realize how fragile and coupled your code is.
 
 If your components depend on base styles, then changes to those base styles will require checking your entire site to ensure everything still looks right.
 
@@ -69,7 +69,7 @@ When multiple developers are committing to the same code base, the chances of tw
 
 And this isn't just a problem with top level class names. As I'll show in the next section, picking the same name in a subtree can be just as dangerous, if not more so.
 
-### Subtree matching
+### Subtree matches
 
 Lots of developers are aware of the above two forms of CSS side effects, so you'll often see people use a descendant combinator to limit the scope of the rules they're writing (e.g. `#homepage .header` or `.some-widget .title`).
 
@@ -102,13 +102,13 @@ Given the CSS above, the widget title in this example is going to render with an
 <article class="article">
   <h2 **class="title"**>Article Title</h2>
   <div class="content">
-
-    <p>&hellip;</p>
+    <p>…</p>
 
     <!-- The .widget module -->
-    <div class="widget">
+    <form class="widget">
       <h2 **class="title"**>Widget Title</h2>
-    </div>
+      <fieldset>…</fieldset>
+    </form>
 
   </div>
 </article>
@@ -128,8 +128,8 @@ I said above that all CSS rules are global and every rule has the potential to c
 - **Naming collisions:**<br>
   In BEM, every class selector is either the block name itself or uses the block name as a prefix, and the rules for each block live in their own dedicated file. Since file systems do not allow two files to have the same name, the OS is actually helping to prevent accidental duplication. If you follow all of the BEM naming conventions, and you ensure all block code resides in its own file, you will never have naming collisions.
 
-- **Subtree matching:**<br>
-  The subtree matching example in the previous section used the selectors `.article .title` and `.widget .title`. Since the class name "title" was used in both cases, there was a risk of subtree matching. BEM avoids this risk by requiring that all element classes be prefixed with the block name. The BEM equivalents of these two title selectors would be `.Article-title` and `.Widget-title` (or `.article__title` and `.widget__title`, depending on your preference).<sup>[[4]](#footnote-4)</sup> Since the class names are different, their styles won't ever conflict, and thus it's impossible to have unintended subtree matches.
+- **Subtree matches:**<br>
+  The subtree matching example in the previous section used the selectors `.article .title` and `.widget .title`. Since the class name "title" was used in both cases, there's a risk of subtree matching. BEM avoids this risk by requiring that all element classes be prefixed with the block name. The BEM equivalents of these two title selectors would be `.Article-title` and `.Widget-title` (or `.article__title` and `.widget__title`, depending on your preference).<sup>[[4]](#footnote-4)</sup> Since the class names are different, their styles won't ever conflict, and thus it's impossible to have unintended subtree matches.
 
 ### Enforcing conventions
 
@@ -161,7 +161,7 @@ In the real world there are cases where the strict adherence to BEM conventions 
 
 There are also cases where, for convenience, developers choose to ignore BEM conventions. A common example of this is in the content area of a site. A developer may choose to favor tag selectors over having to put a class on every single `<p>` or `<a>` tag.
 
-By now I hope it's obvious that making exceptions or ignoring BEM conventions will incur risk. And after reading this article it should be apparent exactly what these risks are. You can decide for yourself the level of risk you are willing to take, given your situation.
+By now I hope it's obvious that making exceptions or ignoring BEM conventions will incur risk. And after reading this article it should be apparent exactly what those risks are. You can decide for yourself the level of risk you are willing to take, given your situation.
 
 If your exceptions are limited to just one area of your site (say, the content area), and if you don't have to support older browsers, you could adopt a strategy like this:
 
@@ -171,9 +171,9 @@ If your exceptions are limited to just one area of your site (say, the content a
 .Content a:not([class]) { }
 ```
 
-While I haven't tested this approach in a real-world scenario, I mention it because it's an example of a variation on BEM conventions that doesn't compromise its guarantee of no side-effects. Since all BEM blocks are styled via classes, styling elements that don't have a class is "safe", at least from conflict with the rest of your CSS (obviously if you're using classes for other things, this can still be risky as adding a class to such an element would prevent it from matching the selector).
+While I haven't tested this approach in a real-world scenario, I mention it because it's an example of a variation on BEM conventions that doesn't compromise its guarantee of no side effects. Since all BEM blocks are styled via classes, styling elements that don't have a class is "safe", at least from conflict with the rest of your CSS (obviously if you're using classes for other things, this can still be risky as adding a class to such an element would prevent it from matching the selector).
 
-Another example I encounter frequently is using site-wide state or support classes. [Modernizr](http://modernizr.com/) is a good example. Though not technically within BEM's rules, the following pattern does not increase the risk of side-effects as long as the rest of the rules are followed.
+Another example I encounter frequently is using site-wide state or support classes. [Modernizr](http://modernizr.com/) is a good example. Though not technically within BEM's rules, the following pattern does not increase the risk of side effects as long as the rest of the rules are followed.
 
 ```css
 .GridRow {
@@ -192,7 +192,7 @@ In the bad old days of JavaScript, it was common for library authors to add meth
 
 These days, almost no libraries modify native prototypes. In fact, I've seen some libraries publicly shamed for even trying. If we've learned our lesson in JavaScript, why haven't we learned it in CSS?
 
-The class naming system used by pretty much all the popular CSS frameworks are just as bad if not worse than modifying native prototypes in JavaScript. They litter the global namespace with base styles, they choose class names so common they're almost guaranteed to conflict with your existing code, and they make almost no effort to encapsulate their components.
+The class naming systems used by pretty much every popular CSS framework are just as bad if not worse than modifying native prototypes in JavaScript. They litter the global namespace with base styles, they choose class names so common they're almost guaranteed to conflict with your existing code, and they make almost no effort to encapsulate their components.
 
 Consider Bootstrap. Every single one of its JavaScript plugins uses a namespace and comes with a `.noConflict()` method to avoid naming collisions. Its CSS, on the other hand, makes no such effort despite [numerous](https://github.com/twbs/bootstrap/issues/1235) [requests](https://github.com/twbs/bootstrap/issues/1287) for it, and [easy solutions](/articles/dynamic-selectors/) that people have been suggesting for a long time.
 

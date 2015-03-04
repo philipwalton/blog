@@ -7,8 +7,10 @@
 }
 
 .Share-figure {
+  align-items: center;
+  display: flex;
   font-size: 1.1em;
-  height: 1em;
+  height: 1.5em;
   width: 1.5em;
 }
 

@@ -6,8 +6,6 @@
 
 var cssnext = require('cssnext');
 var fs = require('fs-extra')
-var postcss = require('postcss');
-var url = require("postcss-url")
 
 
 module.exports = function() {
@@ -17,18 +15,18 @@ module.exports = function() {
   function preprocess(source, dest) {
     var css = fs.readFileSync(source, 'utf-8')
 
-    var bundle = postcss()
-        .use(cssnext({
-          compress: true
-        }))
-        .use(url({
-          url: 'inline'
-        }))
-        .process(css, {
-          map: {inline: false},
-          from: '_styles/style.css',
-          to: 'style.css'
-        });
+    var opts = {
+      browsers: '> 1%, last 2 versions, Safari > 5, ie > 9, Firefox ESR',
+      compress: true,
+      from: '_styles/style.css',
+      map: {inline: false},
+      to: 'style.css',
+      url: {
+        url: 'inline'
+      }
+    };
+
+    var bundle = cssnext(css, opts);
 
     // Save to the _site folder.
     fs.outputFileSync(dest, bundle.css);

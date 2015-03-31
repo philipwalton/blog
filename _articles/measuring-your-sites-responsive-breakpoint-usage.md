@@ -254,8 +254,8 @@ If you want to create a custom report showing breakpoint change events, use the 
 
 Alternatively you can query the Google Analytics Core Reporting API to get the same data. The following two reports use the [Query Explorer](https://ga-dev-tools.appspot.com/explorer/) to access the API (these assume your custom dimension has an index of 1):
 
-- [Pageviews (by breakpoint)](https://ga-dev-tools.appspot.com/explorer/?dimensions=ga%253Adimension1&metrics=ga%253Asessions&sort=-ga%253Asessions&start-date=2014-12-01&end-date=2014-12-31)
-- [Breakpoint change events (by breakpoint)](https://ga-dev-tools.appspot.com/explorer/?dimensions=ga%253AeventLabel&metrics=ga%253AtotalEvents&filters=ga%253AeventCategory%253D%253DBreakpoint%252Cga%253AeventAction%253D%253Dchange&start-date=2014-12-01&end-date=2014-12-31)
+- [Pageviews (by breakpoint)](https://ga-dev-tools.appspot.com/query-explorer/?start-date=30daysAgo&end-date=yesterday&metrics=ga%3Asessions&dimensions=ga%3Adimension1&sort=-ga%3Asessions)
+- [Breakpoint change events (by breakpoint)](https://ga-dev-tools.appspot.com/query-explorer/?start-date=30daysAgo&end-date=yesterday&metrics=ga%3AtotalEvents&dimensions=ga%3AeventLabel&filters=ga%3AeventCategory%3D%3DBreakpoint%2Cga%3AeventAction%3D%3Dchange)
 
 ## Wrapping up
 

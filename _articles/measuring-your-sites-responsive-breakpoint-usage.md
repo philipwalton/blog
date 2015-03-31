@@ -252,7 +252,7 @@ To view the custom dimension data you've collected in Google Analytics you'll ne
 
 If you want to create a custom report showing breakpoint change events, use the metric "Total Events", the dimension "Event Label", and add two filters so the "Event Category" is "breakpoint" and the "Event Action" is "change".
 
-Alternatively you can query the Google Analytics Core Reporting API to get the same data. The following two reports use the [Query Explorer](https://ga-dev-tools.appspot.com/explorer/) to access the API (these assume your custom dimension has an index of 1):
+Alternatively you can query the Google Analytics Core Reporting API to get the same data. The following two reports use the [Query Explorer](https://ga-dev-tools.appspot.com/query-explorer/) to access the API (these assume your custom dimension has an index of 1):
 
 - [Pageviews (by breakpoint)](https://ga-dev-tools.appspot.com/query-explorer/?start-date=30daysAgo&end-date=yesterday&metrics=ga%3Asessions&dimensions=ga%3Adimension1&sort=-ga%3Asessions)
 - [Breakpoint change events (by breakpoint)](https://ga-dev-tools.appspot.com/query-explorer/?start-date=30daysAgo&end-date=yesterday&metrics=ga%3AtotalEvents&dimensions=ga%3AeventLabel&filters=ga%3AeventCategory%3D%3DBreakpoint%2Cga%3AeventAction%3D%3Dchange)

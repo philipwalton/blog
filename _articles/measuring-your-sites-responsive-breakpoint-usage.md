@@ -1,14 +1,8 @@
-<!--
-{
-  "layout": "article",
-  "title": "Measuring Your Site's Responsive Breakpoint Usage",
-  "date": "2014-12-22T22:38:36-08:00",
-  "tags": [
-    "JavaScript",
-    "CSS"
-  ]
-}
--->
+---
+template: article.html
+title: "Measuring Your Site's Responsive Breakpoint Usage"
+date: 2014-12-22T22:38:36-08:00
+---
 
 Most web analytics tools will give you a lot of information about your users' devices. These insights can be extremely useful for measuring trends and are particularly important if you have a separate mobile and desktop site or a different design for Android and iOS. But if you've built your site responsively, device information just doesn't tell the whole story.
 
@@ -78,7 +72,7 @@ This is fine for CSS, but from an analytics perspective, a dimension can only ha
 
 At the time of this writing, this site [defines the following breakpoints](https://github.com/philipwalton/blog/blob/03452d29533cbc85fe863b5917f43cf1638a8236/_styles/base/custom-media.css) in CSS:
 
-```text
+```
 sm : (min-width: 420px)
 md : (min-width: 570px)
 lg : (min-width: 800px)

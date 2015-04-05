@@ -1,13 +1,8 @@
-<!--
-{
-  "layout": "article",
-  "title": "Normalizing Cross-browser Flexbox Bugs",
-  "date": "2015-01-01T17:44:38-08:00",
-  "tags": [
-    "CSS"
-  ]
-}
--->
+---
+template: article.html
+title: "Normalizing Cross-browser Flexbox Bugs"
+date: 2015-01-01T17:44:38-08:00
+---
 
 <div class="Callout">
   <p><strong>Update:</strong> as a follow-up to this article, I've created the Github repo [Flexbugs](https://github.com/philipwalton/flexbugs): a community curated list of cross-browser flexbox issues and their known workarounds. The goal is if you're building a website using flexbox, and something isn't working as you'd expect, you can find the solution there.</p>

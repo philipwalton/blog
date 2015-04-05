@@ -1,16 +1,8 @@
-<!--
-{
-  "layout": "article",
-  "title": "Web Components and the Future of Modular CSS",
-  "date": "2014-10-31T22:01:36-07:00",
-  "draft": true,
-  "tags": [
-    "CSS",
-    "HTML",
-    "JavaScript"
-  ]
-}
--->
+---
+template: article.html
+title: "Web Components and the Future of Modular CSS"
+date: 2014-10-31T22:01:36-07:00
+---
 
 <!--
 I. Problems with CSS
@@ -48,7 +40,6 @@ II. Modular CSS today
     2. These systems are not interoperable as the conventions typically only work when *all* the code is following the convention.
       a. Conventions are great for your own code, but they typically fall apart if you're using any third party code.
       b. Conformance
-
 III. How could CSS be better?
   A. Style scoping
   B. Abstracting implementation details

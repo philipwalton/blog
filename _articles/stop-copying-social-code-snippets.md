@@ -1,14 +1,8 @@
-<!--
-{
-  "layout": "article",
-  "title": "Stop Copying Social Code Snippets",
-  "date": "2014-04-20T16:17:32-07:00",
-  "tags": [
-    "JavaScript",
-    "HTML"
-  ]
-}
--->
+---
+template: article.html
+title: "Stop Copying Social Code Snippets"
+date: 2014-04-20T16:17:32-07:00
+---
 
 If you're a web developer, chances are, at some point, you've had to add a social widget to one of your page. Actually, probably more than one. And chances are you didn't want to put too much thought into it, so you just copied some code from the Internet and called it a day. Done and done.
 

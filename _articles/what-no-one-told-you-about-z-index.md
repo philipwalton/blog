@@ -1,13 +1,8 @@
-<!--
-{
-  "layout": "article",
-  "title": "What No One Told You About Z-Index",
-  "date": "2012-12-22T21:17:39-08:00",
-  "tags": [
-    "CSS"
-  ]
-}
--->
+---
+template: article.html
+title: "What No One Told You About Z-Index"
+date: 2012-12-22T21:17:39-08:00
+---
 
 The problem with z-index is that very few people understand how it really works. It's not complicated, but it if you've never taken the time to read its specification, there are almost certainly crucial aspects that you're completely unaware of.
 

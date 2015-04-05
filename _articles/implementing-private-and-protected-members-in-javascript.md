@@ -1,13 +1,8 @@
-<!--
-{
-  "layout": "article",
-  "title": "Implementing Private and Protected Members in JavaScript",
-  "date": "2014-04-09T20:59:27-07:00",
-  "tags": [
-    "JavaScript"
-  ]
-}
--->
+---
+template: article.html
+title: "Implementing Private and Protected Members in JavaScript"
+date: 2014-04-09T20:59:27-07:00
+---
 
 Privacy has been a complicated issue throughout JavaScript's history.
 

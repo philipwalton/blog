@@ -1,15 +1,8 @@
-<!--
-{
-  "layout": "article",
-  "title": "The Future of OOCSS: A Proposal",
-  "date": "2013-01-17T11:02:16-08:00",
-  "tags": [
-    "CSS",
-    "OOCSS",
-    "Preprocessors"
-  ]
-}
--->
+---
+template: article.html
+title: "The Future of OOCSS: A Proposal"
+date: 2013-01-17T11:02:16-08:00
+---
 
 In CSS we often code the same visual components over and over again &mdash; even within the same project. It's embarrassing how many separate times in my career I've coded a two-column layout, or tabbed navigation, or a dropdown menu, or a popup (and the list goes on).
 
@@ -252,7 +245,7 @@ My proposal for native OOCSS introduces two new features: a new kind of simple s
 
 The new simple selector would be called the "abstract class selector". It would be a class name prepended with a percent sign (`%`) similar to Sass's placeholder syntax. The abstract class selector would match any element that inherits or extends from it. The new `@` rule would be used to declare the inheritance. Here is an example:
 
-```text
+```
 %button {
   background-color: gray;
   border: thin solid black;
@@ -273,7 +266,7 @@ Since an abstract class selector would be just another simple selector, it could
 
 All of the following would be valid uses of the abstract class selector:
 
-```text
+```
 %foo { }
 %foo %bar { }
 %baz:first-of-type { }
@@ -323,7 +316,7 @@ All other rules of specificity would apply normally, including the use of `!impo
 
 Abstract class selectors should be able to extend other abstract class selectors as well. This could allow for a very rich component hierarchy:
 
-```text
+```
 @extend %widget < %base-widget;
 @extend .my-widget < %widget;
 ```
@@ -336,7 +329,7 @@ To demonstrate how abstract class selectors could be used in a real project, let
 
 Here is the CSS for the skeleton grid system:
 
-```text
+```
 /* define a clearfix abstract class */
 %clearfix {
   /* clearfix implementation */
@@ -384,7 +377,7 @@ Now that we have our base grid system, we can extend from it to build a basic si
 
 We can easily use our base grid to style the above markup by simply extending a few of the abstract classes.
 
-```text
+```
 @extend .main < %grid-row;
 @extend .menu < %grid-col-1-4;
 @extend .content < %grid-col-1-2;
@@ -403,7 +396,7 @@ We can easily use our base grid to style the above markup by simply extending a 
 
 If we want our grid system to be responsive, we can use a media query to make each cell full width when the screen is smaller than `30em`. Notice that we're only modifying the abstract class selectors in this media query (which the `.menu`, `.content`, and `.promotional` class selectors will automatically inherit).
 
-```text
+```
 @media (max-width: 30em) {
   %grid-row {
     margin-left: 0;

@@ -1,14 +1,9 @@
-<!--
-{
-  "layout": "article",
-  "title": "How to Unit Test Private Functions in JavaScript",
-  "date": "2013-07-08T23:28:18-07:00",
-  "tags": [
-    "JavaScript"
-  ],
-  "excerpt": "JavaScript's closures provide an excellent way to make variables and functions private, keeping them out of the global scope"
-}
--->
+---
+template: article.html
+title: "How to Unit Test Private Functions in JavaScript"
+date: 2013-07-08T23:28:18-07:00
+excerpt: JavaScript's closures provide an excellent way to make variables and functions private, keeping them out of the global scope
+---
 
 <div class="Callout">
   <p><strong>Update:</strong> A lot of readers have commented or tweeted that I shouldn't be unit testing private functions in the first place. Admittedly, this article is a little light on the <em>why</em> and mainly focuses on the <em>how</em>.</p>

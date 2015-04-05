@@ -1,17 +1,9 @@
-<!--
-{
-  "layout": "article",
-  "title": "CSS Architecture",
-  "date": "2012-11-16T18:04:25-08:00",
-  "tags": [
-    "Architecture",
-    "CSS",
-    "OOCSS",
-    "HTML"
-  ],
-  "excerpt": "To many Web developers, being good at CSS means you can take a visual mock-up and replicate it perfectly in code"
-}
--->
+---
+template: article.html
+title: "CSS Architecture"
+date: 2012-11-16T18:04:25-08:00
+excerpt: To many Web developers, being good at CSS means you can take a visual mock-up and replicate it perfectly in code
+---
 
 <p class="Callout">
   This article was originally published on the <a href="http://engineering.appfolio.com/2012/11/16/css-architecture">AppFolio Engineering Technical Blog</a>. It has been reprinted here with permission.

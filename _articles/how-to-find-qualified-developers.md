@@ -1,10 +1,8 @@
-<!--
-{
-  "layout": "article",
-  "title": "How to Find Qualified Developers",
-  "date": "2014-01-20T13:51:26-08:00"
-}
--->
+---
+template: article.html
+title: "How to Find Qualified Developers"
+date: 2014-01-20T13:51:26-08:00
+---
 
 Finding a good developer is hard.
 

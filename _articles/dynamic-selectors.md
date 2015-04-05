@@ -1,15 +1,8 @@
-<!--
-{
-  "layout": "article",
-  "title": "Dynamic Selectors",
-  "date": "2013-02-20T14:22:24-08:00",
-  "tags": [
-    "Architecture",
-    "CSS",
-    "Preprocessors"
-  ]
-}
--->
+---
+template: article.html
+title: "Dynamic Selectors"
+date: 2013-02-20T14:22:24-08:00
+---
 
 When creating a new CSS library or framework, developers typically take one of two approaches with component naming: the [Bootstrap](http://twitter.github.com/bootstrap/) approach or the [jQueryUI](http://jqueryui.com/) approach.
 

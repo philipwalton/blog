@@ -1,14 +1,8 @@
-<!--
-{
-  "layout": "article",
-  "title": "The Dangers of Stopping Event Propagation",
-  "date": "2014-05-20T06:32:55-07:00",
-  "tags": [
-    "JavaScript",
-    "HTML"
-  ]
-}
--->
+---
+template: article.html
+title: "The Dangers of Stopping Event Propagation"
+date: 2014-05-20T06:32:55-07:00
+---
 
 One of the most annoying bugs I've ever had deal with happened at my previous company. In one of our apps there was a "what's new" button in the top left. When you clicked on the button it would display a dropdown of newly added features, and when you clicked anywhere else on the page the dropdown would go away&mdash;except it didn't.
 

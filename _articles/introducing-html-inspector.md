@@ -1,14 +1,8 @@
-<!--
-{
-  "layout": "article",
-  "title": "Introducing HTML Inspector",
-  "date": "2013-06-11T08:22:52-07:00",
-  "tags": [
-    "HTML",
-    "JavaScript"
-  ]
-}
--->
+---
+template: article.html
+title: "Introducing HTML Inspector"
+date: 2013-06-11T08:22:52-07:00
+---
 
 <p class="prelude"><a href="https://github.com/philipwalton/html-inspector">HTML Inspector</a> is a code quality tool to help you and your team write better markup. It's written in JavaScript and runs in the browser, so testing your HTML has never been easier.</p>
 

@@ -1,14 +1,8 @@
-<!--
-{
-  "layout": "article",
-  "title": "CSS: Everything is Global and How to Deal With It",
-  "date": "2013-03-25T20:21:57-07:00",
-  "tags": [
-    "Architecture",
-    "CSS"
-  ]
-}
--->
+---
+template: article.html
+title: "CSS: Everything is Global and How to Deal With It"
+date: 2013-03-25T20:21:57-07:00
+---
 
 Everything in CSS is global. Every line you write has the potential to conflict with every other line. Because of this, CSS is often the hardest part of scaling any Web application or working on a development team.
 

@@ -1,13 +1,8 @@
-<!--
-{
-  "layout": "article",
-  "title": "Side Effects in CSS",
-  "date": "2015-03-03T21:25:06-08:00",
-  "tags": [
-    "CSS"
-  ]
-}
--->
+---
+template: article.html
+title: "Side Effects in CSS"
+date: 2015-03-03T21:25:06-08:00
+---
 
 It feels like every few days I read about some shiny new way people are writing CSS. Many of these "new" ways are not actually new, they're variations on one or more well-known methodologies, but with a few changes sprinkled on top.
 
@@ -79,7 +74,7 @@ Limiting the scope of a selector to a particular DOM subtree *does* guarantee th
 
 Consider the following example:
 
-```
+```css
 /* in article.css */
 .article .title {
   border-bottom: 1px solid;

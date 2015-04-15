@@ -2,6 +2,7 @@
 template: article.html
 title: "Normalizing Cross-browser Flexbox Bugs"
 date: 2015-01-01T17:44:38-08:00
+excerpt: Way back in September of 2013, while testing my Solved by Flexbox project, I discovered a bug in Internet Explorer 10 and 11 that was preventing my sticky footer from actually sticking to the bottom of the page. I spent some time trying to work around the issue, but all my attempts failed.
 ---
 
 <div class="Callout">

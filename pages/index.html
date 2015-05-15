@@ -1,0 +1,26 @@
+---
+template: base.html
+title: "Home"
+---
+
+<h1 class="PageTitle">Recent Articles</h1>
+
+<ul class="ArticleList">
+  {% for article in site.articles %}
+    <li class="ArticleList-item">
+      <a class="ArticlePreview" title="{{ article.title }}">
+        <time class="ArticlePreview-date" datetime="{{ article.date | format('YYYY-MM-DDTHH:mm:ssZ') }}">
+          {{ article.date | format('MMMM D, YYYY') }}
+        </time>
+        <h2 class="ArticlePreview-title">{{ article.title }}</h2>
+        <p class="ArticlePreview-excerpt">
+          {%- if article.excerpt %}
+            {{ article.excerpt | striptags | truncate(200)  }}
+          {% else %}
+            {{ article.content | striptags | truncate(200) }}
+          {% endif %}
+        </p>
+      </a>
+    </li>
+  {% endfor %}
+</ul>

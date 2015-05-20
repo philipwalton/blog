@@ -2,7 +2,7 @@
 {
   "layout": "article",
   "title": "Extending Styles",
-  "date": "2015-05-15T12:36:19-07:00",
+  "date": "2015-05-20T12:34:57-07:00",
   "tags": [
     "CSS"
   ]

@@ -2,7 +2,6 @@
 
 .hljs {
   background: var(--bg-color);
-  line-height: 1.6;
   margin: 0 0 var(--space);
   overflow: auto;
   padding: 1em var(--space);

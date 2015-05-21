@@ -136,7 +136,7 @@ And most preprocessors also support declaring dependencies through `import` or `
 
 What's nice about this approach is it's clear to other developers that `.PromoButton` includes styles from `.Button`, and it's clear to the preprocessor (or build system) that *button.css* needs to be included before *promo-button.css* when the final stylesheet is created.
 
-If you were using the mixes approach above and including two or more classes on a single HTML element, `@extend` can be a very handy way to construct a new component from those parts while simultaneously ensuring the source order is correct. In the following example, all styles will appear in the order they are imported.
+If you were using the mixes approach above and including two or more classes on a single HTML element, `@extend` can be a very handy way to construct a new component from those parts while simultaneously ensuring the source order is correct. In the following example, all styles will appear in the order they are imported.<sup>[[1]](#footnote-1)</sup>
 
 ```scss
 @import './button.css';
@@ -153,7 +153,7 @@ If you were using the mixes approach above and including two or more classes on 
 
 The primary way a future shift to Web Components will affect this discussion is that styling elements will no longer simply be a function of adding classes to elements or selectors to your stylesheets.
 
-With Web Components (specifically Shadow DOM), the only styles that can affect the inner-workings of an element are the styles that the component author has packaged within that element. Likewise, the only way a parent context is allowed to affect the style of an element is if the component author has explicitly OK'd it.<sup>[[1]](#footnote-1)</sup>
+With Web Components (specifically Shadow DOM), the only styles that can affect the inner-workings of an element are the styles that the component author has packaged within that element. Likewise, the only way a parent context is allowed to affect the style of an element is if the component author has explicitly OK'd it.<sup>[[2]](#footnote-2)</sup>
 
 This means that if you use options 1 or 3 now, it will be quite a bit harder to transition your code to use Web Components. Option 1 will never be able to work with third-party components (since they can't predict your HTML structure in advance), and adding a list of classes to a custom element (option 3) will only affect that particular element. It will *not* affect its descendants.
 
@@ -216,6 +216,7 @@ In general, when faced with these decisions it's important to not just think abo
 <aside class="Footnotes">
   <h1 class="Footnotes-title">Footnotes:</h1>
   <ol class="Footnotes-items">
-    <li id="footnote-1">This can be accomplished via the [`:host-context()`](http://dev.w3.org/csswg/css-scoping/#host-selector) selector, though arguably its usage should be mostly avoided for all the reasons listed in this article.</li>
+    <li id="footnote-1">Technically, most preprocessors won't actually guarantee correct source order based on the order of `@import` statements; `@import` simply means *this file must exist in the source before I include myself*. In practice, however, if all your component files `@import` their dependencies in the correct order, the final stylesheet's order will also be correct.</li>
+    <li id="footnote-2">This can be accomplished via the [`:host-context()`](http://dev.w3.org/csswg/css-scoping/#host-selector) selector, though arguably its usage should be mostly avoided for all the reasons listed in this article.</li>
   </ol>
 </aside>

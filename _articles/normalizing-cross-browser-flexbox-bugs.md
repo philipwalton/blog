@@ -10,7 +10,7 @@
 -->
 
 <div class="Callout">
-  <p><strong>Update:</strong> as a follow-up to this article, I've created the Github repo [Flexbugs](https://github.com/philipwalton/flexbugs): a community curated list of cross-browser flexbox issues and their known workarounds. The goals is if you're building a website using flexbox, and something isn't working as you'd expect, you can find the solution there.</p>
+  <p><strong>Update:</strong> as a follow-up to this article, I've created the Github repo [Flexbugs](https://github.com/philipwalton/flexbugs): a community curated list of cross-browser flexbox issues and their known workarounds. The goal is if you're building a website using flexbox, and something isn't working as you'd expect, you can find the solution there.</p>
 </div>
 
 Way back in September of 2013, while testing my [Solved by Flexbox](//philipwalton.github.io/solved-by-flexbox/) project, I discovered a [bug](https://connect.microsoft.com/IE/feedback/details/802625/min-height-and-flexbox-flex-direction-column-dont-work-together-in-ie-10-11-preview) in Internet Explorer 10 and 11 that was preventing my sticky footer from actually *sticking* to the bottom of the page. I spent some time trying to work around the issue, but all my attempts failed.
@@ -173,7 +173,7 @@ I've added comments to the CSS to clarify which parts are workarounds:
 }
 ```
 
-Too see this new solution in action, check out the updated Solved by Flexbox [sticky footer demo](http://philipwalton.github.io/solved-by-flexbox/demos/sticky-footer/).
+To see this new solution in action, check out the updated Solved by Flexbox [sticky footer demo](http://philipwalton.github.io/solved-by-flexbox/demos/sticky-footer/).
 
 <aside class="Footnotes">
   <h1 class="Footnotes-title">Footnotes:</h1>
@@ -184,5 +184,3 @@ Too see this new solution in action, check out the updated Solved by Flexbox [st
     <li id="footnote-4">The [March 2014](http://www.w3.org/TR/2014/WD-css-flexbox-1-20140325/) update to the flexbox spec changed the meaning of the `flex:1` shorthand from `1 1 0px` to `1 1 0%`.</li>
   </ol>
 </aside>
-
-

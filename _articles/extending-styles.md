@@ -107,7 +107,7 @@ And in *button.css*:
 }
 ```
 
-While sometimes a comment like this does the trick, it's definitely not a fool-proof solution.
+While sometimes a comment like the one in *header.css* above does the trick, it's definitely not a fool-proof solution.
 
 Whenever you put more than one class on an element, those classes combine to form the final, rendered state. With modifiers this is not really a problem because the two classes are defined in the same file, so cascade preference can be easily managed by source order.
 

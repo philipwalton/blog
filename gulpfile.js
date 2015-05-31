@@ -30,7 +30,7 @@ import yargs from 'yargs';
 /**
  * The output directory for all the built files.
  */
-const DEST = './build';
+const DEST = 'build';
 
 
 /**
@@ -39,10 +39,24 @@ const DEST = './build';
 const REPO = 'blog';
 
 
+let htmlminOptions = {
+  removeComments: true,
+  collapseWhitespace: true,
+  collapseBooleanAttributes: true,
+  removeAttributeQuotes: true,
+  removeRedundantAttributes: true,
+  useShortDoctype: true,
+  removeEmptyAttributes: true,
+  minifyJS: true,
+  minifyCSS: true
+};
+
+
 let env = nunjucks.configure('templates', {
   autoescape: false,
   watch: false
 });
+
 
 env.addFilter('format', function(str, formatString) {
   return moment(str).format(formatString);
@@ -53,7 +67,6 @@ env.addFilter('format', function(str, formatString) {
 env.addFilter('striptags', function(str) {
   return str.replace(/(<([^>]+)>)/ig, '');
 });
-
 
 
 /**
@@ -98,9 +111,12 @@ function getDestPathFromPermalink(permalink) {
 }
 
 
-function extractFrontMatter(options) {
+function renderContent() {
   let files = [];
-  let site = assign({articles: []}, options);
+
+  let baseData = require('./_config.json');
+  let overrides = {env: isProd() ? 'production' : 'development'};
+  let site = assign(baseData, overrides, {articles: []});
 
   let md = new MarkdownIt({
     html: true,
@@ -146,34 +162,6 @@ function extractFrontMatter(options) {
       done();
     }
   )
-}
-
-
-function renderMarkdown() {
-  let md = new MarkdownIt({
-    html: true,
-    typographer: true,
-    highlight: function(code, lang) {
-      // Unescape to avoid double escaping.
-      // code = he.unescape(code);
-      return lang ? hljs.highlight(lang, code).value : '';
-    }
-  });
-  return through.obj(function (file, enc, cb) {
-    try {
-      if (path.extname(file.path) == '.md') {
-        file.data.page.contents = file.contents;
-        file.contents = new Buffer(md.render(file.contents.toString()));
-      }
-      this.push(file);
-    }
-    catch (err) {
-      this.emit('error', new gutil.PluginError('renderMarkdown', err, {
-        fileName: file.path
-      }));
-    }
-    cb();
-  });
 }
 
 
@@ -229,34 +217,18 @@ function createPartials() {
 }
 
 
+gulp.task('images', function() {
+  return gulp.src(['./assets/images/*'], {base: process.cwd()})
+      .pipe(gulp.dest(DEST));
+});
+
+
 gulp.task('pages', function() {
-
-  let baseData = require('./_config.json');
-  let overrides = {
-    baseUrl: isProd()  ? '/' + REPO + '/' : '/',
-    env: isProd() ? 'prod' : 'dev',
-    buildTime: Date.now()
-  };
-  let siteData = assign(baseData, overrides);
-
-  // return gulp.src(['*.html', './demos/**/*'], {base: process.cwd()})
   return gulp.src(['./articles/*', './pages/*'], {base: process.cwd()})
       .pipe(plumber({errorHandler: streamError}))
-      .pipe(extractFrontMatter(siteData))
-      // .pipe(renderMarkdown())
+      .pipe(renderContent())
       .pipe(renderTemplate())
-
-      // .pipe(htmlmin({
-      //   removeComments: true,
-      //   collapseWhitespace: true,
-      //   collapseBooleanAttributes: true,
-      //   removeAttributeQuotes: true,
-      //   removeRedundantAttributes: true,
-      //   useShortDoctype: true,
-      //   removeEmptyAttributes: true,
-      //   minifyJS: true,
-      //   minifyCSS: true
-      // }))
+      .pipe(gulpIf(isProd(), htmlmin(htmlminOptions)))
       .pipe(createPartials())
       .pipe(gulp.dest(DEST));
 });
@@ -265,10 +237,10 @@ gulp.task('pages', function() {
 gulp.task('css', function() {
   let opts = {
     browsers: '> 1%, last 2 versions, Safari > 5, ie > 9, Firefox ESR',
-    compress: true,
+    compress: isProd(),
     url: {url: 'inline'}
   }
-  return gulp.src('./_styles/style.css')
+  return gulp.src('./assets/css/main.css', {base: process.cwd()})
       .pipe(plumber({errorHandler: streamError}))
       .pipe(cssnext(opts))
       .pipe(gulp.dest(DEST));
@@ -276,15 +248,13 @@ gulp.task('css', function() {
 
 
 gulp.task('javascript', function() {
-  let opts = {
-    debug: true,
-    detectGlobals: false
-  };
-  return browserify('./_scripts/main.js', opts)
+  let entry = './assets/javascript/main.js';
+  let opts = {debug: true,detectGlobals: false};
+  return browserify(entry, opts)
       .transform(babelify)
       .bundle()
       .on('error', streamError)
-      .pipe(source('main.js'))
+      .pipe(source(entry))
       .pipe(buffer())
       .pipe(sourcemaps.init({loadMaps: true}))
       .pipe(gulpIf(isProd(), uglify()))
@@ -298,7 +268,7 @@ gulp.task('clean', function(done) {
 });
 
 
-gulp.task('default', ['css', 'javascript', 'pages']);
+gulp.task('default', ['css', 'javascript', 'images', 'pages']);
 
 
 gulp.task('serve', ['default'], function() {
@@ -314,18 +284,22 @@ gulp.task('serve', ['default'], function() {
 
 gulp.task('release', ['default'], function() {
 
+  if (!isProd()) {
+    throw new Error('The release task must be run in production mode.');
+  }
+
   // Create a tempory directory and
   // checkout the existing gh-pages branch.
-  shell.rm('-rf', '_tmp');
-  shell.mkdir('_tmp');
-  shell.cd('_tmp');
+  shell.rm('-rf', './_tmp');
+  shell.mkdir('./_tmp');
+  shell.cd('./_tmp');
   shell.exec('git init');
   shell.exec(`git remote add origin git@github.com:philipwalton/${REPO}.git`);
   shell.exec('git pull origin gh-pages');
 
   // Delete all the existing files and add
   // the new ones from the build directory.
-  shell.rm('-rf', './*');
+  shell.rm('-rf', '*');
   shell.cp('-rf', path.join('..', DEST, '/'), './');
   shell.exec('git add -A');
 
@@ -337,7 +311,7 @@ gulp.task('release', ['default'], function() {
 
   // Clean up.
   shell.cd('..');
-  shell.rm('-rf', '_tmp');
+  shell.rm('-rf', './_tmp');
   shell.rm('-rf', DEST);
 
 });

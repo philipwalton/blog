@@ -85,6 +85,8 @@ function isLinkOutbound(link) {
 module.exports = {
   track: function() {
 
+    ga('set', 'transport', 'beacon');
+
     trackBreakpoints();
     trackOutboundLinks();
     trackSocialInteractions();

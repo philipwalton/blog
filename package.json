@@ -1,5 +1,6 @@
 {
   "name": "blog",
+  "description": "The source code for philipwalton.com",
   "repository": {
     "type": "git",
     "url": "git://github.com/philipwalton/blog.git"

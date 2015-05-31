@@ -70,6 +70,27 @@ function streamError(err) {
 }
 
 
+function getPermalink(filepath) {
+  let extname = path.extname(filepath);
+  let dirname = path.dirname(filepath);
+  let basename = path.basename(filepath, extname)
+      .replace(/\d{4}-\d{2}-\d{2}-/, '');
+
+  if (basename != 'index' &&
+      basename != 'atom' &&
+      basename != '404') {
+
+    dirname += '/' + basename;
+    basename = 'index';
+    extname = '.html';
+
+    filepath = path.join(dirname, basename + extname);
+  }
+
+  return filepath.replace('pages/', '');
+}
+
+
 function extractFrontMatter(options) {
   let files = [];
   let site = assign({articles: []}, options);
@@ -91,11 +112,12 @@ function extractFrontMatter(options) {
 
       if (yaml.attributes) {
         let slug = path.basename(file.path, path.extname(file.path));
+        let permalink = getPermalink(file.path);
 
         contents = yaml.body;
         file.data = {
           site: site,
-          page: assign({slug: slug}, yaml.attributes)
+          page: assign({slug, permalink}, yaml.attributes)
         };
       }
 
@@ -158,6 +180,7 @@ function renderTemplate() {
       // Then render the page in its template.
       let template = file.data.page.template;
       file.contents = new Buffer(nunjucks.render(template, file.data));
+      file.path = file.data.page.permalink;
 
       this.push(file);
     }
@@ -166,6 +189,33 @@ function renderTemplate() {
         fileName: file.path
       }));
     }
+    cb();
+  });
+}
+
+
+function createPartials() {
+  return through.obj(function (file, enc, cb) {
+    try {
+      if (path.extname(file.path) == '.html') {
+        let partial = file.clone();
+        let content = partial.contents.toString()
+            .replace(/^[\s\S]*<main[^>]*>([\s\S]*)<\/main>[\s\S]*$/, '$1');
+
+        partial.contents = new Buffer(content);
+        partial.path = path.join(
+            path.dirname(file.path), '_' + path.basename(file.path));
+
+        this.push(partial);
+      }
+    }
+    catch (err) {
+      this.emit('error', new gutil.PluginError('renderTemplate', err, {
+        fileName: file.path
+      }));
+    }
+
+    this.push(file);
     cb();
   });
 }
@@ -187,17 +237,7 @@ gulp.task('pages', function() {
       .pipe(extractFrontMatter(siteData))
       // .pipe(renderMarkdown())
       .pipe(renderTemplate())
-      .pipe(rename(function(path) {
-        if (path.basename != 'index' &&
-            path.basename != 'atom' &&
-            path.basename != '404') {
-          // Remove date prefixes from filenames.
-          path.basename = path.basename.replace(/\d{4}-\d{2}-\d{2}-/, '');
-          path.dirname += '/' + path.basename;
-          path.basename = 'index';
-          path.extname = '.html';
-        }
-      }))
+
       // .pipe(htmlmin({
       //   removeComments: true,
       //   collapseWhitespace: true,
@@ -209,6 +249,7 @@ gulp.task('pages', function() {
       //   minifyJS: true,
       //   minifyCSS: true
       // }))
+      .pipe(createPartials())
       .pipe(gulp.dest(DEST));
 });
 

@@ -8,7 +8,7 @@ title: "Home"
 <ul class="ArticleList">
   {% for article in site.articles %}
     <li class="ArticleList-item">
-      <a class="ArticlePreview" title="{{ article.title }}">
+      <a href="{{ article.permalink }}" class="ArticlePreview" title="{{ article.title }}">
         <time class="ArticlePreview-date" datetime="{{ article.date | format('YYYY-MM-DDTHH:mm:ssZ') }}">
           {{ article.date | format('MMMM D, YYYY') }}
         </time>

@@ -87,7 +87,14 @@ function getPermalink(filepath) {
     filepath = path.join(dirname, basename + extname);
   }
 
-  return filepath.replace('pages/', '');
+  return path.join('/', path.relative('.', filepath))
+      .replace(/^\/pages\//, '/')
+      .replace(/index\.html$/, '');
+}
+
+function getDestPathFromPermalink(permalink) {
+  // Add index.html if necessary and remove leading slash.
+  return path.resolve(permalink.replace(/\/$/, '/index.html').slice(1));
 }
 
 
@@ -125,7 +132,7 @@ function extractFrontMatter(options) {
         file.data.page.contents = contents = md.render(contents);
       }
 
-      if (file.path.indexOf('articles') > -1) {
+      if (path.relative('.', file.path).startsWith('articles')) {
         site.articles.unshift(file.data.page);
       }
 
@@ -180,7 +187,8 @@ function renderTemplate() {
       // Then render the page in its template.
       let template = file.data.page.template;
       file.contents = new Buffer(nunjucks.render(template, file.data));
-      file.path = file.data.page.permalink;
+
+      file.path = getDestPathFromPermalink(file.data.page.permalink);
 
       this.push(file);
     }
@@ -300,7 +308,7 @@ gulp.task('serve', ['default'], function() {
   gulp.watch('./assets/css/**/*.css', ['css']);
   gulp.watch('./assets/images/*', ['images']);
   gulp.watch('./assets/javascript/*', ['javascript']);
-  gulp.watch(['*.html', './demos/*', './templates/*'], ['pages']);
+  gulp.watch(['./pages/*', './articles/*', './templates/*'], ['pages']);
 });
 
 

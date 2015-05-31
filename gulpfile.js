@@ -13,7 +13,7 @@ import he from 'he';
 import hljs from 'highlight.js';
 import htmlmin from 'gulp-htmlmin';
 import MarkdownIt from 'markdown-it';
-import moment from 'moment';
+import moment from 'moment-timezone';
 import nunjucks from 'nunjucks';
 import path from 'path';
 import plumber from 'gulp-plumber';
@@ -39,6 +39,15 @@ const DEST = 'build';
 const REPO = 'blog';
 
 
+let siteData = {
+  title: 'Philip Walton',
+  description: 'Thoughts on web development' +
+      'open source, software architecture, and the future.',
+  baseURL: 'http://philipwalton.com',
+  timezone: 'America/Los_Angeles'
+}
+
+
 let htmlminOptions = {
   removeComments: true,
   collapseWhitespace: true,
@@ -59,7 +68,7 @@ let env = nunjucks.configure('templates', {
 
 
 env.addFilter('format', function(str, formatString) {
-  return moment(str).format(formatString);
+  return moment.tz(str, siteData.timezone).format(formatString);
 });
 
 // Necessary until this exists:
@@ -114,9 +123,8 @@ function getDestPathFromPermalink(permalink) {
 function renderContent() {
   let files = [];
 
-  let baseData = require('./_config.json');
   let overrides = {env: isProd() ? 'production' : 'development'};
-  let site = assign(baseData, overrides, {articles: []});
+  let site = assign(siteData, overrides, {articles: []});
 
   let md = new MarkdownIt({
     html: true,

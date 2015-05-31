@@ -9,8 +9,10 @@
     "url": "http://philipwalton.com"
   },
   "scripts": {
-    "build": "NODE_ENV=production gulp --require babel/register",
-    "start": "NODE_ENV=production gulp --require babel/register serve"
+    "build": "gulp --require babel/register",
+    "start": "gulp --require babel/register serve",
+    "clean": "gulp --require babel/register clean",
+    "release": "gulp --require babel/register release"
   },
   "license": "MIT",
   "bugs": {

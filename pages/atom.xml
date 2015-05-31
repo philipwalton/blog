@@ -5,8 +5,8 @@ template: atom.xml
 {%- for article in site.articles %}
   <entry>
     <title>{{ article.title }}</title>
-    <link href="http://philipwalton.com/articles/{{ article.slug }}"/>
+    <link href="{{ site.baseUrl }}{{ article.permalink }}"/>
     <updated>{{ article.date | format('YYYY-MM-DDTHH:mm:ssZ') }}</updated>
-    <id>http://philipwalton.com/articles/{{ article.slug }}</id>
+    <id>{{ site.baseUrl }}{{ article.permalink }}</id>
   </entry>
 {% endfor -%}

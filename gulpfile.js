@@ -43,9 +43,10 @@ let siteData = {
   title: 'Philip Walton',
   description: 'Thoughts on web development' +
       'open source, software architecture, and the future.',
-  baseURL: 'http://philipwalton.com',
-  timezone: 'America/Los_Angeles'
-}
+  baseUrl: 'http://philipwalton.com',
+  timezone: 'America/Los_Angeles',
+  buildTime: new Date(),
+};
 
 
 let htmlminOptions = {
@@ -142,13 +143,10 @@ function renderContent() {
       let yaml = frontMatter(contents);
 
       if (yaml.attributes) {
-        let slug = path.basename(file.path, path.extname(file.path));
-        let permalink = getPermalink(file.path);
-
         contents = yaml.body;
         file.data = {
           site: site,
-          page: assign({slug, permalink}, yaml.attributes)
+          page: assign({permalink: getPermalink(file.path)}, yaml.attributes)
         };
       }
 

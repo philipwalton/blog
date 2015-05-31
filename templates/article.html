@@ -25,9 +25,16 @@
       </span>
       <p class="Share-pitch">
         If you liked this article and think others should read it, please
+
+        {% set shareParams = {
+           text: page.title,
+           url: 'http://philipwalton.com' + page.permalink,
+           via: 'philwalton' } | urlencode%}
+
         <a data-social-network="Twitter"
            data-social-action="tweet"
-           href="{{ page.twitterShareLink }}">share it on Twitter</a>.
+           href="http://twitter.com/intent/tweet?{{ shareParams }}">
+           share it on Twitter</a>.
       </p>
     </div>
   </footer>

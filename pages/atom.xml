@@ -1,0 +1,12 @@
+---
+template: atom.xml
+---
+
+{%- for article in site.articles %}
+  <entry>
+    <title>{{ article.title }}</title>
+    <link href="{{ site.baseUrl }}{{ article.permalink }}"/>
+    <updated>{{ article.date | format('YYYY-MM-DDTHH:mm:ssZ') }}</updated>
+    <id>{{ site.baseUrl }}{{ article.permalink }}</id>
+  </entry>
+{% endfor -%}

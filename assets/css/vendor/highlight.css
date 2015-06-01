@@ -1,0 +1,17 @@
+@import "highlight.js/styles/github";
+
+pre {
+  background: var(--bg-color);
+  margin: 0 0 var(--space);
+  overflow: auto;
+  padding: 1em var(--space);
+  -webkit-text-size-adjust: none;
+  white-space: pre;
+}
+
+/* Allow for highlighting specific parts of a code block. */
+pre em {
+  background-color: #ff9;
+  box-shadow: 0 0 0 .2em #ff9;
+  font-style: normal;
+}

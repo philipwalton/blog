@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  {% include '_head.html' %}
+</head>
+<body class="Site">
+
+  <div class="Site-header">
+    <header class="Header">
+      <a class="Header-info" href="/" title="Home">
+        <h1 class="Header-title">Philip Walton</h1>
+        <p class="Header-tagline">Engineer at Google</p>
+      </a>
+      <a class="Header-photo" href="/" title="Home"></a>
+      <div class="Header-social">
+        {% include '_social-nav.html' %}
+      </div>
+      <div class="Header-nav">
+        {% include '_main-nav.html' %}
+      </div>
+    </header>
+  </div>
+
+  <div class="Site-contentContainer">
+    <main class="Site-content">
+      {% block content %}
+        {{ page.content }}
+      {% endblock %}
+    </main>
+  </div>
+
+  {% include '_foot-scripts.html' %}
+
+</body>
+</html>

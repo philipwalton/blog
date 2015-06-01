@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<article role="article" class="hentry" id="content">
+
+  <header class="ContentHeader">
+    <h1 class="ContentHeader-title">{{ page.title }}</h1>
+  </header>
+
+  {{ super() }}
+
+</article>
+
+{% endblock %}

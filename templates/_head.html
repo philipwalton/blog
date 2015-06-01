@@ -1,0 +1,23 @@
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+<title>
+  {% if page.title %}
+    {{ page.title }} &mdash;
+  {% endif %}
+  {{ site.title }}
+</title>
+
+<!--[if lt IE 9]><script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.2/html5shiv.min.js"></script><![endif]-->
+
+<link href="//fonts.googleapis.com/css?family=Open+Sans:700,400|Noto+Serif:400italic,400" rel="stylesheet">
+
+{% include '_head-scripts.html' %}
+
+<link href="/assets/css/main.css" rel="stylesheet">
+<link href="//feeds.feedburner.com/philipwalton" rel="alternate" title="{{site.title}}" type="application/atom+xml">
+
+<meta name="description" content="{% if post.excerpt %}{{ post.excerpt }}{% else %}{{ site.description }}{% endif %}">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+{% include '_icons.html' %}

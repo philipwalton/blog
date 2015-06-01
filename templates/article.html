@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<article role="article" class="hentry">
+
+  <header class="ContentHeader">
+    <h1 class="ContentHeader-title entry-title">{{ page.title }}</h1>
+    <time class="ContentHeader-date published"
+        datetime="{{ page.date | format('YYYY-MM-DDTHH:mm:ssZ') }}">
+      {{ page.date | format('MMMM D, YYYY') }}
+    </time>
+  </header>
+
+  <div class="entry-content">
+    {{ super() }}
+  </div>
+
+  <footer class="entry-unrelated">
+    <div class="Share">
+      <span class="Share-figure">
+        <svg viewBox="0 0 39 32">
+          <use xlink:href="#icon-twitter-bird"></use>
+        </svg>
+      </span>
+      <p class="Share-pitch">
+        If you liked this article and think others should read it, please
+
+        {% set shareParams = {
+           text: page.title,
+           url: 'http://philipwalton.com' + page.permalink,
+           via: 'philwalton' } | urlencode%}
+
+        <a data-social-network="Twitter"
+           data-social-action="tweet"
+           href="http://twitter.com/intent/tweet?{{ shareParams }}">
+           share it on Twitter</a>.
+      </p>
+    </div>
+  </footer>
+
+</article>
+
+{% endblock %}

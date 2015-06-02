@@ -41,7 +41,7 @@ const REPO = 'blog';
 
 let siteData = {
   title: 'Philip Walton',
-  description: 'Thoughts on web development' +
+  description: 'Thoughts on web development, ' +
       'open source, software architecture, and the future.',
   baseUrl: 'http://philipwalton.com',
   timezone: 'America/Los_Angeles',

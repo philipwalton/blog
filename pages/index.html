@@ -15,9 +15,9 @@ title: "Home"
         <h2 class="ArticlePreview-title">{{ article.title }}</h2>
         <p class="ArticlePreview-excerpt">
           {%- if article.excerpt %}
-            {{ article.excerpt | striptags | truncate(200)  }}
+            {{ article.excerpt | striptags | truncate(200, false, '…') }}
           {% else %}
-            {{ article.content | striptags | truncate(200) }}
+            {{ article.content | striptags | truncate(200, false, '…') }}
           {% endif %}
         </p>
       </a>

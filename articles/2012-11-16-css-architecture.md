@@ -5,11 +5,11 @@ date: 2012-11-16T18:04:25-08:00
 excerpt: To many Web developers, being good at CSS means you can take a visual mock-up and replicate it perfectly in code. You don't use tables, and you pride yourself on using as few images as possible. If you're really good, you use the latest and greatest techniques like media queries, transitions and transforms. While all this is certainly true of good CSS developers, there's an entirely separate side to CSS that rarely gets mentioned when assessing one's skill.
 ---
 
-<p class="Callout">
+<div class="Callout">
 
 This article was originally published on the [AppFolio Engineering Technical Blog](http://engineering.appfolio.com/2012/11/16/css-architecture). It has been reprinted here with permission.
 
-</p>
+</div>
 
 To many Web developers, being good at CSS means you can take a visual mock-up and replicate it perfectly in code. You don't use tables, and you pride yourself on using as few images as possible. If you're really good, you use the latest and greatest techniques like media queries, transitions and transforms. While all this is certainly true of good CSS developers, there's an entirely separate side to CSS that rarely gets mentioned when assessing one's skill.
 

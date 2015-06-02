@@ -162,7 +162,7 @@ While this may seem harmless at first, it often leads to copying and pasting fro
 
 All of the above bad practices share one similarity, they place far too much of the styling burden on the CSS.
 
-That may seem like strange statement. After all, it is a stylesheet; shouldn't it bear most (if not all) of the styling burden? Isn't that what we want?
+That may seem like a strange statement. After all, it is a stylesheet; shouldn't it bear most (if not all) of the styling burden? Isn't that what we want?
 
 The simple answer to this question is "yes", but, as usual, things aren't always so simple. Separating content from presentation is a good thing, but just because your CSS is separate from your HTML doesn't mean your content is separate from your presentation. Put another way, striping all presentational code from your HTML doesn't fulfill the goal if your CSS requires an intimate knowledge of your HTML structure in order to work.
 

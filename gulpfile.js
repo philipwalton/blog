@@ -223,14 +223,18 @@ function createPartials() {
 }
 
 
+gulp.task('static', function() {
+  return gulp.src(['./static/*'], {dot: true}).pipe(gulp.dest(DEST));
+});
+
+
 gulp.task('images', function() {
-  return gulp.src(['./assets/images/*'], {base: process.cwd()})
-      .pipe(gulp.dest(DEST));
+  return gulp.src(['./assets/images/*'], {base: '.'}).pipe(gulp.dest(DEST));
 });
 
 
 gulp.task('pages', function() {
-  return gulp.src(['./articles/*', './pages/*'], {base: process.cwd()})
+  return gulp.src(['./articles/*', './pages/*'], {base: '.'})
       .pipe(plumber({errorHandler: streamError}))
       .pipe(renderContent())
       .pipe(renderTemplate())
@@ -246,7 +250,7 @@ gulp.task('css', function() {
     compress: isProd(),
     url: {url: 'inline'}
   }
-  return gulp.src('./assets/css/main.css', {base: process.cwd()})
+  return gulp.src('./assets/css/main.css', {base: '.'})
       .pipe(plumber({errorHandler: streamError}))
       .pipe(cssnext(opts))
       .pipe(gulp.dest(DEST));
@@ -274,7 +278,7 @@ gulp.task('clean', function(done) {
 });
 
 
-gulp.task('default', ['css', 'javascript', 'images', 'pages']);
+gulp.task('default', ['css', 'javascript', 'images', 'pages', 'static']);
 
 
 gulp.task('serve', ['default'], function() {

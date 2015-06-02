@@ -70,7 +70,7 @@ body.homepage .widget {
 
 At first this might seem like fairly harmless code, but let's examine it based on the goals established above.
 
-First, the widget in the examle is not predictable. A developer who's made several of these widgets will expect it to look a certain way, yet when she uses it in the sidebar or on the homepage, it will look different, despite the markup being exactly the same.
+First, the widget in the example is not predictable. A developer who's made several of these widgets will expect it to look a certain way, yet when she uses it in the sidebar or on the homepage, it will look different, despite the markup being exactly the same.
 
 It's also not very reusable or scalable. What happens when the way it looks on the homepage is requested on some other page? New rules will have to be added.
 
@@ -100,7 +100,7 @@ If this HTML were never going to change, an argument could be made for its merit
 
 These examples above are not reusable at all. Since the selector is pointing to a very particular place in the markup, how could another component with a different HTML structure reuse those styles? Taking the first selector (the dropdown) as an example, what if a similar looking dropdown were needed on a different page and it wasn't inside of the `#main-nav` element? You'd have to recreate the entire style.
 
-These selectors are also very unpredictable if the HTML needs to change. Imagine that a devloper wanted to change the `<div>` in the third example to the HTML5 `<section>` tag, the whole rule would break.
+These selectors are also very unpredictable if the HTML needs to change. Imagine that a developer wanted to change the `<div>` in the third example to the HTML5 `<section>` tag, the whole rule would break.
 
 Finally, since these selectors only work when the HTML remains constant, they're by definition not maintainable or scalable.
 

@@ -11,7 +11,7 @@ import gulpIf from 'gulp-if';
 import gutil from 'gulp-util';
 import he from 'he';
 import hljs from 'highlight.js';
-import htmlmin from 'gulp-htmlmin';
+import htmlMinifier from 'html-minifier';
 import MarkdownIt from 'markdown-it';
 import moment from 'moment-timezone';
 import nunjucks from 'nunjucks';
@@ -46,19 +46,6 @@ let siteData = {
   baseUrl: 'http://philipwalton.com',
   timezone: 'America/Los_Angeles',
   buildTime: new Date(),
-};
-
-
-let htmlminOptions = {
-  removeComments: true,
-  collapseWhitespace: true,
-  collapseBooleanAttributes: true,
-  removeAttributeQuotes: true,
-  removeRedundantAttributes: true,
-  useShortDoctype: true,
-  removeEmptyAttributes: true,
-  minifyJS: true,
-  minifyCSS: true
 };
 
 
@@ -196,6 +183,40 @@ function renderTemplate() {
 }
 
 
+function minifyHtml() {
+  let opts = {
+    removeComments: true,
+    collapseWhitespace: true,
+    collapseBooleanAttributes: true,
+    removeAttributeQuotes: true,
+    removeRedundantAttributes: true,
+    useShortDoctype: true,
+    removeEmptyAttributes: true,
+    minifyJS: true,
+    minifyCSS: true
+  };
+  return through.obj(function (file, enc, cb) {
+    try {
+      if (path.extname(file.path) == '.html') {
+        let content = file.contents.toString()
+        let minifiedContent = htmlMinifier.minify(content, opts);
+
+        file.contents = new Buffer(minifiedContent);
+        this.push(file);
+      }
+    }
+    catch (err) {
+      this.emit('error', new gutil.PluginError('minifyHtml', err, {
+        fileName: file.path
+      }));
+    }
+
+    this.push(file);
+    cb();
+  });
+}
+
+
 function createPartials() {
   return through.obj(function (file, enc, cb) {
     try {
@@ -238,7 +259,7 @@ gulp.task('pages', function() {
       .pipe(plumber({errorHandler: streamError}))
       .pipe(renderContent())
       .pipe(renderTemplate())
-      .pipe(gulpIf(isProd(), htmlmin(htmlminOptions)))
+      .pipe(gulpIf(isProd(), minifyHtml()))
       .pipe(createPartials())
       .pipe(gulp.dest(DEST));
 });

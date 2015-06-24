@@ -109,9 +109,8 @@ module.exports = {
 
     linkClicked(function(event) {
 
-      // Don't attempt to AJAX in content if the link was click
-      // while the command (meta) or control key was pressed.
-      if (event.metaKey || event.ctrlKey) return;
+      // Don't attempt to AJAX in content if the link was clicked to open a new tab.
+      if (event.metaKey || event.ctrlKey || event.which == 2) return;
 
       var page = parseUrl(location.href);
       var link = parseUrl(this.href);

@@ -10,10 +10,10 @@
     "url": "http://philipwalton.com"
   },
   "scripts": {
-    "build": "gulp --require babel/register",
-    "start": "gulp --require babel/register serve",
-    "clean": "gulp --require babel/register clean",
-    "release": "gulp --require babel/register release"
+    "build": "gulp",
+    "start": "gulp serve",
+    "clean": "gulp clean",
+    "release": "gulp release"
   },
   "license": "MIT",
   "bugs": {
@@ -27,7 +27,7 @@
     "cssnext": "^1.1.0",
     "del": "^1.1.1",
     "front-matter": "^0.2.1",
-    "gulp": "^3.8.11",
+    "gulp": "^3.9.0",
     "gulp-cssnext": "^1.0.0",
     "gulp-if": "^1.2.5",
     "gulp-plumber": "^0.6.6",

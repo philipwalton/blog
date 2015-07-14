@@ -23,15 +23,17 @@ If my experience is any indication, then what you know is not always as importan
 
 Too many people who write CSS and JavaScript tinker until they find something that works, then they just move on. This sometimes gets the job done, but it doesn't increase your knowledge or improve your craft.
 
-In CSS you see this a lot with the excessive use of floats. Floating an element will stop its margins from collapsing and it will clearfix its floated children. If you don't understand how these things works, but you discover that adding `float: left` fixes your immediate problem. It's probably tempting to just leave it and move on.
+I know this happens because I see it all the time when doing code reviews.
 
-In JavaScript you see this with the excessive use of function binding, or adding a `setTimeout` call for no reason other than that, without it, your code doesn't work.
+I'll frequently ask someone: "Why did you add `float: left` here?" or "is this `position: relative` really necessary?", and they'll respond: "I don't know, but if I remove it, it doesn't work".
 
-Taking the time to understand *why* your hack works may take more time at the moment, but I can promise you it'll save you time later in your career. Having a fuller understanding of the systems your working within will mean less guess-and-check work in the future.
+The same is true of JavaScript. I'll see a `setTimeout` that seems to serve no purpose, or someone using the `=>` function syntax because they're sick of dealing with bugs from `this` not being what they expect.
+
+Taking the time to understand *why* your hack works may take more time at this particular the moment, but I can promise you it'll save you far more time later. Having a fuller understanding of the systems your working within will mean less guess-and-check work in the future.
 
 ## Learn to anticipate future changes to the platform
 
-The main difference between front-end and back-end code is back-end code generally runs on a platform that is completely under your control. The front-end, by contrast, is completely outside of your control. The user's platform or device could completely change at any moment, and your code needs to be able to handle it gracefully.
+The main difference between front-end and back-end code is back-end code generally runs on a platform that is completely under your control. The front end, by contrast, is completely outside of your control. The user's platform or device could completely change at any moment, and your code needs to be able to handle it gracefully.
 
 I remember reading the source code of a popular JavaScript library in 2011 and seeing the following (changed for simplicity):
 

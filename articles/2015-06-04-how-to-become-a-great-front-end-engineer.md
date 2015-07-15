@@ -9,41 +9,41 @@ I recently received an email from a reader of my blog that, for whatever reason,
 > Hi Philip, is it okay to ask how you become a great front-end engineer?<br>
 > Any advice?
 
-First of all, I was surprised to even be asked this question since I've never really thought of myself as a "great" front-end engineer. In fact, the first four jobs I had in this industry I was completely unqualified for. I only got them because the people interviewing me didn't know better, and I was good at pretending.
+First of all, I was surprised to even be asked this question since I've never really thought of myself as a "great" front-end engineer. In fact, the first few years I worked in this industry, I honestly don't think I was qualified for any of the jobs I had. I was only able to get them because the people interviewing me didn't know what to ask, and I didn't realize just how little I knew.
 
-That being said, I ended up doing very well in each of these roles and became a valued member of the team. By the time I eventually left (for the next challenge I was also unqualified for) and was tasked with helping to hire my replacement, I would reflect with slight amusement at the ironic fact that I probably wouldn't have hired my former self. I don't think I would have been able to pass the interviews I was giving.
+That being said, I ended up doing very well in each of these roles and became a valued member of the team. By the time I eventually left (for the next challenge I was also not qualified for) and was tasked with helping to hire my replacement, I would reflect with slight amusement at the ironic fact that I probably wouldn't have hired my former self. I don't think I would have been able to pass the interviews I was giving.
 
-As I started thinking about this question more and more, I began to realize how lucky I've been. Much of my success is a result of being thrust into situations I had no business being in&mdash;yet still expected to perform. But I don't think it's entirely about being stretched or working hard. Over time I've learned some very important lessons that I'd like to share. Some of these are specific to front-end development, and some are just generally good practices.
+As I started thinking about this question more and more, I began to realize how lucky I've been. Much of my success has been a result of getting thrust into situations I had no business being in&mdash;yet still expected to perform. But I don't think it's entirely about being stretched or working hard. Over time I've learned some very important lessons that I'd like to share. Some of these are specific to front-end development; some are just generally good practices.
 
-I've read a lot of posts over the years discussing what makes a good front-end engineer. They almost entirely focus on what someone needs to know&mdash;frameworks, tools, etc.&mdash;so I wanted to take a different approach.
+I've read a lot of posts over the years discussing what makes a good front-end engineer. They mostly tend to focus on what someone needs to know&mdash;frameworks, tools, etc.&mdash;so I wanted to take a different approach.
 
 If my experience is any indication, then what you know is not always as important as how you think. In this article I'm going to give my opinion on the mindset that makes a front-end engineer great.
 
 ## Don't just solve problems, figure out what's really going on
 
-Too many people who write CSS and JavaScript tinker until they find something that works, then they just move on. This sometimes gets the job done, but it doesn't increase your knowledge or improve your craft.
-
-I know this happens because I see it all the time when doing code reviews.
+Too many people who write CSS and JavaScript tinker until they find something that works, then they just move on. I know this happens because I see it all the time when doing code reviews.
 
 I'll frequently ask someone: "Why did you add `float: left` here?" or "is this `position: relative` really necessary?", and they'll respond: "I don't know, but if I remove it, it doesn't work".
 
 The same is true of JavaScript. I'll see a `setTimeout` that seems to serve no purpose, or someone using the `=>` function syntax because they're sick of dealing with bugs from `this` not being what they expect.
 
-Taking the time to understand *why* your hack works may take more time at this particular the moment, but I can promise you it'll save you far more time later. Having a fuller understanding of the systems your working within will mean less guess-and-check work in the future.
+I get that there are times when you need something that works, and you need it now. But if you never take the time to understand the root of the problem, then you'll find yourself in this same situation over and over again.
+
+Taking the time to figure out *why* your hack works may seem costly now, but I promise it'll save you time in the future. Having a fuller understanding of the systems you're working within will mean less guess-and-check work going forward.
 
 ## Learn to anticipate future changes to the platform
 
-The main difference between front-end and back-end code is back-end code generally runs on a platform that is completely under your control. The front end, by contrast, is completely outside of your control. The user's platform or device could completely change at any moment, and your code needs to be able to handle it gracefully.
+One of the main differences between front and back-end code is back-end code generally runs in an environment that is completely under your control. The front end, by contrast, is completely outside of your control. The user's platform or device could completely change at any moment, and your code needs to be able to handle it gracefully.
 
-I remember reading the source code of a popular JavaScript library in 2011 and seeing the following (changed for simplicity):
+I remember reading the source code of a popular JavaScript framework back in 2011 and seeing the following line (changed for simplicity):
 
 ```js
 var isIE6 = !isIE7 && !isIE8 && !isIE9;
 ```
 
-In this case IE6 was the catchall for IE version, presumably to make things like IE 5.5 work, but at soon as IE10 came out, large portions of our application were completely broken.
+In this case IE6 was the catchall for IE versions, presumably to make things like IE 5.5 work, but at soon as IE10 came out, large portions of our application were completely broken.
 
-I understand that in the real world feature detection doesn't work 100% of the time, and sometimes you have to depend on buggy behavior or whitelist browsers whose feature detects erroneously return false positives (or negatives), but any time you do this it's absolutely critical that you anticipate the almost-certain future where these bugs no longer exists.
+I understand that in the real world feature detection doesn't work 100% of the time, and sometimes you have to depend on buggy behavior or whitelist browsers whose feature detects erroneously return false positives (or negatives), but any time you do this it's absolutely critical that you anticipate the almost-certain future where these bugs no longer exist.
 
 For many of us, most of the code we write will outlive our tenure at our current jobs. Some of the code I wrote more than 8 years ago is still running on websites today, a thought that is both satisfying and terrifying.
 

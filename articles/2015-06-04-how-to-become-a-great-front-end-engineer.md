@@ -9,15 +9,13 @@ I recently received an email from a reader of my blog that, for whatever reason,
 > Hi Philip, is it okay to ask how you become a great front-end engineer?<br>
 > Any advice?
 
-First of all, I was surprised to even be asked this question since I've never really thought of myself as a "great" front-end engineer. In fact, the first few years I worked in this industry, I honestly don't think I was qualified for any of the jobs I had. I was only able to get them because the people interviewing me didn't know what to ask, and I didn't realize just how little I knew.
+First of all, I was surprised to even be asked this question since I've never really thought of myself as a "great" front-end engineer. In fact, the first few years I worked in this industry, I honestly don't think I was qualified for any of the jobs I had. I was only able to get them because the people interviewing me didn't really know what to ask, and I didn't realize just how little I knew.
 
-That being said, I ended up doing very well in each of these roles and became a valued member of the team. By the time I eventually left (for the next challenge I was also not qualified for) and was tasked with helping to hire my replacement, I would reflect with slight amusement at the ironic fact that I probably wouldn't have hired my former self. I don't think I would have been able to pass the interviews I was giving.
+That being said, I ended up doing very well in each of these roles and became a valued member of the team. When I eventually left (for the next challenge I was also not qualified for) I was usually tasked with hiring my replacement. Looking back on how I approached these interviews, I'm struck by how much emphasis I placed on knowledge&mdash;despite lacking in that area when I started. My current self probably wouldn't have hired my former self, even though I knew from personal experience that success was possible.
 
-As I started thinking about this question more and more, I began to realize how lucky I've been. Much of my success has been a result of getting thrust into situations I had no business being in&mdash;yet still expected to perform. But I don't think it's entirely about being stretched or working hard. Over time I've learned some very important lessons that I'd like to share. Some of these are specific to front-end development; some are just generally good practices.
+The longer I work on the web, the more I realize that what separates the good people from the really good people isn't what they know; it's how they think. Obviously knowledge is important&mdash;critical in some cases&mdash;but in a field that changes so quickly, how you go about acquiring that knowledge is always going to be more important (at least in the long term) than what you know at any given time. And perhaps most important of all is how you use that knowledge to solve everyday problems.
 
-I've read a lot of posts over the years discussing what makes a good front-end engineer. They mostly tend to focus on what someone needs to know&mdash;frameworks, tools, etc.&mdash;so I wanted to take a different approach.
-
-If my experience is any indication, then what you know is not always as important as how you think. In this article I'm going to give my opinion on the mindset that makes a front-end engineer great.
+There are plenty of articles out there that talk about the languages, frameworks, and tools you need to know to get a job. I wanted to take a different approach. In this article I'm going to talk about the mindset of a front-end engineer, and hopefully give a more lasting answer to the question: *how do you become great?*
 
 ## Don't just solve problems, figure out what's really going on
 

@@ -211,7 +211,7 @@ In general, when faced with these decisions it's important to not just think abo
 <aside class="Footnotes">
   <h1 class="Footnotes-title">Footnotes:</h1>
   <ol class="Footnotes-items">
-    <li id="footnote-1">Technically, most preprocessors won't actually guarantee correct source order based on the order of `@import` statements; `@import` simply means *this file must exist in the source before I include myself*. In practice, however, if all your component files `@import` their dependencies in the correct order, the final stylesheet's order will also be correct.</li>
-    <li id="footnote-2">This can be accomplished via the [`:host-context()`](http://dev.w3.org/csswg/css-scoping/#host-selector) selector, though arguably its usage should be mostly avoided for all the reasons listed in this article.</li>
+    <li id="footnote-1">Technically, most preprocessors won't actually guarantee correct source order based on the order of <code>@import</code> statements; <code>@import</code> simply means <em>this file must exist in the source before I include myself</em>. In practice, however, if all your component files <code>@import</code> their dependencies in the correct order, the final stylesheet's order will also be correct.</li>
+    <li id="footnote-2">This can be accomplished via the <a href="http://dev.w3.org/csswg/css-scoping/#host-selector"><code>:host-context()</code></a> selector, though arguably its usage should be mostly avoided for all the reasons listed in this article.</li>
   </ol>
 </aside>

@@ -6,7 +6,9 @@ excerpt: Way back in September of 2013, while testing my Solved by Flexbox proje
 ---
 
 <div class="Callout">
-  <p><strong>Update:</strong> as a follow-up to this article, I've created the Github repo [Flexbugs](https://github.com/philipwalton/flexbugs): a community curated list of cross-browser flexbox issues and their known workarounds. The goal is if you're building a website using flexbox, and something isn't working as you'd expect, you can find the solution there.</p>
+
+**Update:** as a follow-up to this article, I've created the Github repo [Flexbugs](https://github.com/philipwalton/flexbugs): a community curated list of cross-browser flexbox issues and their known workarounds. The goal is if you're building a website using flexbox, and something isn't working as you'd expect, you can find the solution there.
+
 </div>
 
 Way back in September of 2013, while testing my [Solved by Flexbox](//philipwalton.github.io/solved-by-flexbox/) project, I discovered a [bug](https://connect.microsoft.com/IE/feedback/details/802625/min-height-and-flexbox-flex-direction-column-dont-work-together-in-ie-10-11-preview) in Internet Explorer 10 and 11 that was preventing my sticky footer from actually *sticking* to the bottom of the page. I spent some time trying to work around the issue, but all my attempts failed.
@@ -174,9 +176,9 @@ To see this new solution in action, check out the updated Solved by Flexbox [sti
 <aside class="Footnotes">
   <h1 class="Footnotes-title">Footnotes:</h1>
   <ol class="Footnotes-items">
-    <li id="footnote-1">Technically, if you don't need to support IE 7 and older, you can build a [sticky footer layout](http://galengidman.com/2014/03/25/responsive-flexible-height-sticky-footers-in-css/) using `display:table` that allows for unknown header/footer heights. Though clearly this is more of a hack that just happens to work cross-browser rather than an actual, forward-facing solution.
-    <li id="footnote-2">When I say "all browsers" I mean all browsers that implement a version of the flexbox specification dated [March 2012](http://www.w3.org/TR/2012/WD-css3-flexbox-20120322/) or newer. In other words, it should work in all [browsers that claim to support modern flexbox](http://caniuse.com/#feat=flexbox) .</li>
-    <li id="footnote-3">Using `flex-basis:0` solves the vast majority of problems associated with this bug, but not all of them. If you want your flex-items to shrink *and* you want them to not shrink past the default content size, this solution will not work.</li>
-    <li id="footnote-4">The [March 2014](http://www.w3.org/TR/2014/WD-css-flexbox-1-20140325/) update to the flexbox spec changed the meaning of the `flex:1` shorthand from `1 1 0px` to `1 1 0%`.</li>
+    <li id="footnote-1">Technically, if you don't need to support IE 7 and older, you can build a <a href="http://galengidman.com/2014/03/25/responsive-flexible-height-sticky-footers-in-css/">sticky footer layout</a> using <code>display:table</code> that allows for unknown header/footer heights. Though clearly this is more of a hack that just happens to work cross-browser rather than an actual, forward-facing solution.
+    <li id="footnote-2">When I say "all browsers" I mean all browsers that implement a version of the flexbox specification dated <a href="http://www.w3.org/TR/2012/WD-css3-flexbox-20120322/">March 2012</a> or newer. In other words, it should work in all <a href="http://caniuse.com/#feat=flexbox">browsers that claim to support modern flexbox</a> .</li>
+    <li id="footnote-3">Using <code>flex-basis:0</code> solves the vast majority of problems associated with this bug, but not all of them. If you want your flex-items to shrink <em>and</em> you want them to not shrink past the default content size, this solution will not work.</li>
+    <li id="footnote-4">The <a href="http://www.w3.org/TR/2014/WD-css-flexbox-1-20140325/">March 2014</a> update to the flexbox spec changed the meaning of the <code>flex:1</code> shorthand from <code>1 1 0px</code> to <code>1 1 0%</code>.</li>
   </ol>
 </aside>

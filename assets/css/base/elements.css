@@ -48,6 +48,14 @@ article a {
   background-size: 1px 1px;
 }
 
+article a code {
+  background-color: var(--code-bg-color);
+  background-image: linear-gradient(to top, #777, #777);
+  background-position: 0 1.4em;
+  background-repeat: repeat-x;
+  background-size: 1px 1px;
+}
+
 article sup a {
   background: 0;
 }

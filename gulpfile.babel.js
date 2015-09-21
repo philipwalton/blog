@@ -313,10 +313,10 @@ gulp.task('serve', ['default'], function() {
 });
 
 
-gulp.task('release', ['default'], function() {
+gulp.task('deploy', ['default'], function() {
 
   if (!isProd()) {
-    throw new Error('The release task must be run in production mode.');
+    throw new Error('The deploy task must be run in production mode.');
   }
 
   // Create a tempory directory and
@@ -336,7 +336,7 @@ gulp.task('release', ['default'], function() {
 
   // Commit and push the changes to
   // the gh-pages branch.
-  shell.exec('git commit -m "Deploy site."');
+  shell.exec('git commit -m "Deploy site"');
   shell.exec('git branch -m gh-pages');
   shell.exec('git push origin gh-pages');
 

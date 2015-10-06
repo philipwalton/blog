@@ -338,10 +338,14 @@ gulp.task('deploy', ['default'], function() {
   // the new ones from the build directory.
   shell.rm('-rf', '*');
   shell.cp('-rf', path.join('..', DEST, '/'), './');
-  shell.exec('git add -A');
+
+  // Remove the index to workaround a bug:
+  // http://bit.ly/1JPtgwA
+  shell.rm('.git/index');
 
   // Commit and push the changes to
   // the gh-pages branch.
+  shell.exec('git add -A');
   shell.exec('git commit -m "Deploy site"');
   shell.exec('git branch -m gh-pages');
   shell.exec('git push origin gh-pages');

@@ -118,9 +118,15 @@ function renderContent() {
     html: true,
     typographer: true,
     highlight: function(code, lang) {
-      // Unescape to avoid double escaping.
-      // code = he.unescape(code);
-      return lang ? hljs.highlight(lang, code).value : '';
+      var code = lang
+          ? hljs.highlight(lang, code).value
+          // since we're not using highlight.js here, we need to espace the html
+          // unescape first in order to avoid double escaping
+          : he.escape(he.unescape(code));
+
+      // Allow for highlighting portions of code blocks
+      // using `**` before and after
+      return code.replace(/\*\*(.+)?\*\*/g, '<mark>$1</mark>');
     }
   });
 

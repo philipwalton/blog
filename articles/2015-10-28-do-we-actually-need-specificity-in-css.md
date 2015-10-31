@@ -10,7 +10,7 @@ What I want to do is pose an actual, honest question to the web development comm
 
 To restate the question in a way that gets more at the heart of the issue: *If we lived in a world where specificity was never added to the cascade, would things be better or worse?*
 
-Now, I'm sure some people are thinking: *Who cares? Specifity exists, and we're stuck with it. So what's the point is bringing this up?*
+Now, I'm sure some people are thinking: *Who cares? Specificity exists, and we're stuck with it. So what's the point is bringing this up?*
 
 To anyone thinking that, I'm happy to inform you that you're wrong :-)
 
@@ -133,7 +133,7 @@ And since pseudo-classes can be chained, i.e. `:root:root:root` will still match
 
 ### Handling ID specificity
 
-ID selectors are more specific than psuedo-class selectors, and therefore no amount of prepending `:root` to a selector will trump an ID.
+ID selectors are more specific than pseudo-class selectors, and therefore no amount of prepending `:root` to a selector will trump an ID.
 
 However, the ID selector `#content` and the attribute selector `[id="content"]` will match exactly the same element, so if you replace all ID selectors with attribute selectors, the technique described above will still work.
 
@@ -216,6 +216,6 @@ The other obvious concern is it will increase file size, though since it's only 
 
 Finally, and to restate what I said in the intro, this is a question, not a prescription. I haven't tried this technique in the wild, as I haven't fully made up my mind about it.
 
-I suspect it would vastly simply things, but it also might uncover how much we truly depend on specificity.
+I suspect it would vastly simplify things, but it also might uncover how much we truly depend on specificity.
 
 If there's a large team out there constantly fighting specificity battles, it would be interesting to hear if something like this helps. If you do try it, feel free to let me know your conclusions by email or on Twitter. Or better yet, write a follow-up article and I'll link to it.

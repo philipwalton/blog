@@ -4,21 +4,31 @@ title: "Do We Actually Need Specificity In CSS?"
 date: 2015-10-28T10:49:00-07:00
 ---
 
-I know the title of this article probably sounds like I'm trying to stir the pot, but I'm honestly not. I'm asking this question because I've been thinking about it a lot lately, and I'm curious to know what other people think.
+Okay, before I start, I want to get one thing out of the way upfront. This article is *not* a rant about how much I hate specificity. If you want to read an article like that, I'm sure you can find dozens online.
 
-Let me give you a little context.
+What I want to do is pose an actual, honest question to the web development community and hopefully get people thinking.
 
-For normal CSS rules, the cascade takes three things into consideration when figuring out what declarations to apply to an element: source order, specificity, and importance.
+To restate the question in a way that gets more at the heart of the issue: *If we lived in a world where specificity was never added to the cascade, would things be better or worse?*
 
-Source order makes a lot of sense. It's natural and intuitive to think that if rule X comes after rule Y, and they apply to the same element, rule Y should override rule X.
+Now, I'm sure some people are thinking: *Who cares? Specifity exists, and we're stuck with it. So what's the point is bringing this up?*
 
-Importance also makes a lot of sense. There are always going to be cases with one-off exceptions where you need to override something, and it's good to have the option to do so. There are also cases, usually with utility classes, where you can confidently say that: *if element X has this class then it must apply*. For example, in an `.is-hidden` rule, it makes sense to use `!important`.
+To anyone thinking that, I'm happy to inform you that you're wrong :-)
 
-But I think specificity is a little different.
+In this article I'm going to show that it *is possible* to prevent specificity from affecting the cascade&mdash;meaning this question isn't purely theoretical. If it turns out to be true that specificity does more harm than good, there's something we can actually do about it today.
 
-Specificity isn't intuitive, and, especially for new developers, the results can almost seem like a *gotcha* rather than the intended behavior.
+## A little background
 
-I'm also not sure there's an equivalent in other systems or languages. I mean, imagine if the following code worked in JavaScript:
+For normal CSS rules, the cascade takes three things into consideration: source order, specificity, and importance.
+
+Source order makes a lot of sense. It's natural and intuitive to think that if rule X comes after rule Y, and both rules apply to the same element, rule Y's declarations should "win".
+
+Importance also makes a lot of sense. There are always going to be cases where you need to override something, and it's good to have the option to do so. Importance is also the only way to override inline styles, so it's actually quite necessary in some cases.
+
+But I think specificity is different.
+
+Specificity isn't intuitive, and&mdash;especially for new developers&mdash;the results can often seem like a *gotcha* rather than the intended behavior. I'm also not sure there's an equivalent in other systems or languages.
+
+For example, what if specificity were a thing in JavaScript. Imagine how much more unpredictable your code would be if the following test passed?
 
 ```js
 window.document.foo = 'bar';
@@ -27,63 +37,71 @@ document.foo = 'quz';
 assert(window.document.foo == 'bar'); // true, WTF?
 ```
 
-In the above code, should the `window.document.foo` assignment trump `document.foo` because the reference is more "specific"? I seems a little crazy, but that's kind of what happens in CSS.
+It would be crazy and completely unmanageable if the `window.document.foo = 'bar'` assignment above (which comes first) trumped the `document.foo = 'quz'` assignment (which comes second) just because the reference was "more specific". Yet that's essentially what happens in CSS.
 
 ## But specificity is useful, right?
 
-I'm sure there are thousands, probably even millions of websites out there that depend on specificity to make their CSS work. I'm not suggesting that it can't be useful in some cases.
+I'm sure there are thousands, probably even millions of websites out there that depend on specificity to make their CSS work. If browsers started ignoring specificity tomorrow, all of those sites would break.
 
-What I *am* suggesting is that perhaps it's not useful enough to make it worth the unpredictability and the confusion that comes with it.
+So I'm not suggesting that specificity isn't being used. It clearly is. What I *am* suggesting is that perhaps it's not useful enough to make it worth the unpredictability and the confusion that comes with it.
 
-Moreover, I can't think of a single time in my life where I've written a CSS rule that was more specific than another rule *and didn't also come after it in the source order*. To make that more clear, I've never done something like this:
+I believe that specificity is useful in the same way that global variables can be useful. And just as most people consider reliance on global variables to be an anti-pattern, maybe it's the same with specificity.
+
+Moreover, I can't think of a single time in my life where I've written a CSS rule that I wanted to override another CSS rule (using specificity) where I didn't also put the more specific rule later in the source order.
+
+To make that more clear, I've never done something like in the following example, where the more-specific footer links are defined *before* the less-specific default links:
 
 ```css
 .footer a {
   color: white;
   text-decoration: none;
 }
+
 a {
   color: blue;
   text-decoration: underline;
 }
 ```
 
-I always write the more specific rule after the less specific rule because that's what makes intuitive sense to me.
+If I expect rule X to override rule Y, then I put it later in the source order. It just makes intuitive sense to do it this way, and anything else would just be confusing.
+
+So that got me thinking, if I already expect rules later in the source order to always override rules earlier in the source order, what if I could make that happen regardless of the specificity of those rules?
+
+Essentially, what if I could prevent myself (and other people on my team) from accidentally breaking away from the paradigm that we all agree makes the most sense.
 
 ## What if specificity didn't exist?
 
-Ok, let's imagine a world in which specificity doesn't exist in CSS. In that world the cascade would be determined by source order and importance alone. In other words, if rule X and Y both match a particular element, and rule Y comes after rule X in the source, rule Y will always win. And of course individual property declarations in rule X can optionally trump rule Y using importance.
+Let's imagine a world in which specificity doesn't exist in CSS. In that world the cascade would be determined by source order and importance alone. In other words, if rule X and Y both match a particular element, and rule Y comes after rule X in the source, rule Y will always win, regardless of the specificity of rule X. The only way for properties on rule X to trump properties in rule Y would be to use importance.
 
-So the question is: *Would that be a better world? Would that lead to more predictable, maintainable, and scalable code?*
+Would that be a better world? Would that lead to more predictable, maintainable, and scalable code?
 
-I think it would, but I'm curious to hear what other people think.
+### A real-life example
 
-Let me offer one specific example of how I (and many other developers) fight against specificity in almost every project. The way I write CSS (and most people who follow BEM/SUIT/SMACSS conventions), I generally order my rules as follows:
+Up until this point I've been mostly talking in generalities, so let me offer a real-life example where specificity gets in the way.
 
-1. Reset/normalize
-2. Base/element styles
-3. Component styles
-4. Utilities/state styles
+Many people use what are commonly known as "state" or "utility" classes in their CSS. An example of this is the class `is-hidden`, which (obviously) is used to hide an element.
 
-In my utility style declarations, I almost always use `!important` because if I'm using a utility class I want to be sure it applies, and overrides any existing component styles.
+With state classes can be generically applied to any element, they're usually defined as a single class selector, which makes their specificity pretty low. But conceptually they're an override-type class, i.e. you wouldn't add the class `is-hidden` to an element if you really wanted it to be visible. State classes should always win.
 
-For example, I'd never add a class like `is-hidden` to an element if I didn't want it to be hidden.
+If specificity didn't exist, you could ensure state classes trumped other classes by including them last in the source order. As it is today, you have to use `!important` to solve the problem, which, for what it's worth, is the technique practice when using [SMACSS state classes]((https://smacss.com/book/type-state#tips)) and [SUIT utility classes]((https://github.com/suitcss/utils-display/blob/0.4.2/lib/display.css))).
 
-This practice is recommended by Jonathan Snook when discussing [state classes](https://smacss.com/book/type-state#tips). You can also see it used in the [display utilities](https://github.com/suitcss/utils-display/blob/0.4.2/lib/display.css) of Nicolas Gallagher's SUIT CSS library.
+It would be nice if our best practices didn't have to resort to the nuclear option for everyday styling needs.
 
-If specificity didn't exist, simply putting these classes at the end of the CSS file would be all that's needed.
+## Removing specificity from the cascade
 
-## Is removing specificity even possible?
+This is where things get pretty interesting. While it's not possible to simply instruct the browser to ignore specificity, it *is* possible to prevent specificity from affecting the cascade for a particular CSS file or set of CSS files.
 
-This is where things get pretty interesting. While it's not possible to tell the browser to ignore specificity, it *is* possible to prevent specificity from affecting the cascade for a particular CSS file.
+How? The answer is to make specificity and source order the same.
 
-How? To answer that question, imagine a stylesheet in which all rules are ordered from least specific to most specific. In such a stylesheet, since the specificity of the rules also corresponds to the source order, it, for all intents and purposes, doesn't matter.
+Imagine a stylesheet in which all rules were ordered from least specific to most specific. In such a stylesheet, since the specificity of the rules also corresponds to the source order, it, for all intents and purposes, doesn't matter.
 
-Of course, most people don't write their CSS this way, and expecting or asking them to would be unreasonable.
+Of course, most people don't write their CSS this way, and expecting or asking them to do so would be unreasonable.
 
-But what if a robot could modify your CSS, after you author it, and update the selectors for you, so they actually were in ascending-specificity order?
+But what if a transpiler could modify your CSS, after you author it, to ensure all your selectors were in ascending-specificity order? And more importantly, what if it could do this without affecting what elements those selectors matched?
 
-Imagine the following CSS rules, currently in descending-specificity order (above each rule, I've listed the specificity using `[idCount].[classCount].[typeCount]` notation):
+Thanks to some awesome quirks about how CSS selectors match, you can!
+
+Consider the following CSS rules, currently in descending-specificity order (above each rule, I've listed the specificity using `[idCount].[classCount].[typeCount]` notation):
 
 ```css
 /* 0.2.5 */
@@ -109,14 +127,17 @@ main.content aside.sidebar ul li a { }
 **:root:root:root** .sidebar a { }
 ```
 
-Since all HTML documents always have a root element, prefixing a selector with `:root` will not change what elements the selector matches. And since `:root:root` will still match the root element, you can arbitrarily add specificity to any selector to transform an entire CSS file into ascending-specificity order without changing its functionality.
+This works because all HTML documents have a root element (the `<html>` element), so adding the `:root` pseudo-class to the beginning of a selector won't change what elements it can match.
+
+And since pseudo-classes can be chained, i.e. `:root:root:root` will still match the `<html>` element, you can arbitrarily add specificity to any selector to make it more specific than the previous selector.
 
 ### Handling ID specificity
 
-Many CSS developers no longer use IDs in their CSS files, but obviously a lot still do.
+ID selectors are more specific than psuedo-class selectors, and therefore no amount of prepending `:root` to a selector will trump an ID.
 
-If your CSS file contains ID selectors, you could still use this technique, but it would require modifying the markup. You'd have to add an ID attribute to the `<html>` element, `id="root"` for example, and then your PostCSS plugin could add the ID selector `#root` to the beginning of selectors in the same way:
+However, the ID selector `#content` and the attribute selector `[id="content"]` will match exactly the same element, so if you replace all ID selectors with attribute selectors, the technique described above will still work.
 
+The following authored stylesheet:
 
 ```css
 /* 1.1.5 */
@@ -129,46 +150,72 @@ aside.sidebar ul a { }
 .sidebar a { }
 ```
 
-Would become:
+Gets transpiled to:
 
 ```css
-/* 1.1.5 */
-main#content aside.sidebar ul li a { }
+/* 0.2.5 */
+main**[id="content"]** aside.sidebar ul li a { }
 
-/* 1.2.3 */
-**#root:root** aside.sidebar ul a { }
+/* 0.3.3 */
+**:root:root** aside.sidebar ul a { }
 
-/* 1.3.1 */
-**#root:root:root** .sidebar a { }
+/* 0.4.1 */
+**:root:root:root** .sidebar a { }
 ```
 
-### Handling selectors that already refer to the root element
+### Handling selectors that may already refer to the root element
 
-It's a relatively common practice to use class selectors that are used to match the `<html>` element. Probably the most well-known example of this is the Modernizr library, which adds classes to the `<html>` element for feature detection.
+With most selectors, it's not possible to tell by looking at them whether they may be intending to match the `<html>` element. For example, if a site is using Modernizr, you'll probably see selectors that look like this:
 
-Since the selector `:root .flexbox` won't match the element `<html class="flexbox">`, so the `:root` prefixing technique described above won't work. However, you can just as easily chain instead of prefixing, e.g. `:root.flexbox`.
+```css
+.columns {
+  display: flex;
+}
 
-In order to cover both possibilities, you'd have to apply the prefixing and chaining technique to all selectors that don't begin with type selector. For example, the selector `.flexbox .button` could be rewritten as follows:
-
+.noflexbox .columns {
+  display: table;
+}
 ```
-.flexbox**:root** .button,
-**:root** .flexbox .button { }
+
+To account for the possibility that either of these selectors might intend to match the `<html>` element, you'd have to include both possibilities and rewrite them as follows:
+
+```css
+.columns**:root**,
+**:root** .columns {
+  display: flex;
+}
+
+.noflexbox**:root** .columns,
+**:root** .noflexbox .columns {
+  display: table;
+}
 ```
 
-Alternatively (actually preferably) you'd could abide by the convention that you never add classes to the `<html>` element, which greatly simplify things.
+Alternatively, you could avoid this problem entirely by establishing a convention that none of your selectors are allowed match the `<html>` element, and that `<body>` is the highest they can go.
 
-### Other potential issues
+### The full rewriting algorithm
 
-The other obvious, potential issue with this technique is it has to be applied to *all* styles referenced on a page or it could have side effects because it increases the specificity of some selectors and not others. If you're referencing external assets on a CDN, this won't work. You'd have to download those assets and process them as well.
+I'm not aware of any transpiler that currently does what I've outlined in this article. If you were interested in trying to make one, I'd recommend doing so as a [PostCSS](https://github.com/postcss/postcss) plugin.
 
-Another obvious downside is the file size is going to be larger, but since you're always just adding the word "root", it should gzip very well. I don't see file size being a major concern.
+Here's the basic algorithm you'd need to follow:
 
-## What do you think?
+1. Iterate through each selector in your stylesheets.
+2. For each selector:
+    1. If the selector contains any ID selectors, replace them with ID attribute selectors, otherwise do nothing.
+    2. Calculate the specificity of the current selector (with any IDs replaced).
+    3. If the current selector is the first selector, do nothing. Otherwise, compare its specificity to the specificity of the previous selector.
+    5. If the previous selector is less specific than the current selector, do nothing. Otherwise, rewrite the current selector selector so its specificity is greater than or equal to the specificity of the previous selector.
+        1. If the current selector begins with the `:root` selector or a type selector other than `html`, rewrite the selector with `:root` prepended as an ancestor. Otherwise rewrite the selector so the first part is listed both chained to `:root` and as a descendant of `:root`.
+3. Once all selectors have been rewritten, output the final styles. They will now be in ascending-specificity order.
 
-Earlier this week I was speaking at CSSDevConf; while there I figured it'd be a great time to run this idea by some of the most respected people in the CSS community.
+## Final thoughts
 
-The general consensus seemed to be that specificity wasn't something anyone used as a tool or a technique to make their code better. Resorting to a dependence on specificity always felt like a hack&mdash;something they intended to refactor later.
+While the approach I've outlined above is solid and will definitely work, it does some with a few downsides. For one thing, it won't work if you're referencing external stylesheets hosted on a CDN. If you want to use external assets, you'd have to process them as well and then host them yourself.
 
-At the same time, most of the people I talked to weren't really bothered by specificity. They write their code in a modular way and don't do a lot of contextual styling, so specificity conflicts rarely come up. For them, a solution like this would be unnecessary and just complicate things.
+The other obvious concern is it will increase file size, though since it's only adding the word "root" a bunch of times, it should gzip very well.
 
-What do you think? Discuss amongst yourselves, and feel free to let me know your conclusions by email or on Twitter. Or better yet, write a follow-up article and I'll link to it.
+Finally, and to restate what I said in the intro, this is a question, not a prescription. I haven't tried this technique in the wild, as I haven't fully made up my mind about it.
+
+I suspect it would vastly simply things, but it also might uncover how much we truly depend on specificity.
+
+If there's a large team out there constantly fighting specificity battles, it would be interesting to hear if something like this helps. If you do try it, feel free to let me know your conclusions by email or on Twitter. Or better yet, write a follow-up article and I'll link to it.

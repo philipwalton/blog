@@ -3,7 +3,7 @@ template: page.html
 title: "About"
 ---
 
-My name is Philip Walton. I'm an engineer at Google on the developer relations team and formerly, senior front-end software engineer at Appfolio. I've been working on the web professionally for the past seven years, and unprofessionally since 1998 when I made my first website.
+My name is Philip Walton. I'm an engineer at Google on the developer relations team and formerly, senior front-end software engineer at Appfolio. I've been working on the web professionally since 2006, and unprofessionally since 1998 when I made my first website.
 
 This blog is a place where I can explore the ideas I think about outside of work. I tend to prefer writing about larger, more abstract topics, but occasionally I'll bring up a specific technology as well.
 

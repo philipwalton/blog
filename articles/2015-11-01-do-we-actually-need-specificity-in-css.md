@@ -1,7 +1,7 @@
 ---
 template: article.html
 title: "Do We Actually Need Specificity In CSS?"
-date: 2015-10-28T10:49:00-07:00
+date: 2015-11-01T14:37:42-08:00
 ---
 
 Okay, before I start, I want to get one thing out of the way upfront. This article is *not* a rant about how much I hate specificity. If you want to read an article like that, I'm sure you can find dozens elsewhere online.

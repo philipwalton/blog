@@ -13,6 +13,7 @@ import he from 'he';
 import hljs from 'highlight.js';
 import htmlMinifier from 'html-minifier';
 import MarkdownIt from 'markdown-it';
+import markdownItAnchor from 'markdown-it-anchor';
 import moment from 'moment-timezone';
 import nunjucks from 'nunjucks';
 import path from 'path';
@@ -128,7 +129,7 @@ function renderContent() {
       // using `**` before and after
       return code.replace(/\*\*(.+)?\*\*/g, '<mark>$1</mark>');
     }
-  });
+  }).use(markdownItAnchor);
 
   return through.obj(
     function transform(file, enc, done) {

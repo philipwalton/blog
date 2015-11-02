@@ -83,7 +83,7 @@ Since state classes can be generically applied to any element, they're usually d
 
 If specificity didn't exist, you could ensure state classes trumped other classes by simply including them last in the source order. But as it is today, you have to use `!important` to solve the problem.
 
-For what it's worth, adding `!important` in these situations is actually recommended when using [SMACSS state classes]((https://smacss.com/book/type-state#tips)) and [SUIT utility classes]((https://github.com/suitcss/utils-display/blob/0.4.2/lib/display.css)). It would be nice if our best practices didn't have to resort to the nuclear option for everyday styling needs.
+For what it's worth, adding `!important` in these situations is actually recommended when using [SMACSS state classes](https://smacss.com/book/type-state#tips) and [SUIT utility classes](https://github.com/suitcss/utils-display/blob/0.4.2/lib/display.css). It would be nice if our best practices didn't have to resort to the nuclear option for everyday styling needs.
 
 ## Removing specificity from the cascade
 

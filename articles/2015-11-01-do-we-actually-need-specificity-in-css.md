@@ -20,7 +20,7 @@ In this article I'm going to show that it *is possible* to prevent specificity f
 
 For anyone who's a little rusty on how the cascade works, for normal CSS rules, the cascade takes three things into consideration: source order, specificity, and importance.
 
-Source order makes a lot of sense. It's natural and intuitive to think that if rule X comes after rule Y, and both rules apply to the same element, rule Y's declarations should "win".
+Source order makes a lot of sense. It's natural and intuitive to think that if rule Y comes after rule X, and both rules apply to the same element, rule Y's declarations should "win".
 
 Importance also makes a lot of sense. There are always going to be cases where you need to override something, and it's good to have the option to do so. Importance is also the only way to override inline styles, so it's actually quite necessary in some cases.
 
@@ -63,7 +63,7 @@ a {
 }
 ```
 
-If I want rule X to override rule Y, I put it later in the source order. Period. Which means any time I have a specificity conflict, it's always an accident.
+If I want rule Y to override rule X, I put it later in the source order. Period. Which means any time I have a specificity conflict, it's always an accident.
 
 So that got me thinking, if I already expect rules later in the source order to always override rules earlier in the source order, what if I could make that happen regardless of the specificity of those rules?
 

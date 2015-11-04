@@ -221,3 +221,15 @@ Before I conclude, I want to restate what I said in the intro. This is a questio
 I suspect it would vastly simplify things, but it also might uncover how much we truly depend on specificity.
 
 If there's a large team out there constantly fighting specificity battles, it would be interesting to hear if something like this helps. If you do try it, feel free to [let me know](/about/#contact) your findings. Or better yet, write a follow-up article and I'll link to it.
+
+<div class="Callout">
+
+**Update:** *(November 3, 2015)*
+
+[Lea Verou](https://twitter.com/LeaVerou) pointed out to me [on Twitter](https://twitter.com/LeaVerou/status/661617150243672064) that you could use the `:not()` pseudo-class as an alternative to using `:root` for arbitrarily increasing selector specificity.
+
+The advantage of using `:not()` is you can apply it to any element (including `<html>`), so you wouldn't have to split selectors. You could also use it to add type or ID-level specificity, e.g. `:not(z)` or `:not(#z)`, so you wouldn't always have to increase by classes.
+
+The downside of using `:not()` is you must be careful to pick a selector that's guaranteed to not match the element, otherwise it won't work.
+</div>
+

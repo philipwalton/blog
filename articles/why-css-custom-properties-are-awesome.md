@@ -4,7 +4,7 @@ title: "Why CSS Custom Properties are Awesome"
 date: 2015-11-03T17:28:56-08:00
 ---
 
-A few days ago CSS Custom Properties, commonly known as CSS Variables, shipped in Chrome Canary. When Chrome team member [Addy Osmani](https://twitter.com/addyosmani) first announced the new feature on Twitter, he was met with a surprising amount of negativity (at least surprising to me).
+A few days ago CSS Custom Properties, commonly known as CSS Variables, shipped in Chrome Canary. When Chrome team member [Addy Osmani](https://twitter.com/addyosmani) first announced the new feature on Twitter, he was met with a [surprising](https://twitter.com/kuizinas/status/661600615911526401) [amount](https://twitter.com/DanTup/status/661609987047866368) of [negativity](https://twitter.com/joshlangner/status/661608288707026944) (at least surprising to me).
 
 From what I can tell, 99% of the negatively were variations of these two complaints:
 

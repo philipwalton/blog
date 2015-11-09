@@ -35,9 +35,15 @@ a {
 
 I get why you'd be disappointed.
 
-And if CSS variables were *just* a way to reference commonly used values and they didn't offer anything above and beyond what preprocessors give us, I would be complaining about the syntax too.
+And if that's all CSS variables did, I'd be disappointed too.
 
-But the reality is CSS variables can do *so much* more than anything a preprocessor can do. In fact, it's not even fair to call them variables at all. They're custom properties. And I'm going to try to convince you of their awesomeness.
+If CSS variables were *just* a way to reference stored values, and they didn't offer anything above and beyond what preprocessors already give us, there would be little reason for them to exist (and no reason to have the syntax they do).
+
+But the reality is CSS variables can do *so much* more than that. In fact, I think it does them a disservice to call them variables at all. They're custom properties, which gives them an entirely different set of superpowers.
+
+In this post I'm going to talk about some of the limitations of preprocessor variables and show how none of those limitations apply to custom properties.
+
+I'll also demo some of the new design patterns that custom properties will enable like responsive cascading and contextual styling via single-directional data flow.
 
 ## What are custom properties?
 

@@ -45,6 +45,65 @@ In this post I'm going to talk about some of the limitations of preprocessor var
 
 I'll also demo some of the new design patterns that custom properties will enable like responsive cascading and contextual styling via single-directional data flow.
 
+## The limitations of preprocessor variables
+
+At their core, CSS preprocessors are essentially a templating language. They allow you to abstract common patterns and more easily reuse bits of code. But at the end of the day they spit out raw CSS, which means they're incapable of doing anything that CSS can't already do natively.
+
+### Preprocessor variables aren't live
+
+Preprocessors give the appearance of dynamic logic and magical power. Even if know you they ultimately just produce CSS, their limitations can often be surprising, especially to new developers.
+
+Perhaps the most common example of this is the inability to redefine a variable inside a media query.
+
+```scss
+$gutter: 1em;
+
+@media (min-width: 30em) {
+  $gutter: 2em;
+}
+
+body {
+  margin: $gutter;
+}
+```
+
+If you compile the above code with Sass, you'll see that the media query block gets discarded altogether. While it's technically *possible* for a preprocessor to make conditional variable declarations work, doing so would be technically challenging and require enumerating all possible permutations&mdash;exponentially increasing the final file size of your CSS.
+
+Since this doesn't work dynamically, the only option is to assign variations for all media sizes, and code out each version separately.
+
+```scss
+$font-size-sm: 1em;
+$font-size-md: 1.5em;
+$font-size-lg: 2em;
+```
+
+### Preprocessors variables don't cascade
+
+Whenever you use variables, the question of scope inevitably comes into play. Should this variable be global? Should it be scoped to the file? Should it be scoped to the block? These are all questions I hear asked frequently by Sass developers.
+
+As it turns out, there's another way to scope variables that ends up being even more power: scoping them to a DOM subtree.
+
+Since preprocessors don't run in the browser and never see the markup, the can't do this.
+
+If you're wondering why you'd want to scope a variable to a DOM subtree, consider the following example:
+
+
+```css
+.alert { background-color: lightyellow; }
+.alert.info { background-color: lightblue; }
+.alert.error { background-color: orangered; }
+
+.alert button {
+  border-color: darken(background-color, 25%);
+}
+```
+
+The above code isn't valid CSS, but you get the idea. The button is trying to access the background color of the parent alert and use a slightly darker version of it for it's border.
+
+The idea is that no matter what background color ends up being applied to the alert, the button can respond to it.
+
+Since preprocessor variables aren't CSS declarations (property-value pairs), they don't cascade. More specifically, they don't inherit from parent element to child element.
+
 ## What are custom properties?
 
 In order to fully understand what custom properties are, it's important to have a solid grasp on how CSS properties work in general.

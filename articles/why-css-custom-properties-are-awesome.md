@@ -200,3 +200,112 @@ Though these two examples may seem to be doing the same thing, they're subtly di
 ```
 
 Such a rule in the first example would still produce orange links because the default is defined on `<a>` elements rather than on `:root`.
+
+## Real-life examples
+
+It's one thing to understand how custom properties work, but it's another thing entirely to really get how they're useful.
+
+In this section I'm going to present three example of problems that are a pain to deal with in CSS today, even with preprocessor variables.
+
+### Responsive properties with media queries
+
+Probably the most compelling use-case for custom properties is the ability to automatically update the property values in response to the matched media.
+
+Consider a site with a standard gutter variable that defines the default spacing between items in the layout as well as the default padding for all the various section on the page.
+
+In many cases, you want the value of this gutter to be different depending on how big the browser window is. On large screens you want a lot of space between items&mdash;a lot of breathing room&mdash;but on smaller screens you can't afford that much space, so the gutter needs to be smaller.
+
+Since CSS preprocessors ultimately produce static files, the only way to do this today is to explicitly write all possible variations. Consider the following Sass code that defines a `sm`, `md`, and `lg` variation:
+
+```css
+/* Declares three gutter values, one for each breakpoint */
+
+$gutter-sm: 1em;
+$gutter-md: 2em;
+$gutter-lg: 3em;
+
+/* Base styles for small screens, using $gutter-sm. */
+
+.Container {
+  margin: 0 auto;
+  max-width: 60em;
+  padding: var(--gutter-sm);
+}
+.Grid {
+  display: flex;
+  margin: -$gutter-sm 0 0 -$gutter-sm;
+}
+.Grid-cell {
+  flex: 1;
+  padding: $gutter-sm 0 0 $gutter-sm;
+}
+
+
+/* Override styles for medium screens, using $gutter-md. */
+
+@media (min-width: 30em) {
+  .Container {
+    padding: $gutter-md;
+  }
+  .Grid {
+    margin: -$gutter-md 0 0 -$gutter-md;
+  }
+  .Grid-cell {
+    padding: $gutter-md 0 0 $gutter-md;
+  }
+}
+
+/* Override styles for large screens, using $gutter-lg. */
+
+@media (min-width: 30em) {
+  .Container {
+    padding: $gutter-lg;
+  }
+  .Grid {
+    margin: -$gutter-lg 0 0 -$gutter-lg;
+  }
+  .Grid-cell {
+    padding: $gutter-lg 0 0 $gutter-lg;
+  }
+}
+```
+
+To accomplish the exact same using custom properties, all you'd have to do is define the styles once referencing a custom `--gutter` property. Then, as the matched media changes, you just update the value of the `--gutter` custom property.
+
+The following code does that same thing as the above with about one-third as much code:
+
+```scss
+/* Declares the `--gutter` value at each breakpoint */
+
+:root { --gutter: 1.5em; }
+
+@media (min-width: 30em) {
+  :root { --gutter: 2em; }
+}
+@media (min-width: 48em) {
+  :root { --gutter: 3em; }
+}
+
+/*
+ * Styles only need to be defined once because
+ * the custom property values automatically update.
+ */
+
+.Container {
+  margin: 0 auto;
+  max-width: 60em;
+  padding: var(--gutter);
+}
+.Grid {
+  display: flex;
+  margin: -var(--gutter) 0 0 -var(--gutter);
+}
+.Grid-cell {
+  flex: 1;
+  padding: var(--gutter) 0 0 var(--gutter);
+}
+```
+
+Even with the extra verbosity of the custom property syntax, the amount of code needed to accomplish the same thing is substantially reduced. And this only takes into account three variations. The more variations you need, the more code this will save.
+
+The following demo shows a basic site layout that automatically redefines the gutter value as the viewport width changes ([editor view](http://codepen.io/philipwalton/pen/epLWNO?editors=110), [full page view](http://codepen.io/philipwalton/full/epLWNO/)).

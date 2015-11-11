@@ -100,3 +100,11 @@ The above code isn't valid CSS, but you get the idea. The button is trying to ac
 The idea is that no matter what background color ends up being applied to the alert, the button can respond to it.
 
 Since preprocessor variables aren't CSS declarations (property-value pairs), they don't cascade. More specifically, they don't inherit from parent element to child element.
+
+### Preprocessor variables aren't interoperable
+
+This is a relatively obvious downside, but I mention it because I think it's important. If you're building a site with PostCSS and you want to use a third-party component that's only themeable via Sass, you're kinda stuck.
+
+It's not possible (or at least not easy) to share preprocessor variables across different toolset or with third-party stylesheets hosted on a CDN.
+
+Native CSS custom properties will work with any CSS preprocessor or plain CSS file. The reverse is not usually true.

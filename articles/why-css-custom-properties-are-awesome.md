@@ -108,3 +108,95 @@ This is a relatively obvious downside, but I mention it because I think it's imp
 It's not possible (or at least not easy) to share preprocessor variables across different toolset or with third-party stylesheets hosted on a CDN.
 
 Native CSS custom properties will work with any CSS preprocessor or plain CSS file. The reverse is not usually true.
+
+## How custom properties are different
+
+I mentioned above that CSS variables aren't actually variables in the traditional sense, they're custom properties, which makes them quite a bit more powerful.
+
+But what does that mean?
+
+To answer the question, I think it's helpful to examine how normal properties work in CSS, specifically the inheritable properties.
+
+Think about what happens when you set `color: gray` or `font-size: .875em` on the `<body>` element. All descendants of `<body>`, who don't specificy their own colors or font sizes, inherit those values.
+
+Since custom properties are just regular, inheritable propeties, all of these concepts apply to them as well. And all the mechanisms you can use to define or override regular properties in CSS apply to custom properties as well.
+
+To put that more technically: *custom properties cascade!*
+
+Back to the `color` and `font-size` example, consider what happens when the following rule is added to the CSS:
+
+```css
+@media (min-width: 48em) {
+  body {
+    font-size: 1.25em;
+  }
+}
+```
+
+When the above media query matches, the `font-size` value becomes `1.25em` and all descendants of `<body>` will update accordingly. Since the new declaration didn't override the `color`, the original declaration still applies.
+
+The same thing happens to custom properties; *their values are live!* Any time you define a custom property in a media query or state class, as soon as that declaration matches or stops matching, the custom property value automatically updates throughout the site.
+
+### Using custom properties
+
+Here's a basic example of how custom properties work. In the following code, the custom property `--table-stripe-color` is defined on the `<table>` element, and then odd table rows reference that property in their background color declaration:
+
+```css
+table {
+  --table-stripe-color: lightgray;
+}
+tr:nth-child(odd) {
+  background: var(--table-stripe-color);
+}
+```
+
+An important distinction to note is that the `tr:nth-child(odd)` elements aren't actually looking up the value of `--table-stripe-color` on the `<table>` element, they don't actually know or care where the property was defined. *They're looking up the property on themselves*.
+
+To make that last point more clear, since all `<tr>` elements are children of `<table>` elements, and since custom properties inherit from parent to child, the `<tr>` gets the value of `--table-stripe-color: lightgray` through property inheritance *not* through variable reference.
+
+Continuing with the table example, suppose we decided that we didn't want rows in the table head to be stripped. Since the `<thead>` element is child of `<table>` and a parent of `<tr>` elements in the table's head, we can prevent those `<tr>` elements from being striped by redefining the `--table-stripe-color` to it's initial value. .
+
+```css
+table {
+  --table-stripe-color: lightgray;
+}
+thead {
+  --table-stripe-color: initial;
+}
+tr:nth-child(odd) {
+  background: var(--table-stripe-color);
+}
+```
+
+When the `<tr>` elements lookup their property value for `--table-stripe-color`, they'll find `initial` instead of `lightgray`.
+
+### Default values
+
+The `var()` function takes an optional second argument that can be used as a fallback in the event that the custom property isn't defined. For example, the following declaration would allow third-party users to define a `--link-color` property, but if no such property were found, the links would be orange.
+
+```css
+a {
+  color: var(--link-color, orange);
+}
+```
+
+Another way to set default values is to define properties on the root element:
+
+```css
+:root {
+  --link-color: orange;
+}
+a {
+  color: var(--link-color);
+}
+```
+
+Though these two examples may seem to be doing the same thing, they're subtly different. In the second example, a user could unset the property for all links in the sidebar with the following rule:
+
+```css
+.sidebar {
+  --link-color: unset;
+}
+```
+
+Such a rule in the first example would still produce orange links because the default is defined on `<a>` elements rather than on `:root`.

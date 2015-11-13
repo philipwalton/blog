@@ -44,13 +44,15 @@ In this post I'm going to talk about some of the limitations of preprocessor var
 
 ## The limitations of preprocessor variables
 
-At their core, CSS preprocessors are essentially a templating language. They allow you to abstract common patterns and more easily reuse bits of code. But at the end of the day they spit out raw CSS, which means they're incapable of doing anything that CSS can't already do natively.
+Preprocessors can do some pretty amazing things. And even if you know that ultimately they just spit out raw CSS, it's still often surprising how powerful they can be.
+
+That being said, they definitely do have limitations, and sometime the appearance of dynamic power can make these limitations surprising, especially to new users.
 
 ### Preprocessor variables aren't live
 
-Preprocessors give the appearance of dynamic logic and magical power. Even if know you they ultimately just produce CSS, their limitations can often be surprising, especially to new developers.
+Perhaps the most common example of a preprocessor limitation that surprises new users is the inability to define variables or use `@extend` inside a media query.
 
-Perhaps the most common example of this is the inability to redefine a variable inside a media query.
+Since this post is about variables, I'll just focus on that one:
 
 ```scss
 $gutter: 1em;
@@ -64,9 +66,9 @@ body {
 }
 ```
 
-If you compile the above code with Sass, you'll see that the media query block gets discarded altogether. While it's technically *possible* for a preprocessor to make conditional variable declarations work, doing so would be technically challenging and require enumerating all possible permutations&mdash;exponentially increasing the final file size of your CSS.
+If you compile the above code with Sass, you'll see that the media query block simply gets discarded. While it's technically *possible* for a preprocessor to make conditional variable declarations work, doing so would be technically challenging and require enumerating all possible permutations&mdash;exponentially increasing the final file size of your CSS.
 
-Since this doesn't work dynamically, the only option is to assign variations for all media sizes, and code out each version separately.
+Since this feature doesn't work dynamically, the only option is to use a separate variable for every media query, and code out each version separately.
 
 ```scss
 $font-size-sm: 1em;
@@ -80,10 +82,9 @@ Whenever you use variables, the question of scope inevitably comes into play. Sh
 
 As it turns out, there's another way to scope variables that ends up being even more power: scoping them to a DOM subtree.
 
-Since preprocessors don't run in the browser and never see the markup, the can't do this.
+Since preprocessors don't run in the browser and never see the markup, they can't do this.
 
 If you're wondering why you'd want to scope a variable to a DOM subtree, consider the following example:
-
 
 ```css
 .alert { background-color: lightyellow; }
@@ -95,15 +96,15 @@ If you're wondering why you'd want to scope a variable to a DOM subtree, conside
 }
 ```
 
-The above code isn't valid CSS, but you get the idea. The button is trying to access the background color of the parent alert and use a slightly darker version of it for it's border.
+The above code isn't valid CSS, but you should be able to understand what it's trying to do. The idea is that `<button>` elements should be able to automatically take on or adapt to the properties of their parent context.
 
-The idea is that no matter what background color ends up being applied to the alert, the button can respond to it.
+Regardless of what background color is applied to `.alert`, the button inside of it should be able to have a border color that matches.
 
 Since preprocessor variables aren't CSS declarations (property-value pairs), they don't cascade. More specifically, they don't inherit from parent element to child element.
 
 ### Preprocessor variables aren't interoperable
 
-This is a relatively obvious downside, but I mention it because I think it's important. If you're building a site with PostCSS and you want to use a third-party component that's only themeable via Sass, you're kinda stuck.
+This is a relatively obvious downside of preprocessors, but I mention it because I think it's important. If you're building a site with PostCSS and you want to use a third-party component that's only themeable via Sass, you're out of luck.
 
 It's not possible (or at least not easy) to share preprocessor variables across different toolset or with third-party stylesheets hosted on a CDN.
 
@@ -239,7 +240,6 @@ $gutter-lg: 3em;
   flex: 1;
   padding: $gutter-sm 0 0 $gutter-sm;
 }
-
 
 /* Override styles for medium screens, using $gutter-md. */
 

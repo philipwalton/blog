@@ -402,3 +402,58 @@ Arguably the most significant way React has changed web development is its champ
 This architectural model is almost exactly the same as inheritable custom properties in CSS.
 
 Even though custom properties are a new, untested domain, I think the success of the React model gives me confidence that a complex system can be built on top of one-way property inheritance.
+
+## Minimizing side effects
+
+Unlike `props` in React, CSS custom properties all inherit by default. In some cases, this could lead to components being styled in way they may not have intended.
+
+This can be avoided though, because it's possible to prevent custom properties from inheriting.
+
+To completely prevent any properties from inheriting to a particular component you can use the `all` property, and set it to `initial`.
+
+```css
+.MyComponent {
+  all: initial;
+
+  /* Additional styles here */
+}
+```
+
+If you want only white-listed custom properties to inherit, you can use a combination of `all` and setting individual, allowed properties to inherit:
+
+```css
+.MyComponent {
+  all: initial;
+
+  /* Whitelist these properties */
+  --color: inherit;
+  --font: inherit;
+
+  /* Additional styles here */
+}
+```
+
+Though not part of the specification yet, the property `--` has [been discussed](https://github.com/w3c/webcomponents/issues/300#issuecomment-144551648), which could be used to reset only custom properties, while allowing regular inheritable properties (e.g. `color`, `font-family`) to inherit as normal.
+
+```css
+.MyComponent {
+  /* Resets only custom properties. */
+  --: initial;
+
+  /* Whitelists these custom properties */
+  --color: inherit;
+  --font: inherit;
+
+  /* Additional styles here */
+}
+```
+
+### Managing global names
+
+If you've been paying attention to how I've been naming my custom properties, you've probably noticed that I've prefixed them with the class name of the component, e.g. `--Button-backgroundColor`.
+
+Like most names in CSS, custom properties are global and there's always the possibility that they'll conflict with names being used by other developers on your team.
+
+An easy way to avoid this problem is to stick to a naming convention, like I've done here.
+
+For more complex projects, you'd probably want to consider something like [CSS Modules](https://github.com/css-modules/css-modules) which localifies all global names and has recently [expressed interest](https://github.com/css-modules/postcss-modules-values/issues/6#issuecomment-155526613) in supporting custom properties.

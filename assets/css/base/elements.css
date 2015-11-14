@@ -25,7 +25,8 @@ body {
 
 h1,
 h2,
-h3 {
+h3,
+h4 {
   color: var(--heading-color);
   font-family: var(--fonts-sans-serif-backup);
   letter-spacing: -0.04em;
@@ -33,7 +34,8 @@ h3 {
 }
 .wf-active h1,
 .wf-active h2,
-.wf-active h3 {
+.wf-active h3,
+.wf-active h4 {
   font-family: var(--fonts-sans-serif);
 }
 

@@ -120,7 +120,7 @@ To answer the question, I think it's helpful to examine how normal properties wo
 
 Think about what happens when you set `color: gray` or `font-size: .875em` on the `<body>` element. All descendants of `<body>`, who don't specificy their own colors or font sizes, inherit those values.
 
-Since custom properties are just regular, inheritable propeties, all of these concepts apply to them as well. And all the mechanisms you can use to define or override regular properties in CSS apply to custom properties as well.
+Since custom properties are just regular, inheritable propeties, all of these concepts apply to them as well. And all the mechanisms you can use to define or override regular properties apply to custom properties too.
 
 To put that more technically: *custom properties cascade!*
 
@@ -138,7 +138,7 @@ When the above media query matches, the `font-size` value becomes `1.25em` and a
 
 The same thing happens to custom properties; *their values are live!* Any time you define a custom property in a media query or state class, as soon as that declaration matches or stops matching, the custom property value automatically updates throughout the site.
 
-### Using custom properties
+## Using custom properties
 
 Here's a basic example of how custom properties work. In the following code, the custom property `--table-stripe-color` is defined on the `<table>` element, and then odd table rows reference that property in their background color declaration:
 
@@ -155,7 +155,7 @@ An important distinction to note is that the `tr:nth-child(odd)` elements aren't
 
 To make that last point more clear, since all `<tr>` elements are children of `<table>` elements, and since custom properties inherit from parent to child, the `<tr>` gets the value of `--table-stripe-color: lightgray` through property inheritance *not* through variable reference.
 
-Continuing with the table example, suppose we decided that we didn't want rows in the table head to be stripped. Since the `<thead>` element is child of `<table>` and a parent of `<tr>` elements in the table's head, we can prevent those `<tr>` elements from being striped by redefining the `--table-stripe-color` to it's initial value. .
+Continuing with the table example, suppose we decided that we didn't want rows in the table head to be striped. Since the `<thead>` element is child of `<table>` and a parent of `<tr>` elements in the table's head, we can prevent those `<tr>` elements from being striped by redefining the `--table-stripe-color` to its initial value.
 
 ```css
 table {
@@ -204,9 +204,9 @@ Such a rule in the first example would still produce orange links because the de
 
 ## Real-life examples
 
-It's one thing to understand how custom properties work, but it's another thing entirely to really get how they're useful.
+It's one thing to understand how custom properties work, but it's another thing entirely to really get how they're useful. I think the best way to demonstrate usefulness is with real-life exapmles.
 
-In this section I'm going to present three example of problems that are a pain to deal with in CSS today, even with preprocessor variables.
+In this section I'm going to show three problems that are a pain to deal with in CSS today, even with preprocessor variables, and demonstrate how custom properties provide an elegant and simple solution.
 
 ### Responsive properties with media queries
 

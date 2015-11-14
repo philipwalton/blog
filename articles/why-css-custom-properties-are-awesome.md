@@ -192,11 +192,11 @@ a {
 }
 ```
 
-Though these two examples may seem to be doing the same thing, they're subtly different. In the second example, a user could unset the property for all links in the sidebar with the following rule:
+Though these two examples may seem to be doing the same thing, they're subtly different. In the second example, a user could reset the property for all links in the sidebar with the following rule:
 
 ```css
 .sidebar {
-  --link-color: unset;
+  --link-color: initial;
 }
 ```
 
@@ -230,7 +230,7 @@ $gutter-lg: 3em;
 .Container {
   margin: 0 auto;
   max-width: 60em;
-  padding: var(--gutter-sm);
+  padding: $gutter-sm;
 }
 .Grid {
   display: flex;
@@ -297,15 +297,18 @@ The following code does that same thing as the above with about one-third as muc
   padding: var(--gutter);
 }
 .Grid {
+  --gutterNegative: calc(1 * var(--gutter));
   display: flex;
-  margin: -var(--gutter) 0 0 -var(--gutter);
+  margin-left: var(--gutterNegative);
+  margin-top: var(--gutterNegative);
 }
 .Grid-cell {
   flex: 1;
-  padding: var(--gutter) 0 0 var(--gutter);
+  margin-left: var(--gutter);
+  margin-top: var(--gutter);
 }
 ```
 
 Even with the extra verbosity of the custom property syntax, the amount of code needed to accomplish the same thing is substantially reduced. And this only takes into account three variations. The more variations you need, the more code this will save.
 
-The following demo shows a basic site layout that automatically redefines the gutter value as the viewport width changes ([editor view](http://codepen.io/philipwalton/pen/epLWNO?editors=110), [full page view](http://codepen.io/philipwalton/full/epLWNO/)).
+The following demo shows a basic site layout that automatically redefines the gutter value as the viewport width changes ([editor view](http://codepen.io/philipwalton/pen/epLWNO), [full page view](http://codepen.io/philipwalton/full/epLWNO/)).

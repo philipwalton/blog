@@ -312,3 +312,93 @@ The following code does that same thing as the above with about one-third as muc
 Even with the extra verbosity of the custom property syntax, the amount of code needed to accomplish the same thing is substantially reduced. And this only takes into account three variations. The more variations you need, the more code this will save.
 
 The following demo shows a basic site layout that automatically redefines the gutter value as the viewport width changes ([editor view](http://codepen.io/philipwalton/pen/epLWNO), [full page view](http://codepen.io/philipwalton/full/epLWNO/)).
+
+### Contextual styling
+
+Contextual stying (styling an element based on where it appears in the DOM) is a contentious topic in CSS. On the one hand, it's something most well-respected CSS developer warn against. But on the other hand, it's something thousands of people do every day.
+
+Harry Roberts recently wrote [a post on this subject](http://csswizardry.com/2015/06/contextual-styling-ui-components-nesting-and-implementation-detail/). This quote summarizes his main point well:
+
+> If you need to change the cosmetics of a UI component based on where it is placed, your design system is failing&hellip;Things should be designed to be ignorant; things should be designed so that we always just have "this component" and not "this component when inside&hellip;
+
+While I do agree with Harry about this (as well as most things), I think the fact that so many people take shortcuts in these cases is perhaps indicative of a larger problem: that CSS may not be expressive enough to allow us to write our components how we really want.
+
+Consider the usual approach to contextual styling in CSS, using the descendant combinator:
+
+```css
+/* Regular button styles. */
+.Button { }
+
+/* Button styles that are different when inside the header. */
+.Header .Button { }
+```
+
+This approach has a lot of problems, which I explain in my article on [CSS Architecture](/articles/css-architecture/#modifying-components-based-on-who-their-parents-are). One way to recognize this pattern as a code smell is it violates the [open/closed principle](https://en.wikipedia.org/wiki/Open/closed_principle) of software development; it modifies the implementation details of a closed component.
+
+> Software entities (classes, modules, functions, etc.) should be open for extension, but closed for modification.
+
+But custom properties change almost everything about this paradigm!
+
+With custom properties, we can, for the first time, write components that are actually open for extension in a meaningful way. Here's an example:
+
+```css
+.Button {
+  background: var(--Button-backgroundColor, #eee);
+  border: 1px solid var(--Button-borderColor, #333);
+  color: var(--Button-color, #333);
+  /* ... */
+}
+
+.Header {
+  --Button-backgroundColor: purple;
+  --Button-borderColor: transparent;
+  --Button-color: white;
+}
+```
+
+The difference between this and the previous code example is subtle but important.
+
+In the first example (using a descendant combinator), we're declaring that buttons inside the header *will look this way*, and that way is different from how the button component defines itself. Such a declaration is dictatorial and hard to undo in the case of an exception where a button in the header *doesn't* need to look this way.
+
+With custom properties, on the other hand, the button component is still ignorant of its context and completely decoupled from the header component. All it says is: I'm going to style myself based on whatever these variables happen to be in my current situation. And the header component simply say: I'm going to suggest that if any button components reside inside me, is should look this way *unless another component suggests otherwise*.
+
+The main difference is that the extension is opt-in by the button component, and it's easily undone in the case of an exception.
+
+To make that last point more clear, imagine if a `.Promo` component were added to the header, and button inside the `.Promo` component needed to look like normal buttons, not header buttons.
+
+If you were using descendant combinators, you have to write a bunch of styles for the header buttons and then *undo* those styles for the promo buttons; which is messy, unnecessary, and error prone:
+
+```css
+/* Regular button styles. */
+.Button { }
+
+/* Button styles that are different when inside the header. */
+.Header .Button { }
+
+/* Undo button styles in the header that are also in promo. */
+.Header .Promo .Button { }
+```
+
+With custom properties, you can simply update the button properties to be whatever you want, or reset them to return to the default styling.
+
+```css
+.Promo {
+  --Button-backgroundColor: initial;
+  --Button-borderColor: initial;
+  --Button-color: initial;
+}
+```
+
+Here's a demo that illustrates contextual styling of both links and button in the header of a site as well as the content area ([editor view](http://codepen.io/philipwalton/pen/KdxmWL), [full page view](http://codepen.io/philipwalton/full/KdxmWL/))
+
+#### Learning from React
+
+When I was first exploring the idea of contextual styling via custom properties, I was skeptical. Like I said, my inclination is to prefer context-agnostic components that define their own variations rather than adapting to arbitrary variations.
+
+But one thing that helped sway my opinion was comparing custom properties in CSS to `props` in React components.
+
+Arguably the most significant way React has changed web development is its championing of a single-directional (or one-way) data flow. In React, parent components pass data to child components via `props`, and child components define what props they're willing to accept.
+
+This architectural model is almost exactly the same as inheritable custom properties in CSS.
+
+Even though custom properties are a new, untested domain, I think the success of the React model gives me confidence that a complex system can be built on top of one-way property inheritance.

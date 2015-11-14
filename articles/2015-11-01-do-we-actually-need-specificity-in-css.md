@@ -231,5 +231,13 @@ If there's a large team out there constantly fighting specificity battles, it wo
 The advantage of using `:not()` is you can apply it to any element (including `<html>`), so you wouldn't have to split selectors. You could also use it to add type or ID-level specificity, e.g. `:not(z)` or `:not(#z)`, so you wouldn't always have to increase by classes.
 
 The downside of using `:not()` is you must be careful to pick a selector that's guaranteed to not match the element, otherwise it won't work.
+
 </div>
 
+<div class="Callout">
+
+**Update:** *(November 14, 2015)*
+
+[David Khourshid](https://twitter.com/davidkpiano/) wrote a response to this article entitled [The Simplicity of Specificity](http://codepen.io/davidkpiano/post/the-simplicity-of-specificity) where he argues that CSS should not be compared to an imperative language, and things would be better if we wrote rules that were source order-independent. While it's probably no surprise that I disagree with this position, I encourage you to read it if you want an alternative perspective.
+
+</div>

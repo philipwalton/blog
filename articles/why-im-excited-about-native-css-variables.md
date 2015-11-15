@@ -4,9 +4,11 @@ title: "Why I'm Excited About Native CSS Variables"
 date: 2015-11-03T17:28:56-08:00
 ---
 
-A few days ago CSS Custom Properties&mdash;a.k.a. CSS Variables&mdash;shipped in Chrome Canary. When Chrome engineer [Addy Osmani](https://twitter.com/addyosmani) first tweeted about the release, he was met with a [surprising](https://twitter.com/kuizinas/status/661600615911526401) [amount](https://twitter.com/DanTup/status/661609987047866368) of [negativity](https://twitter.com/joshlangner/status/661608288707026944). At least, it was surprising to me, given how excited I am about this feature.
+A few days ago CSS variables&mdash;more accurately known as CSS custom properties&mdash;shipped in Chrome Canary.
 
-After a quick scan of the responses, it was clear that 99% of the negatively centered around these two complaints:
+When Chrome engineer [Addy Osmani](https://twitter.com/addyosmani) first tweeted about the release, he was met with a surprising amount of [negativity](https://twitter.com/joshlangner/status/661608288707026944), [hostility](https://twitter.com/kuizinas/status/661600615911526401), and [skepticism](https://twitter.com/DanTup/status/661609987047866368). At least, it was surprising to me, given how excited I am about this feature.
+
+After a quick scan of the responses, it was clear that 99% of the complaints focused on one of these two things:
 
 * The syntax is "ugly" and "verbose".
 * Sass already does this, so why should I care?
@@ -14,10 +16,10 @@ After a quick scan of the responses, it was clear that 99% of the negatively cen
 For the record, I *do* understand why people have this reaction. I mean, if you're used to doing this:
 
 ```scss
-$link-color: red;
+$linkColor: red;
 
 a {
-  color: $link-color;
+  color: $linkColor;
 }
 ```
 
@@ -25,11 +27,11 @@ and then you're told to do this:
 
 ```css
 :root {
-  --link-color: red;
+  --linkColor: red;
 }
 
 a {
-  color: var(--link-color);
+  color: var(--linkColor);
 }
 ```
 
@@ -37,21 +39,21 @@ I get why you'd be disappointed&mdash;and if that's all CSS variables did, I'd b
 
 If CSS variables were *just* a way to reference stored values, and they didn't offer anything above and beyond what we can already do with preprocessors, there would be little reason for them to exist (and no reason to have the syntax they do).
 
-But the reality is CSS variables can do *so much* more than that. In fact, I think it does them a disservice to call them variables at all. They're custom properties, which gives them an entirely different set of superpowers.
+But the reality is CSS variables can do *so much* more than that. In fact, I think it does them a disservice to even call them variables at all. They're custom properties, which gives them an entirely different set of superpowers.
 
-In this post I'm going to highlight some of the limitations of preprocessor variables and show how none of those limitations apply to custom properties I'll also demo some of the new design patterns that custom properties will enable: things like responsive, cascading properties and contextual styling via React-style, one-way data flow.
+In this article I'm going to highlight some of the limitations of preprocessor variables and show that these limitations don't apply to custom properties. I'll also demo some of the new design patterns that custom properties will enable: things like responsive, cascading properties and contextual styling via React-style, one-way data flow.
 
 ## The limitations of preprocessor variables
 
-Preprocessors can do some pretty amazing things. Even if you know that they ultimately just spit out raw CSS, they call still feel magical at times.
+CSS preprocessors can do some pretty amazing things. Even if you know that they ultimately just spit out raw CSS, they can still feel magical at times.
 
-That being said, they definitely have their limitations, and sometime the appearance of dynamic power can make these limitations surprising, especially to new users.
+That being said, they definitely have their limitations, and sometimes the appearance of dynamic power can make these limitations surprising, especially to new users.
 
 ### Preprocessor variables aren't live
 
 Perhaps the most common example of a preprocessor limitation that surprises new users is the inability to define variables or use `@extend` inside a media query.
 
-Since this post is about variables, I'll focus on that one:
+Since this article is about variables, I'll focus on the former:
 
 ```scss
 $gutter: 1em;
@@ -65,13 +67,13 @@ $gutter: 1em;
 }
 ```
 
-If you compile the above code with Sass, you'll see that the media query block simply gets discarded, and the variable assignment ignored. While it's technically *possible* for a preprocessor to make conditional variable declarations work, doing so would be technically challenging and require enumerating all possible permutations&mdash;exponentially increasing the final size of your CSS.
+If you compile the above code with Sass, you'll see that the media query block simply gets discarded and the variable assignment ignored. While it's technically *possible* for a preprocessor to make conditional variable declarations work, doing so would be technically challenging and require enumerating all possible permutations&mdash;exponentially increasing the final size of your CSS.
 
-Since it's not possible to change a variable based on the matching media query, the only option is to assign a unique variable per media query, and code out each version separately. More on this later.
+Since it's not possible to change a variable based on the matching `@media` rule, the only option is to assign a unique variable per media query, and code out each version separately. More on this later.
 
-### Preprocessors variables don't cascade
+### Preprocessor variables don't cascade
 
-Whenever you use variables, the question of scope inevitably comes into play. Should this variable be global? Should it be scoped to the file? Should it be scoped to the block? These are all questions I hear asked frequently by Sass developers.
+Whenever you use variables, the question of scope inevitably comes into play. Should this variable be global? Should it be scoped to the file/module? Should it be scoped to the block? These are all questions I hear asked frequently by Sass developers.
 
 As it turns out, there's another way to scope variables that ends up being far more useful: scoping them to a DOM subtree. And since preprocessors don't run in the browser and never see the markup, they can't do this.
 
@@ -89,15 +91,15 @@ If you're wondering why you'd want to scope a variable to a DOM subtree, conside
 
 The above code isn't valid CSS, but you should be able to understand what it's trying to accomplish. The idea is that `<button>` elements should be able to adapt to the properties of their parent context. Regardless of what background color is applied to `.alert`, the button inside of it should be able to have a border color that matches.
 
-There are tons of use cases for this type of feature, but perhaps the most compelling is to ensure text is always readable and sufficiently contracts with the background.
+There are tons of use cases for this type of feature, but I think the most compelling is to ensure text is always readable and sufficiently contrasts with the background.
 
-Since preprocessor variables aren't CSS declarations (property-value pairs), they don't cascade. And they don't inherit to child element.
+Since preprocessor variables aren't CSS declarations (property-value pairs), they don't cascade. And they don't inherit to child elements.
 
 ### Preprocessor variables aren't interoperable
 
 This is a relatively obvious downside of preprocessors, but I mention it because I think it's important. If you're building a site with PostCSS and you want to use a third-party component that's only themeable via Sass, you're out of luck.
 
-It's not possible (or at least not easy) to share preprocessor variables across different toolset or with third-party stylesheets hosted on a CDN.
+It's not possible (or at least not easy) to share preprocessor variables across different toolsets or with third-party stylesheets hosted on a CDN.
 
 Native CSS custom properties will work with any CSS preprocessor or plain CSS file. The reverse is not usually true.
 
@@ -125,9 +127,9 @@ Back to the `color` and `font-size` example, consider what happens when the foll
 }
 ```
 
-When the above media query matches, the `font-size` value becomes `1.25em` and all descendants of `<body>` will update accordingly. Since the new declaration didn't override the `color`, the original declaration still applies.
+When the above `@media` rule matches, the `font-size` value becomes `1.25em` and all descendants of `<body>` will update accordingly. Since the new declaration didn't override the `color`, the original declaration still applies.
 
-The same thing happens to custom properties; *their values are live!* Any time you define a custom property in a media query or class declaration, as soon as that declaration matches or stops matching, the custom property value automatically updates throughout the site.
+The same thing happens to custom properties. Just like regular properties, their values are live! Any time you define a custom property in a media query or class declaration, as soon as that declaration matches or stops matching, the custom property value automatically updates throughout the site.
 
 ## Using custom properties
 
@@ -142,7 +144,7 @@ tr:nth-child(odd) {
 }
 ```
 
-An important distinction to note is that the `tr:nth-child(odd)` elements aren't actually looking up the value of `--tableStripeColor` on the `<table>` element, they don't actually know or care where the property was defined. They're looking up the property on themselves, and they find it one themselves because the value inherits from the `<table>` element to the `<tr>` element.
+An important distinction to note is that the `tr:nth-child(odd)` elements aren't actually looking up the value of `--tableStripeColor` on the `<table>` element, they don't actually know or care where the property was initially defined. They're looking up the property on themselves, and they find it on themselves because the property/value declaration inherits from the `<table>` element to the `<tr>` element.
 
 Now suppose we decide we don't want rows in the table head to be striped. Since the `<thead>` element is child of `<table>` and a parent of the rows we don't want to stripe, we can prevent those rows from getting the `--tableStripeColor` property by resetting it to its initial value.
 
@@ -160,11 +162,11 @@ tr:nth-child(odd) {
 
 ### Setting defaults
 
-The `var()` function takes an optional second argument that can be used as a fallback in the event that the custom property isn't defined. For example, the following declaration would allow third-party users to define a `--link-color` property, but if no such property were found, the links would be orange.
+The `var()` function takes an optional second argument that can be used as a fallback in the event that the custom property isn't defined. For example, the following declaration would allow third-party users to define a `--linkColor` property, but if no such property were found, the links would be orange.
 
 ```css
 a {
-  color: var(--link-color, orange);
+  color: var(--linkColor, orange);
 }
 ```
 
@@ -172,10 +174,11 @@ Another way to set default values is to define properties on the root element:
 
 ```css
 :root {
-  --link-color: orange;
+  --linkColor: orange;
 }
+
 a {
-  color: var(--link-color);
+  color: var(--linkColor);
 }
 ```
 
@@ -183,7 +186,7 @@ Though these two examples may seem to be doing the same thing, they're subtly di
 
 ```css
 .sidebar {
-  --link-color: initial;
+  --linkColor: initial;
 }
 ```
 
@@ -201,68 +204,68 @@ With custom properties, now it is.
 
 Probably the most compelling use-case for custom properties is the ability to automatically update the property values in response to the matched media.
 
-Consider a site with a standard gutter variable that defines the default spacing between items in the layout as well as the default padding for all the various section on the page.
+Consider a site with a standard gutter variable that defines the default spacing between items in the layout as well as the default padding for all the various sections on the page.
 
-In many cases, you want the value of this gutter to be different depending on how big the browser window is. On large screens you want a lot of space between items (a lot of breathing room) but on smaller screens you can't afford that much space, so the gutters need to be smaller.
+In many cases, you want the value of this gutter to be different depending on how big the browser window is. On large screens you want a lot of space between items (a lot of breathing room), but on smaller screens you can't afford that much space, so the gutters need to be smaller.
 
-Since CSS preprocessors ultimately produce static files, the only way to do this today is to explicitly write all possible variations. Consider the following Sass code that defines a `sm`, `md`, and `lg` variation:
+Since CSS preprocessors ultimately produce static files, the only way to do this today is to explicitly write out all possible variations. Consider the following Sass code that defines `$gutterSm`, `$gutterMd`, and `$gutterLg` variations:
 
 ```css
 /* Declares three gutter values, one for each breakpoint */
 
-$gutter-sm: 1em;
-$gutter-md: 2em;
-$gutter-lg: 3em;
+$gutterSm: 1em;
+$gutterMd: 2em;
+$gutterLg: 3em;
 
-/* Base styles for small screens, using $gutter-sm. */
+/* Base styles for small screens, using $gutterSm. */
 
 .Container {
   margin: 0 auto;
   max-width: 60em;
-  padding: $gutter-sm;
+  padding: $gutterSm;
 }
 .Grid {
   display: flex;
-  margin: -$gutter-sm 0 0 -$gutter-sm;
+  margin: -$gutterSm 0 0 -$gutterSm;
 }
 .Grid-cell {
   flex: 1;
-  padding: $gutter-sm 0 0 $gutter-sm;
+  padding: $gutterSm 0 0 $gutterSm;
 }
 
-/* Override styles for medium screens, using $gutter-md. */
+/* Override styles for medium screens, using $gutterMd. */
 
 @media (min-width: 30em) {
   .Container {
-    padding: $gutter-md;
+    padding: $gutterMd;
   }
   .Grid {
-    margin: -$gutter-md 0 0 -$gutter-md;
+    margin: -$gutterMd 0 0 -$gutterMd;
   }
   .Grid-cell {
-    padding: $gutter-md 0 0 $gutter-md;
+    padding: $gutterMd 0 0 $gutterMd;
   }
 }
 
-/* Override styles for large screens, using $gutter-lg. */
+/* Override styles for large screens, using $gutterLg. */
 
 @media (min-width: 30em) {
   .Container {
-    padding: $gutter-lg;
+    padding: $gutterLg;
   }
   .Grid {
-    margin: -$gutter-lg 0 0 -$gutter-lg;
+    margin: -$gutterLg 0 0 -$gutterLg;
   }
   .Grid-cell {
-    padding: $gutter-lg 0 0 $gutter-lg;
+    padding: $gutterLg 0 0 $gutterLg;
   }
 }
 ```
 
-To accomplish the exact same using custom properties, you just define your styles one and reference a single `--gutter` property. Then, as the matched media changes, you update the value of `--gutter` and everything responds accordingly.
+To accomplish the exact same thing using custom properties, you just define your styles once, and you reference a single `--gutter` property. Then, as the matched media changes, you update the value of `--gutter` and everything responds accordingly.
 
 ```scss
-/* Declares the `--gutter` value at each breakpoint */
+/* Declares what `--gutter` is at each breakpoint */
 
 :root { --gutter: 1.5em; }
 
@@ -296,7 +299,7 @@ To accomplish the exact same using custom properties, you just define your style
 }
 ```
 
-Even with the extra verbosity of the custom property syntax, the amount of code needed to accomplish the same thing is substantially reduced. And this only takes into account three variations. The more variations you need, the more code this will save.
+Even with the extra verbosity of the custom property syntax, the amount of code needed to accomplish the same thing is substantially reduced. And this only takes into account three variations. The more variations you have, the more code this will save.
 
 The following demo shows a basic site layout that automatically redefines the gutter value as the viewport width changes. Check it out in a browser that supports custom properties to see it in action!
 
@@ -309,11 +312,11 @@ View the demo on CodePen:
 
 Contextual styling (styling an element based on where it appears in the DOM) is a contentious topic in CSS. On the one hand, it's something most well-respected CSS developers warn against. But on the other hand, it's something thousands of people still do every day.
 
-Harry Roberts recently wrote [this post](http://csswizardry.com/2015/06/contextual-styling-ui-components-nesting-and-implementation-detail/) with his thoughts on the matter:
+[Harry Roberts](https://twitter.com/csswizardry) recently wrote [this post](http://csswizardry.com/2015/06/contextual-styling-ui-components-nesting-and-implementation-detail/) with his thoughts on the matter:
 
 > If you need to change the cosmetics of a UI component based on where it is placed, your design system is failing&hellip;Things should be designed to be ignorant; things should be designed so that we always just have "this component" and not "this component when inside&hellip;
 
-While I do side with Harry on this (and most things), I think the fact that so many people take shortcuts in this situation is perhaps indicative of a larger problem: that CSS is limited in its expressiveness, and most people aren't satisfied with any of the current "best practices".
+While I do side with Harry on this (and most things), I think the fact that so many people take shortcuts in situation like this is perhaps indicative of a larger problem: that CSS is limited in its expressiveness, and most people aren't satisfied with any of the current "best practices".
 
 The follow example shows how most people approach contextual styling in CSS, using the descendant combinator:
 
@@ -325,7 +328,7 @@ The follow example shows how most people approach contextual styling in CSS, usi
 .Header .Button { }
 ```
 
-This approach has a lot of problems, which I explain in my article on [CSS Architecture](/articles/css-architecture/#modifying-components-based-on-who-their-parents-are). One way to recognize this pattern as a code smell is it violates the [open/closed principle](https://en.wikipedia.org/wiki/Open/closed_principle) of software development; it modifies the implementation details of a closed component.
+This approach has a lot of problems (which I explain in my article on [CSS Architecture](/articles/css-architecture/#modifying-components-based-on-who-their-parents-are)). One way to recognize this pattern as a code smell is it violates the [open/closed principle](https://en.wikipedia.org/wiki/Open/closed_principle) of software development; it modifies the implementation details of a closed component.
 
 > Software entities (classes, modules, functions, etc.) should be open for extension, but closed for modification.
 
@@ -350,13 +353,13 @@ The difference between this and the descendant combinator example is subtle but 
 
 When using descendant combinators we're declaring that buttons inside the header *will look this way*, and that way is different from how the button component defines itself. Such a declaration is dictatorial (to borrow Harry's word) and hard to undo in the case of an exception where a button in the header *doesn't* need to look this way.
 
-With custom properties, on the other hand, the button component is still ignorant of its context and completely decoupled from the header component. Its declaration simply says: I'm going to style myself based on these variables, whatever they happen to be in my current situation. And the header component simply says: I'm going to set these property values; it's up to the button to determine if and how to use them.
+With custom properties, on the other hand, the button component is still ignorant of its context and completely decoupled from the header component. Its declaration simply says: *I'm going to style myself based on these variables, whatever they happen to be in my current situation*. And the header component simply says: *I'm going to set these property values; it's up to my descendants to determine if and how to use them*.
 
 The main difference is that the extension is opt-in by the button component, and it's easily undone in the case of an exception.
 
-To make that last point more clear, imagine if a `.Promo` component were added to the header, and button inside the `.Promo` component needed to look like normal buttons, not header buttons.
+To make that last point more clear, imagine if a `.Promo` component were added to the header, and buttons inside the `.Promo` component needed to look like normal buttons, not header buttons.
 
-If you were using descendant combinators, you have to write a bunch of styles for the header buttons and then *undo* those styles for the promo buttons; which is messy, unnecessary, and error prone:
+If you were using descendant combinators, you'd have to write a bunch of styles for the header buttons and then *undo* those styles for the promo buttons; which is messy and error prone, and easily gets out of hand as the number of combinations increases:
 
 ```css
 /* Regular button styles. */
@@ -369,7 +372,7 @@ If you were using descendant combinators, you have to write a bunch of styles fo
 .Header .Promo .Button { }
 ```
 
-With custom properties, you can simply update the button properties to be whatever you want, or reset them to return to the default styling.
+With custom properties, you can simply update the button properties to be whatever you want, or reset them to return to the default styling. And regardless of the number of exceptions, the way to alter the styles is always the same.
 
 ```css
 .Promo {
@@ -389,11 +392,11 @@ View the demo on CodePen:
 
 #### Learning from React
 
-When I was first exploring the idea of contextual styling via custom properties, I was skeptical. Like I said, my inclination is to prefer context-agnostic components that define their own variations rather than adapting to arbitrary data inherited from the parent.
+When I was first exploring the idea of contextual styling via custom properties, I was skeptical. Like I said, my inclination is to prefer context-agnostic components that define their own variations rather than adapting to arbitrary data inherited from their parent.
 
 But one thing that helped sway my opinion was comparing custom properties in CSS to `props` in React components.
 
-Arguably the most significant way React has changed web development is its championing of a single-directional (one-way) flow of data. In React, parent components pass data to child components via `props`, and child components define what props they're willing to accept and how they're going to use them.
+Arguably the most significant way React has changed web development is its championing of a single-directional (one-way) flow of data. In React, parent components pass data to child components via `props`, and child components define what `props` they're willing to accept and how they're going to use them.
 
 This architectural model is almost exactly the same as inheritable custom properties in CSS.
 
@@ -423,7 +426,7 @@ If you want only white-listed custom properties to inherit, you can use a combin
 }
 ```
 
-Though not part of the specification yet, the property `--` has [been discussed](https://github.com/w3c/webcomponents/issues/300#issuecomment-144551648), which could be used to reset only custom properties, while allowing regular inheritable properties (e.g. `color`, `font-family`) to inherit as normal.
+Though not part of the specification yet, the `--` property has [been discussed](https://github.com/w3c/webcomponents/issues/300#issuecomment-144551648), which could be used to reset only custom properties, while allowing regular inheritable properties (e.g. `color`, `font-family`) to inherit as normal.
 
 ```css
 .MyComponent {
@@ -438,7 +441,7 @@ Though not part of the specification yet, the property `--` has [been discussed]
 
 ### Managing global names
 
-If you've been paying attention to how I've been naming my custom properties, you've probably noticed that I've prefixed them with the class name of the component, e.g. `--Button-backgroundColor`.
+If you've been paying attention to how I name my custom properties, you've probably noticed that I prefix them with the class name of the component, e.g. `--Button-backgroundColor`.
 
 Like most names in CSS, custom properties are global and there's always the possibility that they'll conflict with names being used by other developers on your team.
 
@@ -457,5 +460,3 @@ Custom properties fill a gap that preprocessor variables simply can't. Despite t
 Because of this, I firmly believe that many sites will use a combination of both in the future. Custom properties for reactive theming and preprocessor variables for static templating.
 
 I don't think it has to be an either-or situation. And pitting them against each other as competitors does a disservice to everyone.
-
-

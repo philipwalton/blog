@@ -445,3 +445,17 @@ Like most names in CSS, custom properties are global and there's always the poss
 An easy way to avoid this problem is to stick to a naming convention, like I've done here.
 
 For more complex projects, you'd probably want to consider something like [CSS Modules](https://github.com/css-modules/css-modules) which localifies all global names and has recently [expressed interest](https://github.com/css-modules/postcss-modules-values/issues/6#issuecomment-155526613) in supporting custom properties.
+
+## Wrapping up
+
+If you weren't familiar with custom properties in CSS before reading this article, I hope I've convinced you to give them a shot. And if you were one of the people skeptical of their necessity, I hope I've changed your mind.
+
+Custom properties bring a new set of dynamic and powerful capabilities to CSS, and I'm sure many of their biggest strengths are yet to be uncovered.
+
+Custom properties fill a gap that preprocessor variables simply can't. Despite that, preprocessor variables remain the easier-to-use and more elegant choice in many cases.
+
+Because of this, I firmly believe that many sites will use a combination of both in the future. Custom properties for reactive theming and preprocessor variables for static templating.
+
+I don't think it has to be an either-or situation. And pitting them against each other as competitors does a disservice to everyone.
+
+

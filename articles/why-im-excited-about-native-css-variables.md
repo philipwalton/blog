@@ -1,6 +1,6 @@
 ---
 template: article.html
-title: "Why CSS Custom Properties are Awesome"
+title: "Why I'm Excited About Native CSS Variables"
 date: 2015-11-03T17:28:56-08:00
 ---
 

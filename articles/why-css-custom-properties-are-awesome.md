@@ -307,7 +307,7 @@ View the demo on CodePen:
 
 ### Contextual styling
 
-Contextual stying (styling an element based on where it appears in the DOM) is a contentious topic in CSS. On the one hand, it's something most well-respected CSS developers warn against. But on the other hand, it's something thousands of people still do every day.
+Contextual styling (styling an element based on where it appears in the DOM) is a contentious topic in CSS. On the one hand, it's something most well-respected CSS developers warn against. But on the other hand, it's something thousands of people still do every day.
 
 Harry Roberts recently wrote [this post](http://csswizardry.com/2015/06/contextual-styling-ui-components-nesting-and-implementation-detail/) with his thoughts on the matter:
 

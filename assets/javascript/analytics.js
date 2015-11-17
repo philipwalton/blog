@@ -4,44 +4,6 @@ var linkClicked = require('./link-clicked');
 var parseUrl = require('./parse-url');
 
 
-var breakpoints = {
-  xs: '(max-width: 419px)',
-  sm: '(min-width: 420px) and (max-width: 569px)',
-  md: '(min-width: 570px) and (max-width: 799px)',
-  lg: '(min-width: 800px) and (max-width: 999px)',
-  xl: '(min-width: 1000px)'
-};
-
-
-function trackBreakpoints() {
-  // Do nothing in browsers that don't support `window.matchMedia`.
-  if (!window.matchMedia) return;
-
-  // Prevent rapid breakpoint changes from all firing at once.
-  var timeout;
-
-  Object.keys(breakpoints).forEach(function(breakpoint) {
-    var mql = window.matchMedia(breakpoints[breakpoint]);
-
-    // Set the initial breakpoint on pageload.
-    if (mql.matches) {
-      ga('set', 'dimension1', breakpoint);
-    }
-
-    // Update the breakpoint as the matched media changes, and send an event.
-    mql.addListener(function(mql) {
-      if (mql.matches) {
-        clearTimeout(timeout);
-        timeout = setTimeout(function() {
-          ga('set', 'dimension1', breakpoint);
-          ga('send', 'event', 'Breakpoint', 'change', breakpoint);
-        }, 1000);
-      }
-    });
-  });
-}
-
-
 function trackOutboundLinks() {
   linkClicked(function() {
     // Ignore outbound links on social buttons.
@@ -84,13 +46,7 @@ function isLinkOutbound(link) {
 
 module.exports = {
   track: function() {
-
-    ga('set', 'transport', 'beacon');
-
-    trackBreakpoints();
     trackOutboundLinks();
     trackSocialInteractions();
-
-    ga('send', 'pageview');
   }
 };

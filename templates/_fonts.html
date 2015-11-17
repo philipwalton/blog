@@ -1,0 +1,33 @@
+<script>
+// Tracks the font load start time.
+__userTiming && performance.mark('fonts:start');
+
+WebFontConfig = {
+  google: {
+    families: [
+      'Open+Sans:400,700:latin',
+      'Noto+Serif:400,400italic:latin'
+    ]
+  },
+  active: function() {
+    if (__userTiming) {
+      performance.mark('fonts:end');
+      performance.measure('fonts:load', 'fonts:start', 'fonts:end')
+      var fontsLoad = performance.getEntriesByName('fonts:load')[0];
+      // Tracks how long it took to load the fonts including
+      // the time it tooks to download the webfont.js script.
+      ga('send', 'timing', 'Fonts', 'load',
+          fontsLoad.duration, 'fonts.googleapis.com');
+    }
+    localStorage.setItem('wf-cached', +new Date);
+  },
+  inactive: function() {
+    // Tracks when load errors occur.
+    ga('send', 'event', 'Fonts', 'error', 'fonts.googleapis.com', {
+      nonInteraction: true
+    });
+  }
+};
+</script>
+
+<script async src="//ajax.googleapis.com/ajax/libs/webfont/1/webfont.js"></script>

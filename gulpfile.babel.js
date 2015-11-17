@@ -52,6 +52,7 @@ let siteData = {
 
 let env = nunjucks.configure('templates', {
   autoescape: false,
+  noCache: true,
   watch: false
 });
 

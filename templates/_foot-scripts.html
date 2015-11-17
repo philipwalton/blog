@@ -1,29 +1,17 @@
+<script>
+// Tracks the JavaScript load start time.
+__userTiming && performance.mark('js:start')</script>
+
 <script src="/assets/javascript/main.js"></script>
 
-<!-- Load GA after the `window.ga` is initialized or you'll get errors. -->
+<script>
+if (__userTiming) {
+  performance.mark('js:end');
+  performance.measure('js:load', 'js:start', 'js:end');
+  var jsLoad = performance.getEntriesByName('js:load')[0];
+  // Tracks the amount of time it took the JavaScript to load.
+  ga('send', 'timing', 'JavaScript', 'load', jsLoad.duration, 'local');
+}
+</script>
 
-{% if site.env == 'production' %}
-  <script async src="//www.google-analytics.com/analytics.js"></script>
-{% else %}
-  <script async src="//www.google-analytics.com/analytics_debug.js"></script>
-{% endif %}
-
-<!-- Load HTML Inspector in dev mode. -->
-
-{% if site.env != 'production' %}
-  <script src="//cdnjs.cloudflare.com/ajax/libs/html-inspector/0.8.2/html-inspector.js"></script>
-  <script>
-    HTMLInspector.rules.extend("unused-classes", function(config) {
-      config.whitelist = config.whitelist.concat([/^wf-/]);
-      return config;
-    });
-
-    HTMLInspector.rules.extend("script-placement", function(config) {
-      config.whitelist = config.whitelist.concat(['#ga-setup']);
-      return config;
-    });
-
-    // start the inspection
-    HTMLInspector.inspect();
-  </script>
-{% endif %}
+<script async src="//www.google-analytics.com/analytics.js"></script>

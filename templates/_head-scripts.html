@@ -1,13 +1,11 @@
-<script id="ga-setup">
+<script>
 
 // Google Analytics async snippet:
 // http://goo.gl/3FPNDx
 window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
 
-
 // Create the GA tracker before doing any logging.
 ga('create', 'UA-21292978-1', 'auto', {siteSpeedSampleRate: 100});
-
 
 {% if site.env != 'production' %}
   // In non-production mode, simply log GA hits to the console.
@@ -29,5 +27,11 @@ window.onerror = function(message, url, line, col) {
     exFatal: false
   });
 };
+
+// Check for User Timing support.
+window.__userTiming = window.performance &&
+    typeof performance.mark == 'function' &&
+    typeof performance.measure == 'function' &&
+    typeof performance.getEntriesByName == 'function';
 
 </script>

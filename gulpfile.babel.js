@@ -25,6 +25,7 @@ import source from 'vinyl-source-stream';
 import sourcemaps from 'gulp-sourcemaps';
 import through from 'through2';
 import uglify from 'gulp-uglify';
+import webdriver from 'gulp-webdriver';
 import yargs from 'yargs';
 
 
@@ -318,6 +319,15 @@ gulp.task('serve', ['default'], function() {
   gulp.watch('./assets/images/*', ['images']);
   gulp.watch('./assets/javascript/*', ['javascript']);
   gulp.watch(['./pages/*', './articles/*', './templates/*'], ['pages']);
+});
+
+
+gulp.task('test', ['default'], function() {
+  let port = yargs.argv.port || yargs.argv.p || 4000;
+  let server = connect().use(serveStatic(DEST)).listen(port);
+  return gulp.src('./wdio.conf.js')
+      .pipe(webdriver())
+      .on('end', server.close.bind(server));
 });
 
 

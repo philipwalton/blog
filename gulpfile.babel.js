@@ -314,7 +314,7 @@ gulp.task('clean', function(done) {
 });
 
 
-gulp.task('default', ['css', 'javascript', 'images', 'pages', 'static']);
+gulp.task('build', ['css', 'javascript', 'images', 'pages', 'static']);
 
 
 gulp.task('serve', function(done) {
@@ -323,7 +323,7 @@ gulp.task('serve', function(done) {
 });
 
 
-gulp.task('watch', ['default', 'serve'], function() {
+gulp.task('watch', ['build', 'serve'], function() {
   gulp.watch('./assets/css/**/*.css', ['css']);
   gulp.watch('./assets/images/*', ['images']);
   gulp.watch('./assets/javascript/*', ['javascript']);
@@ -331,14 +331,14 @@ gulp.task('watch', ['default', 'serve'], function() {
 });
 
 
-gulp.task('test', ['default', 'serve'], function() {
+gulp.task('test', ['build', 'serve'], function() {
   return gulp.src('./wdio.conf.js')
       .pipe(webdriver())
       .on('end', server.close.bind(server));
 });
 
 
-gulp.task('deploy', ['default'], function() {
+gulp.task('deploy', ['build'], function() {
 
   if (!isProd()) {
     throw new Error('The deploy task must be run in production mode.');
@@ -375,3 +375,6 @@ gulp.task('deploy', ['default'], function() {
   shell.rm('-rf', DEST);
 
 });
+
+
+gulp.task('default', ['build']);

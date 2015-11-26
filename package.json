@@ -10,7 +10,7 @@
     "url": "http://philipwalton.com"
   },
   "scripts": {
-    "build": "gulp",
+    "build": "gulp build",
     "start": "gulp serve",
     "clean": "gulp clean",
     "deploy": "gulp deploy"

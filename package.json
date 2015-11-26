@@ -13,7 +13,8 @@
     "build": "gulp build",
     "start": "gulp watch",
     "clean": "gulp clean",
-    "deploy": "gulp deploy"
+    "deploy": "gulp deploy",
+    "test": "gulp test"
   },
   "license": "MIT",
   "bugs": {

@@ -41,6 +41,12 @@ const DEST = 'build';
 const REPO = 'blog';
 
 
+/**
+ * The connect server used for testing and previewing the site.
+ */
+let server;
+
+
 let siteData = {
   title: 'Philip Walton',
   description: 'Thoughts on web development, ' +
@@ -311,10 +317,13 @@ gulp.task('clean', function(done) {
 gulp.task('default', ['css', 'javascript', 'images', 'pages', 'static']);
 
 
-gulp.task('serve', ['default'], function() {
+gulp.task('serve', function(done) {
   let port = yargs.argv.port || yargs.argv.p || 4000;
-  connect().use(serveStatic(DEST)).listen(port);
+  server = connect().use(serveStatic(DEST)).listen(port, done);
+});
 
+
+gulp.task('watch', ['default', 'serve'], function() {
   gulp.watch('./assets/css/**/*.css', ['css']);
   gulp.watch('./assets/images/*', ['images']);
   gulp.watch('./assets/javascript/*', ['javascript']);
@@ -322,9 +331,7 @@ gulp.task('serve', ['default'], function() {
 });
 
 
-gulp.task('test', ['default'], function() {
-  let port = yargs.argv.port || yargs.argv.p || 4000;
-  let server = connect().use(serveStatic(DEST)).listen(port);
+gulp.task('test', ['default', 'serve'], function() {
   return gulp.src('./wdio.conf.js')
       .pipe(webdriver())
       .on('end', server.close.bind(server));

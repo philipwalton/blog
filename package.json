@@ -46,6 +46,7 @@
     "moment-timezone": "^0.4.0",
     "normalize.css": "^3.0.3",
     "nunjucks": "2.0.0",
+    "selenium-server-standalone-jar": "^2.47.1",
     "serve-static": "^1.10.0",
     "shelljs": "^0.5.1",
     "through2": "^2.0.0",

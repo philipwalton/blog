@@ -20,9 +20,11 @@ import path from 'path';
 import plumber from 'gulp-plumber';
 import rename from 'gulp-rename';
 import shell from 'shelljs';
+import seleniumServerJar from 'selenium-server-standalone-jar'
 import serveStatic from 'serve-static';
 import source from 'vinyl-source-stream';
 import sourcemaps from 'gulp-sourcemaps';
+import {spawn} from 'child_process';
 import through from 'through2';
 import uglify from 'gulp-uglify';
 import webdriver from 'gulp-webdriver';
@@ -45,6 +47,12 @@ const REPO = 'blog';
  * The connect server used for testing and previewing the site.
  */
 let server;
+
+
+/**
+ * A reference to the selenium server standalone subprocess.
+ */
+let seleniumServer;
 
 
 let siteData = {
@@ -323,6 +331,16 @@ gulp.task('serve', function(done) {
 });
 
 
+gulp.task('selenium-server', function(done) {
+  seleniumServer = spawn('java',  ['-jar', seleniumServerJar.path]);
+  seleniumServer.stderr.on('data', function(data) {
+    if (data.indexOf('Selenium Server is up and running') > -1) {
+      done();
+    }
+  });
+});
+
+
 gulp.task('watch', ['build', 'serve'], function() {
   gulp.watch('./assets/css/**/*.css', ['css']);
   gulp.watch('./assets/images/*', ['images']);
@@ -331,10 +349,14 @@ gulp.task('watch', ['build', 'serve'], function() {
 });
 
 
-gulp.task('test', ['build', 'serve'], function() {
+gulp.task('test', ['build', 'serve', 'selenium-server'], function() {
+  function stopServers() {
+    server.close();
+    seleniumServer.kill();
+  }
   return gulp.src('./wdio.conf.js')
       .pipe(webdriver())
-      .on('end', server.close.bind(server));
+      .on('end', stopServers);
 });
 
 

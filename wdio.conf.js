@@ -37,10 +37,11 @@ exports.config = {
   // Sauce Labs platform configurator - a great tool to configure your capabilities:
   // https://docs.saucelabs.com/reference/platforms-configurator
   //
-  capabilities: [{
-    // browserName: 'firefox'
-    browserName: 'phantomjs'
-  }],
+  capabilities: [
+    {
+      browserName: 'phantomjs'
+    }
+  ],
   //
   // ===================
   // Test Configurations
@@ -48,7 +49,8 @@ exports.config = {
   // Define all options that are relevant for the WebdriverIO instance here
   //
   // Level of logging verbosity: silent | verbose | command | data | result | error
-  logLevel: 'silent', // 'verbose',
+  logLevel: 'silent',
+
   //
   // Enables colors for log output.
   coloredLogs: true,
@@ -98,7 +100,8 @@ exports.config = {
   // Options to be passed to Mocha.
   // See the full list at http://mochajs.org/
   mochaOpts: {
-    ui: 'bdd'
+    ui: 'bdd',
+    timeout: 60000
   },
 
   //

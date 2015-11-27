@@ -1,27 +1,107 @@
 {
   "articles": [
-    "Do We Actually Need Specificity In CSS?",
-    "How to Become a Great Front-End Engineer",
-    "Extending Styles",
-    "Side Effects in CSS",
-    "Normalizing Cross-browser Flexbox Bugs",
-    "Measuring Your Site's Responsive Breakpoint Usage",
-    "The Dangers of Stopping Event Propagation",
-    "Stop Copying Social Code Snippets",
-    "Implementing Private and Protected Members in JavaScript",
-    "How to Find Qualified Developers",
-    "Interviewing as a Front-End Engineer in San Francisco",
-    "Solved by Flexbox",
-    "Decoupling Your HTML, CSS, and JavaScript",
-    "Why I Test Private Functions In JavaScript",
-    "How to Unit Test Private Functions in JavaScript",
-    "Introducing HTML Inspector",
-    "CSS: Everything is Global and How to Deal With It",
-    "Dynamic Selectors",
-    "Defending Presentational Class Names",
-    "The Future of OOCSS: A Proposal",
-    "What No One Told You About Z-Index",
-    "CSS Architecture"
+    {
+      "title": "CSS Architecture",
+      "path": "/articles/css-architecture/"
+    },
+    {
+      "title": "What No One Told You About Z-Index",
+      "path": "/articles/what-no-one-told-you-about-z-index/"
+    },
+    {
+      "title": "The Future of OOCSS: A Proposal",
+      "path": "/articles/the-future-of-oocss-a-proposal/"
+    },
+    {
+      "title": "Defending Presentational Class Names",
+      "path": "/articles/defending-presentational-class-names/"
+    },
+    {
+      "title": "Dynamic Selectors",
+      "path": "/articles/dynamic-selectors/"
+    },
+    {
+      "title": "CSS: Everything is Global and How to Deal With It",
+      "path": "/articles/css-everything-is-global-and-how-to-deal-with-it/"
+    },
+    {
+      "title": "Introducing HTML Inspector",
+      "path": "/articles/introducing-html-inspector/"
+    },
+    {
+      "title": "How to Unit Test Private Functions in JavaScript",
+      "path": "/articles/how-to-unit-test-private-functions-in-javascript/"
+    },
+    {
+      "title": "Why I Test Private Functions In JavaScript",
+      "path": "/articles/why-i-test-private-functions-in-javascript/"
+    },
+    {
+      "title": "Decoupling Your HTML, CSS, and JavaScript",
+      "path": "/articles/decoupling-html-css-and-javascript/"
+    },
+    {
+      "title": "Solved by Flexbox",
+      "path": "/articles/solved-by-flexbox/"
+    },
+    {
+      "title": "Interviewing as a Front-End Engineer in San Francisco",
+      "path": "/articles/interviewing-as-a-front-end-engineer-in-san-francisco/"
+    },
+    {
+      "title": "How to Find Qualified Developers",
+      "path": "/articles/how-to-find-qualified-developers/"
+    },
+    {
+      "title": "Implementing Private and Protected Members in JavaScript",
+      "path": "/articles/implementing-private-and-protected-members-in-javascript/"
+    },
+    {
+      "title": "Stop Copying Social Code Snippets",
+      "path": "/articles/stop-copying-social-code-snippets/"
+    },
+    {
+      "title": "The Dangers of Stopping Event Propagation",
+      "path": "/articles/the-dangers-of-stopping-event-propagation/"
+    },
+    {
+      "title": "Measuring Your Site's Responsive Breakpoint Usage",
+      "path": "/articles/measuring-your-sites-responsive-breakpoint-usage/"
+    },
+    {
+      "title": "Normalizing Cross-browser Flexbox Bugs",
+      "path": "/articles/normalizing-cross-browser-flexbox-bugs/"
+    },
+    {
+      "title": "Side Effects in CSS",
+      "path": "/articles/side-effects-in-css/"
+    },
+    {
+      "title": "Extending Styles",
+      "path": "/articles/extending-styles/"
+    },
+    {
+      "title": "How to Become a Great Front-End Engineer",
+      "path": "/articles/how-to-become-a-great-front-end-engineer/"
+    },
+    {
+      "title": "Do We Actually Need Specificity In CSS?",
+      "path": "/articles/do-we-actually-need-specificity-in-css/"
+    }
   ],
-  "titleSuffix": " \u2014 Philip Walton"
+  "pages": [
+    {
+      "title": "Home",
+      "path": "/"
+    },
+    {
+      "title": "Articles",
+      "path": "/articles/"
+    },
+    {
+      "title": "About",
+      "path": "/about/"
+    }
+  ],
+  "titleSuffix": " — Philip Walton"
 }

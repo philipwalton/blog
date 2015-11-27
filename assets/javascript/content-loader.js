@@ -75,16 +75,7 @@ function trackPage() {
 
 
 function trackError(error) {
-  var url = this.nextPage.href;
-  ga('send', 'exception', {
-    exDescription: error.stack || error.message,
-    exFatal: false,
-    hitCallback: function() {
-      // If there's an error, attempt to manually navigation to the
-      // page. If that fails Github pages will show the actual 404 page.
-      location.href = url;
-    }
-  });
+  ga('send', 'exception', {exDescription: error.stack || error.message});
 }
 
 

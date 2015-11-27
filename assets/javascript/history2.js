@@ -15,11 +15,12 @@ function History2() {
   this._queue = [];
 
   // Listen for popstate changes and log them.
+  var self = this;
   window.addEventListener('popstate', function(event) {
     var state = event.state;
     var title = state && state.title;
-    this.add(window.location.href, title, state, event);
-  }.bind(this));
+    self.add(window.location.href, title, state, event);
+  });
 }
 
 

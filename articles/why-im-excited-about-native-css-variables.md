@@ -235,7 +235,7 @@ $gutterLg: 3em;
 
 /* Override styles for large screens, using $gutterLg. */
 
-@media (min-width: 30em) {
+@media (min-width: 48em) {
   .Container {
     padding: $gutterLg;
   }

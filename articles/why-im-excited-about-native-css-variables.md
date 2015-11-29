@@ -4,44 +4,30 @@ title: "Why I'm Excited About Native CSS Variables"
 date: 2015-11-03T17:28:56-08:00
 ---
 
-A few days ago CSS variables&mdash;more accurately known as CSS custom properties&mdash;shipped in Chrome Canary.
+Last month CSS variables&mdash;more accurately known as [CSS Custom Properties](https://drafts.csswg.org/css-variables/)&mdash;shipped in Chrome Canary behind the Experimental Web Platform Features flag.<sup>[[1]](#footnote-1)</sup>
 
 When Chrome engineer [Addy Osmani](https://twitter.com/addyosmani) first tweeted about the release, he was met with a surprising amount of [negativity](https://twitter.com/joshlangner/status/661608288707026944), [hostility](https://twitter.com/kuizinas/status/661600615911526401), and [skepticism](https://twitter.com/DanTup/status/661609987047866368). At least, it was surprising to me, given how excited I am about this feature.
 
-After a quick scan of the responses, it was clear that 99% of the complaints focused on one of these two things:
+After a quick scan of the responses, it was clear that 99% of the complaints focused on these two things:
 
 * The syntax is "ugly" and "verbose".
-* Sass already does this, so why should I care?
+* Sass already has variables, so why should I care?
 
-For the record, I *do* understand why people have this reaction. I mean, if you're used to doing this:
+While I completely get the dislike of the syntax, it's important to understand it wasn't just arbitrarily chosen. Members of the CSS working group discussed syntax at length, and they [had to pick something](http://www.xanthir.com/blog/b4KT0) that was compatible with the grammar of CSS and wouldn't conflict with future additions to the language.
 
-```scss
-$linkColor: red;
+Secondly, in regards to preprocessor variables, this is where I think the biggest misunderstanding lies:
 
-a {
-  color: $linkColor;
-}
-```
+Native CSS variables weren't just an attempt to copy what CSS preprocessors could already do. In fact, if you read some of the [initial design discussions](https://www.google.com/#q=syntax+%22css-variables%22+site:lists.w3.org%2FArchives%2FPublic%2Fwww-style), you'll see that most of motivation for native CSS variables was to make it possible to do things you *can't* do with preprocessors!
 
-and then you're told to do this:
+CSS preprocessors are fantastic tools, but their variables are static and lexically scoped. Native CSS variables, on the other hand, are an entirely different kind of variable: they're dynamic, and they're DOM-scoped. In fact, I think it's confusing to call the variables at all because they're actually CSS properties, which means they can do things like inherit and cascade! This gives them an entirely different set of capabilities and allows them to solve an entirely different set of problems.
 
-```css
-:root {
-  --linkColor: red;
-}
+In this article I'm going to discuss some of the things you can do with CSS custom properties that you can't do with preprocessor variables. I'll also demo some of the new design patterns that custom properties will enable. Finally, I'll discuss why I think in the future we'll most likely use preprocessors variables and custom properties together, to leverage the best of both worlds.
 
-a {
-  color: var(--linkColor);
-}
-```
+<div class="Note">
 
-I get why you'd be disappointed&mdash;and if that's all CSS variables did, I'd be disappointed too.
+**Note:** this article is *not* an introduction to CSS custom properties. If you've never heard of them or are unfamiliar with how they work, you should quickly [read up on them](https://developer.mozilla.org/en-US/docs/Web/CSS/Using_CSS_variables) before continuing.
 
-If CSS variables were *just* a way to reference stored values, and they didn't offer anything above and beyond what we can already do with preprocessors, there would be little reason for them to exist (and no reason to have the syntax they do).
-
-But the reality is CSS variables can do *so much* more than that. In fact, I think it does them a disservice to even call them variables at all. They're custom properties, which gives them an entirely different set of superpowers.
-
-In this article I'm going to highlight some of the limitations of preprocessor variables and show that these limitations don't apply to custom properties. I'll also demo some of the new design patterns that custom properties will enable: things like responsive, cascading properties and contextual styling via React-style, one-way data flow.
+</div>
 
 ## The limitations of preprocessor variables
 
@@ -460,3 +446,10 @@ Custom properties fill a gap that preprocessor variables simply can't. Despite t
 Because of this, I firmly believe that many sites will use a combination of both in the future. Custom properties for reactive theming and preprocessor variables for static templating.
 
 I don't think it has to be an either-or situation. And pitting them against each other as competitors does a disservice to everyone.
+
+<aside class="Footnotes">
+  <h1 class="Footnotes-title">Footnotes:</h1>
+  <ol class="Footnotes-items">
+    <li id="footnote-1">You can enable the Experimental Web Platform Features flag in Chrome by navigating to the address <code>about:flags</code>, searching for "Experimental Web Platform Features", and clicking the "enable" button.</li>
+  </ol>
+</aside>

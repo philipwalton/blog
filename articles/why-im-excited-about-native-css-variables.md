@@ -31,13 +31,13 @@ In this article I'm going to discuss some of the things you can do with CSS cust
 
 ## The limitations of preprocessor variables
 
-CSS preprocessors can do some pretty amazing things. Even if you know that they ultimately just spit out raw CSS, they can still feel magical at times.
+Before continuing, I want to stress that I do really like CSS preprocessors, and I use them on every project I work on. Preprocessors can do some pretty amazing things, and even if you know that they ultimately just spit out raw CSS, they can still feel magical at times.
 
-That being said, they definitely have their limitations, and sometimes the appearance of dynamic power can make these limitations surprising, especially to new users.
+That being said, like any tool, they have their limitations, and sometimes the appearance of dynamic power can make these limitations surprising, especially to new users.
 
 ### Preprocessor variables aren't live
 
-Perhaps the most common example of a preprocessor limitation that surprises new users is the inability to define variables or use `@extend` inside a media query.
+Perhaps the most common example of a preprocessor limitation that surprises newcomers is the inability to define variables or use `@extend` inside a media query.
 
 Since this article is about variables, I'll focus on the former:
 
@@ -53,7 +53,17 @@ $gutter: 1em;
 }
 ```
 
-If you compile the above code with Sass, you'll see that the media query block simply gets discarded and the variable assignment ignored. While it's technically *possible* for a preprocessor to make conditional variable declarations work, doing so would be technically challenging and require enumerating all possible permutations&mdash;exponentially increasing the final size of your CSS.
+If you compile the above code with Sass, this is what you'll get:
+
+```css
+.Container {
+  padding: 1em;
+}
+```
+
+As you can see, the media query block simply gets discarded and the variable assignment ignored.
+
+While it may be technically *possible* for a preprocessor to make conditional variable declarations work, doing so would be challenging and require enumerating all possible permutations&mdash;exponentially increasing the final size of your CSS.
 
 Since it's not possible to change a variable based on the matching `@media` rule, the only option is to assign a unique variable per media query, and code out each version separately. More on this later.
 
@@ -61,11 +71,38 @@ Since it's not possible to change a variable based on the matching `@media` rule
 
 Whenever you use variables, the question of scope inevitably comes into play. Should this variable be global? Should it be scoped to the file/module? Should it be scoped to the block? These are all questions I hear asked frequently by Sass developers.
 
-As it turns out, there's another way to scope variables that ends up being far more useful: scoping them to a DOM subtree. And since preprocessors don't run in the browser and never see the markup, they can't do this.
+When you're writing HTML, it turns out there's another useful way to scope variables: to a DOM subtree. But since preprocessors don't run in the browser and never see the markup, they can't do this.
 
-If you're wondering why you'd want to scope a variable to a DOM subtree, consider the following example:
+Consider a site that tries to add the class `user-setting-large-text` to the `<html>` element if a user has set their preference for a larger text size:
+
+```scss
+$font-size: 1em;
+
+.user-setting-large-text {
+  $font-size: 1.5em;
+}
+
+body {
+  font-size: $font-size;
+}
+```
+
+As in the media block example above, Sass ignores this variable assignment altogether:
 
 ```css
+body {
+  font-size: 1em;
+}
+```
+
+### Preprocessor variables don't inherit
+
+Though inheritance is technically part of the cascade, I want to call it out separately here because of how many times I've wanted to use this feature but couldn't.
+
+Consider a situation where you have DOM elements that you want to style based on whatever colors happen to be applied to their parent element:
+
+
+```scss
 .alert { background-color: lightyellow; }
 .alert.info { background-color: lightblue; }
 .alert.error { background-color: orangered; }
@@ -75,11 +112,13 @@ If you're wondering why you'd want to scope a variable to a DOM subtree, conside
 }
 ```
 
-The above code isn't valid CSS, but you should be able to understand what it's trying to accomplish. The idea is that `<button>` elements should be able to adapt to the properties of their parent context. Regardless of what background color is applied to `.alert`, the button inside of it should be able to have a border color that matches.
+The above code isn't valid Sass (or CSS), but you should be able to understand what it's trying to accomplish.
 
-There are tons of use cases for this type of feature, but I think the most compelling is to ensure text is always readable and sufficiently contrasts with the background.
+The last declaration is trying to use Sass's `darken` function on the `background-color` property that the `<button>` element will inherit from its parent `.alert` element.
 
-Since preprocessor variables aren't CSS declarations (property-value pairs), they don't cascade. And they don't inherit to child elements.
+Now, this isn't going to work because Sass doesn't know about the DOM structure, but hopefully it's clear why the ability to do this type of thing would be useful.
+
+The call out one particular use case: it would be incredibly handy to be able to run color functions on inherited DOM properties for accessibility reason. For example, to ensure text is always readable and sufficiently contrasts with the background color.
 
 ### Preprocessor variables aren't interoperable
 

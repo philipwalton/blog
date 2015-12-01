@@ -254,6 +254,12 @@ View the demo on CodePen:
 * [Editor view with code](http://codepen.io/philipwalton/pen/epLWNO) &#8594;
 * [Full page demo](http://codepen.io/philipwalton/full/epLWNO/) &#8594;
 
+<div class="Note">
+
+**Note:** In addition to Chrome Canary, CSS Variables are already supported in Firefox and Webkit Nightly. You can view the demos in any of these browsers.
+
+</div>
+
 ### Contextual styling
 
 Contextual styling (styling an element based on where it appears in the DOM) is a contentious topic in CSS. On the one hand, it's something most well-respected CSS developers warn against. But on the other hand, it's something thousands of people still do every day.

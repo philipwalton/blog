@@ -130,92 +130,13 @@ Native CSS custom properties will work with any CSS preprocessor or plain CSS fi
 
 ## How custom properties are different
 
-I mentioned above that CSS variables aren't actually variables in the traditional sense, they're custom properties, which makes them quite a bit more powerful.
+As you've probably guessed, none of the limitations I listed above apply to CSS custom properties. But perhaps more important than *that* they don't apply is *why* they don't apply.
 
-But what does that mean?
+CSS custom properties are just like regular CSS properties, and they operate in exactly the same way (with the obvious exception that they don't style anything).
 
-To answer that question, I think it's helpful to examine how normal CSS properties work, specifically the inheritable properties.
+Like regular CSS properties, custom properties are dynamic. They can be modified at runtime, they can be updated inside a media query or by adding a new class to the DOM. They can be assigned inline (on an element) or in a regular CSS declaration with a selector. They can be updated or overridden using all the normal rules of the cascade, or by using JavaScript. And, perhaps most importantly, they're inheritable, so when they're applied to a DOM element, they also get passed to that element's children.
 
-Think about what happens when you set `color: gray` or `font-size: .875em` on the `<body>` element. All descendants of `<body>`, who don't specify their own colors or font sizes, inherit those values.
-
-Since custom properties are just regular, inheritable properties, all of these concepts apply to them as well. And all the mechanisms you can use to define or override regular properties apply to custom properties too.
-
-To put that more technically: *custom properties cascade!*
-
-Back to the `color` and `font-size` example, consider what happens when the following rule is added to the CSS:
-
-```css
-@media (min-width: 48em) {
-  body {
-    font-size: 1.25em;
-  }
-}
-```
-
-When the above `@media` rule matches, the `font-size` value becomes `1.25em` and all descendants of `<body>` will update accordingly. Since the new declaration didn't override the `color`, the original declaration still applies.
-
-The same thing happens to custom properties. Just like regular properties, their values are live! Any time you define a custom property in a media query or class declaration, as soon as that declaration matches or stops matching, the custom property value automatically updates throughout the site.
-
-## Using custom properties
-
-Here's a basic example of how custom properties work. In the following code, the custom property `--tableStripeColor` is defined on the `<table>` element, and then odd table rows reference that property in their background color declaration:
-
-```css
-table {
-  --tableStripeColor: lightgray;
-}
-tr:nth-child(odd) {
-  background: var(--tableStripeColor);
-}
-```
-
-An important distinction to note is that the `tr:nth-child(odd)` elements aren't actually looking up the value of `--tableStripeColor` on the `<table>` element, they don't actually know or care where the property was initially defined. They're looking up the property on themselves, and they find it on themselves because the property/value declaration inherits from the `<table>` element to the `<tr>` element.
-
-Now suppose we decide we don't want rows in the table head to be striped. Since the `<thead>` element is child of `<table>` and a parent of the rows we don't want to stripe, we can prevent those rows from getting the `--tableStripeColor` property by resetting it to its initial value.
-
-```css
-table {
-  --tableStripeColor: lightgray;
-}
-thead {
-  --tableStripeColor: initial;
-}
-tr:nth-child(odd) {
-  background: var(--tableStripeColor);
-}
-```
-
-### Setting defaults
-
-The `var()` function takes an optional second argument that can be used as a fallback in the event that the custom property isn't defined. For example, the following declaration would allow third-party users to define a `--linkColor` property, but if no such property were found, the links would be orange.
-
-```css
-a {
-  color: var(--linkColor, orange);
-}
-```
-
-Another way to set default values is to define properties on the root element:
-
-```css
-:root {
-  --linkColor: orange;
-}
-
-a {
-  color: var(--linkColor);
-}
-```
-
-Though these two examples may seem to be doing the same thing, they're subtly different. In the second example, a user could reset the property for all links in the sidebar with the following rule:
-
-```css
-.sidebar {
-  --linkColor: initial;
-}
-```
-
-Such a rule in the first example would still produce orange links because the default is defined on `<a>` elements rather than on `:root`.
+To put that more succinctly, preprocessor variables are lexically scoped and static after they're compiled. Custom properties are live, dynamic, and scoped to the DOM.
 
 ## Real-life examples
 

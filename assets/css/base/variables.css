@@ -9,7 +9,8 @@
   --text-color: #333;
   --heading-color: #222;
   --accent-color: hsl(150, 40%, 50%);
-  --border-color: #ddd;
+  --border-color: hsl(30, 15%, 80%);
+  --border-radius: 3px;
   --bg-color: hsl(30, 15%, 95%);
   --code-bg-color: hsl(30, 15%, 96%);
 

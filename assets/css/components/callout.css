@@ -1,5 +1,6 @@
 .Callout {
   background: var(--bg-color);
+  border-radius: var(--border-radius);
   margin: 0 0 var(--space);
   padding: 1em var(--space);
 }

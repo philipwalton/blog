@@ -132,7 +132,31 @@ ol ol ol {
 }
 
 figure {
-  margin: 0;
+  margin: 0 0 var(--space);
+}
+
+figure a {
+  background: none;
+}
+
+figcaption {
+  color: #666;
+  font-size: .8em;
+  padding: 0 .5em;
+  text-align: right;
+}
+
+figcaption a {
+  color: var(--accent-color);
+  border-bottom: 1px dotted var(--accent-color);
+}
+
+img {
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  height: auto;
+  max-width: 100%;
+  padding: 3px;
 }
 
 iframe {

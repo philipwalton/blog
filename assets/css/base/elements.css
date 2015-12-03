@@ -80,6 +80,7 @@ article sup a {
 code {
   background: var(--code-bg-color);
   border-radius: 2px;
+  display: inline-block;
   font-family: Monaco, monospace;
   font-size: 0.8em;
   padding: 2px 3px 1px;

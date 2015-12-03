@@ -321,7 +321,7 @@ The following demo illustrates contextual styling of both links and buttons in t
 
 #### Making exceptions
 
-To futher illustrate how making exceptions is easier in this paradigm, imagine if a `.Promo` component were added to the header, and buttons inside the `.Promo` component needed to look like normal buttons, not header buttons.
+To further illustrate how making exceptions is easier in this paradigm, imagine if a `.Promo` component were added to the header, and buttons inside the `.Promo` component needed to look like normal buttons, not header buttons.
 
 If you were using descendant combinators, you'd have to write a bunch of styles for the header buttons and then *undo* those styles for the promo buttons; which is messy and error prone, and easily gets out of hand as the number of combinations increases:
 
@@ -356,42 +356,30 @@ Arguably the most significant way React has changed web development is its champ
 
 This architectural model is almost exactly the same as inheritable custom properties in CSS.
 
-Even though custom properties are a new, untested domain, I think the success of the React model gives me confidence that a complex system can be built on top of one-way property inheritance.
+Even though custom properties are a new, untested domain, I think the success of the React model gives me confidence that a complex system can be built on top of one-way property inheritance&mdash;and, moreover, that DOM-scoped variables are a useful design pattern.
 
 ## Minimizing side effects
 
-Unlike `props` in React, CSS custom properties all inherit by default. In some cases, this could lead to components being styled in ways they may not have intended. This can be avoided though, because it's possible to prevent custom properties from inheriting.
+Unlike `props` in React, CSS custom properties all inherit by default. In some cases, this could lead to components being styled in ways they may not have intended.
 
-To completely prevent any properties from being inherited by a particular component you can set the `all` property to `initial`.
+As I showed in the previous section, you can prevent this by resetting individual properties, which prevents unknown values from being applied to an element's children:
 
 ```css
 .MyComponent {
-  all: initial;
+  --propertyName: initial;
 }
 ```
 
-If you want only white-listed custom properties to inherit, you can use a combination of `all` and setting individual, allowed properties to inherit:
+Though not part of the specification yet, the `--` property has been discussed,<sup>[[2](#footnote-2)]</sup> which could be used to reset all custom properties. And if you wanted to whitelist just a few properties, you could set them individually to `inherit`, which would allow them to continue to operate normally:
 
 ```css
 .MyComponent {
-  all: initial;
-
-  /* Whitelists these individual custom properties */
-  --color: inherit;
-  --font: inherit;
-}
-```
-
-Though not part of the specification yet, the `--` property has [been discussed](https://github.com/w3c/webcomponents/issues/300#issuecomment-144551648), which could be used to reset only custom properties, while allowing regular inheritable properties (e.g. `color`, `font-family`) to inherit as normal.
-
-```css
-.MyComponent {
-  /* Resets only custom properties. */
+  /* Resets all custom properties. */
   --: initial;
 
   /* Whitelists these individual custom properties */
-  --color: inherit;
-  --font: inherit;
+  --someProperty: inherit;
+  --someOtherProperty: inherit;
 }
 ```
 
@@ -409,11 +397,9 @@ For more complex projects, you'd probably want to consider something like [CSS M
 
 If you weren't familiar with custom properties in CSS before reading this article, I hope I've convinced you to give them a shot. And if you were one of the people skeptical of their necessity, I hope I've changed your mind.
 
-Custom properties bring a new set of dynamic and powerful capabilities to CSS, and I'm sure many of their biggest strengths are yet to be uncovered.
+Custom properties bring a new set of dynamic and powerful capabilities to CSS, and I'm sure many of their biggest strengths are yet to be discovered.
 
-Custom properties fill a gap that preprocessor variables simply can't. Despite that, preprocessor variables remain the easier-to-use and more elegant choice in many cases.
-
-Because of this, I firmly believe that many sites will use a combination of both in the future. Custom properties for reactive theming and preprocessor variables for static templating.
+Custom properties fill a gap that preprocessor variables simply can't. Despite that, preprocessor variables remain the easier-to-use and more elegant choice in many cases. Because of this, I firmly believe that many sites will use a combination of both in the future. Custom properties for reactive theming and preprocessor variables for static templating.
 
 I don't think it has to be an either-or situation. And pitting them against each other as competitors does a disservice to everyone.
 
@@ -421,5 +407,6 @@ I don't think it has to be an either-or situation. And pitting them against each
   <h1 class="Footnotes-title">Footnotes:</h1>
   <ol class="Footnotes-items">
     <li id="footnote-1">You can enable the Experimental Web Platform Features flag in Chrome by navigating to the address <code>about:flags</code>, searching for "Experimental Web Platform Features", and clicking the "enable" button.</li>
+    <li id="footnote-2">Use of the <code>--</code> property (as it relates to styling custom elements) was mentioned by Tab Atkins in this <a href="https://github.com/w3c/webcomponents/issues/300#issuecomment-144551648">Github comment</a>. In addition, in a <a href="https://lists.w3.org/Archives/Public/www-style/2015Dec/0002.html">post</a> on the www-style mailing list, Tab suggested that adding <code>--</code> to the spec should happen soon.</li>
   </ol>
 </aside>

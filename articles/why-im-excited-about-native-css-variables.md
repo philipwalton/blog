@@ -249,16 +249,18 @@ Even with the extra verbosity of the custom property syntax, the amount of code 
 
 The following demo shows a basic site layout that automatically redefines the gutter value as the viewport width changes. Check it out in a browser that supports custom properties to see it in action!
 
-View the demo on CodePen:
-
-* [Editor view with code](http://codepen.io/philipwalton/pen/epLWNO) &#8594;
-* [Full page demo](http://codepen.io/philipwalton/full/epLWNO/) &#8594;
-
-<div class="Note">
-
-**Note:** In addition to Chrome Canary, CSS Variables are already supported in Firefox and Webkit Nightly. You can view the demos in any of these browsers.
-
-</div>
+<figure>
+  <a href="http://codepen.io/philipwalton/pen/epLWNO/?editors=110">
+    <img srcset="
+      ../../assets/images/custom-properties-responsive-1400w.png 1400w,
+      ../../assets/images/custom-responsive.png 700w"
+      src="../../assets/images/custom-properties-responsive-properties.png"
+      alt="Responsive Properties Demo">
+  </a>
+  <figcaption>
+    View the demo on CodePen: <a href="http://codepen.io/philipwalton/pen/epLWNO/?editors=110">editor view</a> / <a href="http://codepen.io/philipwalton/full/epLWNO/">full page</a>
+  </figcaption>
+</figure>
 
 ### Contextual styling
 
@@ -336,11 +338,17 @@ With custom properties, you can simply update the button properties to be whatev
 
 The following demo illustrates contextual styling of both links and buttons in the header of a site as well as the content area.
 
-View the demo on CodePen:
-
-* [Editor view with code](http://codepen.io/philipwalton/pen/KdxmWL) &#8594;
-* [Full page demo](http://codepen.io/philipwalton/full/KdxmWL/) &#8594;
-
+<figure>
+  <a href="http://codepen.io/philipwalton/pen/KdxmWL/?editors=110">
+    <img srcset="
+      ../../assets/images/custom-properties-contextual-styling-1400w.png 1400w,
+      ../../assets/images/custom-properties-contextual-styling.png 700w"
+      src="../../assets/images/custom-properties-contextual-styling.png">
+  </a>
+  <figcaption>
+    View the demo on CodePen: <a href="http://codepen.io/philipwalton/pen/KdxmWL/?editors=110">editor view</a> / <a href="http://codepen.io/philipwalton/full/KdxmWL/">full page</a>
+  </figcaption>
+</figure>
 
 #### Learning from React
 

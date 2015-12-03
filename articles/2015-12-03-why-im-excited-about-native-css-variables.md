@@ -1,7 +1,7 @@
 ---
 template: article.html
 title: "Why I'm Excited About Native CSS Variables"
-date: 2015-11-03T17:28:56-08:00
+date: 2015-12-03T13:07:13-08:00
 ---
 
 A few weeks ago CSS variables&mdash;more accurately known as [CSS Custom Properties](https://drafts.csswg.org/css-variables/)&mdash;shipped in Chrome Canary behind the Experimental Web Platform Features flag.<sup>[[1]](#footnote-1)</sup>

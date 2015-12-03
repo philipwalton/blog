@@ -12,13 +12,17 @@ import gutil from 'gulp-util';
 import he from 'he';
 import hljs from 'highlight.js';
 import htmlMinifier from 'html-minifier';
+import imagemin from 'gulp-imagemin';
 import MarkdownIt from 'markdown-it';
 import markdownItAnchor from 'markdown-it-anchor';
+import merge from 'merge-stream';
 import moment from 'moment-timezone';
 import nunjucks from 'nunjucks';
 import path from 'path';
 import plumber from 'gulp-plumber';
+import pngquant from 'imagemin-pngquant';
 import rename from 'gulp-rename';
+import resize from 'gulp-image-resize';
 import shell from 'shelljs';
 import seleniumServerJar from 'selenium-server-standalone-jar'
 import serveStatic from 'serve-static';
@@ -273,7 +277,18 @@ gulp.task('static', function() {
 
 
 gulp.task('images', function() {
-  return gulp.src(['./assets/images/*'], {base: '.'}).pipe(gulp.dest(DEST));
+  return merge(
+    gulp.src('./assets/images/*.png', {base: '.'})
+        .pipe(resize({width: 700}))
+        .pipe(imagemin({use: [pngquant()]}))
+        .pipe(gulp.dest(DEST)),
+
+    gulp.src('./assets/images/*.png', {base: '.'})
+        .pipe(resize({width : 1400}))
+        .pipe(imagemin({use: [pngquant()]}))
+        .pipe(rename((path) => path.basename += "-1400w"))
+        .pipe(gulp.dest(DEST))
+  );
 });
 
 

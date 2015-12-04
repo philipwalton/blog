@@ -152,7 +152,7 @@ As I mentioned above, Sass variables don't work in media queries, so you have to
 
 The following example defines the variables `$gutterSm`, `$gutterMd`, and `$gutterLg`, and then declares separate rules for each variation:
 
-```css
+```scss
 /* Declares three gutter values, one for each breakpoint */
 
 $gutterSm: 1em;
@@ -206,7 +206,7 @@ $gutterLg: 3em;
 
 To accomplish the exact same thing using custom properties, you only have to define the styles once. You can use a single `--gutter` property, and then, as the matched media changes, you update the value of `--gutter` and everything responds accordingly.
 
-```scss
+```css
 /* Declares what `--gutter` is at each breakpoint */
 
 :root { --gutter: 1.5em; }

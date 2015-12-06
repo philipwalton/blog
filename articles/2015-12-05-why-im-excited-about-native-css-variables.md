@@ -1,7 +1,7 @@
 ---
 template: article.html
 title: "Why I'm Excited About Native CSS Variables"
-date: 2015-12-03T13:07:13-08:00
+date: 2015-12-05T12:43:53-08:00
 ---
 
 A few weeks ago CSS variables&mdash;more accurately known as [CSS Custom Properties](https://drafts.csswg.org/css-variables/)&mdash;shipped in Chrome Canary behind the Experimental Web Platform Features flag.<sup>[[1]](#footnote-1)</sup>
@@ -402,6 +402,12 @@ Custom properties bring a new set of dynamic and powerful capabilities to CSS, a
 Custom properties fill a gap that preprocessor variables simply can't. Despite that, preprocessor variables remain the easier-to-use and more elegant choice in many cases. Because of this, I firmly believe that many sites will use a combination of both in the future. Custom properties for dynamic theming and preprocessor variables for static templating.
 
 I don't think it has to be an either-or situation. And pitting them against each other as competitors does a disservice to everyone.
+
+<div class="Thanks">
+
+Special thanks to [Addy Osmani](https://twitter.com/addyosmani) and [Matt Gaunt](https://twitter.com/gauntface) for reviewing and to Shane Stephens for prioritizing and fixing a Chrome bug to get the demos working.
+
+</div>
 
 <aside class="Footnotes">
   <h1 class="Footnotes-title">Footnotes:</h1>

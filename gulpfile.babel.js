@@ -316,19 +316,27 @@ gulp.task('css', function() {
 });
 
 
-gulp.task('javascript', function() {
+gulp.task('javascript', function(done) {
   let entry = './assets/javascript/main.js';
-  let opts = {debug: true,detectGlobals: false};
-  return browserify(entry, opts)
-      .transform(babelify)
-      .bundle()
-      .on('error', streamError)
-      .pipe(source(entry))
-      .pipe(buffer())
-      .pipe(sourcemaps.init({loadMaps: true}))
-      .pipe(gulpIf(isProd(), uglify()))
-      .pipe(sourcemaps.write('./'))
-      .pipe(gulp.dest(DEST));
+  browserify(entry, {
+    debug: true,
+    detectGlobals: false
+  })
+  .transform(babelify)
+  .bundle()
+
+  // TODO(philipwalton): Add real error handling.
+  // This temporary hack fixes an issue with tasks not restarting in
+  // watch mode after a syntax error is fixed.
+  .on('error', (err) => { gutil.beep(); done(err); })
+  .on('end', done)
+
+  .pipe(source(entry))
+  .pipe(buffer())
+  .pipe(sourcemaps.init({loadMaps: true}))
+  .pipe(gulpIf(isProd(), uglify()))
+  .pipe(sourcemaps.write('./'))
+  .pipe(gulp.dest(DEST));
 });
 
 

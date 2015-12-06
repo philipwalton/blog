@@ -1,6 +1,7 @@
 .Share {
   align-items: center;
   background: var(--bg-color);
+  border-radius: var(--border-radius);
   display: flex;
   margin-top: 3em;
   padding: 1.25em 1em;

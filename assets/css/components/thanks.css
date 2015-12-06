@@ -1,0 +1,15 @@
+.Thanks {
+  color: #888;
+  font-style: italic;
+  margin: 0 0 var(--space);
+}
+
+.Thanks > p {
+  font-size: .85em;
+  margin: 0;
+}
+
+.Thanks a {
+  background-image: linear-gradient(to top, #bbb, #bbb);
+  background-position: 0 1.2em;
+}

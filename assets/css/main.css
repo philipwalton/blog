@@ -16,5 +16,6 @@
 @import "./components/callout.css";
 @import "./components/codepen-container.css";
 @import "./components/footnotes.css";
+@import "./components/thanks.css";
 
 @import "./vendor/highlight.css";

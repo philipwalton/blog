@@ -21,17 +21,17 @@ Native CSS variables weren't just an attempt to copy what CSS preprocessors coul
 
 CSS preprocessors are fantastic tools, but their variables are static and lexically scoped. Native CSS variables, on the other hand, are an entirely different kind of variable: they're dynamic, and they're scoped to the DOM. In fact, I think it's confusing to call them variables at all. They're actually CSS properties, which gives them an entirely different set of capabilities and allows them to solve an entirely different set of problems.
 
-In this article I'm going to discuss some of the things you can do with CSS custom properties that you can't do with preprocessor variables. I'll also demo some of the new design patterns that custom properties will enable. Finally, I'll discuss why I think in the future we'll most likely use preprocessor variables and custom properties together, to leverage the best of both worlds.
+In this article I'm going to discuss some of the things you can do with CSS custom properties that you can't do with preprocessor variables. I'll also demo some of the new design patterns that custom properties enable. Finally, I'll discuss why I think in the future we'll most likely use preprocessor variables and custom properties together, to leverage the best of both worlds.
 
 <div class="Callout">
 
-**Note:** this article is *not* an introduction to CSS custom properties. If you've never heard of them or are unfamiliar with how they work, you should quickly [read up](https://developer.mozilla.org/en-US/docs/Web/CSS/Using_CSS_variables) before continuing.
+**Note:** this article is *not* an introduction to CSS custom properties. If you've never heard of them or are unfamiliar with how they work, I'd recommend [getting yourself acquainted](https://developer.mozilla.org/en-US/docs/Web/CSS/Using_CSS_variables) first.
 
 </div>
 
 ## The limitations of preprocessor variables
 
-Before continuing, I want to stress that I actually really like CSS preprocessors, and I use them on all my projects. Preprocessors can do some pretty amazing things, and even if you know they ultimately just spit out raw CSS, they can still feel magical at times.
+Before continuing, I want to stress that I really do like CSS preprocessors, and I use them in all my projects. Preprocessors can do some pretty amazing things, and even if you know they ultimately just spit out raw CSS, they can still feel magical at times.
 
 That being said, like any tool, they have their limitations, and sometimes the appearance of dynamic power can make those limitations surprising, especially to new users.
 
@@ -71,7 +71,7 @@ Whenever you use variables, the question of scope inevitably comes into play. Sh
 
 Since CSS is ultimately going to style HTML, it turns out there's another useful way to scope variables: to a DOM element. But since preprocessors don't run in the browser and never see the markup, they can't do this.
 
-Consider a site that tries to add the class `user-setting-large-text` to the `<html>` element for users who've indicated their preference for larger text sizes. When this class is set on the `<html>` element, the larger `$font-size` variable assignment should apply:
+Consider a site that tries to add the class `user-setting-large-text` to the `<html>` element for users who've indicated their preference for larger text sizes. When this class is set, the larger `$font-size` variable assignment should apply:
 
 ```scss
 $font-size: 1em;
@@ -85,7 +85,7 @@ body {
 }
 ```
 
-But just like with the media block example above, Sass ignores this variable assignment altogether, meaning this kind of thing isn't possible. Here's the output:
+But again, just like with the media block example above, Sass ignores this variable assignment altogether, meaning this kind of thing isn't possible. Here's the output:
 
 ```css
 body {
@@ -112,7 +112,7 @@ Consider a situation where you have DOM elements that you want to style based on
 
 The above code isn't valid Sass (or CSS), but you should be able to understand what it's trying to accomplish.
 
-The last declaration is trying to use Sass's `darken` function on the `background-color` property that the `<button>` element could inherit from its parent `.alert` element. If the class `info` or `error` has been added to the alert (or if the background color has been arbitrarily changed via JavaScript or a user style), the button element wants to be able to respond to that.
+The last declaration is trying to use Sass's `darken` function on the `background-color` property that the `<button>` element could inherit from its parent `.alert` element. If the class `info` or `error` has been added to the alert (or if the background color has been arbitrarily set via JavaScript or a user style), the button element wants to be able to respond to that.
 
 Now, obviously this won't work in Sass because preprocessors don't know about the DOM structure, but hopefully it's clear why this type of thing could be useful.
 
@@ -405,7 +405,7 @@ I don't think it has to be an either-or situation. And pitting them against each
 
 <div class="Thanks">
 
-Special thanks to [Addy Osmani](https://twitter.com/addyosmani) and [Matt Gaunt](https://twitter.com/gauntface) for reviewing and to Shane Stephens for prioritizing and fixing a Chrome bug to get the demos working.
+Special thanks to [Addy Osmani](https://twitter.com/addyosmani) and [Matt Gaunt](https://twitter.com/gauntface) for reviewing this article and to Shane Stephens for prioritizing and fixing a Chrome bug to get the demos working.
 
 </div>
 

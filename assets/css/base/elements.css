@@ -50,17 +50,17 @@ p {
 
 a {
   color: inherit;
-  text-decoration: none;
 }
 
-article a {
+.wf-active article a {
   background-image: linear-gradient(to top, #777, #777);
   background-position: 0 1.25em;
   background-repeat: repeat-x;
   background-size: 1px 1px;
+  text-decoration: none;
 }
 
-article a code {
+.wf-active article a code {
   background-color: var(--code-bg-color);
   background-image: linear-gradient(to top, #777, #777);
   background-position: 0 1.4em;
@@ -68,8 +68,10 @@ article a code {
   background-size: 1px 1px;
 }
 
-article sup a {
+article sup a,
+.wf-active article sup a {
   background: 0;
+  text-decoration: none;
 }
 
 .is-legacy article a {

@@ -26,6 +26,7 @@
 .Header-info {
   display: block;
   flex: 1 1 50%;
+  text-decoration: none;
 }
 .Header-title {
   font-size: 1em;

@@ -9,7 +9,7 @@
   margin: 0;
 }
 
-.Thanks a {
+.wf-active .Thanks a {
   background-image: linear-gradient(to top, #bbb, #bbb);
   background-position: 0 1.2em;
 }

@@ -229,7 +229,7 @@ To accomplish the exact same thing using custom properties, you only have to def
   padding: var(--gutter);
 }
 .Grid {
-  --gutterNegative: calc(1 * var(--gutter));
+  --gutterNegative: calc(-1 * var(--gutter));
   display: flex;
   margin-left: var(--gutterNegative);
   margin-top: var(--gutterNegative);

@@ -1,7 +1,7 @@
 ---
 template: article.html
 title: "Decoupling Your HTML, CSS, and JavaScript"
-date: 2013-08-17T12:39:09-07:00
+date: 2013-08-18T12:39:09-07:00
 ---
 
 Any non-trivial site or application on the Web today will contain a large amount of HTML, CSS, and JavaScript. As the use of the Internet evolves and our dependence on it increases, having a plan for organizing and maintaining your front-end code is an absolute must.

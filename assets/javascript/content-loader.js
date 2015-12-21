@@ -100,8 +100,8 @@ module.exports = {
 
     linkClicked(function(event) {
 
-      // Don't attempt to AJAX in content if the link was clicked to open a new tab.
-      if (event.metaKey || event.ctrlKey || event.which == 2) return;
+      // Don't attempt to load content if the user is trying to open a new tab.
+      if (event.metaKey || event.ctrlKey || event.which > 1) return;
 
       var page = parseUrl(location.href);
       var link = parseUrl(this.href);

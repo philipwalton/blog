@@ -65,14 +65,6 @@ function setScroll() {
 }
 
 
-function trackPage() {
-  ga('set', {
-    page: this.nextPage.pathname,
-    title: this.nextPage.title
-  });
-  ga('send', 'pageview');
-}
-
 
 function trackError(error) {
   ga('send', 'exception', {exDescription: error.stack || error.message});
@@ -95,7 +87,6 @@ module.exports = {
         .use(loadPageContent)
         .use(showPageContent)
         .use(setScroll)
-        .use(trackPage)
         ['catch'](trackError);
 
     linkClicked(function(event) {

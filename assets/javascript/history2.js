@@ -48,6 +48,7 @@ History2.prototype.use = function(plugin) {
   return this;
 };
 
+
 /**
  * Register a handler to catch any errors.
  * Note: In ES3 reserved words like "catch" couldn't be used as property names:
@@ -69,6 +70,8 @@ History2.prototype._onError = function(error) {
 
 History2.prototype._onComplete = function(event) {
 
+  if (this.nextPage.title) document.title = this.nextPage.title;
+
   // Popstate triggered navigation is already handled by the browser,
   // so we only add to the history in non-popstate cases.
   if (!(event && event.type == 'popstate')) {
@@ -77,8 +80,6 @@ History2.prototype._onComplete = function(event) {
         this.nextPage.title,
         this.nextPage.href);
   }
-
-  if (this.nextPage.title) document.title = this.nextPage.title;
 
   // Update the last url to the current url
   this.currentPage = this.nextPage;

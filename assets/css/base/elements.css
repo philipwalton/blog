@@ -138,7 +138,7 @@ figure {
   margin: 0 0 var(--space);
 }
 
-figure a {
+.wf-active figure a {
   background: none;
 }
 
@@ -149,7 +149,7 @@ figcaption {
   text-align: right;
 }
 
-figcaption a {
+.wf-active figcaption a {
   color: var(--accent-color);
   border-bottom: 1px dotted var(--accent-color);
 }

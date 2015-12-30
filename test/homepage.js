@@ -31,15 +31,20 @@ describe('The home page', function() {
       let headingQuery = `.ArticleList-item:nth-last-child(${i}) h2`;
       let linkQuery = `.ArticleList-item:nth-last-child(${i}) a`;
 
-      let title = yield browser.url('/').getText(headingQuery);
+      // Waits for the link to appear to reduce flakiness.
+      yield browser.url('/').waitForVisible(linkQuery);
+
+      let title = yield browser.getText(headingQuery);
       let href = yield browser.getAttribute(linkQuery, 'href');
       assert.equal(title, article.title);
       assert.equal(href, data.baseUrl + article.path);
 
-      title = yield browser.click(linkQuery).getTitle();
-      let path = yield getUrlPath();
+      title = yield browser
+          .click(linkQuery)
+          .waitUntil(urlMatches(article.path))
+          .getTitle();
+
       assert.equal(title, article.title + data.titleSuffix);
-      assert.equal(path, article.path);
     }
   });
 
@@ -50,17 +55,31 @@ describe('The home page', function() {
 
       let linkQuery = `.MainNav a:nth-child(${i})`;
 
-      let title = yield browser.url('/').getText(linkQuery);
+      // Waits for the link to appear to reduce flakiness.
+      yield browser.url('/').waitForVisible(linkQuery);
+
+      let title = yield browser.getText(linkQuery);
       let href = yield browser.getAttribute(linkQuery, 'href');
       assert.equal(title, page.title);
       assert.equal(href, data.baseUrl + page.path);
 
-      title = yield browser.click(linkQuery).getTitle();
-      let path = yield getUrlPath();
+      title = yield browser
+          .click(linkQuery)
+          .waitUntil(urlMatches(page.path))
+          .getTitle();
+
       assert.equal(title, page.title + data.titleSuffix);
-      assert.equal(path, page.path);
     }
   });
 
-
 });
+
+
+function urlMatches(expectedUrl) {
+  return function() {
+    return browser.url().then(function(result) {
+      var actualUrl = result.value;
+      return actualUrl.indexOf(expectedUrl) > -1;
+    });
+  }
+}

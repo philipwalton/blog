@@ -32,6 +32,10 @@ describe('The content loader', function() {
 
 
   it('should work with the back and forward buttons', function *() {
+
+    // Ensures the viewport is big enough so all navigation is present.
+    browser.setViewportSize({width:1024, height:768}, true);
+
     // Navigates to an article.
     let currentTitle = yield browser
         .click(`a[href="${data.articles[0].path}"]`).getTitle();

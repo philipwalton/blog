@@ -14,7 +14,7 @@ describe('Code syntax highlighting', function() {
 
 
   it('should be present on code blocks', function() {
-    return browser.waitForExist('pre code.language-css .hljs-class');
+    return browser.waitForExist('pre code.language-css');
   });
 
 

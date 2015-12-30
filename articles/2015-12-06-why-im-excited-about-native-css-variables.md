@@ -249,7 +249,7 @@ The following demo uses the above code to build a basic site layout that automat
   <a href="http://codepen.io/philipwalton/pen/epLWNO/?editors=110">
     <img srcset="
       ../../assets/images/custom-properties-responsive-1400w.png 1400w,
-      ../../assets/images/custom-responsive.png 700w"
+      ../../assets/images/custom-properties-responsive.png 700w"
       src="../../assets/images/custom-properties-responsive-properties.png"
       alt="Responsive Properties Demo">
   </a>

@@ -286,7 +286,7 @@ gulp.task('images', function() {
     gulp.src('./assets/images/*.png', {base: '.'})
         .pipe(resize({width : 1400}))
         .pipe(imagemin({use: [pngquant()]}))
-        .pipe(rename((path) => path.basename += "-1400w"))
+        .pipe(rename((path) => path.basename += '-1400w'))
         .pipe(gulp.dest(DEST))
   );
 });

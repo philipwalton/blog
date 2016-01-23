@@ -293,6 +293,6 @@ Feel free to use this code on your site, but don't forget to change the breakpoi
 <aside class="Footnotes">
   <h1 class="Footnotes-title">Footnotes:</h1>
   <ol class="Footnotes-items">
-    <li id="footnote-1">There may be situations where you want to track more than one matching media query at the same time. A good example of this would be tracking screen width *and* device pixel density. In such cases it's best to track these with two separate dimensions. Within a single dimension, only one value can apply at a time.</li>
+    <li id="footnote-1">There may be situations where you want to track more than one matching media query at the same time. A good example of this would be tracking screen width <em>and</em> device pixel density. In such cases it's best to track these with two separate dimensions. Within a single dimension, only one value can apply at a time.</li>
   </ol>
 </aside>

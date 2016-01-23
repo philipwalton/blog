@@ -1,10 +1,4 @@
-// Requires individual autotrack plugins.
-require('autotrack/lib/plugins/media-query-tracker');
-require('autotrack/lib/plugins/outbound-link-tracker');
-require('autotrack/lib/plugins/session-duration-tracker');
-require('autotrack/lib/plugins/social-tracker');
-require('autotrack/lib/plugins/url-change-tracker');
-
+require('./analytics');
 
 var contentLoader = require('./content-loader');
 var supports = require('./supports');
@@ -14,7 +8,6 @@ var supports = require('./supports');
 if (!supports.flexbox()) {
   document.documentElement.className += ' is-legacy';
 }
-
 
 // Load links via AJAX instead of full page loads in browsers with pushState.
 contentLoader.init();

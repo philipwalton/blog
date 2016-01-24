@@ -8,8 +8,3 @@
   font-size: .85em;
   margin: 0;
 }
-
-.wf-active .Thanks a {
-  background-image: linear-gradient(to top, #bbb, #bbb);
-  background-position: 0 1.2em;
-}

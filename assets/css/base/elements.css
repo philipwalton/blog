@@ -14,10 +14,11 @@ html, body {
 
 body {
   color: var(--text-color);
-  font: 1.0625em/1.47 var(--font-fallback);
+  font: 1em/1.5 var(--font-fallback);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+  letter-spacing: -0.02em;
 }
 .wf-active body {
   font-family: var(--font);
@@ -28,11 +29,7 @@ h2,
 h3,
 h4 {
   line-height: 1.1;
-}
-
-b,
-strong {
-  color: var(--heading-color);
+  margin: 1.5em 0;
 }
 
 p {
@@ -40,34 +37,11 @@ p {
 }
 
 a {
-  color: inherit;
+  color: hsl(0, 0%, 50%);
 }
 
-.wf-active article a {
-  background-image: linear-gradient(to top, #777, #777);
-  background-position: 0 1.25em;
-  background-repeat: repeat-x;
-  background-size: 1px 1px;
+article sup a {
   text-decoration: none;
-}
-
-.wf-active article a code {
-  background-color: var(--code-bg-color);
-  background-image: linear-gradient(to top, #777, #777);
-  background-position: 0 1.4em;
-  background-repeat: repeat-x;
-  background-size: 1px 1px;
-}
-
-article sup a,
-.wf-active article sup a {
-  background: 0;
-  text-decoration: none;
-}
-
-.is-legacy article a {
-  background: 0;
-  text-decoration: underline;
 }
 
 code {
@@ -75,7 +49,7 @@ code {
   border-radius: 2px;
   display: inline-block;
   font-family: Monaco, monospace;
-  font-size: 0.8em;
+  font-size: 0.9em;
   padding: 2px 3px 1px;
   -webkit-font-smoothing: initial;
   -moz-osx-font-smoothing: initial;
@@ -85,6 +59,7 @@ pre code {
   background: inherit;
   color: inherit;
   display: block;
+  font-size: 0.8em;
   padding: 0;
 }
 
@@ -94,11 +69,18 @@ mark {
 }
 
 blockquote {
-  border-left: .333em solid #eee;
-  color: #666;
+  border-left: 4px solid hsl(0, 0%, 93%);
+  color: hsl(0, 0%, 50%);
   font-style: italic;
   margin: 0;
-  padding: 0 0 0 1em;
+  padding: .3em 0 .3em 1em;
+  line-height: 1.3;
+  font-size: 1.05em;
+  margin-bottom: 1.75em;
+}
+
+blockquote p:last-child {
+  margin-bottom: 0;
 }
 
 ol, ul {
@@ -129,10 +111,6 @@ figure {
   margin: 0 0 var(--space);
 }
 
-.wf-active figure a {
-  background: none;
-}
-
 figcaption {
   color: #666;
   font-size: .8em;
@@ -140,9 +118,14 @@ figcaption {
   text-align: right;
 }
 
-.wf-active figcaption a {
+figcaption a {
   color: var(--accent-color);
   border-bottom: 1px dotted var(--accent-color);
+  text-decoration: none;
+}
+
+figcaption a:hover {
+  border-bottom-style: solid;
 }
 
 img {

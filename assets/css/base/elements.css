@@ -14,29 +14,20 @@ html, body {
 
 body {
   color: var(--text-color);
-  font: 1.0625em/1.47 var(--fonts-serif-backup);
+  font: 1.0625em/1.47 var(--font-fallback);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
 }
 .wf-active body {
-  font-family: var(--fonts-serif);
+  font-family: var(--font);
 }
 
 h1,
 h2,
 h3,
 h4 {
-  color: var(--heading-color);
-  font-family: var(--fonts-sans-serif-backup);
-  letter-spacing: -0.04em;
   line-height: 1.1;
-}
-.wf-active h1,
-.wf-active h2,
-.wf-active h3,
-.wf-active h4 {
-  font-family: var(--fonts-sans-serif);
 }
 
 b,

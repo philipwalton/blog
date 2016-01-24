@@ -3,12 +3,7 @@
 __userTiming && performance.mark('fonts:start');
 
 WebFontConfig = {
-  google: {
-    families: [
-      'Open+Sans:400,700:latin',
-      'Noto+Serif:400,400italic:latin'
-    ]
-  },
+  google: {families: ['Open+Sans:400,400italic,600:latin']},
   active: function() {
     if (__userTiming) {
       performance.mark('fonts:end');

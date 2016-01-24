@@ -1,10 +1,7 @@
 :root {
 
-  --fonts-serif-backup: 'Georgia', serif;
-  --fonts-sans-serif-backup: 'Helvetica Neue', sans-serif;
-
-  --fonts-serif: 'Noto Serif', var(--fonts-serif-backup);
-  --fonts-sans-serif: 'Open Sans', var(--fonts-sans-serif-backup);
+  --font-fallback: 'Helvetica Neue', sans-serif;
+  --font: 'Open Sans', var(--font-fallback);
 
   --text-color: #333;
   --heading-color: #222;

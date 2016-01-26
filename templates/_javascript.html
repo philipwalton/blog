@@ -10,6 +10,7 @@ if (__userTiming) {
   performance.measure('js:load', 'js:start', 'js:end');
   var jsLoad = performance.getEntriesByName('js:load')[0];
   // Tracks the amount of time it took the JavaScript to load.
-  ga('send', 'timing', 'JavaScript', 'load', jsLoad.duration, 'local');
+  ga('send', 'timing', 'JavaScript', 'load',
+      Math.round(jsLoad.duration), 'local');
 }
 </script>

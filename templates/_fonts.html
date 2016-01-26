@@ -17,7 +17,7 @@ WebFontConfig = {
       // Tracks how long it took to load the fonts including
       // the time it tooks to download the webfont.js script.
       ga('send', 'timing', 'Fonts', 'load',
-          fontsLoad.duration, 'fonts.googleapis.com');
+          Math.round(fontsLoad.duration), 'fonts.googleapis.com');
     }
   },
   inactive: function() {

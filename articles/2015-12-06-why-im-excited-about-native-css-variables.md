@@ -405,7 +405,7 @@ I don't think it has to be an either-or situation. And pitting them against each
 
 <div class="Thanks">
 
-Special thanks to [Addy Osmani](https://twitter.com/addyosmani) and [Matt Gaunt](https://twitter.com/gauntface) for reviewing this article and to Shane Stephens for prioritizing and fixing a Chrome bug to get the demos working.
+Special thanks to [Addy Osmani](https://twitter.com/addyosmani) and [Matt Gaunt](https://twitter.com/gauntface) for reviewing this article and to [Shane Stephens](https://twitter.com/komradshaneski) for prioritizing and fixing a Chrome bug to get the demos working.
 
 </div>
 

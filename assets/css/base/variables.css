@@ -15,4 +15,6 @@
   --rss-color: #F93;
 
   --space: 1.75em;
+
+  --quantum-easeing :cubic-bezier(.4,0,.2,1);
 }

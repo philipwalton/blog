@@ -42,6 +42,7 @@ function removeClass(element, className) {
 
 
 function handleDrawerToggleClick(event) {
+  event.preventDefault();
   isOpen ? close() : open();
 }
 

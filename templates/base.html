@@ -6,19 +6,33 @@
 <body class="Site">
 
   <div class="Site-header">
-    <header class="Header">
+
+    <header class="Header" id="drawer-container">
+
       <a class="Header-info" href="/" title="Home">
         <h1 class="Header-title">Philip Walton</h1>
-        <p class="Header-tagline">Engineer at Google</p>
+        <p class="Header-tagline">Engineer @ Google</p>
       </a>
-      <a class="Header-photo" href="/" title="Home"></a>
-      <div class="Header-social">
-        {% include '_social-nav.html' %}
+
+      <div class="Header-drawer">
+        <div class="Drawer">
+          <nav class="Drawer-site">
+            {% include '_site-nav.html' %}
+          </nav>
+          <nav class="Drawer-social">
+            {% include '_social-nav.html' %}
+          </nav>
+        </div>
       </div>
-      <div class="Header-nav">
-        {% include '_main-nav.html' %}
+
+      <div class="Header-drawerToggle" id="drawer-toggle">
+        <svg class="Icon" viewBox="0 0 24 24">
+          <use xlink:href="#icon-menu"></use>
+        </svg>
       </div>
+
     </header>
+
   </div>
 
   <div class="Site-contentContainer">

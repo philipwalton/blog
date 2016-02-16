@@ -8,7 +8,8 @@ ga('create', 'UA-21292978-1', 'auto', {siteSpeedSampleRate: 10});
 {% if site.env != 'production' %}
   // In non-production mode, simply log GA hits to the console.
   // Note, tasks must be set before sending the first hit
-  ga('set', 'sendHitTask', function() {
+  ga('set', 'sendHitTask', function(model) {
+    console.log(decodeURIComponent(model.get('hitPayload')));
     // Throw to stop subsequent tasks.
     throw 'Abort tracking in non-production environments.'
   });
@@ -19,11 +20,9 @@ ga('require', 'mediaQueryTracker', {
     name: 'Breakpoint',
     dimensionIndex: 1,
     items: [
-      {name: 'xs', media: 'all'},
-      {name: 'sm', media: '(min-width: 420px)'},
-      {name: 'md', media: '(min-width: 570px)'},
-      {name: 'lg', media: '(min-width: 800px)'},
-      {name: 'xl', media: '(min-width: 1000px)'}
+      {name: 'sm', media: 'all'},
+      {name: 'md', media: '(min-width: 36em)'},
+      {name: 'lg', media: '(min-width: 48em)'}
     ]
   },
   {

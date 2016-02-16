@@ -29,15 +29,15 @@ h2,
 h3,
 h4 {
   line-height: 1.1;
-  margin: 1.5em 0;
+  margin: 1em 0;
 }
 
 p {
-  margin: 0 0 var(--space);
+  margin: 0 0 var(--vgap);
 }
 
 a {
-  color: hsl(0, 0%, 50%);
+  color: var(--link-color);
 }
 
 article sup a {
@@ -49,7 +49,7 @@ code {
   border-radius: 2px;
   display: inline-block;
   font-family: Monaco, monospace;
-  font-size: 0.9em;
+  font-size: 0.9375em;
   padding: 2px 3px 1px;
   -webkit-font-smoothing: initial;
   -moz-osx-font-smoothing: initial;
@@ -59,7 +59,7 @@ pre code {
   background: inherit;
   color: inherit;
   display: block;
-  font-size: 0.8em;
+  font-size: 0.875em;
   padding: 0;
 }
 
@@ -84,7 +84,7 @@ blockquote p:last-child {
 }
 
 ol, ul {
-  margin: 0 0 var(--space);
+  margin: 0 0 var(--vgap);
   padding-left: 2em;
 }
 
@@ -108,7 +108,7 @@ ol ol ol {
 }
 
 figure {
-  margin: 0 0 var(--space);
+  margin: 0 0 var(--vgap);
 }
 
 figcaption {

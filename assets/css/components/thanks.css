@@ -1,7 +1,7 @@
 .Thanks {
   color: #888;
   font-style: italic;
-  margin: 0 0 var(--space);
+  margin: 0 0 var(--vgap);
 }
 
 .Thanks > p {

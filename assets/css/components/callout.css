@@ -1,10 +1,25 @@
 .Callout {
   background: var(--bg-color);
   border-radius: var(--border-radius);
-  margin: 0 0 var(--space);
-  padding: 1em var(--space);
+  margin: var(--vgap) -var(--hgap);
+  padding: var(--vgap) var(--hgap);
 }
 
 .Callout :last-child {
   margin-bottom: 0;
+}
+
+
+@media (--break-md) {
+  .Callout {
+    margin: var(--vgap-md) -var(--hgap-md);
+    padding: var(--vgap-md) var(--hgap-md);
+  }
+}
+
+@media (--break-lg) {
+  .Callout {
+    margin: var(--vgap-md) 0;
+    padding: var(--vgap-md) var(--hgap-md);
+  }
 }

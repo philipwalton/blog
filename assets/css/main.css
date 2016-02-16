@@ -7,9 +7,9 @@
 @import "./components/site.css";
 @import "./components/header.css";
 @import "./components/content-header.css";
-@import "./components/page-title.css";
+@import "./components/drawer.css";
 @import "./components/social-nav.css";
-@import "./components/main-nav.css";
+@import "./components/site-nav.css";
 @import "./components/share.css";
 @import "./components/article-list.css";
 @import "./components/article-preview.css";

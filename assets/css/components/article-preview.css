@@ -1,7 +1,6 @@
 .ArticlePreview {
   color: inherit;
   display: block;
-  padding: var(--space) 0;
   text-decoration: none;
 }
 

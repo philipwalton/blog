@@ -36,6 +36,7 @@ describe('The home page', function() {
 
       let title = yield browser.getText(headingQuery);
       let href = yield browser.getAttribute(linkQuery, 'href');
+
       assert.equal(title, article.title);
       assert.equal(href, data.baseUrl + article.path);
 
@@ -53,17 +54,15 @@ describe('The home page', function() {
 
     for (let i = 1, page; page = data.pages[i-1]; i++) {
 
-      let linkQuery = `.MainNav a:nth-child(${i})`;
+      let linkQuery = `.Header a[title="${page.title}"]`;
 
       // Waits for the link to appear to reduce flakiness.
       yield browser.url('/').waitForVisible(linkQuery);
 
-      let title = yield browser.getText(linkQuery);
       let href = yield browser.getAttribute(linkQuery, 'href');
-      assert.equal(title, page.title);
       assert.equal(href, data.baseUrl + page.path);
 
-      title = yield browser
+      let title = yield browser
           .click(linkQuery)
           .waitUntil(urlMatches(page.path))
           .getTitle();

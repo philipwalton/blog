@@ -3,7 +3,9 @@ template: base.html
 title: "Home"
 ---
 
-<h1 class="PageTitle">Recent Articles</h1>
+<header class="ContentHeader">
+  <h1 class="ContentHeader-pageTitle">Recent Articles</h1>
+</header>
 
 <ul class="ArticleList">
   {% for article in site.articles %}

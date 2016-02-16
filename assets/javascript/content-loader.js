@@ -2,6 +2,7 @@
 
 var linkClicked = require('./link-clicked');
 var History2 = require('./history2');
+var drawer = require('./drawer');
 var parseUrl = require('./parse-url');
 
 // Cache the container element to avoid multiple lookups.
@@ -51,6 +52,11 @@ function showPageContent() {
 }
 
 
+function closeDrawer() {
+  drawer.close();
+}
+
+
 function setScroll() {
   var hash = this.nextPage.hash;
   if (hash) {
@@ -86,6 +92,7 @@ module.exports = {
     var history2 = new History2()
         .use(loadPageContent)
         .use(showPageContent)
+        .use(closeDrawer)
         .use(setScroll)
         ['catch'](trackError);
 

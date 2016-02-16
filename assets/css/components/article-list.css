@@ -1,16 +1,22 @@
 .ArticleList {
   list-style: none;
+  margin: 0;
   padding: 0;
-  margin: 1em 0 0;
 }
 
 .ArticleList-item {
+  border-top: 1px solid var(--border-color);
+  padding: var(--vgap) 0;
   position: relative;
-  border-top: 1px solid #eee;
 }
 
-@media (--break-md) {
-  .ArticleList {
-    margin-top: 1.5em;
+.ArticleList-item:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+@media (--break-lg) {
+  .ArticleList-item {
+    padding: var(--vgap-lg) 0;
   }
 }

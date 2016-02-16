@@ -1,22 +1,33 @@
 :root {
 
-  --fonts-serif-backup: 'Georgia', serif;
-  --fonts-sans-serif-backup: 'Helvetica Neue', sans-serif;
+  --font-fallback: 'Helvetica Neue', sans-serif;
+  --font: 'Open Sans', var(--font-fallback);
 
-  --fonts-serif: 'Noto Serif', var(--fonts-serif-backup);
-  --fonts-sans-serif: 'Open Sans', var(--fonts-sans-serif-backup);
-
-  --text-color: #333;
-  --heading-color: #222;
+  --text-color: hsl(0, 0%, 25%);
+  --light-text-color: hsl(0, 0%, 90%);
+  --link-color: hsl(0, 0%, 40%);
   --accent-color: hsl(150, 40%, 50%);
-  --border-color: hsl(30, 15%, 80%);
+  --border-color: hsl(30, 15%, 94%);
   --border-radius: 3px;
+
   --bg-color: hsl(30, 15%, 95%);
+  --dark-bg-color: hsl(0, 0%, 25%);
   --code-bg-color: hsl(30, 15%, 96%);
+
+  --shadow: 0 0 .5em hsla(0, 0%, 0%, .3);
 
   --twitter-color: #55acee;
   --github-color: #171715;
   --rss-color: #F93;
 
-  --space: 1.5em;
+  --vgap: 1.5em;
+  --vgap-md: var(--vgap);
+  --vgap-lg: 1.75em;
+
+
+  --hgap: 1.25em;
+  --hgap-md: 1.5em;
+  --hgap-lg: 1.75em;
+
+  --quantum-easeing :cubic-bezier(.4,0,.2,1);
 }

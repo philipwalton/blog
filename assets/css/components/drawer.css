@@ -1,0 +1,34 @@
+.Drawer {
+  align-items: center;
+
+  /*background: #fff;*/
+  background: var(--bg-color);
+
+  display: flex;
+  justify-content: flex-end;
+  padding: var(--vgap) var(--hgap);
+}
+
+.Drawer-social,
+.Drawer-site {
+  flex: 1 0 0%;
+}
+
+.Drawer-social {
+  order: -1;
+}
+
+@media (--break-md) {
+  .Drawer {
+    padding: var(--vgap-md) var(--hgap-md);
+  }
+}
+
+@media (--break-lg) {
+  .Drawer {
+    padding: 0;
+  }
+  .Drawer-site {
+    display: block;
+  }
+}

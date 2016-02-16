@@ -1,7 +1,6 @@
 .ArticlePreview {
   color: inherit;
   display: block;
-  padding: var(--space) 0;
   text-decoration: none;
 }
 
@@ -15,14 +14,9 @@
 
 .ArticlePreview-excerpt {
   color: #aaa;
-  font-family: var(--fonts-sans-serif-backup);
   font-size: .9em;
-  letter-spacing: -.02em;
   line-height: 1.4;
   margin: 0;
-}
-.wf-active .ArticlePreview-excerpt {
-  font-family: var(--fonts-sans-serif);
 }
 
 .ArticlePreview-date {

@@ -1,23 +1,42 @@
 .ContentHeader {
-  margin-bottom: var(--space);
+  border-bottom: 1px solid var(--border-color);
+  margin-bottom: var(--vgap);
+  padding: 0 0 var(--vgap);
 }
 
-.ContentHeader-title {
-  font-size: 2em;
-  line-height: 1;
-  letter-spacing: -.04em;
+.ContentHeader-articleTitle {
+  font-size: 1.75em;
+  letter-spacing: -.05em;
   margin: 0;
 }
 
-.ContentHeader-date {
+.ContentHeader-articleDate {
   color: #999;
   display: block;
-  font-size: .9em;
-  margin: 1.1em 0 0;
+  font-size: .875em;
+  margin: 1em 0 0;
 }
 
+.ContentHeader-pageTitle {
+  color: #aaa;
+  font-size: .8em;
+  letter-spacing: .15em;
+  margin: 0;
+  text-align: left;
+  text-transform: uppercase;
+  word-spacing: .5em;
+}
+
+
 @media (--break-lg) {
-  .ContentHeader-title {
-    font-size: 3em;
+  .ContentHeader {
+    margin-bottom: var(--vgap-lg);
+    padding: 0 0 var(--vgap-lg);
+  }
+  .ContentHeader-articleTitle {
+    font-size: 2.5em;
+  }
+  .ContentHeader-pageTitle {
+    text-align: center;
   }
 }

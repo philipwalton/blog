@@ -87,6 +87,10 @@
     {
       "title": "Do We Actually Need Specificity In CSS?",
       "path": "/articles/do-we-actually-need-specificity-in-css/"
+    },
+    {
+      "title": "Why I'm Excited About Native CSS Variables",
+      "path": "/articles/why-im-excited-about-native-css-variables/"
     }
   ],
   "pages": [

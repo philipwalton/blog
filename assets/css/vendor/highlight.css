@@ -3,9 +3,9 @@
 pre {
   background: var(--bg-color);
   border-radius: var(--border-radius);
-  margin: 0 0 var(--space);
+  margin: var(--vgap) -var(--hgap);
   overflow: auto;
-  padding: 1em var(--space);
+  padding: var(--vgap) var(--hgap);
   -webkit-text-size-adjust: none;
   white-space: pre;
 }
@@ -16,3 +16,18 @@ pre mark {
   box-shadow: 0 0 0 .1em #ff9;
   font-style: normal;
 }
+
+@media (--break-md) {
+  pre {
+    margin: var(--vgap-md) -var(--hgap-md);
+    padding: var(--vgap-md) var(--hgap-md);
+  }
+}
+
+@media (--break-lg) {
+  pre {
+    margin: var(--vgap-md) 0;
+    padding: var(--vgap-md) var(--hgap-md);
+  }
+}
+

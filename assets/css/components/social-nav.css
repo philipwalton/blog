@@ -4,7 +4,15 @@
 
 .SocialNav {
   display: flex;
-  justify-content: inherit;
+  justify-content: flex-start;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+@media (--break-lg) {
+  .SocialNav {
+    justify-content: center;
+  }
 }
 
 
@@ -36,50 +44,4 @@
 
 .SocialNav-link--rss:hover svg {
   fill: var(--rss-color);
-}
-
-
-/* Legacy browser fallbacks
-   =============================================== */
-
-.is-legacy .SocialNav {
-  display: block;
-  font-weight: bold;
-  font-size: .8em;
-  line-height: 1.667;
-}
-
-.is-legacy .SocialNav-link {
-  color: #999;
-  display: inline-block;
-  height: auto;
-  width: auto;
-}
-
-.is-legacy .SocialNav-link:hover {
-  color: var(--accent-color);
-}
-
-.is-legacy .SocialNav-link:after {
-  content: attr(title);
-}
-
-.is-legacy .SocialNav-link + .SocialNav-link {
-  margin-left: 1em;
-}
-
-.is-legacy .SocialNav-link svg {
-  display: none;
-}
-
-@media (--break-lg) {
-  .is-legacy .SocialNav {
-    text-align: center;
-  }
-  .is-legacy .SocialNav-link {
-    display: block;
-  }
-  .is-legacy .SocialNav-link + .SocialNav-link {
-    margin-left: 0;
-  }
 }

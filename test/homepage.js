@@ -12,6 +12,7 @@ describe('The home page', function() {
 
   before(function() {
     return browser.url('/')
+        .setViewportSize({width:800, height:600}, false)
         .execute(() => location.protocol + '//' + location.host)
         .then(({value:href}) => data.baseUrl = href);
   });

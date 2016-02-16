@@ -354,7 +354,7 @@ gulp.task('serve', function(done) {
 });
 
 
-gulp.task('selenium-server', function(done) {
+gulp.task('selenium', function(done) {
   seleniumServer = spawn('java',  ['-jar', seleniumServerJar.path]);
   seleniumServer.stderr.on('data', function(data) {
     if (data.indexOf('Selenium Server is up and running') > -1) {
@@ -372,7 +372,7 @@ gulp.task('watch', ['build', 'serve'], function() {
 });
 
 
-gulp.task('test', ['build', 'serve', 'selenium-server'], function() {
+gulp.task('test', ['build', 'serve', 'selenium'], function() {
   function stopServers() {
     server.close();
     seleniumServer.kill();

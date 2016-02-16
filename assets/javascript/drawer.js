@@ -68,10 +68,10 @@ function close() {
 module.exports = {
   init: function() {
     drawerToggle.addEventListener('click', handleDrawerToggleClick);
-    drawerToggle.addEventListener('touchstart', handleDrawerToggleClick);
+    drawerToggle.addEventListener('touchend', handleDrawerToggleClick);
 
     document.addEventListener('click', handleClickOutsideDrawerContainer);
-    document.addEventListener('touchstart', handleClickOutsideDrawerContainer);
+    document.addEventListener('touchend', handleClickOutsideDrawerContainer);
   },
   open: open,
   close: close

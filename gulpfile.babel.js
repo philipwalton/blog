@@ -383,7 +383,7 @@ gulp.task('test', ['build', 'serve', 'selenium-server'], function() {
 });
 
 
-gulp.task('deploy', ['build'], function() {
+gulp.task('deploy', ['test'], function() {
 
   if (!isProd()) {
     throw new Error('The deploy task must be run in production mode.');

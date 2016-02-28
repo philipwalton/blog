@@ -12,5 +12,8 @@ if (__userTiming) {
   // Tracks the amount of time it took the JavaScript to load.
   ga('send', 'timing', 'JavaScript', 'load',
       Math.round(jsLoad.duration), 'local');
+
+  ga('testing.send', 'timing', 'JavaScript', 'load',
+      Math.round(jsLoad.duration), 'local');
 }
 </script>

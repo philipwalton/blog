@@ -18,5 +18,6 @@ if (__userTiming) {
   var cssBlock = performance.getEntriesByName('css:block')[0];
   // Tracks the amount of time loading the CSS blocks rendering.
   ga('send', 'timing', 'CSS', 'block', Math.round(cssBlock.duration), 'local');
+  ga('testing.send', 'timing', 'CSS', 'block', Math.round(cssBlock.duration), 'local');
 }
 </script>

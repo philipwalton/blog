@@ -71,9 +71,9 @@ function setScroll() {
 }
 
 
-
 function trackError(error) {
   ga('send', 'exception', {exDescription: error.stack || error.message});
+  ga('testing.send', 'exception', {exDescription: error.stack || error.message});
 }
 
 

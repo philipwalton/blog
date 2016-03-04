@@ -37,11 +37,17 @@ var autotrackOpts = {
 };
 
 ga('create', 'UA-21292978-1', 'auto', {siteSpeedSampleRate: 10});
+ga('create', 'UA-21292978-4', 'auto', 'control', {siteSpeedSampleRate: 10});
 ga('create', 'UA-21292978-3', 'auto', 'testing', {siteSpeedSampleRate: 10});
+
 
 {% if site.env != 'production' %}
   ga('set', 'sendHitTask', function(model) {
     console.log('t0', Date.now(), decodeURIComponent(model.get('hitPayload')));
+    throw 'Abort tracking in non-production environments.'
+  });
+  ga('control.set', 'sendHitTask', function(model) {
+    console.log('control', Date.now(), decodeURIComponent(model.get('hitPayload')));
     throw 'Abort tracking in non-production environments.'
   });
   ga('testing.set', 'sendHitTask', function(model) {
@@ -55,6 +61,12 @@ ga('require', 'outboundLinkTracker');
 ga('require', 'socialTracker');
 ga('require', 'urlChangeTracker');
 ga('send', 'pageview');
+
+ga('control.require', 'mediaQueryTracker', autotrackOpts);
+ga('control.require', 'outboundLinkTracker');
+ga('control.require', 'socialTracker');
+ga('control.require', 'urlChangeTracker');
+ga('control.send', 'pageview');
 
 ga('testing.require', 'mediaQueryTracker', autotrackOpts);
 ga('testing.require', 'outboundLinkTracker');

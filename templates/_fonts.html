@@ -13,6 +13,8 @@ WebFontConfig = {
       // the time it tooks to download the webfont.js script.
       ga('send', 'timing', 'Fonts', 'load',
           Math.round(fontsLoad.duration), 'fonts.googleapis.com');
+      ga('control.send', 'timing', 'Fonts', 'load',
+          Math.round(fontsLoad.duration), 'fonts.googleapis.com');
       ga('testing.send', 'timing', 'Fonts', 'load',
           Math.round(fontsLoad.duration), 'fonts.googleapis.com');
     }
@@ -20,6 +22,9 @@ WebFontConfig = {
   inactive: function() {
     // Tracks when load errors occur.
     ga('send', 'event', 'Fonts', 'error', 'fonts.googleapis.com', {
+      nonInteraction: true
+    });
+    ga('control.send', 'event', 'Fonts', 'error', 'fonts.googleapis.com', {
       nonInteraction: true
     });
     ga('testing.send', 'event', 'Fonts', 'error', 'fonts.googleapis.com', {

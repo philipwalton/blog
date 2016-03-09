@@ -104,12 +104,13 @@ _ga('create', 'UA-21292978-3', 'auto', 'testing', trackerOpts);
 ga('require', 'mediaQueryTracker', autotrackOpts);
 ga('require', 'outboundLinkTracker');
 ga('require', 'socialTracker');
-ga('require', 'urlChangeTracker');
+// ga('require', 'urlChangeTracker');
+
 
 // Only requires `pageVisibilityTracker` on the 'testing' tracker.
 _ga('testing.require', 'pageVisibilityTracker', autotrackOpts);
 
-ga('send', 'pageview');
+ga('send', 'pageview', {dimension4: 'pageload'});
 
 }(window));
 </script>

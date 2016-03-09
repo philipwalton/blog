@@ -1,10 +1,4 @@
 <script>
-// Check for User Timing support.
-window.__userTiming = window.performance &&
-    typeof performance.mark == 'function' &&
-    typeof performance.measure == 'function' &&
-    typeof performance.getEntriesByName == 'function';
-
 // Tracks the CSS load start time.
 __userTiming && performance.mark('css:start');
 </script>
@@ -18,7 +12,5 @@ if (__userTiming) {
   var cssBlock = performance.getEntriesByName('css:block')[0];
   // Tracks the amount of time loading the CSS blocks rendering.
   ga('send', 'timing', 'CSS', 'block', Math.round(cssBlock.duration), 'local');
-  ga('control.send', 'timing', 'CSS', 'block', Math.round(cssBlock.duration), 'local');
-  ga('testing.send', 'timing', 'CSS', 'block', Math.round(cssBlock.duration), 'local');
 }
 </script>

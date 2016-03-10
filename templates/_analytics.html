@@ -21,7 +21,7 @@ window.ga = (function() {
   // Randomizes the order in which tracker methods are called.
   // This is necessary because latter trackers will lose more hits (for various
   // reasons) and the results will be skewed.
-  var trackerNames = ['t0', 'control', 'testing'];
+  var trackerNames = ['t0', 'testing'];
   var randomizedTrackerNames = [];
   while (trackerNames.length) {
     var index = Math.floor(Math.random() * trackerNames.length);
@@ -82,7 +82,6 @@ var trackerOpts =  {siteSpeedSampleRate: 10};
 
 
 _ga('create', 'UA-21292978-1', 'auto', trackerOpts);
-_ga('create', 'UA-21292978-4', 'auto', 'control', trackerOpts);
 _ga('create', 'UA-21292978-3', 'auto', 'testing', trackerOpts);
 
 

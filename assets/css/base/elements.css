@@ -49,10 +49,8 @@ code {
   border-radius: 2px;
   display: inline-block;
   font-family: Monaco, monospace;
-  font-size: 0.9375em;
+  font-size: 0.875em;
   padding: 2px 3px 1px;
-  -webkit-font-smoothing: initial;
-  -moz-osx-font-smoothing: initial;
 }
 
 pre code {

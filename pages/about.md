@@ -22,8 +22,9 @@ If you're interested in my thoughts on something, let me know, and maybe it'll t
 
 ## Other Writing
 
+* [Smashing Magazine](https://www.smashingmagazine.com/2016/03/houdini-maybe-the-most-exciting-development-in-css-youve-never-heard-of/) *(Mar 2016)*
 * [CSS Tricks](http://css-tricks.com/dangers-stopping-event-propagation/) *(May 2014)*
 * [CSS Tricks](http://css-tricks.com/interviewing-front-end-engineer-san-francisco/) *(Dec 2013)*
-* [Adobe Developer Connection](http://www.adobe.com/devnet/html5/articles/css-everything-is-global-and-how-to-deal-with-it.html)
-* [Codrops](http://tympanus.net/codrops/2013/01/22/defending-presentational-class-names/)
-* [Appfolio Engineering](http://engineering.appfolio.com/2012/11/16/css-architecture/)
+* [Adobe Developer Connection](http://www.adobe.com/devnet/html5/articles/css-everything-is-global-and-how-to-deal-with-it.html) *(Mar 2013)*
+* [Codrops](http://tympanus.net/codrops/2013/01/22/defending-presentational-class-names/) *(Jan 2013)*
+* [Appfolio Engineering](http://engineering.appfolio.com/2012/11/16/css-architecture/) *(Nov 2012)*

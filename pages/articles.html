@@ -18,9 +18,7 @@ title: "Articles"
 
   <li>
     <a href="{{ article.permalink }}" title="{{ article.title }}">
-    {{ article.title }}</a> (<time
-    datetime="{{ article.date | format('YYYY-MM-DDTHH:mm:ssZ') }}">
-    {{ article.date | format('MMMM D, YYYY') }}</time>)
+    {{ article.title }}</a> <em>(<time datetime="{{ article.date | format('YYYY-MM-DDTHH:mm:ssZ') }}">{{ article.date | format('MMM D, YYYY') }}</time>)</em>
   </li>
 
   {% if loop.last %}

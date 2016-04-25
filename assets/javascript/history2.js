@@ -1,4 +1,5 @@
-var parseUrl = require('./parse-url');
+var parseUrl = require('dom-utils/lib/parse-url');
+
 
 function History2() {
 

@@ -1,5 +1,4 @@
-
-var closest = require('closest');
+var closest = require('dom-utils/lib/closest');
 
 
 var drawerContainer = document.getElementById('drawer-container');

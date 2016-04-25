@@ -1,9 +1,10 @@
 /* global ga */
 
-var linkClicked = require('./link-clicked');
+var delegate = require('dom-utils/lib/delegate');
+var parseUrl = require('dom-utils/lib/parse-url');
 var History2 = require('./history2');
 var drawer = require('./drawer');
-var parseUrl = require('./parse-url');
+
 
 // Cache the container element to avoid multiple lookups.
 var container;
@@ -101,7 +102,7 @@ module.exports = {
         .use(trackPageview)
         ['catch'](trackError);
 
-    linkClicked(function(event) {
+    delegate(document, 'click', 'a[href]', function(event) {
 
       // Don't attempt to load content if the user is trying to open a new tab.
       if (event.metaKey || event.ctrlKey || event.which > 1) return;

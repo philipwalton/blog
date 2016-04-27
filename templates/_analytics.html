@@ -57,9 +57,32 @@ window.ga = (function() {
 }());
 
 
-// Defines the autotrack options.
-var autotrackOpts = {
-  mediaQueryDefinitions: [
+// Defines common tracker options.
+var trackerOpts =  {siteSpeedSampleRate: 10};
+
+
+_ga('create', 'UA-21292978-1', 'auto', trackerOpts);
+_ga('create', 'UA-21292978-3', 'auto', 'testing', trackerOpts);
+
+
+{% if site.env != 'production' %}
+  _ga(function() {
+    var trackers = _ga.getAll();
+    for (var i = 0, tracker; tracker = trackers[i]; i++) {
+      tracker.set('sendHitTask', function(model) {
+        console.log(model.get('name'), Date.now(),
+            model.get('hitPayload').split('&').map(decodeURIComponent));
+
+        throw 'Abort tracking in non-production environments.';
+      });
+    }
+  });
+{% endif %}
+
+
+ga('require', 'eventTracker');
+ga('require', 'mediaQueryTracker', {
+  definitions: [
     {
       name: 'Breakpoint',
       dimensionIndex: 1,
@@ -88,44 +111,18 @@ var autotrackOpts = {
         {name: 'portrait',  media: '(orientation: portrait)'}
       ]
     }
-  ],
-  virtualPageviewFields: {
-    dimension4: 'pageVisibilityTracker'
-  }
-};
-
-
-// Defines common tracker options.
-var trackerOpts =  {siteSpeedSampleRate: 10};
-
-
-_ga('create', 'UA-21292978-1', 'auto', trackerOpts);
-_ga('create', 'UA-21292978-3', 'auto', 'testing', trackerOpts);
-
-
-{% if site.env != 'production' %}
-  _ga(function() {
-    var trackers = _ga.getAll();
-    for (var i = 0, tracker; tracker = trackers[i]; i++) {
-      tracker.set('sendHitTask', function(model) {
-        console.log(model.get('name'), Date.now(),
-            model.get('hitPayload').split('&').map(decodeURIComponent));
-
-        throw 'Abort tracking in non-production environments.';
-      });
-    }
-  });
-{% endif %}
-
-
-ga('require', 'mediaQueryTracker', autotrackOpts);
+  ]
+});
 ga('require', 'outboundLinkTracker');
-ga('require', 'socialTracker');
-// ga('require', 'urlChangeTracker');
+ga('require', 'urlChangeTracker', {
+  fieldsObj: {dimension4: 'urlChangeTracker'}
+});
 
 
 // Only requires experimental plugins on the 'testing' tracker.
-_ga('testing.require', 'pageVisibilityTracker', autotrackOpts);
+_ga('testing.require', 'pageVisibilityTracker', {
+  fieldsObj: {dimension4: 'pageVisibilityTracker'}
+});
 _ga('testing.require', 'adblockTracker', {dimensionIndex: 5});
 
 

@@ -72,11 +72,6 @@ function setScroll() {
 }
 
 
-function trackPageview() {
-  ga('send', 'pageview', {dimension4: 'urlChangeTracker'});
-}
-
-
 function trackError(error) {
   ga('send', 'exception', {exDescription: error.stack || error.message});
 }
@@ -99,7 +94,6 @@ module.exports = {
         .use(showPageContent)
         .use(closeDrawer)
         .use(setScroll)
-        .use(trackPageview)
         ['catch'](trackError);
 
     delegate(document, 'click', 'a[href]', function(event) {

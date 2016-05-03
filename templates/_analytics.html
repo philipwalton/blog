@@ -108,7 +108,11 @@ _ga('testing.require', 'cleanUrlTracker', {
   trailingSlash: true
 });
 _ga('testing.require', 'pageVisibilityTracker', {
-  fieldsObj: {dimension4: 'pageVisibilityTracker'}
+  visibleMetricIndex: 1,
+  hiddenMetricIndex: 2,
+  fieldsObj: {
+    dimension4: 'pageVisibilityTracker'
+  }
 });
 
 

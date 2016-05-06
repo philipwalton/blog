@@ -112,6 +112,10 @@ _ga('testing.require', 'pageVisibilityTracker', {
   hiddenMetricIndex: 2,
   fieldsObj: {
     dimension4: 'pageVisibilityTracker'
+  },
+  hitFilter: function(model) {
+    // Sets the "Metric Property" dimension to the event value for bucketting.
+    model.set('dimension6', model.get('eventValue'), true);
   }
 });
 

@@ -9,6 +9,28 @@ require('autotrack/lib/plugins/url-change-tracker');
 var TRACKERS = ['t0', 'testing'];
 
 
+var metrics = {
+  PAGE_VISIBLE: 'metric1',
+  PAGE_HIDDEN: 'metric2'
+};
+
+
+var dimensions = {
+  BREAKPOINT: 'dimension1',
+  RESOLUTION: 'dimension2',
+  ORIENTATION: 'dimension3',
+  HIT_SOURCE: 'dimension4',
+  URL_QUERY_PARAMS: 'dimension5',
+  METRIC_VALUE: 'dimension6'
+};
+
+
+// Accepts a custom dimension or metric and returns it's numerical index.
+function getDefinitionIndex(dimension) {
+  return +dimension.slice(-1);
+}
+
+
 /**
  * Shadows the `window.ga` command queue to allow for easier multi-tracking.
  */
@@ -61,7 +83,7 @@ ga('require', 'mediaQueryTracker', {
   definitions: [
     {
       name: 'Breakpoint',
-      dimensionIndex: 1,
+      dimensionIndex: getDefinitionIndex(dimensions.BREAKPOINT),
       items: [
         {name: 'sm', media: 'all'},
         {name: 'md', media: '(min-width: 36em)'},
@@ -70,7 +92,7 @@ ga('require', 'mediaQueryTracker', {
     },
     {
       name: 'Resolution',
-      dimensionIndex: 2,
+      dimensionIndex: getDefinitionIndex(dimensions.RESOLUTION),
       items: [
         {name: '1x',   media: 'all'},
         {name: '1.5x', media: '(-webkit-min-device-pixel-ratio: 1.5), ' +
@@ -81,7 +103,7 @@ ga('require', 'mediaQueryTracker', {
     },
     {
       name: 'Orientation',
-      dimensionIndex: 3,
+      dimensionIndex: getDefinitionIndex(dimensions.ORIENTATION),
       items: [
         {name: 'landscape', media: '(orientation: landscape)'},
         {name: 'portrait',  media: '(orientation: portrait)'}
@@ -91,30 +113,27 @@ ga('require', 'mediaQueryTracker', {
 });
 ga('require', 'outboundLinkTracker');
 ga('require', 'urlChangeTracker', {
-  fieldsObj: {dimension4: 'urlChangeTracker'}
+  fieldsObj: {[dimensions.HIT_SOURCE]: 'urlChangeTracker'}
 });
 
 
 // Only requires experimental plugins on the 'testing' tracker.
 window.ga('testing.require', 'cleanUrlTracker', {
-  queryDimensionIndex: 5,
+  queryDimensionIndex: getDefinitionIndex(dimensions.URL_QUERY_PARAMS),
   indexFilename: 'index.html',
   trailingSlash: true
 });
 window.ga('testing.require', 'pageVisibilityTracker', {
-  visibleMetricIndex: 1,
-  hiddenMetricIndex: 2,
-  fieldsObj: {
-    dimension4: 'pageVisibilityTracker'
-  },
+  visibleMetricIndex: getDefinitionIndex(metrics.PAGE_VISIBLE),
+  hiddenMetricIndex: getDefinitionIndex(metrics.PAGE_HIDDEN),
+  fieldsObj: {[dimensions.HIT_SOURCE]: 'pageVisibilityTracker'},
   hitFilter: function(model) {
-    // Sets the "Metric Property" dimension to the event value for bucketting.
-    model.set('dimension6', model.get('eventValue'), true);
+    model.set(dimensions.METRIC_VALUE, model.get('eventValue'), true);
   }
 });
 
 
-ga('send', 'pageview', {dimension4: 'pageload'});
+ga('send', 'pageview', {[dimensions.HIT_SOURCE]: 'pageload'});
 
 
 // Sends performance timing metrics after the page loads.

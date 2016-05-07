@@ -153,6 +153,11 @@ if (__userTiming) {
         nonInteraction: true,
         [dimensions.METRIC_VALUE]: cssBlockTime,
       });
+      ga('send', 'timing', 'CSS', 'block', {
+        timingLabel: 'local',
+        timingValue: cssBlockTime,
+        [dimensions.METRIC_VALUE]: cssBlockTime,
+      });
     }
 
 
@@ -166,6 +171,11 @@ if (__userTiming) {
         eventLabel: 'local',
         eventValue: jsLoadTime,
         nonInteraction: true,
+        [dimensions.METRIC_VALUE]: jsLoadTime,
+      });
+      ga('send', 'timing', 'JavaScript', 'load', {
+        timingLabel: 'local',
+        timingValue: jsLoadTime,
         [dimensions.METRIC_VALUE]: jsLoadTime,
       });
     }
@@ -183,6 +193,11 @@ if (__userTiming) {
             eventLabel: 'google',
             eventValue: fontsLoadTime,
             nonInteraction: true,
+            [dimensions.METRIC_VALUE]: fontsLoadTime,
+          });
+          ga('send', 'timing', 'Fonts', 'load', {
+            timingLabel: 'google',
+            timingValue: fontsLoadTime,
             [dimensions.METRIC_VALUE]: fontsLoadTime,
           });
         }

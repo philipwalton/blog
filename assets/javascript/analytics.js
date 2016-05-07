@@ -128,7 +128,12 @@ if (__userTiming) {
 
     if (cssBlockTime) {
       // Tracks the amount of time the CSS blocks rendering.
-      ga('send', 'timing', 'CSS', 'block', cssBlockTime, 'local');
+      ga('send', 'event', 'CSS', 'block', {
+        eventLabel: 'local',
+        eventValue: cssBlockTime,
+        nonInteraction: true,
+        [dimensions.METRIC_VALUE]: cssBlockTime,
+      });
     }
 
 
@@ -138,7 +143,12 @@ if (__userTiming) {
 
     if (jsLoadTime) {
       // Tracks the amount of time the JavaScript takes to load.
-      ga('send', 'timing', 'JavaScript', 'load', jsLoadTime, 'local');
+      ga('send', 'event', 'JavaScript', 'load', {
+        eventLabel: 'local',
+        eventValue: jsLoadTime,
+        nonInteraction: true,
+        [dimensions.METRIC_VALUE]: jsLoadTime,
+      });
     }
 
 
@@ -150,12 +160,16 @@ if (__userTiming) {
 
         if (fontsLoadTime) {
           // Tracks the amount of time the web fonts take to load.
-          ga('send', 'timing', 'Fonts', 'load', fontsLoadTime,
-              'fonts.googleapis.com');
+          ga('send', 'event', 'Fonts', 'load', {
+            eventLabel: 'google',
+            eventValue: fontsLoadTime,
+            nonInteraction: true,
+            [dimensions.METRIC_VALUE]: fontsLoadTime,
+          });
         }
       })
       .catch(function() {
-        ga('send', 'event', 'Fonts', 'error', 'fonts.googleapis.com');
+        ga('send', 'event', 'Fonts', 'error', 'google');
       });
     }
 

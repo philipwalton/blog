@@ -5,6 +5,7 @@ import buffer from 'vinyl-buffer';
 import connect from 'connect';
 import cssnext from 'gulp-cssnext';
 import del from 'del';
+import envify from 'envify';
 import frontMatter from 'front-matter';
 import gulp from 'gulp';
 import gulpIf from 'gulp-if';
@@ -33,6 +34,10 @@ import through from 'through2';
 import uglify from 'gulp-uglify';
 import webdriver from 'gulp-webdriver';
 import yargs from 'yargs';
+
+
+// Defaults to development mode.
+process.env.NODE_ENV = process.env.NODE_ENV || 'development';
 
 
 /**
@@ -322,6 +327,7 @@ gulp.task('javascript', function(done) {
     debug: true,
     detectGlobals: false
   })
+  .transform(envify)
   .transform(babelify)
   .bundle()
 

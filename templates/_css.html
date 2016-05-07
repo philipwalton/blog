@@ -6,11 +6,6 @@ __userTiming && performance.mark('css:start');
 <link href="/assets/css/main.css" rel="stylesheet">
 
 <script>
-if (__userTiming) {
-  performance.mark('css:end');
-  performance.measure('css:block', 'css:start', 'css:end');
-  var cssBlock = performance.getEntriesByName('css:block')[0];
-  // Tracks the amount of time loading the CSS blocks rendering.
-  ga('send', 'timing', 'CSS', 'block', Math.round(cssBlock.duration), 'local');
-}
+// Tracks the CSS load end time.
+__userTiming && performance.mark('css:end');
 </script>

@@ -2,26 +2,31 @@
 // Tracks the font load start time.
 __userTiming && performance.mark('fonts:start');
 
-WebFontConfig = {
-  google: {families: ['Open+Sans:400,400italic,600:latin']},
-  active: function() {
-    if (__userTiming) {
-      performance.mark('fonts:end');
-      performance.measure('fonts:load', 'fonts:start', 'fonts:end')
-      var fontsLoad = performance.getEntriesByName('fonts:load')[0];
-      // Tracks how long it took to load the fonts including
-      // the time it tooks to download the webfont.js script.
-      ga('send', 'timing', 'Fonts', 'load',
-          Math.round(fontsLoad.duration), 'fonts.googleapis.com');
+window.WebFontConfig = (function() {
+  try {
+    function Deferred() {
+      this.promise = new Promise(function(resolve, reject) {
+        this.resolve = resolve;
+        this.reject = reject;
+      }.bind(this));
     }
-  },
-  inactive: function() {
-    // Tracks when load errors occur.
-    ga('send', 'event', 'Fonts', 'error', 'fonts.googleapis.com', {
-      nonInteraction: true
-    });
-  }
-};
+    var TIMEOUT = 10000; // Wait 10 seconds before calling it a load error.
+    var def = new Deferred();
+    setTimeout(def.reject, TIMEOUT); // In case webfont.js fails to laod.
+    return {
+      google: {families: ['Open+Sans:400,400italic,600:latin']},
+      timeout: TIMEOUT,
+      inactive: def.reject,
+      active: function() {
+        __userTiming && performance.mark('fonts:end');
+        def.resolve();
+      },
+      waitUntilReady: function() {
+        return def.promise;
+      }
+    }
+  } catch(e) {}
+}());
 </script>
 
 <script async src="//ajax.googleapis.com/ajax/libs/webfont/1/webfont.js"></script>

@@ -5,12 +5,6 @@ __userTiming && performance.mark('js:start')</script>
 <script src="/assets/javascript/main.js"></script>
 
 <script>
-if (__userTiming) {
-  performance.mark('js:end');
-  performance.measure('js:load', 'js:start', 'js:end');
-  var jsLoad = performance.getEntriesByName('js:load')[0];
-  // Tracks the amount of time it took the JavaScript to load.
-  ga('send', 'timing', 'JavaScript', 'load',
-      Math.round(jsLoad.duration), 'local');
-}
+// Tracks the JavaScript load end time.
+__userTiming && performance.mark('js:end')
 </script>

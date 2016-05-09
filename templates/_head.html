@@ -1,5 +1,6 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
 <title>
   {% if page.title %}
@@ -8,18 +9,14 @@
   {{ site.title }}
 </title>
 
-<!--[if lt IE 9]><script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.2/html5shiv.min.js"></script><![endif]-->
-
-<link rel="preconnect" href="//ajax.googleapis.com">
-<link rel="preconnect" href="//fonts.googleapis.com">
-
-{% include '_analytics.html' %}
+{% include '_perf.html' %}
 {% include '_fonts.html' %}
 {% include '_css.html' %}
 
-<link href="//feeds.feedburner.com/philipwalton" rel="alternate" title="{{site.title}}" type="application/atom+xml">
+<link href="//feeds.feedburner.com/philipwalton" rel="alternate" title="{{site.title}}" type="application/atom+ xml">
 
 <meta name="description" content="{% if post.excerpt %}{{ post.excerpt }}{% else %}{{ site.description }}{% endif %}">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!--[if lt IE 9]><script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.2/html5shiv.min.js"></script><![endif]-->
 
 {% include '_icons.html' %}

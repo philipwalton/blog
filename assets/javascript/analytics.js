@@ -41,9 +41,9 @@ window.onload = function() {
   requirePlugins();
   requireExperimentalPlugins();
   sendInitialPageview();
-  trackCssBlockTime();
-  trackJavaSciptLoadTime();
-  trackWebfontPerfAndFailures();
+  measureCssBlockTime();
+  measureJavaSciptLoadTime();
+  measureWebfontPerfAndFailures();
 };
 
 
@@ -150,7 +150,7 @@ function requireExperimentalPlugins() {
 }
 
 
-function trackCssBlockTime() {
+function measureCssBlockTime() {
   let cssUnblockTime = measureDuration('css:unblock');
   if (cssUnblockTime) {
     // Tracks the amount of time the CSS blocks rendering.
@@ -169,7 +169,7 @@ function trackCssBlockTime() {
 }
 
 
-function trackJavaSciptLoadTime() {
+function measureJavaSciptLoadTime() {
   let jsExecuteTime = measureDuration('js:execute');
   if (jsExecuteTime) {
     // Tracks the amount of time the JavaScript takes to download and execute.
@@ -189,7 +189,7 @@ function trackJavaSciptLoadTime() {
 
 
 
-function trackWebfontPerfAndFailures() {
+function measureWebfontPerfAndFailures() {
   if (window.Promise) {
     new Promise(function(resolve, reject) {
       let loaded = /wf-(in)?active/.exec(document.documentElement.className);;

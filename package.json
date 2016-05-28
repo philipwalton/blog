@@ -7,7 +7,7 @@
   },
   "author": {
     "name": "Philip Walton",
-    "url": "http://philipwalton.com"
+    "url": "https://philipwalton.com"
   },
   "scripts": {
     "build": "gulp build",

@@ -1,0 +1,28 @@
+application: philipwalton-site
+version: 1
+
+runtime: python27
+api_version: 1
+threadsafe: true
+
+handlers:
+# index files
+- url: /(.+)/
+  static_files: build/\1/index.html
+  upload: build/(.+)/index.html
+# site root
+- url: /
+  static_files: build/index.html
+  upload: build/index.html
+# For folders without trailing slashes
+# TODO(philipwalton): these should ideally be a 301 redirect
+- url: /([^\.]+)([^/])
+  static_files: build/\1\2/index.html
+  upload: build/(.+)
+# Redirect Everything else
+- url: /(.+)
+  static_files: build/\1
+  upload: build/(.+)
+
+skip_files:
+- ^node_modules

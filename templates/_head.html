@@ -13,9 +13,11 @@
 {% include '_fonts.html' %}
 {% include '_css.html' %}
 
-<link href="//feeds.feedburner.com/philipwalton" rel="alternate" title="{{site.title}}" type="application/atom+ xml">
+<link href="https://feeds.feedburner.com/philipwalton" rel="alternate" title="{{site.title}}" type="application/atom+ xml">
 
 <meta name="description" content="{% if post.excerpt %}{{ post.excerpt }}{% else %}{{ site.description }}{% endif %}">
+
+<link rel="canonical" href="{{ site.baseUrl }}{{ page.permalink }}" />
 
 <!--[if lt IE 9]><script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.2/html5shiv.min.js"></script><![endif]-->
 

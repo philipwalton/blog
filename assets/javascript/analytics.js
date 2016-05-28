@@ -92,6 +92,11 @@ function sendInitialPageview() {
 
 
 function requirePlugins() {
+  gaAll('require', 'cleanUrlTracker', {
+    queryDimensionIndex: getDefinitionIndex(dimensions.URL_QUERY_PARAMS),
+    indexFilename: 'index.html',
+    trailingSlash: true
+  });
   gaAll('require', 'eventTracker');
   gaAll('require', 'mediaQueryTracker', {
     definitions: [
@@ -134,11 +139,6 @@ function requirePlugins() {
 
 function requireExperimentalPlugins() {
   // Only require these plugins on the test tracker(s).
-  gaTest('require', 'cleanUrlTracker', {
-    queryDimensionIndex: getDefinitionIndex(dimensions.URL_QUERY_PARAMS),
-    indexFilename: 'index.html',
-    trailingSlash: true
-  });
   gaTest('require', 'pageVisibilityTracker', {
     visibleMetricIndex: getDefinitionIndex(metrics.PAGE_VISIBLE),
     hiddenMetricIndex: getDefinitionIndex(metrics.PAGE_HIDDEN),

@@ -10,19 +10,23 @@ handlers:
 - url: /(.+)/
   static_files: build/\1/index.html
   upload: build/(.+)/index.html
+  secure: always
 # site root
 - url: /
   static_files: build/index.html
   upload: build/index.html
+  secure: always
 # For folders without trailing slashes
 # TODO(philipwalton): these should ideally be a 301 redirect
 - url: /([^\.]+)([^/])
   static_files: build/\1\2/index.html
   upload: build/(.+)
+  secure: always
 # Redirect Everything else
 - url: /(.+)
   static_files: build/\1
   upload: build/(.+)
+  secure: always
 
 skip_files:
 - ^node_modules

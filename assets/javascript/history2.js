@@ -1,4 +1,4 @@
-var parseUrl = require('dom-utils/lib/parse-url');
+import parseUrl from 'dom-utils/lib/parse-url';
 
 
 function History2() {
@@ -40,8 +40,9 @@ History2.prototype.add = function(url, title, state, event) {
 
 /**
  * Register a plugin with the History2 instance.
- * @param {Function(History2, done)} - A plugin that runs some task and
- *     informs the next plugin in the queue when it's done.
+ * @param {Function} plugin A plugin that runs some task and informs the next
+ *     plugin in the queue when it's done.
+ * @return {History2} Returns the instance.
  */
 History2.prototype.use = function(plugin) {
   this._queue.push(plugin);
@@ -52,11 +53,10 @@ History2.prototype.use = function(plugin) {
 
 /**
  * Register a handler to catch any errors.
- * Note: In ES3 reserved words like "catch" couldn't be used as property names:
- * http://kangax.github.io/compat-table/es5/#Reserved_words_as_property_names
- * @param {Function(Error)} - The function to handle the error.
+ * @param {Function} onError The function to handle the error.
+ * @return {History2} Returns the instance.
  */
-History2.prototype['catch'] = function(onError) {
+History2.prototype.catch = function(onError) {
   this._onError = onError;
 
   return this;
@@ -124,4 +124,4 @@ History2.prototype._processQueue = function(event) {
 };
 
 
-module.exports = History2;
+export default History2;

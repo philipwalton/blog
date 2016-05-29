@@ -1,9 +1,0 @@
-{
-  "boss": true,
-  "browser": true,
-  "expr": true,
-  "funcscope": true,
-  "laxbreak": true,
-  "node": true,
-  "quotmark": "single"
-}

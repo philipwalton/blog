@@ -1,9 +1,10 @@
-/* global ga */
+import delegate from 'dom-utils/lib/delegate';
+import parseUrl from 'dom-utils/lib/parse-url';
+import drawer from './drawer';
+import History2 from './history2';
 
-var delegate = require('dom-utils/lib/delegate');
-var parseUrl = require('dom-utils/lib/parse-url');
-var History2 = require('./history2');
-var drawer = require('./drawer');
+
+/* global ga */
 
 
 // Cache the container element to avoid multiple lookups.
@@ -88,13 +89,12 @@ module.exports = {
     container = document.querySelector('main');
     pageCache[location.pathname] = container.innerHTML;
 
-
     var history2 = new History2()
         .use(loadPageContent)
         .use(showPageContent)
         .use(closeDrawer)
         .use(setScroll)
-        ['catch'](trackError);
+        .catch(trackError);
 
     delegate(document, 'click', 'a[href]', function(event) {
 

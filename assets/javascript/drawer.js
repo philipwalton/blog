@@ -1,7 +1,6 @@
-var closest = require('dom-utils/lib/closest');
+import closest from 'dom-utils/lib/closest';
 
 
-var drawerContainer = document.getElementById('drawer-container');
 var drawerToggle = document.getElementById('drawer-toggle');
 var isOpen = false;
 
@@ -64,7 +63,7 @@ function close() {
 }
 
 
-module.exports = {
+export default {
   init: function() {
     drawerToggle.addEventListener('click', handleDrawerToggleClick);
     drawerToggle.addEventListener('touchend', handleDrawerToggleClick);
@@ -74,4 +73,4 @@ module.exports = {
   },
   open: open,
   close: close
-}
+};

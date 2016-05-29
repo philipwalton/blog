@@ -5,6 +5,7 @@ import buffer from 'vinyl-buffer';
 import cssnext from 'gulp-cssnext';
 import del from 'del';
 import envify from 'envify';
+import eslint from 'gulp-eslint';
 import frontMatter from 'front-matter';
 import gulp from 'gulp';
 import gulpIf from 'gulp-if';
@@ -23,7 +24,7 @@ import plumber from 'gulp-plumber';
 import pngquant from 'imagemin-pngquant';
 import rename from 'gulp-rename';
 import resize from 'gulp-image-resize';
-import seleniumServerJar from 'selenium-server-standalone-jar'
+import seleniumServerJar from 'selenium-server-standalone-jar';
 import source from 'vinyl-source-stream';
 import sourcemaps from 'gulp-sourcemaps';
 import {spawn} from 'child_process';
@@ -40,12 +41,6 @@ process.env.NODE_ENV = process.env.NODE_ENV || 'development';
  * The output directory for all the built files.
  */
 const DEST = 'build';
-
-
-/**
- * The name of the Github repo.
- */
-const REPO = 'blog';
 
 
 /**
@@ -66,7 +61,7 @@ let siteData = {
       'open source, software architecture, and the future.',
   baseUrl: 'https://philipwalton.com',
   timezone: 'America/Los_Angeles',
-  buildTime: new Date(),
+  buildTime: new Date()
 };
 
 
@@ -88,9 +83,6 @@ env.addFilter('striptags', function(str) {
 });
 
 
-/**
- * Returns true is the NODE_ENV environment variable is set to 'production'.
- */
 function isProd() {
   return process.env.NODE_ENV == 'production';
 }
@@ -140,7 +132,7 @@ function renderContent() {
     html: true,
     typographer: true,
     highlight: function(code, lang) {
-      var code = lang
+      code = lang
           ? hljs.highlight(lang, code).value
           // since we're not using highlight.js here, we need to espace the html
           // unescape first in order to avoid double escaping
@@ -182,7 +174,7 @@ function renderContent() {
       files.forEach(function(file) { this.push(file); }.bind(this));
       done();
     }
-  )
+  );
 }
 
 
@@ -226,7 +218,7 @@ function minifyHtml() {
   return through.obj(function (file, enc, cb) {
     try {
       if (path.extname(file.path) == '.html') {
-        let content = file.contents.toString()
+        let content = file.contents.toString();
         let minifiedContent = htmlMinifier.minify(content, opts);
 
         file.contents = new Buffer(minifiedContent);
@@ -285,7 +277,7 @@ gulp.task('images', function() {
         .pipe(gulp.dest(DEST)),
 
     gulp.src('./assets/images/*.png', {base: '.'})
-        .pipe(resize({width : 1400}))
+        .pipe(resize({width: 1400}))
         .pipe(imagemin({use: [pngquant()]}))
         .pipe(rename((path) => path.basename += '-1400w'))
         .pipe(gulp.dest(DEST))
@@ -309,7 +301,7 @@ gulp.task('css', function() {
     browsers: '> 1%, last 2 versions, Safari > 5, ie > 9, Firefox ESR',
     compress: isProd(),
     url: {url: 'inline'}
-  }
+  };
   return gulp.src('./assets/css/main.css', {base: '.'})
       .pipe(plumber({errorHandler: streamError}))
       .pipe(cssnext(opts))
@@ -323,14 +315,14 @@ gulp.task('javascript', function(done) {
     debug: true,
     detectGlobals: false
   })
-  .transform(envify)
   .transform(babelify)
+  .transform(envify)
   .bundle()
 
   // TODO(philipwalton): Add real error handling.
   // This temporary hack fixes an issue with tasks not restarting in
   // watch mode after a syntax error is fixed.
-  .on('error', (err) => { gutil.beep(); done(err); })
+  .on('error', (err) => {gutil.beep(); done(err); })
   .on('end', done)
 
   .pipe(source(entry))
@@ -339,6 +331,14 @@ gulp.task('javascript', function(done) {
   .pipe(gulpIf(isProd(), uglify()))
   .pipe(sourcemaps.write('./'))
   .pipe(gulp.dest(DEST));
+});
+
+
+gulp.task('lint', function() {
+  return gulp.src(['gulpfile.babel.js', 'assets/javascript/**/*.js'])
+      .pipe(eslint())
+      .pipe(eslint.format())
+      .pipe(eslint.failAfterError());
 });
 
 
@@ -397,7 +397,7 @@ gulp.task('deploy', ['build'], function(done) {
 
   var appConfig = spawn('appcfg.py', ['update', '.']);
   appConfig.stderr.on('data', (data) => process.stdout.write(data));
-  appConfig.on('close', (code) => done());
+  appConfig.on('close', () => done());
 });
 
 

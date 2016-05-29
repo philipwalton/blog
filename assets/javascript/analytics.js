@@ -1,9 +1,12 @@
-require('autotrack/lib/plugins/clean-url-tracker');
-require('autotrack/lib/plugins/event-tracker');
-require('autotrack/lib/plugins/media-query-tracker');
-require('autotrack/lib/plugins/outbound-link-tracker');
-require('autotrack/lib/plugins/page-visibility-tracker');
-require('autotrack/lib/plugins/url-change-tracker');
+import 'autotrack/lib/plugins/clean-url-tracker';
+import 'autotrack/lib/plugins/event-tracker';
+import 'autotrack/lib/plugins/media-query-tracker';
+import 'autotrack/lib/plugins/outbound-link-tracker';
+import 'autotrack/lib/plugins/page-visibility-tracker';
+import 'autotrack/lib/plugins/url-change-tracker';
+
+
+/* global WebFontConfig */
 
 
 const TRACKERS = [
@@ -56,9 +59,9 @@ function createTrackers() {
   if (process.env.NODE_ENV !== 'production') {
     window.ga(function() {
       for (let tracker of window.ga.getAll()) {
-        tracker.set('sendHitTask', function(model) {
-          console.log(model.get('name'), Date.now(),
-              model.get('hitPayload').split('&').map(decodeURIComponent));
+        tracker.set('sendHitTask', function(/* model */) {
+          // console.log(model.get('name'), Date.now(),
+          //     model.get('hitPayload').split('&').map(decodeURIComponent));
           throw 'Abort tracking in non-production environments.';
         });
       }
@@ -79,7 +82,7 @@ function randomizeTrackerCallOrder() {
         args[0] = `${name}.${command}`;
         if (name != exclude) window.ga(...args);
       }
-    }
+    };
   }
   gaAll = createGaProxy();
   gaTest = createGaProxy(TRACKERS[0].name);
@@ -117,7 +120,7 @@ function requirePlugins() {
           {name: '1.5x', media: '(-webkit-min-device-pixel-ratio: 1.5), ' +
                                 '(min-resolution: 144dpi)'},
           {name: '2x',   media: '(-webkit-min-device-pixel-ratio: 2), ' +
-                                '(min-resolution: 192dpi)'},
+                                '(min-resolution: 192dpi)'}
         ]
       },
       {
@@ -158,12 +161,12 @@ function measureCssBlockTime() {
       eventLabel: 'local',
       eventValue: cssUnblockTime,
       nonInteraction: true,
-      [dimensions.METRIC_VALUE]: cssUnblockTime,
+      [dimensions.METRIC_VALUE]: cssUnblockTime
     });
     gaTest('send', 'timing', 'CSS', 'unblock', {
       timingLabel: 'local',
       timingValue: cssUnblockTime,
-      [dimensions.METRIC_VALUE]: cssUnblockTime,
+      [dimensions.METRIC_VALUE]: cssUnblockTime
     });
   }
 }
@@ -177,22 +180,21 @@ function measureJavaSciptLoadTime() {
       eventLabel: 'local',
       eventValue: jsExecuteTime,
       nonInteraction: true,
-      [dimensions.METRIC_VALUE]: jsExecuteTime,
+      [dimensions.METRIC_VALUE]: jsExecuteTime
     });
     gaTest('send', 'timing', 'JavaScript', 'execute', {
       timingLabel: 'local',
       timingValue: jsExecuteTime,
-      [dimensions.METRIC_VALUE]: jsExecuteTime,
+      [dimensions.METRIC_VALUE]: jsExecuteTime
     });
   }
 }
 
 
-
 function measureWebfontPerfAndFailures() {
   if (window.Promise) {
     new Promise(function(resolve, reject) {
-      let loaded = /wf-(in)?active/.exec(document.documentElement.className);;
+      let loaded = /wf-(in)?active/.exec(document.documentElement.className);
       let success = loaded && !loaded[1]; // No "in" in the capture group.
       if (loaded) {
         success ? resolve() : reject();
@@ -216,12 +218,12 @@ function measureWebfontPerfAndFailures() {
           eventLabel: 'google',
           eventValue: fontsActiveTime,
           nonInteraction: true,
-          [dimensions.METRIC_VALUE]: fontsActiveTime,
+          [dimensions.METRIC_VALUE]: fontsActiveTime
         });
         gaTest('send', 'timing', 'Fonts', 'active', {
           timingLabel: 'google',
           timingValue: fontsActiveTime,
-          [dimensions.METRIC_VALUE]: fontsActiveTime,
+          [dimensions.METRIC_VALUE]: fontsActiveTime
         });
       }
     })
@@ -253,6 +255,8 @@ function getDefinitionIndex(dimension) {
  * Randomize array element order in-place.
  * Using Durstenfeld shuffle algorithm.
  * http://goo.gl/91pjZs
+ * @param {Array} array The input array.
+ * @return {Array} The randomized array.
  */
 function shuffleArray(array) {
   for (let i = array.length - 1; i > 0; i--) {

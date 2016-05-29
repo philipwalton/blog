@@ -1,8 +1,7 @@
-// Loads autotrack plugins.
-require('./analytics');
+import './analytics';
+import contentLoader from './content-loader';
+import drawer from './drawer';
 
-// Loads link via AJAX instead of full page loads in browsers with pushState.
-require('./content-loader').init();
 
-// Turns on the collapsable drawer.
-require('./drawer').init();
+contentLoader.init();
+drawer.init();

@@ -2,7 +2,6 @@ import assign from 'lodash/object/assign';
 import babelify from 'babelify';
 import browserify from 'browserify';
 import buffer from 'vinyl-buffer';
-import connect from 'connect';
 import cssnext from 'gulp-cssnext';
 import del from 'del';
 import envify from 'envify';
@@ -24,16 +23,13 @@ import plumber from 'gulp-plumber';
 import pngquant from 'imagemin-pngquant';
 import rename from 'gulp-rename';
 import resize from 'gulp-image-resize';
-import shell from 'shelljs';
 import seleniumServerJar from 'selenium-server-standalone-jar'
-import serveStatic from 'serve-static';
 import source from 'vinyl-source-stream';
 import sourcemaps from 'gulp-sourcemaps';
 import {spawn} from 'child_process';
 import through from 'through2';
 import uglify from 'gulp-uglify';
 import webdriver from 'gulp-webdriver';
-import yargs from 'yargs';
 
 
 // Defaults to development mode.
@@ -53,9 +49,9 @@ const REPO = 'blog';
 
 
 /**
- * The connect server used for testing and previewing the site.
+ * The app engine server used for testing and previewing the site.
  */
-let server;
+let devServer;
 
 
 /**
@@ -354,9 +350,12 @@ gulp.task('clean', function(done) {
 gulp.task('build', ['css', 'javascript', 'images', 'pages', 'static']);
 
 
-gulp.task('serve', function(done) {
-  let port = yargs.argv.port || yargs.argv.p || 4000;
-  server = connect().use(serveStatic(DEST)).listen(port, done);
+gulp.task('serve', [], function(done) {
+  devServer = spawn('dev_appserver.py', ['.']);
+  devServer.stderr.on('data', (data) => {
+    if (data.indexOf('Starting module') > -1) done();
+    process.stdout.write(data);
+  });
 });
 
 
@@ -374,13 +373,14 @@ gulp.task('watch', ['build', 'serve'], function() {
   gulp.watch('./assets/css/**/*.css', ['css']);
   gulp.watch('./assets/images/*', ['images']);
   gulp.watch('./assets/javascript/*', ['javascript']);
+  gulp.watch('./static/*', ['static']);
   gulp.watch(['./pages/*', './articles/*', './templates/*'], ['pages']);
 });
 
 
 gulp.task('test', ['build', 'serve', 'selenium'], function() {
   function stopServers() {
-    server.close();
+    devServer.kill();
     seleniumServer.kill();
   }
   return gulp.src('./wdio.conf.js')
@@ -389,42 +389,15 @@ gulp.task('test', ['build', 'serve', 'selenium'], function() {
 });
 
 
-gulp.task('deploy', ['build'], function() {
+gulp.task('deploy', ['build'], function(done) {
 
   if (!isProd()) {
     throw new Error('The deploy task must be run in production mode.');
   }
 
-  // Create a tempory directory and
-  // checkout the existing gh-pages branch.
-  shell.rm('-rf', './_tmp');
-  shell.mkdir('./_tmp');
-  shell.cd('./_tmp');
-  shell.exec('git init');
-  shell.exec(`git remote add origin git@github.com:philipwalton/${REPO}.git`);
-  shell.exec('git pull origin gh-pages');
-
-  // Delete all the existing files and add
-  // the new ones from the build directory.
-  shell.rm('-rf', '*');
-  shell.cp('-rf', path.join('..', DEST, '/'), './');
-
-  // Remove the index to workaround a bug:
-  // http://bit.ly/1JPtgwA
-  shell.rm('.git/index');
-
-  // Commit and push the changes to
-  // the gh-pages branch.
-  shell.exec('git add -A');
-  shell.exec('git commit -m "Deploy site"');
-  shell.exec('git branch -m gh-pages');
-  shell.exec('git push origin gh-pages');
-
-  // Clean up.
-  shell.cd('..');
-  shell.rm('-rf', './_tmp');
-  shell.rm('-rf', DEST);
-
+  var appConfig = spawn('appcfg.py', ['update', '.']);
+  appConfig.stderr.on('data', (data) => process.stdout.write(data));
+  appConfig.on('close', (code) => done());
 });
 
 

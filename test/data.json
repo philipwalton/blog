@@ -95,6 +95,10 @@
     {
       "title": "Houdini: Maybe the Most Exciting Development in CSS You've Never Heard Of",
       "path": "/articles/houdini-maybe-the-most-exciting-development-in-css-youve-never-heard-of/"
+    },
+    {
+      "title": "Simplifying Cross-browser JavaScript Unit Testing",
+      "path": "/articles/simplifying-cross-browser-javascript-unit-testing/"
     }
   ],
   "pages": [

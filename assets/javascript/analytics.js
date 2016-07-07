@@ -147,7 +147,7 @@ function requireExperimentalPlugins() {
     hiddenMetricIndex: getDefinitionIndex(metrics.PAGE_HIDDEN),
     fieldsObj: {[dimensions.HIT_SOURCE]: 'pageVisibilityTracker'},
     hitFilter: function(model) {
-      model.set(dimensions.METRIC_VALUE, model.get('eventValue'), true);
+      model.set(dimensions.METRIC_VALUE, String(model.get('eventValue')), true);
     }
   });
 }
@@ -161,12 +161,12 @@ function measureCssBlockTime() {
       eventLabel: 'local',
       eventValue: cssUnblockTime,
       nonInteraction: true,
-      [dimensions.METRIC_VALUE]: cssUnblockTime
+      [dimensions.METRIC_VALUE]: String(cssUnblockTime)
     });
     gaTest('send', 'timing', 'CSS', 'unblock', {
       timingLabel: 'local',
       timingValue: cssUnblockTime,
-      [dimensions.METRIC_VALUE]: cssUnblockTime
+      [dimensions.METRIC_VALUE]: String(cssUnblockTime)
     });
   }
 }
@@ -180,12 +180,12 @@ function measureJavaSciptLoadTime() {
       eventLabel: 'local',
       eventValue: jsExecuteTime,
       nonInteraction: true,
-      [dimensions.METRIC_VALUE]: jsExecuteTime
+      [dimensions.METRIC_VALUE]: String(jsExecuteTime)
     });
     gaTest('send', 'timing', 'JavaScript', 'execute', {
       timingLabel: 'local',
       timingValue: jsExecuteTime,
-      [dimensions.METRIC_VALUE]: jsExecuteTime
+      [dimensions.METRIC_VALUE]: String(jsExecuteTime)
     });
   }
 }
@@ -218,12 +218,12 @@ function measureWebfontPerfAndFailures() {
           eventLabel: 'google',
           eventValue: fontsActiveTime,
           nonInteraction: true,
-          [dimensions.METRIC_VALUE]: fontsActiveTime
+          [dimensions.METRIC_VALUE]: String(fontsActiveTime)
         });
         gaTest('send', 'timing', 'Fonts', 'active', {
           timingLabel: 'google',
           timingValue: fontsActiveTime,
-          [dimensions.METRIC_VALUE]: fontsActiveTime
+          [dimensions.METRIC_VALUE]: String(fontsActiveTime)
         });
       }
     })

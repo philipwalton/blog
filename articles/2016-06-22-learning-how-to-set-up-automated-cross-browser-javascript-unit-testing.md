@@ -4,23 +4,23 @@ title: "Learning How to Set Up Automated, Cross-browser JavaScript Unit Testing"
 date: 2016-05-29T12:19:27-07:00
 ---
 
-I have a confessions to make. I've created several open source projects where I claimed they "work in these browsers", but I didn't always test them in every browser I claimed to support.
+We all know how important it is to test our code in multiple browsers. And I think for the most part, we in the web development community do a pretty good job at this&mdash;at least when first releasing a project.
 
-I mean, I would usually test them to some degree, especially before the initial release. But the reality is I don't have easy access to every version of every browser. And even given the browsers I do have, it's time consuming to run the tests manually&mdash;especially if I want to run them for every new commit.
+What we don't do a good job of is testing our code every time we make a change.
 
-Now, I know I'm not alone in this, and a quick Github search can prove that to be true. But I still feel a bit guilty. And I think we as an industry can do better. I know I want to do better.
+I know I'm personally guilty of this. I've had "learn how to set up automated, cross-browser testing" on my to-do list for years, but every time I sat down to really figure it out, I gave up. While this was partially due to laziness, I think it was also due to the surprising lack of good information about this on the web.
 
-For about the past two years, I've had the [Karma](http://karma-runner.github.io/) documentation page open among the many open tabs in my browser, but every time I tried to learn it, I ended up giving up. Figuring out which plugins I needed to install and what configuration options I needed to set was just daunting (convoluted???) enough that I never gave it a fair shot.
+There are a lot of tools and frameworks out there (like Karma) that claim to "make automated, JavaScript testing easy", but in my experience these tools introduce more complexity than they get rid of (more on this later). In my experience, tools that "just work" can be nice once you're an expert, but they’re terrible for learning. And what I wanted was to actually understand how this process worked under the hood, so that when it broke (which it always eventually does), I could fix it.
 
-In addition, I've realized I don't like libraries that try to do too much or have a lot of "magic" going on. Things that hide complexity and claim to "just work" are nice sometimes, but they're terrible for learning, and what I wanted was to actually understand how the process worked under the hood, so that when it broke (which it always eventually does), I could fix it.
+For me, the best way to fully understand how something works is to try to recreated it from scratch myself. So I decided to build my own testing tool, and then share what I learned with the community.
 
-For me, the best way to fully understand how something works is to try to recreated it from scratch myself. So I decided to build my own testing tool, and then share with the community what I learned.
+I'm writing this article because it's the article I wish existed years ago when I first started releasing open source projects. If you've never set up automated, cross-browser testing, then this article is for you. It will explain how the process works and show you how to do it yourself.
 
-I'm writing this article because it's the article I wish existed years ago when I first started releasing open source projects. Sadly, the available content on this topic is surprisingly sparse. If you've ever done a search for how to run automated cross-browser JavaScript unit tests, most of the results you'll get are really just tutorials explaining how to use whatever fill-in-the-blank tool was popular at the time. You rarely find a comprehensive explanation of what  the tool is actually doing.
+## The manual testing process
 
-## The manual process
+Before I explain the automated process, I think it's important to make sure we're all on the same page about how the manual process works.
 
-Before going too deep into how to set up automated cross-browser testing, I want to explain the manual process that I was doing before I took the time to learn this stuff. Based on the sample of people I've talked to, it's the same situation most developers are in today.
+After all, automation is about using machines to off-load the repetitive parts of an existing workflow. If you try to start with automation before fully understanding the manual process, it's unlikely you'll understand the automated process either.
 
 In the manual process, you write your tests in a test file, and it probably looks something like this:
 
@@ -40,7 +40,7 @@ describe('SomeClass', () => {
 
 This example uses Mocha and the Node.js `assert` module, but it doesn't really matter what testing or assertion library you use, it could be anything.
 
-Since Mocha runs in Node.js, you can run this test from the terminal line with the following command:
+Since Mocha runs in Node.js, you can run this test from your terminal with the following command:
 
 ```
 mocha test/some-class-test.js
@@ -52,9 +52,9 @@ To run this test in your browser, you'll need an HTML file with a script tag tha
 browserify test/*-test.js > test/index.js
 ```
 
-The nice thing about a tool like browserify is it combines all your tests (as well as any required dependencies) into a single file, so it's easy to load it from your test page (Note that if your test runner requires additional JS or CSS assets to run, you'll have to those as well).
+The nice thing about module bundlers like browserify or webpack is they combine all your tests (as well as any required dependencies) into a single file, so it's easy to load it from your test page. (Note that if your test runner requires additional JS or CSS assets to run, you'll have to those as well.)
 
-A typical test file using mocha looks something like this:
+A typical test file using Mocha looks something like this:
 
 ```html
 <!DOCTYPE html>
@@ -67,13 +67,13 @@ A typical test file using mocha looks something like this:
 </head>
 <body>
 
-  <!-- A container element for the visual mocha results -->
+  <!-- A container element for the visual Mocha results -->
   <div id="mocha"></div>
 
   <!-- Mocha setup and initiation code -->
   <script>
   mocha.setup('bdd');
-  onload = function() {
+  window.onload = function() {
     mocha.run();
   };
   </script>
@@ -87,28 +87,15 @@ A typical test file using mocha looks something like this:
 
 If you're not using Node.js, then your starting point likely already looks like this HTML file, the only difference is your dependencies are probably listed individually as `<script>` tags.
 
+### Detecting failures
 
+Your test framework is able to know if an individual test fails because assertion libraries will throw an error any time an assertion isn’t true. Test frameworks run each test in a try/catch block to catch any errors that may be thrown, and then they report the errors either visually on the page or log them to the console.
 
-
-
-
-
-<!--
-
-If any of your assertions fail, an `Error` is thrown, which is how the test runner knows that a test failed. Most testing frameworks (like Mocha) will provide hooks so you can plug into the testing process, giving other scripts on the page access to the test results.
-
-I've intentionally gone into a lot of detail so far in case anyone reading wasn't completely clear on how the manual part of this process works. No matter what your level of experience in this area, there are really only two keys points to make sure you understand so far:
-
-* Your tests are run in the browser via an HTML page that loads both the code under test as well as the testing library itself.
-* The results of the test are accessible to other scripts running on the page.
-
--->
+Most testing frameworks (like Mocha) will provide hooks so you can plug into the testing process, giving other scripts on the page access to the test results. This is a key feature for automating the testing process because in order for automation to work, the automation script needs to be able to fetch the results of the testing script.
 
 ### Benefits of the manual approach
 
-There are few things more frustrating than running a set of tests from your terminal, seeing a failure logged to the console, and then not having any idea how to debug that failure.
-
-A major benefit of running your tests manually in a browser is, if one of your tests fails, you can use the browser's existing developer tools to debug it.
+A huge benefit of running your tests manually in a browser is, if one of your tests fails, you can use the browser's existing developer tools to debug it.
 
 It's as simple as this:
 
@@ -127,38 +114,38 @@ describe('SomeClass', () => {
 
 Now when you re-bundle and refresh the browser with the devtools open, you'll be able to step through your code and easily track down the source of the problem.
 
-The thing that always turned me off about test runners bundle your test code for you and run it in a sub-process is that you don't get to use the debugging tools you already know and love.
+By contrast, most of the popular automated testing frameworks out there make this really hard! Part of their convenience offering is they bundle your unit tests and create the host HTML page for you.
 
-If your tests fail in a black box, and you can't rerun them locally to reproduce the error, it can be a debugging nightmare!
+This is nice up until the point when any of your tests fail, because when they do, there's no way to easily reproduce it and debug it locally.
 
 ## The automated process
 
-I've just outlined the benefits of being able to debug locally, and I believe any serious automated testing workflow must include local debugging capabilities.
+I've just outlined the benefits of being able to debug locally, and I believe any serious automated testing workflow must include local debugging capabilities. An automated system isn't better if it loses all the benefits of the manual system.
 
-An automated system isn't better if it sacrifices the primary benefits of the manual system.
+In addition to easy local debugging, I realized had a few other must-haves running through my head, so I decided to make a list of requirements before getting started:
 
 ### Requirements
 
-Along with this requirement, I realized I had other must-haves running through my head as well, so I decided to write them down:
-
-* I need to be able to run the tests from the command line
+* I need to be able to run the tests from the command line.
 * I need to be able to debug failed tests locally.
 * I need all the dependencies required to run my tests to be installable via `npm`, so anyone checking out my code could run them by simply typing `npm install && npm test`.
 * I need the process for running the tests on a CI machine to be the same process as running them from my development machine. That way I can debug failures without having to check in new changes.
 * I need all the tests to run automatically anytime I (or anyone else) commits changes or makes a pull request.
 
-With this rough list in mind, the next step was to dive into to how automated cross-browser testing works on the popular cloud testing providers.
+With this rough list in mind, the next step was to dive into to how automated, cross-browser testing works on the primary cloud testing providers.
 
 ### How cloud testing works
 
-The most surprising thing to me that I discovered as I started diving into how cloud testing works, is how simple it actually is. Because of how many frameworks there are out there that claim to make this easy, I assumed (incorrectly) that it was really hard!
+The most surprising thing to me that I discovered as I started diving into how cloud testing works, is how simple it actually is. Because of how many popular testing frameworks there are out there that claim to make this easy, I assumed (incorrectly) that it was really hard!
 
-I made a big deal out of the first item in my requirements list, but as it turns out, all the cloud testing providers run your tests in exactly the same way you do via the manual process.
+I emphasized the point earlier that I didn't want my automated process to be fundamentally different from my manual process. As it turns out, the automated methods offered by the main cloud testing services are exactly like my manual process.
 
-Here are the basic steps:
+Here, again, the popular testing frameworks led me astray. In their attempt to simply, they hide away the part of the automated process that resembles the manual process, giving the appearance that they're fundamentally different, even though they're not.
+
+Here are the steps involved in running tests using any of the main cloud testing providers:
 
 1. You give the provider a URL to your test page as well as a list of browsers/platforms you want it to run the tests on.
-2. The provider uses selenium webdriver to load the page for each browser/platform combination you give it.
+2. The provider uses [selenium webdriver](http://www.seleniumhq.org/projects/webdriver/) to load the page for each browser/platform combination you give it.
 3. Webdriver inspects the page to see if any tests failed, and it stores the results.
 4. The provider makes the results available to you.
 
@@ -170,9 +157,7 @@ I mistakenly assumed that you had to give these providers your code, and they ra
 
 There are a number of cloud testing providers out there, each with their own strengths and weakness. For my case I was writing open source, so I only looked at providers that offered a free plan for open source projects, and of those, [Sauce Labs](https://saucelabs.com/opensauce/) was the only one that didn't require me to email support to start a new open source account.
 
-And the Sauce Labs JavaScript API, though clearly not written by people who write JavaScript for a living, is actually relatively simple to use.
-
-It consists of two methods:
+The Sauce Labs JavaScript API for running unit tests is pretty simple; it consists of only two methods:
 
 - [Start JS Unit Tests](https://wiki.saucelabs.com/display/DOCS/JavaScript+Unit+Testing+Methods#JavaScriptUnitTestingMethods-StartJSUnitTests)
 - [Get JS Unit Test Status](https://wiki.saucelabs.com/display/DOCS/JavaScript+Unit+Testing+Methods#JavaScriptUnitTestingMethods-GetJSUnitTestStatus)
@@ -186,7 +171,7 @@ curl https://saucelabs.com/rest/v1/SAUCE_USERNAME/js-tests \
   -X POST \
   -u SAUCE_USERNAME:SAUCE_ACCESS_KEY \
   -H 'Content-Type: application/json' \
-  --data '{"url": "https://example.com/tests.html",  "framework": "mocha", "platforms": [["Windows 7", "firefox", "27"], ["Linux", "googlechrome", ""]]}'
+  --data '{"url": "https://example.com/tests.html",  "framework": "mocha", "platforms": [["Windows 7", "firefox", "27"], ["Linux", "chrome", "latest"]]}'
 ```
 
 Since this is for JavaScript unit testing, I'll give an example that uses the [request](https://www.npmjs.com/package/request) node module, which is probably closer to what you'll end up doing if you're using Node.js:
@@ -204,7 +189,7 @@ request({
     url: 'https://example.com/tests.html',
     framework: 'mocha',
     platforms: [
-      ['Linux', 'googlechrome', ''],
+      ['Linux', 'chrome', 'latest'],
       ['Windows 7', 'firefox', '27'],
     ]
   }
@@ -222,25 +207,22 @@ Notice in the post body you see `framework: 'mocha'`. Sauce Labs provides suppor
 If you're using a test framework not in that list, you can set `framework: 'custom'`, and Sauce Labs will instead look for a global variable called `window.global_test_results`. The format for the results is listed in the [custom framework](https://wiki.saucelabs.com/display/DOCS/Reporting+JavaScript+Unit+Test+Results+to+Sauce+Labs+Using+a+Custom+Framework
 ) section of the documentation.
 
-#### Making mocha test results available to Sauce Lab's webdriver client
+#### Making Mocha test results available to Sauce Lab's webdriver client
 
-Sauce Labs claims to have support for all these testing frameworks, but then it requires you to add additional code to make the webdriver client aware of the test results, so arguably it's not real support.
+Enough though you told Sauce Labs in the initial request that you were using Mocha, you still have to update your HTML page to store the test results on a global variable that Sauce Labs can access.
 
-Either way, the amount of code required to make your tests Sauce Labs-aware is very small, and it doesn't interfere with running the tests locally, so it's not that big of a deal to add to any mocha test page you create.
-
-To add mocha support you change these lines in your HTML page:
+To add Mocha support you change these lines in your HTML page:
 
 ```html
 <script>
 mocha.setup('bdd');
-onload = function() {
+window.onload = function() {
   mocha.run();
 };
 </script>
 ```
 
 To something like this:
-
 
 ```html
 <script>
@@ -278,15 +260,15 @@ window.onload = function() {
 </script>
 ```
 
-The only difference between the above code and the default mocha boilerplate is this logic assigns the results of the tests to a variable called `window.mochaResults` in a format that Sauce Labs is expecting.
+The only difference between the above code and the default Mocha boilerplate is this logic assigns the results of the tests to a variable called `window.mochaResults` in a format that Sauce Labs is expecting. And since this new code doesn't interfere with running the tests manually in your browser, you may as well just start using it as the default Mocha boilerplate.
 
-To reemphasize the point I made earlier, when Sauce Labs "runs" your tests, it's not actually running anything, it's simply visiting a webpage and waiting until a value is found on the `window.mochaResults` object. Then it records those results.
+To re-emphasize a point I made earlier, when Sauce Labs "runs" your tests, it's not actually running anything, it's simply visiting a web page and waiting until a value is found on the `window.mochaResults` object. Then it records those results.
 
 #### Determining whether your tests passed or failed
 
 The [Start JS Unit Tests](https://wiki.saucelabs.com/display/DOCS/JavaScript+Unit+Testing+Methods#JavaScriptUnitTestingMethods-StartJSUnitTests) method tells Sauce Labs to queue running your tests in all the browsers/platforms you give it, but it doesn't return the results of the tests.
 
-All it returns is the IDs of the jobs it queued. The results will look something like this:
+All it returns is the IDs of the jobs it queued. The response will look something like this:
 
 ```js
 {
@@ -301,7 +283,7 @@ All it returns is the IDs of the jobs it queued. The results will look something
 
 To determine if your tests have passed or failed, you call the [Get JS Unit Test Status](https://wiki.saucelabs.com/display/DOCS/JavaScript+Unit+Testing+Methods#JavaScriptUnitTestingMethods-GetJSUnitTestStatus) method, which accepts a list of job IDs and returns the current status of each job.
 
-The idea is you call this method periodically until all the jobs are complete.
+The idea is you call this method periodically until all the jobs have completed.
 
 ```javascript
 request({
@@ -355,7 +337,7 @@ The response will look something like this:
 }
 ```
 
-Once `response.body.complete` is `true`, your tests have finished running, and you can loop through each job to report passes and failures.
+Once `response.body.complete` above is `true`, your tests have finished running, and you can loop through each job to report passes and failures.
 
 ### Accessing tests on localhost
 
@@ -363,31 +345,35 @@ I've explained that Sauce Labs "runs" your tests by visiting a URL. Of course, t
 
 This is a problem if you're serving your tests on `localhost`.
 
-Most of posts online (including the Sauce Labs documentation) will suggest using [Sauce Connect](https://wiki.saucelabs.com/display/DOCS/Sauce+Connect) to workaround this problem, but I would strongly suggesting *not* doing that, unless you have a very good reason.
+Most of posts online (including the Sauce Labs documentation) will suggest using [Sauce Connect](https://wiki.saucelabs.com/display/DOCS/Sauce+Connect) to workaround this problem, but I would strongly recommend not doing that, unless you have a specific reason to do so.
 
-Recall the third and fourth item from my original list of requirements:
+Recall the third and fourth items from my original list of requirements:
 
 * I need all the dependencies required to run my tests to be installable via `npm`, so anyone checking out my code could run them by simply typing `npm install && npm test`.
-* I need the process for running the tests on a CI machine to be the same process as running them from my machine. That way I can debug failures without having to check in new changes.
+* I need the process for running the tests on a CI machine to be the same process as running them from my development machine. That way I can debug failures without having to check in new changes.
 
-Using Sauce Connect significantly complicates both of these requirements. In addition, the process for using Sauce Connect on Travis CI is different from using it on my local machine (via their Sauce Connect plugin), and if you're using their plugin, I couldn't get it to run on pull requests, which failed my final requirement:
+The recommended way of using Sauce Connect on Travis CI is to use Travis's Sauce Connect plugin, but doing that violates both of my above requirements.
+
+In addition, I couldn’t get Sauce Connect it to work when an external contributor submitted a pull request to my repo, which failed my final requirement:
 
 * I need all the tests to run automatically anytime I (or anyone else) commits changes or makes a pull request.
 
-While it probably is technically possible to run Sauce Connect in a way that meets all my requirements, it certainly wasn't easy to figure out. Furthermore, I see no obvious benefits to using Sauce Connect over open-source alternatives like `ngrok`.
+While I'm sure it's technically possible to run Sauce Connect in a way that meets all my requirements, it certainly wasn’t easy to figure out.
+
+Luckily, I didn't need to because about half way through trying I realized there's a tool I already use that's much better suited for this purpose: [ngrok](https://ngrok.com/).
 
 #### ngrok
 
 [ngrok](https://ngrok.com/) is a tool for creating secure tunnels to localhost.
 If you do any development or manual testing on a VM, you've probably already heard of ngrok, and if you haven't, you should definitely check it out. It's an extremely useful tool.
 
-Installing ngrok on your matching is a simple as downloading the binary and adding it to your path; though, if you're going to be using ngrok in Node, you may as well install it via npm.
+Installing ngrok on your matching is as simple as downloading the binary and adding it to your path; though, if you're going to be using ngrok in Node, you may as well install it via npm.
 
 ```
 npm install ngrok
 ```
 
-And you can programmatically start it from a Node program with the following code (see the [documentation](#) for the complete API details):
+You can programmatically start it from a Node program with the following code (see the [documentation](#) for the complete API details):
 
 ```javascript
 const ngrok = require('ngrok');
@@ -401,19 +387,19 @@ ngrok.connect(port, (err, url) => {
 });
 ```
 
-Once you have a public URL to your test file, using Sauce Labs to cross-browser test your local code become substantially easier.
+Once you have a public URL to your test file, using Sauce Labs to cross-browser test your local code become substantially easier!
 
 ## Putting all the pieces together
 
-This article has covered a lot of things so far, which might give the impression that automated cross-browser testing is complicated. But this is not the case.
+This article has covered a lot of topics, which might give the impression that automated, cross-browser testing is complicated. But this is not the case.
 
-I've framed the article from my point of view&mdash;as I was attempting to solve this for myself. And, looking back on the experience, the only complications were due to the lack of good information out there as to how the whole process works and how all the pieces fit together.
+I've framed the article from my point of view&mdash;as I was attempting to solve this problem for myself. And, looking back on my experience, the only real complications were due to the lack of good information out there as to how the whole process works and how all the pieces fit together.
 
-Once you understand all the steps, the process is quite simple. Here is the full list of steps:
+Once you understand all the steps, it's quite simple. Here's are all the steps, summarized:
 
-**The initial, manual Process:**
+**The initial, manual process:**
 
-1. Write the tests and then create a single HTML file that runs all of them.
+1. Write your tests and create a single HTML page to run them.
 2. Run the tests locally in one or two browsers to make sure they work.
 
 **Adding automation to the process:**
@@ -427,15 +413,15 @@ Once you understand all the steps, the process is quite simple. Here is the full
 
 ## Making it even easier
 
-I know at the beginning of this article I talked a lot about how you didn't need a framework to do automated cross-browser testing, and I still believe that. However, even though the steps above are simple, you probably don't want to have to hand code them every time for every project.
+I know at the beginning of this article I talked a lot about how you didn’t need a framework to do automated, cross-browser testing, and I still believe that. However, even though the steps above are simple, you probably don’t want to have to hand code them every time for every project.
 
-I have a lot of open source projects I wanted to add automated cross-browser testing to, so for me it made sense to abstract this logic into its own package.
+I had a lot of older projects I wanted to add automated, cross-browser testing to, so for me it made sense to abstract this logic into its own package.
 
-If do recommend you take a stab at implementing this yourself, so you can fully appreciate how it works, but if you don't have time and you want to get testing set up quickly, I recommend trying the library I created called Easy Sauce.
+I do recommend you take a stab at implementing this yourself, so you can fully appreciate how it works, but if you don’t have time and you want to get testing set up quickly, I recommend trying out the library I created. It's called [Easy Sauce](https://github.com/philipwalton/easy-sauce).
 
 ### Easy Sauce
 
-Easy Sauce is a Node package and a command line tool (`easy-sauce`), and it's what I now use for every JavaScript project I want to unit test on the Sauce Labs cloud.
+[Easy Sauce](https://github.com/philipwalton/easy-sauce) is a Node package and a command line tool (`easy-sauce`), and it's what I now use for every JavaScript project I want to unit test on the Sauce Labs cloud.
 
 The `easy-sauce` command takes a path to your HTML test file (defaulting to `/test/`), a port to start a local server on (defaulting to 1337), and a list of browsers/platforms to test against. `easy-sauce` will then run your tests on Sauce Lab's selenium cloud, log the results to the console, and exit with the appropriate status code indicating whether or not the tests passed.
 
@@ -451,4 +437,7 @@ The whole point of `easy-sauce` was to fill a complexity gap that was keeping me
 
 At the beginning of this article I wrote down a list of requirements, and with the help of Easy Sauce, I can now meet these requirements for any project I'm working on.
 
-If you're not already using automated cross-browser testing for your projects, I'd encourage you to give Easy Sauce a try. Even if you don't want to use Easy Sauce, you should at least now have the knowledge needed to roll your own solution or better understand the existing tools.
+If you're not already using automated, cross-browser testing for your projects, I'd encourage you to give Easy Sauce a try. Even if you don't want to use Easy Sauce, you should at least now have the knowledge needed to roll your own solution or better understand the existing tools.
+
+Happy testing!
+

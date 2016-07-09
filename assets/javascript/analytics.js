@@ -9,10 +9,17 @@ import 'autotrack/lib/plugins/url-change-tracker';
 /* global WebFontConfig */
 
 
-const TRACKERS = [
+/**
+ * A global list of tracker object, randomized to ensure no one tracker
+ * data is always sent first.
+ */
+const ALL_TRACKERS = shuffleArray([
   {name: 't0', trackingId: 'UA-21292978-1'},
   {name: 'testing', trackingId: 'UA-21292978-3'}
-];
+]);
+
+
+const TEST_TRACKER = ALL_TRACKERS.filter(({name}) => /test/.test(name));
 
 
 const metrics = {
@@ -32,15 +39,14 @@ const dimensions = {
 
 
 // The command queue proxies.
-let gaAll;
-let gaTest;
+let gaAll = createGaProxy(ALL_TRACKERS);
+let gaTest = createGaProxy(TEST_TRACKER);
 
 
 // Delays running any analytics until after the load event
 // to ensure beacons don't block resources.
 window.onload = function() {
   createTrackers();
-  randomizeTrackerCallOrder();
   requirePlugins();
   requireExperimentalPlugins();
   sendInitialPageview();
@@ -50,8 +56,23 @@ window.onload = function() {
 };
 
 
+/**
+ * Creates a ga() proxy function that calls commands on all but the
+ * excluded trackers.
+ */
+function createGaProxy(trackers) {
+  return function(...args) {
+    let command = args[0];
+    for (let {name} of trackers) {
+      args[0] = `${name}.${command}`;
+      window.ga(...args);
+    }
+  };
+}
+
+
 function createTrackers() {
-  for (let tracker of TRACKERS) {
+  for (let tracker of ALL_TRACKERS) {
     window.ga('create', tracker.trackingId, 'auto', tracker.name, {
       siteSpeedSampleRate: 10
     });
@@ -59,33 +80,14 @@ function createTrackers() {
   if (process.env.NODE_ENV !== 'production') {
     window.ga(function() {
       for (let tracker of window.ga.getAll()) {
-        tracker.set('sendHitTask', function(/* model */) {
-          // console.log(model.get('name'), Date.now(),
-          //     model.get('hitPayload').split('&').map(decodeURIComponent));
+        tracker.set('sendHitTask', function(model) {
+          console.log(model.get('name'), Date.now(),
+              model.get('hitPayload').split('&').map(decodeURIComponent));
           throw 'Abort tracking in non-production environments.';
         });
       }
     });
   }
-}
-
-
-// Randomizes the order in which tracker methods are called.
-// This is necessary because latter trackers will lose more hits (for various
-// reasons) and the results will be skewed.
-function randomizeTrackerCallOrder() {
-  let randomizedTrackers = shuffleArray(TRACKERS);
-  function createGaProxy(exclude) {
-    return function(...args) {
-      let command = args[0];
-      for (let {name} of randomizedTrackers) {
-        args[0] = `${name}.${command}`;
-        if (name != exclude) window.ga(...args);
-      }
-    };
-  }
-  gaAll = createGaProxy();
-  gaTest = createGaProxy(TRACKERS[0].name);
 }
 
 

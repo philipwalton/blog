@@ -1,5 +1,6 @@
 import 'autotrack/lib/plugins/clean-url-tracker';
 import 'autotrack/lib/plugins/event-tracker';
+import 'autotrack/lib/plugins/impression-tracker';
 import 'autotrack/lib/plugins/media-query-tracker';
 import 'autotrack/lib/plugins/outbound-link-tracker';
 import 'autotrack/lib/plugins/page-visibility-tracker';
@@ -151,6 +152,25 @@ function requireExperimentalPlugins() {
     hitFilter: function(model) {
       model.set(dimensions.METRIC_VALUE, String(model.get('eventValue')), true);
     }
+  });
+  gaTest('require', 'impressionTracker', {
+    elements: [{
+      id: 'share',
+      trackFirstImpressionOnly: false
+    }],
+    hitFilter: (function() {
+      let page = null;
+      return function hitFilter(model) {
+        if (page == model.get('page')) {
+          // Throw to abort hit since an impression for this page
+          // was already tracked.
+          throw 0;
+        }
+        else {
+          page = model.get('page');
+        }
+      }
+    }())
   });
 }
 

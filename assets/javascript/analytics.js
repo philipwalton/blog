@@ -60,6 +60,9 @@ window.onload = function() {
 /**
  * Creates a ga() proxy function that calls commands on all but the
  * excluded trackers.
+ * @param {Array} trackers an array or objects containing the `name` and
+ *     `trackingId` fields.
+ * @return {Function} The proxied ga() function.
  */
 function createGaProxy(trackers) {
   return function(...args) {
@@ -81,9 +84,9 @@ function createTrackers() {
   if (process.env.NODE_ENV !== 'production') {
     window.ga(function() {
       for (let tracker of window.ga.getAll()) {
-        tracker.set('sendHitTask', function(model) {
-          console.log(model.get('name'), Date.now(),
-              model.get('hitPayload').split('&').map(decodeURIComponent));
+        tracker.set('sendHitTask', function(/* model */) {
+          // console.log(model.get('name'), Date.now(),
+          //     model.get('hitPayload').split('&').map(decodeURIComponent));
           throw 'Abort tracking in non-production environments.';
         });
       }
@@ -169,7 +172,7 @@ function requireExperimentalPlugins() {
         else {
           page = model.get('page');
         }
-      }
+      };
     }())
   });
 }

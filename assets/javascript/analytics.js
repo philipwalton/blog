@@ -100,9 +100,10 @@ function sendInitialPageview() {
 
 function requirePlugins() {
   gaAll('require', 'cleanUrlTracker', {
+    stripQuery: true,
     queryDimensionIndex: getDefinitionIndex(dimensions.URL_QUERY_PARAMS),
     indexFilename: 'index.html',
-    trailingSlash: true
+    trailingSlash: 'add'
   });
   gaAll('require', 'eventTracker');
   gaAll('require', 'mediaQueryTracker', {

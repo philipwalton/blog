@@ -64,15 +64,13 @@ window.onload = function() {
  *     `trackingId` fields.
  * @return {Function} The proxied ga() function.
  */
-function createGaProxy(trackers) {
-  return function(...args) {
-    let command = args[0];
-    for (let {name} of trackers) {
-      args[0] = `${name}.${command}`;
-      window.ga(...args);
-    }
-  };
-}
+ function createGaProxy(trackers) {
+   return function(command, ...args) {
+     for (let {name} of trackers) {
+       window.ga(`${name}.${command}`, ...args);
+     }
+   };
+ }
 
 
 function createTrackers() {

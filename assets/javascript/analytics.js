@@ -35,7 +35,8 @@ const dimensions = {
   ORIENTATION: 'dimension3',
   HIT_SOURCE: 'dimension4',
   URL_QUERY_PARAMS: 'dimension5',
-  METRIC_VALUE: 'dimension6'
+  METRIC_VALUE: 'dimension6',
+  CLIENT_ID: 'dimension7'
 };
 
 
@@ -49,7 +50,7 @@ let gaTest = createGaProxy(TEST_TRACKER);
 window.onload = function() {
   createTrackers();
   requirePlugins();
-  requireExperimentalPlugins();
+  trackClientId();
   sendInitialPageview();
   measureCssBlockTime();
   measureJavaSciptLoadTime();
@@ -64,13 +65,20 @@ window.onload = function() {
  *     `trackingId` fields.
  * @return {Function} The proxied ga() function.
  */
- function createGaProxy(trackers) {
-   return function(command, ...args) {
-     for (let {name} of trackers) {
-       window.ga(`${name}.${command}`, ...args);
-     }
-   };
- }
+function createGaProxy(trackers) {
+  return function(command, ...args) {
+    for (let {name} of trackers) {
+      if (typeof command == 'function') {
+        window.ga(function() {
+          command(window.ga.getByName(name));
+        });
+      }
+      else {
+        window.ga(`${name}.${command}`, ...args);
+      }
+    }
+  };
+}
 
 
 function createTrackers() {
@@ -106,6 +114,25 @@ function requirePlugins() {
     trailingSlash: 'add'
   });
   gaAll('require', 'eventTracker');
+  gaAll('require', 'impressionTracker', {
+    elements: [{
+      id: 'share',
+      trackFirstImpressionOnly: false
+    }],
+    hitFilter: (function() {
+      let page = null;
+      return function hitFilter(model) {
+        if (page == model.get('page')) {
+          // Throw to abort hit since an impression for this page
+          // was already tracked.
+          throw 0;
+        }
+        else {
+          page = model.get('page');
+        }
+      };
+    }())
+  });
   gaAll('require', 'mediaQueryTracker', {
     definitions: [
       {
@@ -139,15 +166,7 @@ function requirePlugins() {
     ]
   });
   gaAll('require', 'outboundLinkTracker');
-  gaAll('require', 'urlChangeTracker', {
-    fieldsObj: {[dimensions.HIT_SOURCE]: 'urlChangeTracker'}
-  });
-}
-
-
-function requireExperimentalPlugins() {
-  // Only require these plugins on the test tracker(s).
-  gaTest('require', 'pageVisibilityTracker', {
+  gaAll('require', 'pageVisibilityTracker', {
     visibleMetricIndex: getDefinitionIndex(metrics.PAGE_VISIBLE),
     hiddenMetricIndex: getDefinitionIndex(metrics.PAGE_HIDDEN),
     fieldsObj: {
@@ -158,24 +177,16 @@ function requireExperimentalPlugins() {
       model.set(dimensions.METRIC_VALUE, String(model.get('eventValue')), true);
     }
   });
-  gaTest('require', 'impressionTracker', {
-    elements: [{
-      id: 'share',
-      trackFirstImpressionOnly: false
-    }],
-    hitFilter: (function() {
-      let page = null;
-      return function hitFilter(model) {
-        if (page == model.get('page')) {
-          // Throw to abort hit since an impression for this page
-          // was already tracked.
-          throw 0;
-        }
-        else {
-          page = model.get('page');
-        }
-      };
-    }())
+  gaAll('require', 'urlChangeTracker', {
+    fieldsObj: {[dimensions.HIT_SOURCE]: 'urlChangeTracker'}
+  });
+}
+
+
+function trackClientId() {
+  gaAll(function(tracker) {
+    let clientId = tracker.get('clientId');
+    tracker.set(dimensions.CLIENT_ID, clientId);
   });
 }
 

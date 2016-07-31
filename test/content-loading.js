@@ -7,87 +7,91 @@ const book = yaml.safeLoad(fs.readFileSync('./book.yaml', 'utf-8'));
 const titleSuffix = ' \u2014 Philip Walton';
 
 
-describe('The content loader', function() {
+describe('The content loader', () => {
 
   function getUrlPath() {
-    return browser.execute(() => location.pathname)
-        .then(({value:urlPath}) => urlPath);
+    let {value:urlPath} = browser.execute(() => location.pathname);
+    return urlPath;
   }
 
 
-  beforeEach(function() {
-    return browser.url('/')
-        .execute(() => window.__INITIAL_PAGE_LOAD__ = true);
+  beforeEach(() => {
+    browser.url('/').execute(() => window.__INITIAL_PAGE_LOAD__ = true);
   });
 
 
-  afterEach(function() {
-    return browser.execute(() => window.__INITIAL_PAGE_LOAD__)
-        .then(({value:isInitialPageLoad}) => assert(isInitialPageLoad));
+  afterEach(() => {
+    let {value: isInitialPageLoad} = browser
+        .execute(() => window.__INITIAL_PAGE_LOAD__);
+
+    assert(isInitialPageLoad);
   });
 
 
-  it('should load page partials instead of full pages', function *() {
-    let articleTitle = yield browser
-        .click(`a[href="${book.articles[0].path}"]`).getTitle();
-    let articlePath = yield getUrlPath();
-    assert.equal(articleTitle, book.articles[0].title + titleSuffix);
-    assert.equal(articlePath, book.articles[0].path);
+  it('should load page partials instead of full pages', () => {
+    browser.click(`a[href="${book.articles[0].path}"]`);
+    browser.waitUntil(() =>
+        browser.getTitle() == book.articles[0].title + titleSuffix &&
+        getUrlPath() == book.articles[0].path)
   });
 
 
-  it('should work with the back and forward buttons', function *() {
+  it('should work with the back and forward buttons', () => {
 
     // Ensures the viewport is big enough so all navigation is present.
     browser.setViewportSize({width:1024, height:768}, true);
 
     // Navigates to an article.
-    let currentTitle = yield browser
-        .click(`a[href="${book.articles[0].path}"]`).getTitle();
-    let currentPath = yield getUrlPath();
+    browser.click(`a[href="${book.articles[0].path}"]`)
+    browser.waitUntil(() =>
+        browser.getTitle() == book.articles[0].title + titleSuffix &&
+        getUrlPath() == book.articles[0].path);
+
 
     // Navigates to a page.
-    currentTitle = yield browser
-        .click(`a[href="${book.pages[2].path}"]`).getTitle();
-    currentPath = yield getUrlPath();
-    assert.equal(currentTitle, book.pages[2].title + titleSuffix);
-    assert.equal(currentPath, book.pages[2].path);
+    browser.click(`a[href="${book.pages[2].path}"]`);
+    browser.waitUntil(() =>
+        browser.getTitle() == book.pages[2].title + titleSuffix &&
+        getUrlPath() == book.pages[2].path);
+
 
     // Navigates back to the article.
-    currentTitle = yield browser.back().getTitle();
-    currentPath = yield getUrlPath();
-    assert.equal(currentTitle, book.articles[0].title + titleSuffix);
-    assert.equal(currentPath, book.articles[0].path);
+    browser.back().getTitle();
+    browser.waitUntil(() =>
+        browser.getTitle() == book.articles[0].title + titleSuffix &&
+        getUrlPath() == book.articles[0].path);
 
     // Navigates back home.
-    currentTitle = yield browser.back().getTitle();
-    currentPath = yield getUrlPath();
-    assert.equal(currentTitle, book.pages[0].title + titleSuffix);
-    assert.equal(currentPath, book.pages[0].path);
+    browser.back().getTitle();
+    browser.waitUntil(() =>
+        browser.getTitle() == book.pages[0].title + titleSuffix &&
+        getUrlPath() == book.pages[0].path);
 
     // Navigates forward to the article.
-    currentTitle = yield browser.forward().getTitle();
-    currentPath = yield getUrlPath();
-    assert.equal(currentTitle, book.articles[0].title + titleSuffix);
-    assert.equal(currentPath, book.articles[0].path);
+    browser.forward().getTitle();
+    browser.waitUntil(() =>
+        browser.getTitle() == book.articles[0].title + titleSuffix &&
+        getUrlPath() == book.articles[0].path);
 
     // Navigates forward to the page.
-    currentTitle = yield browser.forward().getTitle();
-    currentPath = yield getUrlPath();
-    assert.equal(currentTitle, book.pages[2].title + titleSuffix);
-    assert.equal(currentPath, book.pages[2].path);
+    browser.forward().getTitle();
+    browser.waitUntil(() =>
+        browser.getTitle() == book.pages[2].title + titleSuffix &&
+        getUrlPath() == book.pages[2].path);
+
   });
 
 
-  it('should scroll to the top for "new" pages', function *() {
-    browser.click('.ArticleList-item:last-child a')
-        .waitForVisible('.ContentHeader-title');
+  it('should scroll to the top for "new" pages', () => {
+    browser
+        .click('.ArticleList-item:last-child a')
+        .waitForVisible('.ContentHeader-articleTitle');
   });
 
 
-  it('should jump to an anchor for URLs with hash fragments', function *() {
+  it('should jump to an anchor for URLs with hash fragments', () => {
     // Adds a hash fragments to an article URL
-    return browser.execute(function() {
+    browser.execute(function() {
       document.querySelector('.ArticleList-item:last-child a').href += '#share';
     }).click('.ArticleList-item:last-child a').waitForVisible('#share');
   });

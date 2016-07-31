@@ -7,88 +7,72 @@ const book = yaml.safeLoad(fs.readFileSync('./book.yaml', 'utf-8'));
 const titleSuffix = ' \u2014 Philip Walton';
 
 
-describe('Navigation drawer', function() {
+describe('Navigation drawer', () => {
 
-  beforeEach(function() {
-    return browser.url('/');
-  });
+  beforeEach(() => browser.url('/'));
 
 
-  it('should show the menu icon but no nav links on small screens',
-      function*() {
-
-    return browser
+  it('should show the menu icon but no nav links on small screens', () => {
+    browser
         .setViewportSize({width:375, height:627}, false)
         .waitForVisible('#drawer-toggle');
-
-    let linksAreVisible = yield browser.isVisible('#drawer-contents');
-    assert(linksAreVisible === false);
   });
 
 
-  it('should show the nav links but no menu icon on large screens',
-      function*() {
-
-    yield browser
+  it('should show the nav links but no menu icon on large screens', () => {
+    browser
         .setViewportSize({width:800, height:600}, false)
         .waitForVisible('#drawer-contents');
 
-    let menuIconIsVisible = yield browser.isVisible('#drawer-toggle');
-    assert(menuIconIsVisible === false);
+    assert(!browser.isVisible('#drawer-toggle'));
   });
 
 
-  it('should open a closed drawer when the menu icon is clicked', function() {
-    return browser
+  it('should open a closed drawer when the menu icon is clicked', () => {
+    browser
         .setViewportSize({width:375, height:627}, false)
         .click('#drawer-toggle')
         .waitForVisible('#drawer-contents');
   });
 
 
-  it('should close an open drawer when the menu icon is clicked', function() {
-    return browser
+  it('should close an open drawer when the menu icon is clicked', () => {
+    browser
         .setViewportSize({width:375, height:627}, false)
         .click('#drawer-toggle')
-        .waitForVisible('#drawer-contents')
+        .waitForVisible('#drawer-contents');
+
+    browser
         .click('#drawer-toggle')
-        .waitUntil(elementNoLongerVisible('#drawer-contents'));
+        .waitUntil(() => !browser.isVisible('#drawer-contents'));
   });
 
 
   it('should close an open drawer when clicking a nav link to a new page',
-      function*() {
+      () => {
 
-    let newPageTitle = yield browser
-        .setViewportSize({width:375, height:627}, false)
-        .click('#drawer-toggle')
-        .pause(200) // Waits for the links to be clickable.
-        .click(`a[href="${book.pages[2].path}"]`)
-        .getTitle();
+    browser.setViewportSize({width:375, height:627}, false)
+    // Waits for the links to be clickable.
+    browser.click('#drawer-toggle').pause(200)
+    browser.click(`a[href="${book.pages[2].path}"]`)
 
-    assert.equal(newPageTitle, book.pages[2].title + titleSuffix)
+    browser.waitUntil(() =>
+        browser.getTitle() == book.pages[2].title + titleSuffix);
 
-    yield browser.waitUntil(elementNoLongerVisible('#drawer-contents'));
-
+    browser.waitUntil(() => !browser.isVisible('#drawer-contents'));
   });
 
 
-  it('should close an open drawer when clicking anywhere else', function() {
-    return browser
-        .setViewportSize({width:375, height:627}, false)
+  it('should close an open drawer when clicking anywhere else', () => {
+    browser.setViewportSize({width:375, height:627}, false)
+
+    browser
         .click('#drawer-toggle')
         .waitForVisible('#drawer-contents')
+
+    browser
         .click('body')
-        .waitUntil(elementNoLongerVisible('#drawer-contents'));
+        .waitUntil(() => !browser.isVisible('#drawer-contents'));
   });
 
 });
-
-
-function elementNoLongerVisible(selector) {
-  return function() {
-    return browser.isVisible(selector).then(function(isVisible) {
-      return !isVisible;
-    });
-  };
-}

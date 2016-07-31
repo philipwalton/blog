@@ -7,30 +7,29 @@ const book = yaml.safeLoad(fs.readFileSync('./book.yaml', 'utf-8'));
 const titleSuffix = ' \u2014 Philip Walton';
 
 
-describe('The home page', function() {
+describe('The home page', () => {
 
 
   function getUrlPath() {
-    return browser.execute(() => location.pathname)
-        .then(({value:urlPath}) => urlPath);
+    let {value:urlPath} = browser.execute(() => location.pathname);
+    return urlPath;
   }
 
-  before(function() {
-    return browser.url('/')
-        .setViewportSize({width:800, height:600}, false)
-        .execute(() => location.protocol + '//' + location.host)
-        .then(({value:href}) => book.site.baseUrl = href);
+  before(() => {
+    browser.url('/').setViewportSize({width:800, height:600}, false);
+    let {value:href} = browser.execute(() => location.protocol + '//' + location.host)
+    book.site.baseUrl = href;
   });
 
 
-  it('should have the right title', function *() {
-    let actualTitle = yield browser.url('/').getTitle();
+  it('should have the right title', () => {
+    let actualTitle = browser.url('/').getTitle();
     let expectedTitle = book.pages[0].title + titleSuffix;
     assert.equal(actualTitle, expectedTitle);
   });
 
 
-  it('should contain working links to all published articles', function *() {
+  it('should contain working links to all published articles', () => {
 
     for (let i = 1, article; article = book.articles[i - 1]; i++) {
 
@@ -38,42 +37,33 @@ describe('The home page', function() {
       let linkQuery = `.ArticleList-item:nth-last-child(${i}) a`;
 
       // Waits for the link to appear to reduce flakiness.
-      yield browser.url('/').waitForVisible(linkQuery);
+      browser.url('/').waitForVisible(linkQuery);
 
-      let title = yield browser.getText(headingQuery);
-      let href = yield browser.getAttribute(linkQuery, 'href');
-
+      let title = browser.getText(headingQuery);
+      let href = browser.getAttribute(linkQuery, 'href');
       assert.equal(title, article.title);
       assert.equal(href, book.site.baseUrl + article.path);
 
-      title = yield browser
-          .click(linkQuery)
-          .waitUntil(urlMatches(article.path))
-          .getTitle();
-
-      assert.equal(title, article.title + titleSuffix);
+      browser.click(linkQuery).waitUntil(urlMatches(article.path));
+      assert.equal(browser.getTitle(), article.title + titleSuffix);
     }
   });
 
 
-  it('should contain working links to pages', function *() {
+  it('should contain working links to pages', () => {
 
     for (let i = 1, page; page = book.pages[i-1]; i++) {
 
       let linkQuery = `.Header a[title="${page.title}"]`;
 
       // Waits for the link to appear to reduce flakiness.
-      yield browser.url('/').waitForVisible(linkQuery);
+      browser.url('/').waitForVisible(linkQuery);
 
-      let href = yield browser.getAttribute(linkQuery, 'href');
+      let href = browser.getAttribute(linkQuery, 'href');
       assert.equal(href, book.site.baseUrl + page.path);
 
-      let title = yield browser
-          .click(linkQuery)
-          .waitUntil(urlMatches(page.path))
-          .getTitle();
-
-      assert.equal(title, page.title + titleSuffix);
+      browser.click(linkQuery).waitUntil(urlMatches(page.path));
+      assert.equal(browser.getTitle(), page.title + titleSuffix);
     }
   });
 
@@ -81,10 +71,8 @@ describe('The home page', function() {
 
 
 function urlMatches(expectedUrl) {
-  return function() {
-    return browser.url().then(function(result) {
-      var actualUrl = result.value;
-      return actualUrl.indexOf(expectedUrl) > -1;
-    });
+  return () => {
+    let {value} = browser.url();
+    return value.includes(expectedUrl);
   }
 }

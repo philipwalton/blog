@@ -1,9 +1,3 @@
----
-template: article.html
-title: "Defending Presentational Class Names"
-date: 2013-01-24T08:57:01-08:00
----
-
 Recently, [Codrops](http://tympanus.net/codrops/), an online web design and development blog, published an article I wrote for them entitled: [Defending Presentational Class Names](http://tympanus.net/codrops/2013/01/22/defending-presentational-class-names/).
 
 In the article I discuss the use of presentational classes, why we've historically avoided them, and how perhaps some situations might warrant their use today. I hope you find it helpful, and as always, I welcome your feedback.

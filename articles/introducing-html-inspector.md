@@ -1,10 +1,4 @@
----
-template: article.html
-title: "Introducing HTML Inspector"
-date: 2013-06-11T08:22:52-07:00
----
-
-<p class="prelude"><a href="https://github.com/philipwalton/html-inspector">HTML Inspector</a> is a code quality tool to help you and your team write better markup. It's written in JavaScript and runs in the browser, so testing your HTML has never been easier.</p>
+[HTML Inspector](https://github.com/philipwalton/html-inspector) is a code quality tool to help you and your team write better markup. It's written in JavaScript and runs in the browser, so testing your HTML has never been easier.
 
 Like [JSHint](http://www.jshint.com/) and [CSSLint](http://csslint.net), HTML Inspector is completely customizable, so you can use what you like and ignore what you don't. It's also extensible and pluggable, making it possible to write your own rules that enforce your chosen conventions.
 

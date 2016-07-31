@@ -1,9 +1,3 @@
----
-template: article.html
-title: "Dynamic Selectors"
-date: 2013-02-20T14:22:24-08:00
----
-
 When creating a new CSS library or framework, developers typically take one of two approaches with component naming: the [Bootstrap](http://twitter.github.com/bootstrap/) approach or the [jQueryUI](http://jqueryui.com/) approach.
 
 Bootstrap tries to be as simple and basic as possible, calling a component exactly what it is. If something is a tooltip, why not use the class selector `.tooltip` to define how it looks? This approach keeps things simple, clean, and easy to remember, but it has one big disadvantage. If you're trying to incorporate Bootstrap into an existing project, the chances are pretty high it will conflict with your existing selectors.

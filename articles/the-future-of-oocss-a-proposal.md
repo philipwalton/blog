@@ -1,9 +1,3 @@
----
-template: article.html
-title: "The Future of OOCSS: A Proposal"
-date: 2013-01-17T11:02:16-08:00
----
-
 In CSS we often code the same visual components over and over again &mdash; even within the same project. It's embarrassing how many separate times in my career I've coded a two-column layout, or tabbed navigation, or a dropdown menu, or a popup (and the list goes on).
 
 To deal with this problem [Nicole Sullivan](http://stubbornella.org) created the [Object Oriented CSS](https://github.com/stubbornella/oocss/wiki) (OOCSS) project. She suggests that instead of defining entire components in a single selector, developers should identify the visual patterns that appear over and over again and break them down into their reusable parts, defining each part as a separate class. Those classes can then be used and reused together in the HTML to build a variety of complex UI components.

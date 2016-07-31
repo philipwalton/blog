@@ -1,9 +1,3 @@
----
-template: article.html
-title: "Learning How to Set Up Automated, Cross-browser JavaScript Unit Testing"
-date: 2016-07-10T23:48:41-07:00
----
-
 We all know how important it is to test our code in multiple browsers. And I think for the most part, we in the web development community do a pretty good job at this&mdash;at least when first releasing a project.
 
 What we don't do a good job of is testing our code every time we make a change.

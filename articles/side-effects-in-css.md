@@ -1,9 +1,3 @@
----
-template: article.html
-title: "Side Effects in CSS"
-date: 2015-03-03T21:25:06-08:00
----
-
 It feels like every few days I read about some shiny new way people are writing CSS. Many of these "new" ways are not actually new, they're variations on one or more well-known methodologies, but with a few changes sprinkled on top.
 
 Now, I'm certainly not against change, nor trying to make improvements on current best practices, but if you're going to make changes, they should be for the better. From what I've seen recently, many of these new methodologies have not been better, if anything, they've been a step backward.

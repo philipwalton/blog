@@ -1,9 +1,3 @@
----
-template: article.html
-title: "Implementing Private and Protected Members in JavaScript"
-date: 2014-04-09T20:59:27-07:00
----
-
 Privacy has been a complicated issue throughout JavaScript's history.
 
 While it's always been possible to meet even the most stringent privacy needs (the myriad of compile-to-js languages proves this), the extraneous ceremony required to really do it right is often too much of a turn-off for most developers &mdash; especially to those coming from other languages where privacy is built in.

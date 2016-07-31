@@ -1,9 +1,3 @@
----
-template: article.html
-title: "Why I'm Excited About Native CSS Variables"
-date: 2015-12-06T12:43:53-08:00
----
-
 A few weeks ago CSS variables&mdash;more accurately known as [CSS Custom Properties](https://drafts.csswg.org/css-variables/)&mdash;shipped in Chrome Canary behind the Experimental Web Platform Features flag.<sup>[[1]](#footnote-1)</sup>
 
 When Chrome engineer [Addy Osmani](https://twitter.com/addyosmani) first tweeted about the release, he was met with a surprising amount of [negativity](https://twitter.com/joshlangner/status/661608288707026944), [hostility](https://twitter.com/kuizinas/status/661600615911526401), and [skepticism](https://twitter.com/DanTup/status/661609987047866368). At least, it was surprising to me, given how excited I am about this feature.

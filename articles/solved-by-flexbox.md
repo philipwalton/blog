@@ -1,9 +1,3 @@
----
-template: article.html
-title: "Solved by Flexbox"
-date: 2013-10-03T22:59:16-07:00
----
-
 The first version of [philipwalton.com](/ 'Home') was built using [Flexbox](http://www.w3.org/TR/css3-flexbox/) way back in 2010 when the syntax was `display:box`. It only worked in Chrome, Safari, and Firefox and was pretty buggy, but it worked and was a million times better than any existing layout method.
 
 I was distrought when I first learned that the Flexbox spec was being rewritten, certain that it would be years before the new version had anything close to the browser support of the old version, much less enough support to be used in any real application.

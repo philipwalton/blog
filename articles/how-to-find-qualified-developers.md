@@ -1,9 +1,3 @@
----
-template: article.html
-title: "How to Find Qualified Developers"
-date: 2014-01-20T13:51:26-08:00
----
-
 Finding a good developer is hard.
 
 People constantly complain about how few qualified applicants they receive. They post their job openings to every known listing. They hire recruiters to scour Linkedin. They do all of this in the hopes that a bigger stack of résumés will yield at least one hire who is up to their standards.

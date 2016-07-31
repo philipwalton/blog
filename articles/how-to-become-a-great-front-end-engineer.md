@@ -1,9 +1,3 @@
----
-template: article.html
-title: "How to Become a Great Front-End Engineer"
-date: 2015-08-02T15:39:17-07:00
----
-
 I recently received an email from a reader of my blog that, for whatever reason, really got me thinking. Here's what it said:
 
 > Hi Philip, is it okay to ask how you become a great front-end engineer?<br>

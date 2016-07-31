@@ -1,9 +1,3 @@
----
-template: article.html
-title: "Extending Styles"
-date: 2015-05-20T12:34:57-07:00
----
-
 Last week [@simurai](https://twitter.com/simurai) wrote [a great article](http://simurai.com/blog/2015/05/11/nesting-components/) discussing the various strategies for contextual styling in CSS. If you haven't read his article yet, you should&mdash;it will give you better context for this read, and you'll probably learn something you didn't know.
 
 The problem? What is the best way to approach altering the look of a component when it's a descendant of another component?

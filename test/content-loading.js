@@ -1,5 +1,10 @@
 import assert from 'assert';
-import data from './data';
+import fs from 'fs';
+import yaml from 'js-yaml';
+
+
+const book = yaml.safeLoad(fs.readFileSync('./book.yaml', 'utf-8'));
+const titleSuffix = ' \u2014 Philip Walton';
 
 
 describe('The content loader', function() {
@@ -24,10 +29,10 @@ describe('The content loader', function() {
 
   it('should load page partials instead of full pages', function *() {
     let articleTitle = yield browser
-        .click(`a[href="${data.articles[0].path}"]`).getTitle();
+        .click(`a[href="${book.articles[0].path}"]`).getTitle();
     let articlePath = yield getUrlPath();
-    assert.equal(articleTitle, data.articles[0].title + data.titleSuffix);
-    assert.equal(articlePath, data.articles[0].path);
+    assert.equal(articleTitle, book.articles[0].title + titleSuffix);
+    assert.equal(articlePath, book.articles[0].path);
   });
 
 
@@ -38,39 +43,39 @@ describe('The content loader', function() {
 
     // Navigates to an article.
     let currentTitle = yield browser
-        .click(`a[href="${data.articles[0].path}"]`).getTitle();
+        .click(`a[href="${book.articles[0].path}"]`).getTitle();
     let currentPath = yield getUrlPath();
 
     // Navigates to a page.
     currentTitle = yield browser
-        .click(`a[href="${data.pages[2].path}"]`).getTitle();
+        .click(`a[href="${book.pages[2].path}"]`).getTitle();
     currentPath = yield getUrlPath();
-    assert.equal(currentTitle, data.pages[2].title + data.titleSuffix);
-    assert.equal(currentPath, data.pages[2].path);
+    assert.equal(currentTitle, book.pages[2].title + titleSuffix);
+    assert.equal(currentPath, book.pages[2].path);
 
     // Navigates back to the article.
     currentTitle = yield browser.back().getTitle();
     currentPath = yield getUrlPath();
-    assert.equal(currentTitle, data.articles[0].title + data.titleSuffix);
-    assert.equal(currentPath, data.articles[0].path);
+    assert.equal(currentTitle, book.articles[0].title + titleSuffix);
+    assert.equal(currentPath, book.articles[0].path);
 
     // Navigates back home.
     currentTitle = yield browser.back().getTitle();
     currentPath = yield getUrlPath();
-    assert.equal(currentTitle, data.pages[0].title + data.titleSuffix);
-    assert.equal(currentPath, data.pages[0].path);
+    assert.equal(currentTitle, book.pages[0].title + titleSuffix);
+    assert.equal(currentPath, book.pages[0].path);
 
     // Navigates forward to the article.
     currentTitle = yield browser.forward().getTitle();
     currentPath = yield getUrlPath();
-    assert.equal(currentTitle, data.articles[0].title + data.titleSuffix);
-    assert.equal(currentPath, data.articles[0].path);
+    assert.equal(currentTitle, book.articles[0].title + titleSuffix);
+    assert.equal(currentPath, book.articles[0].path);
 
     // Navigates forward to the page.
     currentTitle = yield browser.forward().getTitle();
     currentPath = yield getUrlPath();
-    assert.equal(currentTitle, data.pages[2].title + data.titleSuffix);
-    assert.equal(currentPath, data.pages[2].path);
+    assert.equal(currentTitle, book.pages[2].title + titleSuffix);
+    assert.equal(currentPath, book.pages[2].path);
   });
 
 

@@ -1,0 +1,94 @@
+site:
+  title: "Philip Walton"
+  titleSuffix: " &mdash; Philip Walton"
+  description: "Thoughts on web development, open source, software architecture, and the future."
+  timezone: "America/Los_Angeles"
+  baseUrl: https://philipwalton.com
+
+pages:
+- title: "Home"
+  path: /
+- title: "Articles"
+  path: /articles/
+- title: "About"
+  path: /about/
+
+articles:
+- title: "CSS Architecture"
+  path: /articles/css-architecture/
+  date: 2012-11-16T18:04:25-08:00
+  excerpt: "To many Web developers, being good at CSS means you can take a visual mock-up and replicate it perfectly in code. You don't use tables, and you pride yourself on using as few images as possible. If you're really good, you use the latest and greatest techniques like media queries, transitions and transforms. While all this is certainly true of good CSS developers, there's an entirely separate side to CSS that rarely gets mentioned when assessing one's skill."
+- title: "What No One Told You About Z-Index"
+  path: /articles/what-no-one-told-you-about-z-index/
+  date: 2013-01-15T11:17:39-08:00
+- title: "The Future of OOCSS: A Proposal"
+  path: /articles/the-future-of-oocss-a-proposal/
+  date: 2013-01-17T11:02:16-08:00
+- title: "Defending Presentational Class Names"
+  path: /articles/defending-presentational-class-names/
+  date: 2013-01-24T08:57:01-08:00
+- title: "Dynamic Selectors"
+  path: /articles/dynamic-selectors/
+  date: 2013-02-20T14:22:24-08:00
+- title: "CSS: Everything is Global and How to Deal With It"
+  path: /articles/css-everything-is-global-and-how-to-deal-with-it/
+  date: 2013-03-25T20:21:57-07:00
+- title: "Introducing HTML Inspector"
+  path: /articles/introducing-html-inspector/
+  date: 2013-06-11T08:22:52-07:00
+- title: "How to Unit Test Private Functions in JavaScript"
+  path: /articles/how-to-unit-test-private-functions-in-javascript/
+  date: 2013-07-08T23:28:18-07:00
+  excerpt: "JavaScript's closures provide an excellent way to make variables and functions private, keeping them out of the global scope. This is particularly important in the browser because all scripts share the same scope, and it's quite easy to inadvertently pick a variable or function name used by another library."
+- title: "Why I Test Private Functions In JavaScript"
+  path: /articles/why-i-test-private-functions-in-javascript/
+  date: 2013-07-17T08:47:00-07:00
+- title: "Decoupling Your HTML, CSS, and JavaScript"
+  path: /articles/decoupling-html-css-and-javascript/
+  date: 2013-08-18T12:39:09-07:00
+- title: "Solved by Flexbox"
+  path: /articles/solved-by-flexbox/
+  date: 2013-10-03T22:59:16-07:00
+- title: "Interviewing as a Front-End Engineer in San Francisco"
+  path: /articles/interviewing-as-a-front-end-engineer-in-san-francisco/
+  date: 2013-12-24T13:25:12-08:00
+- title: "How to Find Qualified Developers"
+  path: /articles/how-to-find-qualified-developers/
+  date: 2014-01-20T13:51:26-08:00
+- title: "Implementing Private and Protected Members in JavaScript"
+  path: /articles/implementing-private-and-protected-members-in-javascript/
+  date: 2014-04-09T20:59:27-07:00
+- title: "Stop Copying Social Code Snippets"
+  path: /articles/stop-copying-social-code-snippets/
+  date: 2014-04-20T16:17:32-07:00
+- title: "The Dangers of Stopping Event Propagation"
+  path: /articles/the-dangers-of-stopping-event-propagation/
+  date: 2014-05-20T06:32:55-07:00
+- title: "Measuring Your Site's Responsive Breakpoint Usage"
+  path: /articles/measuring-your-sites-responsive-breakpoint-usage/
+  date: 2014-12-22T22:38:36-08:00
+- title: "Normalizing Cross-browser Flexbox Bugs"
+  path: /articles/normalizing-cross-browser-flexbox-bugs/
+  date: 2015-01-04T17:44:38-08:00
+  excerpt: "Way back in September of 2013, while testing my Solved by Flexbox project, I discovered a bug in Internet Explorer 10 and 11 that was preventing my sticky footer from actually sticking to the bottom of the page. I spent some time trying to work around the issue, but all my attempts failed."
+- title: "Side Effects in CSS"
+  path: /articles/side-effects-in-css/
+  date: 2015-03-03T21:25:06-08:00
+- title: "Extending Styles"
+  path: /articles/extending-styles/
+  date: 2015-05-20T12:34:57-07:00
+- title: "How to Become a Great Front-End Engineer"
+  path: /articles/how-to-become-a-great-front-end-engineer/
+  date: 2015-08-02T15:39:17-07:00
+- title: "Do We Actually Need Specificity In CSS?"
+  path: /articles/do-we-actually-need-specificity-in-css/
+  date: 2015-11-01T14:37:42-08:00
+- title: "Why I'm Excited About Native CSS Variables"
+  path: /articles/why-im-excited-about-native-css-variables/
+  date: 2015-12-06T12:43:53-08:00
+- title: "Houdini: Maybe the Most Exciting Development in CSS You've Never Heard Of"
+  path: /articles/houdini-maybe-the-most-exciting-development-in-css-youve-never-heard-of/
+  date: 2016-03-24T15:43:07-07:00
+- title: "Learning How to Set Up Automated, Cross-browser JavaScript Unit Testing"
+  path: /articles/learning-how-to-set-up-automated-cross-browser-javascript-unit-testing/
+  date: 2016-07-10T23:48:41-07:00

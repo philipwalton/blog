@@ -1,5 +1,10 @@
 import assert from 'assert';
-import data from './data';
+import fs from 'fs';
+import yaml from 'js-yaml';
+
+
+const book = yaml.safeLoad(fs.readFileSync('./book.yaml', 'utf-8'));
+const titleSuffix = ' \u2014 Philip Walton';
 
 
 describe('Navigation drawer', function() {
@@ -58,10 +63,10 @@ describe('Navigation drawer', function() {
         .setViewportSize({width:375, height:627}, false)
         .click('#drawer-toggle')
         .pause(200) // Waits for the links to be clickable.
-        .click(`a[href="${data.pages[2].path}"]`)
+        .click(`a[href="${book.pages[2].path}"]`)
         .getTitle();
 
-    assert.equal(newPageTitle, data.pages[2].title + data.titleSuffix)
+    assert.equal(newPageTitle, book.pages[2].title + titleSuffix)
 
     yield browser.waitUntil(elementNoLongerVisible('#drawer-contents'));
 

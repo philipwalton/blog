@@ -45,6 +45,9 @@ let gaAll = createGaProxy(ALL_TRACKERS);
 let gaTest = createGaProxy(TEST_TRACKER);
 
 
+export {gaAll, gaTest};
+
+
 // Delays running any analytics until after the load event
 // to ensure beacons don't block resources.
 window.onload = function() {

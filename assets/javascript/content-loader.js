@@ -1,10 +1,8 @@
 import delegate from 'dom-utils/lib/delegate';
 import parseUrl from 'dom-utils/lib/parse-url';
+import {gaAll} from './analytics';
 import drawer from './drawer';
 import History2 from './history2';
-
-
-/* global ga */
 
 
 // Cache the container element to avoid multiple lookups.
@@ -81,7 +79,7 @@ function setScroll() {
 
 
 function trackError(error) {
-  ga('send', 'exception', {exDescription: error.stack || error.message});
+  gaAll('send', 'exception', {exDescription: error.stack || error.message});
 }
 
 

@@ -10,7 +10,7 @@ const titleSuffix = ' \u2014 Philip Walton';
 describe('The content loader', () => {
 
   function getUrlPath() {
-    let {value:urlPath} = browser.execute(() => location.pathname);
+    let {value: urlPath} = browser.execute(() => location.pathname);
     return urlPath;
   }
 
@@ -32,17 +32,17 @@ describe('The content loader', () => {
     browser.click(`a[href="${book.articles[0].path}"]`);
     browser.waitUntil(() =>
         browser.getTitle() == book.articles[0].title + titleSuffix &&
-        getUrlPath() == book.articles[0].path)
+        getUrlPath() == book.articles[0].path);
   });
 
 
   it('should work with the back and forward buttons', () => {
 
     // Ensures the viewport is big enough so all navigation is present.
-    browser.setViewportSize({width:1024, height:768}, true);
+    browser.setViewportSize({width: 1024, height: 768}, true);
 
     // Navigates to an article.
-    browser.click(`a[href="${book.articles[0].path}"]`)
+    browser.click(`a[href="${book.articles[0].path}"]`);
     browser.waitUntil(() =>
         browser.getTitle() == book.articles[0].title + titleSuffix &&
         getUrlPath() == book.articles[0].path);

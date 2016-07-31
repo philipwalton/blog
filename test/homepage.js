@@ -9,15 +9,11 @@ const titleSuffix = ' \u2014 Philip Walton';
 
 describe('The home page', () => {
 
-
-  function getUrlPath() {
-    let {value:urlPath} = browser.execute(() => location.pathname);
-    return urlPath;
-  }
-
   before(() => {
-    browser.url('/').setViewportSize({width:800, height:600}, false);
-    let {value:href} = browser.execute(() => location.protocol + '//' + location.host)
+    browser.url('/').setViewportSize({width: 800, height: 600}, false);
+    let {value: href} = browser
+        .execute(() => location.protocol + '//' + location.host);
+
     book.site.baseUrl = href;
   });
 
@@ -71,8 +67,5 @@ describe('The home page', () => {
 
 
 function urlMatches(expectedUrl) {
-  return () => {
-    let {value} = browser.url();
-    return value.includes(expectedUrl);
-  }
+  return () => browser.url().value.includes(expectedUrl);
 }

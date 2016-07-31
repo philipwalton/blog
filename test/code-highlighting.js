@@ -1,10 +1,8 @@
-const assert = require('assert');
 const fs = require('fs');
 const yaml = require('js-yaml');
 
 
 const book = yaml.safeLoad(fs.readFileSync('./book.yaml', 'utf-8'));
-const titleSuffix = ' \u2014 Philip Walton';
 
 
 describe('Code syntax highlighting', function() {
@@ -15,7 +13,7 @@ describe('Code syntax highlighting', function() {
         article.path.indexOf('do-we-actually-need-specificity-in-css') > -1);
 
     browser.url(specificityArticle.path);
-  })
+  });
 
 
   it('should be present on code blocks', function() {

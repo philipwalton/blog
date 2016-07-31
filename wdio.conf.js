@@ -1,7 +1,3 @@
-// Allow test files to be compiled via Babel
-require("babel-core/register");
-
-
 exports.config = {
 
   user: process.env.SAUCE_USERNAME,

@@ -1,36 +1,38 @@
-import assign from 'lodash/object/assign';
-import babelify from 'babelify';
-import browserify from 'browserify';
-import buffer from 'vinyl-buffer';
-import cssnext from 'gulp-cssnext';
-import del from 'del';
-import envify from 'envify';
-import eslint from 'gulp-eslint';
-import frontMatter from 'front-matter';
-import gulp from 'gulp';
-import gulpIf from 'gulp-if';
-import gutil from 'gulp-util';
-import he from 'he';
-import hljs from 'highlight.js';
-import htmlMinifier from 'html-minifier';
-import imagemin from 'gulp-imagemin';
-import MarkdownIt from 'markdown-it';
-import markdownItAnchor from 'markdown-it-anchor';
-import merge from 'merge-stream';
-import moment from 'moment-timezone';
-import nunjucks from 'nunjucks';
-import path from 'path';
-import plumber from 'gulp-plumber';
-import pngquant from 'imagemin-pngquant';
-import rename from 'gulp-rename';
-import resize from 'gulp-image-resize';
-import seleniumServerJar from 'selenium-server-standalone-jar';
-import source from 'vinyl-source-stream';
-import sourcemaps from 'gulp-sourcemaps';
-import {spawn} from 'child_process';
-import through from 'through2';
-import uglify from 'gulp-uglify';
-import webdriver from 'gulp-webdriver';
+const babelify = require('babelify');
+const browserify = require('browserify');
+const spawn = require('child_process').spawn;
+const cssnext = require('gulp-cssnext');
+const del = require('del');
+const envify = require('envify');
+const frontMatter = require('front-matter');
+const fs = require('fs');
+const gulp = require('gulp');
+const eslint = require('gulp-eslint');
+const gulpIf = require('gulp-if');
+const resize = require('gulp-image-resize');
+const imagemin = require('gulp-imagemin');
+const plumber = require('gulp-plumber');
+const rename = require('gulp-rename');
+const sourcemaps = require('gulp-sourcemaps');
+const uglify = require('gulp-uglify');
+const gutil = require('gulp-util');
+const webdriver = require('gulp-webdriver');
+const he = require('he');
+const hljs = require('highlight.js');
+const htmlMinifier = require('html-minifier');
+const pngquant = require('imagemin-pngquant');
+const MarkdownIt = require('markdown-it');
+const markdownItAnchor = require('markdown-it-anchor');
+const merge = require('merge-stream');
+const moment = require('moment-timezone');
+const nunjucks = require('nunjucks');
+const path = require('path');
+const querystring = require('querystring');
+const seleniumServerJar = require('selenium-server-standalone-jar');
+const through = require('through2');
+const buffer = require('vinyl-buffer');
+const source = require('vinyl-source-stream');
+const yaml = require('js-yaml');
 
 
 // Defaults to development mode.
@@ -126,7 +128,7 @@ function renderContent() {
   let files = [];
 
   let overrides = {env: isProd() ? 'production' : 'development'};
-  let site = assign(siteData, overrides, {articles: []});
+  let site = Object.assign(siteData, overrides, {articles: []});
 
   let md = new MarkdownIt({
     html: true,
@@ -153,7 +155,7 @@ function renderContent() {
         contents = yaml.body;
         file.data = {
           site: site,
-          page: assign({permalink: getPermalink(file.path)}, yaml.attributes)
+          page: Object.assign({permalink: getPermalink(file.path)}, yaml.attributes)
         };
       }
 

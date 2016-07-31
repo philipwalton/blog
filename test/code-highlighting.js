@@ -1,6 +1,6 @@
-import assert from 'assert';
-import fs from 'fs';
-import yaml from 'js-yaml';
+const assert = require('assert');
+const fs = require('fs');
+const yaml = require('js-yaml');
 
 
 const book = yaml.safeLoad(fs.readFileSync('./book.yaml', 'utf-8'));

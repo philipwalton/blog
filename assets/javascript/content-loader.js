@@ -21,28 +21,35 @@ function getTitle(a) {
 }
 
 
+function getMainContent(content) {
+  var match = /<main[^>]*>([\s\S]*)<\/main>/.exec(content);
+  return match && match[1];
+}
+
+
 function loadPageContent(done) {
   var path = this.nextPage.path;
-
   if (pageCache[path]) return done();
 
-  var basename = /(\w+)\.html$/;
-  var url = basename.test(path) ?
-      path.replace(basename, '_$1.html') : path + '_index.html';
-
   var xhr = new XMLHttpRequest();
-  xhr.open('GET', url);
+  xhr.open('GET', path);
   xhr.onload = function() {
     if (xhr.status >= 200 && xhr.status < 400) {
-      pageCache[path] = xhr.responseText;
-      done();
+      let content = getMainContent(xhr.responseText);
+      if (!content) {
+        done(new Error('Could not parse content from response: ' + path));
+      }
+      else {
+        pageCache[path] = content;
+        done();
+      }
     }
     else {
       done(new Error('(' + xhr.status + ') ' + xhr.response));
     }
   };
   xhr.onerror = function() {
-    done(new Error('Error making request to:' + url));
+    done(new Error('Error making request to: ' + path));
   };
   xhr.send();
 }

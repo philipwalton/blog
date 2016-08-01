@@ -7,8 +7,8 @@
   <header class="ContentHeader">
     <h1 class="ContentHeader-articleTitle entry-title">{{ page.title }}</h1>
     <time class="ContentHeader-articleDate published"
-        datetime="{{ page.date | format('YYYY-MM-DDTHH:mm:ssZ') }}">
-      {{ page.date | format('MMMM D, YYYY') }}
+        datetime="{{ page.date }}">
+      {{ page.date | datetimeformat }}
     </time>
   </header>
 
@@ -26,11 +26,11 @@
       <p class="Share-pitch">
         If you liked this article and think others should read it, please
 
-        {% set shareUrl = 'http://philipwalton.com' + page.permalink %}
+        {% set shareUrl = site.baseUrl + page.path %}
         {% set shareParams = {
-           text: page.title,
-           url: shareUrl,
-           via: 'philwalton' } | urlencode%}
+           'text': page.title,
+           'url': shareUrl,
+           'via': 'philwalton' } | urlencode %}
 
         <a ga-on="click"
            ga-hit-type="social"
@@ -39,6 +39,7 @@
            ga-social-target="{{ shareUrl }}"
            href="http://twitter.com/intent/tweet?{{ shareParams }}">
            share it on Twitter</a>.
+
       </p>
     </div>
   </footer>

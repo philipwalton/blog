@@ -1,12 +1,11 @@
 const babelify = require('babelify');
 const browserify = require('browserify');
 const spawn = require('child_process').spawn;
-const cssnext = require('gulp-cssnext');
 const del = require('del');
 const envify = require('envify');
-const frontMatter = require('front-matter');
 const fs = require('fs');
 const gulp = require('gulp');
+const cssnext = require('gulp-cssnext');
 const eslint = require('gulp-eslint');
 const gulpIf = require('gulp-if');
 const resize = require('gulp-image-resize');
@@ -19,15 +18,11 @@ const gutil = require('gulp-util');
 const webdriver = require('gulp-webdriver');
 const he = require('he');
 const hljs = require('highlight.js');
-const htmlMinifier = require('html-minifier');
 const pngquant = require('imagemin-pngquant');
 const MarkdownIt = require('markdown-it');
 const markdownItAnchor = require('markdown-it-anchor');
 const merge = require('merge-stream');
-const moment = require('moment-timezone');
-const nunjucks = require('nunjucks');
 const path = require('path');
-const querystring = require('querystring');
 const seleniumServerJar = require('selenium-server-standalone-jar');
 const through = require('through2');
 const buffer = require('vinyl-buffer');
@@ -57,34 +52,6 @@ let devServer;
 let seleniumServer;
 
 
-let siteData = {
-  title: 'Philip Walton',
-  description: 'Thoughts on web development, ' +
-      'open source, software architecture, and the future.',
-  baseUrl: 'https://philipwalton.com',
-  timezone: 'America/Los_Angeles',
-  buildTime: new Date()
-};
-
-
-let env = nunjucks.configure('templates', {
-  autoescape: false,
-  noCache: true,
-  watch: false
-});
-
-
-env.addFilter('format', function(str, formatString) {
-  return moment.tz(str, siteData.timezone).format(formatString);
-});
-
-// Necessary until this exists:
-// https://github.com/mozilla/nunjucks/issues/359
-env.addFilter('striptags', function(str) {
-  return str.replace(/(<([^>]+)>)/ig, '');
-});
-
-
 function isProd() {
   return process.env.NODE_ENV == 'production';
 }
@@ -96,49 +63,16 @@ function streamError(err) {
 }
 
 
-function getPermalink(filepath) {
-  let extname = path.extname(filepath);
-  let dirname = path.dirname(filepath);
-  let basename = path.basename(filepath, extname)
-      .replace(/\d{4}-\d{2}-\d{2}-/, '');
-
-  if (basename != 'index' &&
-      basename != 'atom' &&
-      basename != '404') {
-
-    dirname += '/' + basename;
-    basename = 'index';
-    extname = '.html';
-
-    filepath = path.join(dirname, basename + extname);
-  }
-
-  return path.join('/', path.relative('.', filepath))
-      .replace(/^\/pages\//, '/')
-      .replace(/index\.html$/, '');
-}
-
-function getDestPathFromPermalink(permalink) {
-  // Add index.html if necessary and remove leading slash.
-  return path.resolve(permalink.replace(/\/$/, '/index.html').slice(1));
-}
-
-
-function renderContent() {
-  let files = [];
-
-  let overrides = {env: isProd() ? 'production' : 'development'};
-  let site = Object.assign(siteData, overrides, {articles: []});
-
+function renderMarkdown(content) {
   let md = new MarkdownIt({
     html: true,
     typographer: true,
     highlight: function(code, lang) {
-      code = lang
-          ? hljs.highlight(lang, code).value
-          // since we're not using highlight.js here, we need to espace the html
-          // unescape first in order to avoid double escaping
-          : he.escape(he.unescape(code));
+      code = lang ? hljs.highlight(lang, code).value :
+          // Since we're not using highlight.js here, we need to
+          // espace the html, but we have to unescape first in order
+          // to avoid double escaping.
+          he.escape(he.unescape(code));
 
       // Allow for highlighting portions of code blocks
       // using `**` before and after
@@ -146,128 +80,34 @@ function renderContent() {
     }
   }).use(markdownItAnchor);
 
+  return md.render(content);
+}
+
+
+function renderContent() {
+  let data = yaml.safeLoad(fs.readFileSync('./book.yaml', 'utf-8'));
+  data.site.buildTime = new Date();
   return through.obj(
-    function transform(file, enc, done) {
-      let contents = file.contents.toString();
-      let yaml = frontMatter(contents);
+      function transform(file, enc, done) {
+        let article = data.articles.find((a) =>
+            path.basename(a.path) == path.basename(file.path, '.md'));
 
-      if (yaml.attributes) {
-        contents = yaml.body;
-        file.data = {
-          site: site,
-          page: Object.assign({permalink: getPermalink(file.path)}, yaml.attributes)
-        };
+        article.content = renderMarkdown(file.contents.toString());
+        done();
+      },
+      function flush(done) {
+        this.push(new gutil.File({
+          path: './data.json',
+          contents: new Buffer(JSON.stringify(data, null, 2))
+        }));
+        done();
       }
-
-      if (path.extname(file.path) == '.md') {
-        file.data.page.contents = contents = md.render(contents);
-      }
-
-      if (path.relative('.', file.path).startsWith('articles')) {
-        site.articles.unshift(file.data.page);
-      }
-
-      file.contents = new Buffer(contents);
-
-      files.push(file);
-      done();
-    },
-    function flush(done) {
-      files.forEach(function(file) { this.push(file); }.bind(this));
-      done();
-    }
   );
 }
 
 
-function renderTemplate() {
-  return through.obj(function (file, enc, cb) {
-    try {
-      // Render the file's content to the page.content template property.
-      let content = file.contents.toString();
-      file.data.page.content = nunjucks.renderString(content, file.data);
-
-      // Then render the page in its template.
-      let template = file.data.page.template;
-      file.contents = new Buffer(nunjucks.render(template, file.data));
-
-      file.path = getDestPathFromPermalink(file.data.page.permalink);
-
-      this.push(file);
-    }
-    catch (err) {
-      this.emit('error', new gutil.PluginError('renderTemplate', err, {
-        fileName: file.path
-      }));
-    }
-    cb();
-  });
-}
-
-
-function minifyHtml() {
-  let opts = {
-    removeComments: true,
-    collapseWhitespace: true,
-    collapseBooleanAttributes: true,
-    removeAttributeQuotes: true,
-    removeRedundantAttributes: true,
-    useShortDoctype: true,
-    removeEmptyAttributes: true,
-    minifyJS: true,
-    minifyCSS: true
-  };
-  return through.obj(function (file, enc, cb) {
-    try {
-      if (path.extname(file.path) == '.html') {
-        let content = file.contents.toString();
-        let minifiedContent = htmlMinifier.minify(content, opts);
-
-        file.contents = new Buffer(minifiedContent);
-        this.push(file);
-      }
-    }
-    catch (err) {
-      this.emit('error', new gutil.PluginError('minifyHtml', err, {
-        fileName: file.path
-      }));
-    }
-
-    this.push(file);
-    cb();
-  });
-}
-
-
-function createPartials() {
-  return through.obj(function (file, enc, cb) {
-    try {
-      if (path.extname(file.path) == '.html') {
-        let partial = file.clone();
-        let content = partial.contents.toString()
-            .replace(/^[\s\S]*<main[^>]*>([\s\S]*)<\/main>[\s\S]*$/, '$1');
-
-        partial.contents = new Buffer(content);
-        partial.path = path.join(
-            path.dirname(file.path), '_' + path.basename(file.path));
-
-        this.push(partial);
-      }
-    }
-    catch (err) {
-      this.emit('error', new gutil.PluginError('renderTemplate', err, {
-        fileName: file.path
-      }));
-    }
-
-    this.push(file);
-    cb();
-  });
-}
-
-
 gulp.task('static', function() {
-  return gulp.src(['./static/*'], {dot: true}).pipe(gulp.dest(DEST));
+  return gulp.src(['./assets/favicon.ico']).pipe(gulp.dest(DEST));
 });
 
 
@@ -287,13 +127,10 @@ gulp.task('images', function() {
 });
 
 
-gulp.task('pages', function() {
-  return gulp.src(['./articles/*', './pages/*'], {base: '.'})
+gulp.task('content', function() {
+  return gulp.src('./articles/*', {base: '.'})
       .pipe(plumber({errorHandler: streamError}))
       .pipe(renderContent())
-      .pipe(renderTemplate())
-      .pipe(gulpIf(isProd(), minifyHtml()))
-      .pipe(createPartials())
       .pipe(gulp.dest(DEST));
 });
 
@@ -337,10 +174,14 @@ gulp.task('javascript', function(done) {
 
 
 gulp.task('lint', function() {
-  return gulp.src(['gulpfile.babel.js', 'assets/javascript/**/*.js'])
-      .pipe(eslint())
-      .pipe(eslint.format())
-      .pipe(eslint.failAfterError());
+  return gulp.src([
+    'gulpfile.js',
+    'assets/javascript/**/*.js',
+    'test/**/*.js'
+  ])
+  .pipe(eslint())
+  .pipe(eslint.format())
+  .pipe(eslint.failAfterError());
 });
 
 
@@ -349,7 +190,7 @@ gulp.task('clean', function(done) {
 });
 
 
-gulp.task('build', ['css', 'javascript', 'images', 'pages', 'static']);
+gulp.task('build', ['content', 'css', 'images', 'javascript', 'static']);
 
 
 gulp.task('serve', [], function(done) {
@@ -376,11 +217,11 @@ gulp.task('watch', ['build', 'serve'], function() {
   gulp.watch('./assets/images/*', ['images']);
   gulp.watch('./assets/javascript/*', ['javascript']);
   gulp.watch('./static/*', ['static']);
-  gulp.watch(['./pages/*', './articles/*', './templates/*'], ['pages']);
+  gulp.watch(['./articles/*'], ['content']);
 });
 
 
-gulp.task('test', ['build', 'serve', 'selenium'], function() {
+gulp.task('test', ['lint', 'build', 'serve', 'selenium'], function() {
   function stopServers() {
     devServer.kill();
     seleniumServer.kill();
@@ -391,7 +232,7 @@ gulp.task('test', ['build', 'serve', 'selenium'], function() {
 });
 
 
-gulp.task('deploy', ['build'], function(done) {
+gulp.task('deploy', ['test', 'build'], function(done) {
 
   if (!isProd()) {
     throw new Error('The deploy task must be run in production mode.');

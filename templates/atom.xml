@@ -3,11 +3,18 @@
   <title>{{ site.title }}</title>
   <link href="{{ site.baseUrl }}/atom.xml" rel="self"/>
   <link href="{{ site.baseUrl }}/"/>
-  <updated>{{ site.buildTime | format('YYYY-MM-DDTHH:mm:ssZ') }}</updated>
+  <updated>{{ site.buildTime }}</updated>
   <id>{{ site.baseUrl }}/</id>
   <author>
     <name>Philip Walton</name>
     <email>philip@philipwalton.com</email>
   </author>
-  {{ page.content }}
+  {%- for article in articles %}
+    <entry>
+      <title>{{ article.title }}</title>
+      <link href="{{ site.baseUrl }}{{ article.path }}"/>
+      <updated>{{ article.date }}</updated>
+      <id>{{ site.baseUrl }}{{ article.path }}</id>
+    </entry>
+  {% endfor -%}
 </feed>

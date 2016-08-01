@@ -1,0 +1,31 @@
+{% extends 'page.html' %}
+
+{% block content %}
+
+  {{ super() }}
+
+  {% for article in articles | reverse %}
+
+    {% if loop.first %}
+      {% set currentYear = article.date | datetimeformat('%Y') %}
+      <h3>{{currentYear}}</h3>
+      <ul>
+    {% elif currentYear != article.date | datetimeformat('%Y') %}
+      {% set currentYear = article.date | datetimeformat('%Y') %}
+      </ul>
+      <h3>{{currentYear}}</h3>
+      <ul>
+    {% endif %}
+
+    <li>
+      <a href="{{ article.path }}" title="{{ article.title }}">
+      {{ article.title }}</a> <em>(<time datetime="{{ article.date }}">{{ article.date | datetimeformat }}</time>)</em>
+    </li>
+
+    {% if loop.last %}
+      </ul>
+    {% endif %}
+
+  {% endfor %}
+
+{% endblock %}

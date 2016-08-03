@@ -103,8 +103,20 @@ module.exports = {
 
     delegate(document, 'click', 'a[href]', function(event) {
 
-      // Don't attempt to load content if the user is trying to open a new tab.
-      if (event.metaKey || event.ctrlKey || event.which > 1) return;
+      // Don't load content if the user is doing anything other than a normal
+      // left click to open a page in the same window.
+      if (// On mac, command clicking will open a link in a new tab. Control
+          // clicking does this on windows.
+          event.metaKey || event.ctrlKey ||
+          // Shift clicking in Chrome/Firefox opens the link in a new window
+          // In Safari it adds the URL to a favorites list.
+          event.shiftKey ||
+          // On Mac, clicking with the option key is used to download a resouce.
+          event.altKey ||
+          // Middle mouse button clicks (which == 2) are used to open a link
+          // in a new tab, and right clicks (which == 3) on Firefox trigger
+          // a click event.
+          event.which > 1) return;
 
       var page = parseUrl(location.href);
       var link = parseUrl(this.href);

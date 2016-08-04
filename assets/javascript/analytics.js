@@ -168,7 +168,9 @@ function requirePlugins() {
       }
     ]
   });
-  gaAll('require', 'outboundLinkTracker');
+  gaAll('require', 'outboundLinkTracker', {
+    events: ['click', 'contextmenu']
+  });
   gaAll('require', 'pageVisibilityTracker', {
     visibleMetricIndex: getDefinitionIndex(metrics.PAGE_VISIBLE),
     hiddenMetricIndex: getDefinitionIndex(metrics.PAGE_HIDDEN),

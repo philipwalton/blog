@@ -13,6 +13,7 @@
   --bg-color: hsl(30, 15%, 95%);
   --dark-bg-color: hsl(0, 0%, 25%);
   --code-bg-color: hsl(30, 15%, 96%);
+  --error-color: hsl(0, 60%, 50%);
 
   --shadow: 0 0 .5em hsla(0, 0%, 0%, .3);
 
@@ -24,10 +25,9 @@
   --vgap-md: var(--vgap);
   --vgap-lg: 1.75em;
 
-
   --hgap: 1.25em;
   --hgap-md: 1.5em;
   --hgap-lg: 1.75em;
 
-  --quantum-easeing :cubic-bezier(.4,0,.2,1);
+  --quantum-easing: cubic-bezier(.4,0,.2,1);
 }

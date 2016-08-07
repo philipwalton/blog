@@ -4,6 +4,8 @@
 @import "./base/elements.css";
 @import "./base/custom-media.css";
 
+@import "./components/alert.css";
+@import "./components/alert-container.css";
 @import "./components/article-list.css";
 @import "./components/article-preview.css";
 @import "./components/callout.css";

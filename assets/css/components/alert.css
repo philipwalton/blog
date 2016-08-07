@@ -7,6 +7,7 @@
   left: 0;
   padding: var(--vgap) var(--hgap);
   position: absolute;
+  right: 0;
   top: 0;
   transform: translate3d(0, -100%, 0);
   transition: transform .2s var(--quantum-easing);

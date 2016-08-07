@@ -1,5 +1,6 @@
 import delegate from 'dom-utils/lib/delegate';
 import parseUrl from 'dom-utils/lib/parse-url';
+import alerts from './alerts';
 import {gaAll} from './analytics';
 import drawer from './drawer';
 import History2 from './history2';
@@ -35,7 +36,7 @@ function loadPageContent(done) {
     if (xhr.status >= 200 && xhr.status < 400) {
       let content = getMainContent(xhr.responseText);
       if (!content) {
-        done(new Error('Could not parse content from response: ' + path));
+        done(new Error(`Could not parse content from response: ${path}`));
       }
       else {
         pageCache[path] = content;
@@ -43,11 +44,19 @@ function loadPageContent(done) {
       }
     }
     else {
-      done(new Error('(' + xhr.status + ') ' + xhr.response));
+      alerts.add({
+        title: `Oops, there was an error making your request`,
+        body: `(${xhr.status}) ${xhr.statusText}`
+      });
+      done(new Error(`(${xhr.status})' ${path}`));
     }
   };
   xhr.onerror = function() {
-    done(new Error('Error making request to: ' + path));
+    alerts.add({
+      title: `Oops, there was an error making your request`,
+      body: `Check your network connection to ensure you're still online.`
+    });
+    done(new Error(`Error making request to: ${path}`));
   };
   xhr.send();
 }
@@ -78,7 +87,7 @@ function setScroll() {
 }
 
 
-function trackError(error) {
+function handleError(error) {
   gaAll('send', 'exception', {exDescription: error.stack || error.message});
 }
 
@@ -99,7 +108,7 @@ module.exports = {
         .use(showPageContent)
         .use(closeDrawer)
         .use(setScroll)
-        .catch(trackError);
+        .catch(handleError);
 
     delegate(document, 'click', 'a[href]', function(event) {
 

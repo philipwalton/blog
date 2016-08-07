@@ -4,6 +4,7 @@
 @import "./base/elements.css";
 @import "./base/custom-media.css";
 
+@import "./components/icon.css";
 @import "./components/site.css";
 @import "./components/header.css";
 @import "./components/content-header.css";

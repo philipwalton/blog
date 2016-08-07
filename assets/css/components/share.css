@@ -4,22 +4,14 @@
   border-radius: var(--border-radius);
   display: flex;
   margin-top: 3em;
-  padding: 1.25em 1em;
+  padding: 1.25em;
 }
 
 .Share-figure {
   align-items: center;
+  color: var(--twitter-color);
   display: flex;
-  font-size: 1.1em;
-  height: 1.5em;
-  width: 1.5em;
-}
-
-.Share-figure svg {
-  fill: #55acee;
-  /* width and height needed for IE10 sizing */
-  width: 1.5em;
-  height: 1em;
+  font-size: 1.5em;
 }
 
 .Share-pitch {

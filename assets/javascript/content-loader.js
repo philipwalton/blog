@@ -1,7 +1,7 @@
 import delegate from 'dom-utils/lib/delegate';
 import parseUrl from 'dom-utils/lib/parse-url';
 import alerts from './alerts';
-import {gaAll} from './analytics';
+import {trackError} from './analytics';
 import drawer from './drawer';
 import History2 from './history2';
 
@@ -87,11 +87,6 @@ function setScroll() {
 }
 
 
-function handleError(error) {
-  gaAll('send', 'exception', {exDescription: error.stack || error.message});
-}
-
-
 module.exports = {
 
   init: function() {
@@ -108,7 +103,7 @@ module.exports = {
         .use(showPageContent)
         .use(closeDrawer)
         .use(setScroll)
-        .catch(handleError);
+        .catch(trackError);
 
     delegate(document, 'click', 'a[href]', function(event) {
 

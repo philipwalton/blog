@@ -7,9 +7,6 @@ import 'autotrack/lib/plugins/page-visibility-tracker';
 import 'autotrack/lib/plugins/url-change-tracker';
 
 
-/* global WebFontConfig */
-
-
 /**
  * A global list of tracker object, randomized to ensure no one tracker
  * data is always sent first.
@@ -21,6 +18,9 @@ const ALL_TRACKERS = shuffleArray([
 
 
 const TEST_TRACKER = ALL_TRACKERS.filter(({name}) => /test/.test(name));
+
+
+const NULL_VALUE = '(not set)';
 
 
 const metrics = {
@@ -36,7 +36,10 @@ const dimensions = {
   HIT_SOURCE: 'dimension4',
   URL_QUERY_PARAMS: 'dimension5',
   METRIC_VALUE: 'dimension6',
-  CLIENT_ID: 'dimension7'
+  CLIENT_ID: 'dimension7',
+  SERVICE_WORKER_REPLAY: 'dimension8',
+  SERVICE_WORKER_STATUS: 'dimension9',
+  NETWORK_STATUS: 'dimension10'
 };
 
 
@@ -45,15 +48,13 @@ let gaAll = createGaProxy(ALL_TRACKERS);
 let gaTest = createGaProxy(TEST_TRACKER);
 
 
-export {gaAll, gaTest};
-
-
-// Delays running any analytics until after the load event
-// to ensure beacons don't block resources.
-window.onload = function() {
-  createTrackers();
+export function init() {
+  setDefaultDimensionValues();
   requirePlugins();
   trackClientId();
+  trackServiceWorkerStatus();
+  trackNetworkStatus();
+
   sendInitialPageview();
   measureCssBlockTime();
   measureJavaSciptLoadTime();
@@ -61,51 +62,15 @@ window.onload = function() {
 };
 
 
-/**
- * Creates a ga() proxy function that calls commands on all but the
- * excluded trackers.
- * @param {Array} trackers an array or objects containing the `name` and
- *     `trackingId` fields.
- * @return {Function} The proxied ga() function.
- */
-function createGaProxy(trackers) {
-  return function(command, ...args) {
-    for (let {name} of trackers) {
-      if (typeof command == 'function') {
-        window.ga(function() {
-          command(window.ga.getByName(name));
-        });
-      }
-      else {
-        window.ga(`${name}.${command}`, ...args);
-      }
-    }
-  };
+export function trackError(err) {
+  gaAll('send', 'event', 'Script', 'error', err.stack);
 }
 
 
-function createTrackers() {
-  for (let tracker of ALL_TRACKERS) {
-    window.ga('create', tracker.trackingId, 'auto', tracker.name, {
-      siteSpeedSampleRate: 10
-    });
-  }
-  if (process.env.NODE_ENV !== 'production') {
-    window.ga(function() {
-      for (let tracker of window.ga.getAll()) {
-        tracker.set('sendHitTask', function(/* model */) {
-          // console.log(model.get('name'), Date.now(),
-          //     model.get('hitPayload').split('&').map(decodeURIComponent));
-          throw 'Abort tracking in non-production environments.';
-        });
-      }
-    });
-  }
-}
-
-
-function sendInitialPageview() {
-  gaAll('send', 'pageview', {[dimensions.HIT_SOURCE]: 'pageload'});
+function setDefaultDimensionValues() {
+  Object.keys(dimensions).forEach((key) => {
+    gaAll('set', dimensions[key], NULL_VALUE);
+  });
 }
 
 
@@ -196,6 +161,37 @@ function trackClientId() {
 }
 
 
+function trackServiceWorkerStatus() {
+  const serviceWorkerStatus = 'serviceWorker' in navigator
+    ? (navigator.serviceWorker.controller ? 'controlled' : 'supported')
+    : 'unsupported';
+
+  // Note: the service worker may start controlling the page at some point
+  // after the initial page load, but since we're primarily concerned with
+  // what the status was at initial load, we don't listen for changes.
+  gaTest('set', dimensions.SERVICE_WORKER_STATUS, serviceWorkerStatus);
+}
+
+
+function trackNetworkStatus() {
+  gaTest('set', dimensions.NETWORK_STATUS,
+      navigator.onLine ? 'online' : 'offline');
+
+  const updateNetworkStatus = ({type}) => {
+    gaTest('set', dimensions.NETWORK_STATUS, type);
+    gaTest('send', 'event', 'Network', 'change', type);
+  };
+
+  window.addEventListener('online', updateNetworkStatus);
+  window.addEventListener('offline', updateNetworkStatus);
+}
+
+
+function sendInitialPageview() {
+  gaAll('send', 'pageview', {[dimensions.HIT_SOURCE]: 'pageload'});
+}
+
+
 function measureCssBlockTime() {
   let cssUnblockTime = measureDuration('css:unblock');
   if (cssUnblockTime) {
@@ -233,14 +229,14 @@ function measureWebfontPerfAndFailures() {
         success ? resolve() : reject();
       }
       else {
-        let originalAciveCallback = WebFontConfig.active;
-        WebFontConfig.inactive = reject;
-        WebFontConfig.active = function() {
+        let originalAciveCallback = window.WebFontConfig.active;
+        window.WebFontConfig.inactive = reject;
+        window.WebFontConfig.active = function() {
           originalAciveCallback();
           resolve();
         };
         // In case the webfont.js script failed to load.
-        setTimeout(reject, WebFontConfig.timeout);
+        setTimeout(reject, window.WebFontConfig.timeout);
       }
     })
     .then(function() {
@@ -273,9 +269,32 @@ function measureDuration(mark, reference = 'responseEnd') {
 }
 
 
+/**
+ * Creates a ga() proxy function that calls commands on all but the
+ * excluded trackers.
+ * @param {Array} trackers an array or objects containing the `name` and
+ *     `trackingId` fields.
+ * @return {Function} The proxied ga() function.
+ */
+function createGaProxy(trackers) {
+  return function(command, ...args) {
+    for (let {name} of trackers) {
+      if (typeof command == 'function') {
+        window.ga(function() {
+          command(window.ga.getByName(name));
+        });
+      }
+      else {
+        window.ga(`${name}.${command}`, ...args);
+      }
+    }
+  };
+}
+
+
 // Accepts a custom dimension or metric and returns it's numerical index.
-function getDefinitionIndex(dimension) {
-  return +dimension.slice(-1);
+function getDefinitionIndex(definition) {
+  return +/\d+$/.exec(definition)[0];
 }
 
 

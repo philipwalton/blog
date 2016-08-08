@@ -45,8 +45,8 @@ export default {
     alertContainer.className = 'AlertContainer';
 
     delegate(alertContainer, 'click', '.Alert-close', remove);
-    document.body.addEventListener('click', () => {
-      const insideAlertContainer = !!closest(event.target, '.AlertContainer');
+    document.body.addEventListener('click', (e) => {
+      const insideAlertContainer = !!closest(e.target, '.AlertContainer');
       if (!insideAlertContainer) remove();
     });
 

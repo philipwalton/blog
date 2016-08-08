@@ -10,10 +10,13 @@ libraries:
   version: "2.5.2"
 
 handlers:
-# Redirect Everything else
 - url: /favicon\.ico
-  static_files: favicon.ico
-  upload: favicon\.ico
+  static_files: build/favicon.ico
+  upload: build/favicon\.ico
+  secure: always
+- url: /sw\.js
+  static_files: build/sw.js
+  upload: build/sw\.js
   secure: always
 - url: /assets/(.+)
   static_files: build/assets/\1

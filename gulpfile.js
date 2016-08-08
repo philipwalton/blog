@@ -106,8 +106,11 @@ function renderContent() {
 }
 
 
-gulp.task('static', function() {
-  return gulp.src(['./assets/favicon.ico']).pipe(gulp.dest(DEST));
+gulp.task('content', function() {
+  return gulp.src('./articles/*', {base: '.'})
+      .pipe(plumber({errorHandler: streamError}))
+      .pipe(renderContent())
+      .pipe(gulp.dest(DEST));
 });
 
 
@@ -124,14 +127,6 @@ gulp.task('images', function() {
         .pipe(rename((path) => path.basename += '-1400w'))
         .pipe(gulp.dest(DEST))
   );
-});
-
-
-gulp.task('content', function() {
-  return gulp.src('./articles/*', {base: '.'})
-      .pipe(plumber({errorHandler: streamError}))
-      .pipe(renderContent())
-      .pipe(gulp.dest(DEST));
 });
 
 
@@ -154,7 +149,7 @@ gulp.task('javascript', function(done) {
     debug: true,
     detectGlobals: false
   })
-  .transform(babelify)
+  .transform(babelify, {presets: ['es2015']})
   .transform(envify)
   .bundle()
 
@@ -169,6 +164,30 @@ gulp.task('javascript', function(done) {
   .pipe(sourcemaps.init({loadMaps: true}))
   .pipe(gulpIf(isProd(), uglify()))
   .pipe(sourcemaps.write('./'))
+  .pipe(gulp.dest(DEST));
+});
+
+
+gulp.task('static', function() {
+  return gulp.src(['./assets/favicon.ico']).pipe(gulp.dest(DEST));
+});
+
+
+gulp.task('service-worker', function(done) {
+  browserify('./assets/sw.js')
+  .transform(babelify, {plugins: ['transform-async-to-generator']})
+  .transform(envify)
+  .bundle()
+
+  // TODO(philipwalton): Add real error handling.
+  // This temporary hack fixes an issue with tasks not restarting in
+  // watch mode after a syntax error is fixed.
+  .on('error', (err) => {gutil.beep(); done(err); })
+  .on('end', done)
+
+  .pipe(source('sw.js'))
+  .pipe(buffer())
+  .pipe(gulpIf(isProd(), uglify()))
   .pipe(gulp.dest(DEST));
 });
 
@@ -190,11 +209,18 @@ gulp.task('clean', function(done) {
 });
 
 
-gulp.task('build', ['content', 'css', 'images', 'javascript', 'static']);
+gulp.task('build', [
+  'content',
+  'css',
+  'images',
+  'javascript',
+  'static',
+  'service-worker'
+]);
 
 
 gulp.task('serve', [], function(done) {
-  devServer = spawn('dev_appserver.py', ['.']);
+  devServer = spawn('dev_appserver.py', ['.', '--port', '9090']);
   devServer.stderr.on('data', (data) => {
     if (data.indexOf('Starting module') > -1) done();
     process.stdout.write(data);
@@ -216,7 +242,8 @@ gulp.task('watch', ['build', 'serve'], function() {
   gulp.watch('./assets/css/**/*.css', ['css']);
   gulp.watch('./assets/images/*', ['images']);
   gulp.watch('./assets/javascript/*', ['javascript']);
-  gulp.watch('./static/*', ['static']);
+  gulp.watch('./assets/favicon.ico', ['static']);
+  gulp.watch(['./assets/sw.js'], ['service-worker']);
   gulp.watch(['./articles/*'], ['content']);
 });
 

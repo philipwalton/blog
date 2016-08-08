@@ -33,7 +33,7 @@
     "no-unused-vars": ["error", {"vars": "all"}],
     "no-trailing-spaces": 2,
     "object-curly-spacing": [2, "never"],
-    "quotes": [2, "single"],
+    "quotes": [2, "single", {"allowTemplateLiterals": true}],
     // "require-jsdoc": [2, {
     //   "require": {
     //     "FunctionDeclaration": true,

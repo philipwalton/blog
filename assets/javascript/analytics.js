@@ -59,7 +59,7 @@ export function init() {
   measureCssBlockTime();
   measureJavaSciptLoadTime();
   measureWebfontPerfAndFailures();
-};
+}
 
 
 export function trackError(err) {

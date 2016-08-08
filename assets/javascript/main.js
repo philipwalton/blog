@@ -18,4 +18,4 @@ window.onload = function() {
         .register('/sw.js')
         .catch(analytics.trackError);
   }
-}
+};

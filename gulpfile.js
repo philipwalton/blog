@@ -176,7 +176,6 @@ gulp.task('static', function() {
 gulp.task('service-worker', function(done) {
   browserify('./assets/sw.js')
   .transform(babelify, {plugins: ['transform-async-to-generator']})
-  .transform(envify)
   .bundle()
 
   // TODO(philipwalton): Add real error handling.
@@ -187,7 +186,6 @@ gulp.task('service-worker', function(done) {
 
   .pipe(source('sw.js'))
   .pipe(buffer())
-  .pipe(gulpIf(isProd(), uglify()))
   .pipe(gulp.dest(DEST));
 });
 

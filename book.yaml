@@ -92,3 +92,6 @@ articles:
 - title: "Learning How to Set Up Automated, Cross-browser JavaScript Unit Testing"
   path: /articles/learning-how-to-set-up-automated-cross-browser-javascript-unit-testing/
   date: 2016-07-10T23:48:41-07:00
+- title: "Untangling Deeply Nested Service Worker Promise Chains"
+  path: /articles/improving-complex-promise-logic-with-async-await/
+  date: 2016-08-12T19:37:19-07:00

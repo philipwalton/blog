@@ -23,11 +23,9 @@ self.addEventListener('fetch', (event) => {
 
 While I suppose this code could be considered "basic" in the sense that it's only a few lines and the strategy is conceptually simple, I'd argue that the control flow makes it anything but basic. Unless you're *very* familiar with the new [`Fetch`](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) and [`CacheStorage`](https://developer.mozilla.org/en-US/docs/Web/API/CacheStorage) APIs, and unless you have a solid understanding of all the [nuances of promises](https://pouchdb.com/2015/05/18/we-have-a-problem-with-promises.html), it's probably going to take you a few reads to really grok how this code works.
 
-Speaking from personal experience, about a week ago I started playing around with Service Worker for the first time: I wanted to add basic caching and [offline analytics](https://developers.google.com/web/updates/2016/07/offline-google-analytics) to this site. But after completing my initial implementation, I was pretty unsatisfied with the code I'd written. It wasn't clear, it wasn't self-documenting, and it seemed far to complex for the relatively simple problem I was trying to solve.
+Speaking from personal experience, about a week ago I started playing around with Service Worker for the first time: I wanted to add basic caching and [offline analytics](https://developers.google.com/web/updates/2016/07/offline-google-analytics) to this site. But after completing my initial implementation, I was pretty unsatisfied with the code I'd written. It wasn't clear, it wasn't self-documenting, and it seemed far too complex for the relatively simple problem I was trying to solve.
 
-After spending a few hours refactoring and really exploring these new APIs, I came up with a few strategies for improving the readability of my code that I think others might benefit from.
-
-In the rest of this article I'm going to take the above code and show how I went about refactoring it. But before I do, I want to make sure everyone reading is clear on exactly what this code is doing.
+After spending a few hours refactoring and really exploring these new APIs, I came up with a few strategies for improving the readability of my code that I wanted to share. The strategies range from general software development tips and best-practices to leveraging new JavaScript language features like [async functions](https://tc39.github.io/ecmascript-asyncawait/).
 
 <div class="Callout">
 
@@ -39,7 +37,9 @@ This article is primarily meant to encourage readers of such tutorials to make s
 
 ## What the code is doing
 
-When adding a `fetch` event listener to a service worker, you typically call `event.respondWith` and pass a `Promise` object that resolves to a `Response` object. But when you pass a promise chain like in the above code example (with multiple levels of nested `then` and `catch` calls), it can be pretty hard to see all the points at which the resolution can happen.
+Before I start talking about how to improve this code, I want to make sure everyone reading is very clear on exactly what this code is doing.
+
+When adding a `fetch` event listener to a Service Worker, you typically call [`event.respondWith`](https://developer.mozilla.org/en-US/docs/Web/API/FetchEvent/respondWith) and pass a promise that resolves to a [`Response`](https://developer.mozilla.org/en-US/docs/Web/API/Response) object. But when you pass a promise chain like in the above code example (with multiple levels of nested `then` and `catch` calls), it can be pretty hard to see all the points at which the resolution can happen.
 
 Here is a step-by-step explanation, in plain English, of what happens inside the `fetch` event handler in the code example above:
 
@@ -60,15 +60,15 @@ I mentioned above that `respondWith()` takes a promise that eventually resolves 
 
 ## How the code could be improved
 
-Each of the follow sections introduces a technique or a principle to help make your code more readable and ultimately easier for your (and others) to work with in the future. The techniques start out simple and get more complex as they go&mdash;each one building on the previous one.
+Each of the follow sections introduces a technique or a principle to help make your code more readable and ultimately easier for you (and others) to work with in the future. The techniques start out simple and get more complex as they go&mdash;each one building on the previous one.
 
 ### Give variables more descriptive names
 
-When writing service worker code you'll find yourself dealing with a lot of `request` and `response` objects, and it can be tempting to just use those names with every occurrence of these objects in your code. And if each `request` or `response` object appears in its own distinct scope, there isn't a technical reason to name them anything else.
+When writing Service Worker code you'll find yourself dealing with a lot of `Request` and `Response` objects, and it can be tempting to just use those names with every occurrence of these objects in your code. And if each `Request` or `Response` object appears in its own distinct scope, there isn't a technical reason to name them anything else.
 
-However, in the case of our code service worker `fetch` example, there is a distinct fork in the logic that could result in two very different types of responses: a network response or a cache response.
+However, in the case of our Service Worker `fetch` example, there is a distinct fork in the logic that could result in two very different types of responses: a network response or a cache response.
 
-An easy way to indicate to a reader which condition they're in is to give each `response` object a name specific to that condition:
+An easy way to indicate to a reader which condition they're in is to give each `Response` object a name specific to that condition:
 
 ```js
 self.addEventListener('fetch', (event) => {
@@ -165,9 +165,9 @@ The `getNetworkOrCacheResponse` function contains logic that deals with two very
 To improve readability, we can abstract the cache-related logic into separate, self-contained functions:
 
 ```js
-const **addRequestToCache** = (request, response) => {
+const **addToCache** = (request, networkResponse) => {
   return caches.open('cache:v1')
-    .then((cache) => cache.put(request, response.clone()));
+    .then((cache) => cache.put(request, networkResponse.clone()));
 }
 
 const **getCacheResponse** = (request) => {
@@ -178,7 +178,7 @@ const **getCacheResponse** = (request) => {
 
 const getNetworkOrCacheResponse = (request) => {
   return fetch(request).then((networkResponse) => {
-    **addRequestToCache**(request, networkResponse);
+    **addToCache**(request, networkResponse);
     return networkResponse;
   }).catch(() => {
     return **getCacheResponse**(request)
@@ -195,7 +195,7 @@ If you compare this new logic to the logic in the original function, you'll noti
 
 While at first it might seem like this abstraction will end up doing more work, it's actually an optimization over the original code&mdash;one I only discovered *after* I started separating the concerns.
 
-Consider the case where the service worker makes a network request that is successful. This is the most common case, so we should optimize for it (i.e. get the response to the user as quickly as possible). In the original code, the first step of the logic was to open the cache, and then only respond with a network request once the cache was open.
+Consider the case where the Service Worker makes a network request that is successful. This is the most common case, so we should optimize for it (i.e. get the response to the user as quickly as possible). In the original code, the first step of the logic was to open the cache, and then only respond with a network request once the cache was open.
 
 This is absolutely not necessary. While it's true that we need to write to the cache even in the network case, this write doesn't need to block the response to the user. It can easily happen in parallel.
 
@@ -215,7 +215,7 @@ Even in our refactored, `getNetworkOrCacheResponse` function, it might not be co
 ```js
 const getNetworkOrCacheResponse = (request) => {
   return fetch(request).then((networkResponse) => {
-    addRequestToCache(request, networkResponse);
+    addToCache(request, networkResponse);
     return networkResponse;
   }).catch(() => {
     return getCacheResponse(request)
@@ -230,7 +230,7 @@ In situations like these, you can add resolution clarity by wrapping the whole f
 const getNetworkOrCacheResponse = (request) => {
   return new Promise((resolve) => {
     fetch(request).then((networkResponse) => {
-      addRequestToCache(request, networkResponse);
+      addToCache(request, networkResponse);
       **resolve(networkResponse);**
     }).catch(() => {
       getCacheResponse(request).then((cacheResponse) => {
@@ -241,21 +241,21 @@ const getNetworkOrCacheResponse = (request) => {
 };
 ```
 
-### Use `async`/`await` to remove nesting entirely
+### Use async functions to remove nesting entirely
 
-Perhaps the most significant way to improve the readability of complex promise code is to use the new [`async`/`await`](https://tc39.github.io/ecmascript-asyncawait/) syntax that is currently in the process of being standardized.
+Perhaps the most significant way to improve the readability of complex promise code is to use [async functions](https://tc39.github.io/ecmascript-asyncawait/), a new JavaScript feature that helps make asynchronous logic read more like synchronous code.
 
-The `async` keyword is used to declare that a function will be executed asynchronously (rather than synchronously). In other words, instead of returning a value right away, an `async` function returns a `Promise` that will eventually resolve to the function's `return` value.
+Async functions are declared with the new `async` keyword, and instead of returning a value immediately, they return a promise that will eventually resolve to the function's return value.
 
-The `await` keyword can be used within an `async` function. It is prepended to an expression (any expression that evaluates to a promise) and when the interpretor encounters it, it halts the execution of the function until the promise is resolved. Once the promise is resolved, the awaited expression "returns" that value.
+Within the body of an async function you'll usually find one or more `await` keywords. The `await` keyword is prepended to a promise (or an expression that evaluates to a promise) and when the interpreter encounters the `await` keyword, it halts the execution of the function until the promise is resolved. Once the promise is resolved, the awaited expression "returns" that value.
 
-To make that more clear, consider the `getNetworkOrCacheResponse()` function defined in the section above (the one with the `new Promise()` wrapper). Here's how that function would look as an `async` function using the `await` keyword:
+To make this more clear, consider the `getNetworkOrCacheResponse()` function defined in the section above (the one with the `new Promise()` wrapper). Here's how that function would look as an async function:
 
 ```js
 const getNetworkOrCacheResponse = async (request) => {
   try {
     const networkResponse = await fetch(request);
-    addRequestToCache(request, networkResponse);
+    addToCache(request, networkResponse);
     return networkResponse;
   } catch (err) {
     const cacheResponse = await getCacheResponse(request);
@@ -266,23 +266,42 @@ const getNetworkOrCacheResponse = async (request) => {
 
 There are several important things to notice about the `async` version of this function:
 
-- You can use a `try`/`catch` block instead of `.then()/.catch()` chains, and the error is handled the way it normally is in a `try`/`catch` block.
+- You can use a `try`/`catch` block instead of `.then()`/`.catch()` chains, and the error is handled the way it normally is in a `try`/`catch` block.
 - Since `await` expressions halt execution and evaluate to a `Promise`, what was originally multiple levels of nesting can now be represented as successive, top-level assignment expressions (with no nesting).
 - Since an `async` function is sugar for a promise that resolves to its `return` value, you no longer need the `new Promise()` wrapper to clarify what the `Promise` resolves to. That can now be easily inferred by looking for the `return` statement(s).
 
 These improvements are substantial! They make your code much easier to both read and write.
 
-### Using `async`/`await` today
+## Using async functions today
 
-The `async`/`await` syntax has been around for a while now, and you can compile it to ES5 using [Babel](http://babeljs.io/). However, in order to use that compiled code you *also* have to include the the `babel-polyfill` library (which bundles Facebook's [regenerator](https://github.com/facebook/regenerator) runtime).
+Async functions have been around for a while now, and you can compile them to ES5 using [Babel](http://babeljs.io/). However, in order to use that compiled code you *also* have to include the `babel-polyfill` library (which bundles Facebook's [regenerator](https://github.com/facebook/regenerator) runtime).
 
-While this might make sense for some projects, the added code weight of the polyfill is an absolutely unacceptable cost for a 50-line service worker script (in my testing it added ~60K).
+While this might make sense for some projects, the added code weight of the polyfill is an unacceptably high cost for a 50-line Service Worker script (in my testing it added ~60K).
 
-Fortunately, when it comes to service worker scripts, there's another way!
+Fortunately, when it comes to Service Worker scripts, there's another way!
 
-Since all browsers that support service worker *also* support most ES2015 features (specifically [generators](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Iterators_and_Generators)), you can avoid the regenerator runtime and compile your code with just a single Babel transform: [`async-to-generator`](https://babeljs.io/docs/plugins/transform-async-to-generator/).
+Since all browsers that support Service Worker *also* support most ES2015 features (specifically [generators](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Iterators_and_Generators)), you can avoid the regenerator runtime and compile your code with just a single Babel transform: [`async-to-generator`](https://babeljs.io/docs/plugins/transform-async-to-generator/).
 
-In my code, using the `async-to-generator` transform only added an additional 258 bytes, and since I was already using [browserify](http://browserify.org/) to load the dependencies, supporting `async`/`await` was a no-brainer!
+In my code, using the `async-to-generator` transform only added an additional 258 bytes, and since I was already using [browserify](http://browserify.org/) to load the dependencies, using async functions was a no-brainer!
+
+### Running multiple async functions simultaneously
+
+When working with asynchronous APIs, you typically find yourself wanting to do multiple asynchronous tasks in parallel and then take some action once all of the tasks have completed. The way most people do this today is with [`Promise.all()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/all).
+
+Within an async function you can mimic this behavior by prepending the `await` keyword to an array of expressions that all return promises.
+
+For example, the following function fetches the results from the `/foo.json` and `/bar.json` endpoints at the same time and logs the results to the console once both requests have completed:
+
+```js
+const getFooAndBar = async () => {
+  const [fooResponse, barResponse] = await [
+    fetch('/foo.json'),
+    fetch('/bar.json'),
+  ];
+  console.log(fooResponse);
+  console.log(barResponse);
+};
+```
 
 ## Wrapping up
 
@@ -310,21 +329,21 @@ self.addEventListener('fetch', (event) => {
 **Refactored code:**
 
 ```js
-const addRequestToCache = async (request, response) => {
+const addToCache = async (request, networkResponse) => {
   const cache = await caches.open('cache:v1');
-  cache.put(request, response.clone());
-}
+  cache.put(request, networkResponse.clone());
+};
 
 const getCacheResponse = async (request) => {
   const cache = await caches.open('cache:v1');
-  const cachedResponse = await cache.match(event.request);
+  const cachedResponse = await cache.match(request);
   return cachedResponse;
-}
+};
 
 const getNetworkOrCacheResponse = async (request) => {
   try {
     const networkResponse = await fetch(request);
-    addRequestToCache(request, networkResponse);
+    addToCache(request, networkResponse);
     return networkResponse;
   } catch (err) {
     const cacheResponse = await getCacheResponse(request);

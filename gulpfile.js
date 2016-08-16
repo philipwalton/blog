@@ -23,6 +23,7 @@ const MarkdownIt = require('markdown-it');
 const markdownItAnchor = require('markdown-it-anchor');
 const merge = require('merge-stream');
 const path = require('path');
+const request = require('request');
 const seleniumServerJar = require('selenium-server-standalone-jar');
 const through = require('through2');
 const buffer = require('vinyl-buffer');
@@ -168,6 +169,25 @@ gulp.task('javascript', function(done) {
 });
 
 
+// TODO(philipwalton): this task fetches the analytics.js script so it
+// can be hosted locally as a temporary fix to this issue:
+// https://github.com/GoogleChrome/sw-helpers/issues/40
+gulp.task('analyticsjs', ['javascript'], function() {
+  return request
+      .get('https://www.google-analytics.com/analytics.js')
+      .on('response', function(response) {
+        if (response.statusCode >= 400 ||
+            response.headers['content-type'] != 'text/javascript') {
+          this.emit('error', new gutil.PluginError({
+            plugin: 'analyticsjs',
+            message: 'Invalid response from www.google-analytics.com'
+          }));
+        }
+      })
+      .pipe(fs.createWriteStream(path.join(DEST, './assets/analytics.js')));
+});
+
+
 gulp.task('static', function() {
   return gulp.src(['./assets/favicon.ico']).pipe(gulp.dest(DEST));
 });
@@ -193,6 +213,7 @@ gulp.task('service-worker', function(done) {
 gulp.task('lint', function() {
   return gulp.src([
     'gulpfile.js',
+    'assets/sw.js',
     'assets/javascript/**/*.js',
     'test/**/*.js'
   ])

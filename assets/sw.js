@@ -23,24 +23,14 @@ offlineGoogleAnalytics.initialize({
 });
 
 
-const cacheAnalyticsJs = async (cache) => {
-  let analyticsJsUrl = 'https://www.google-analytics.com/analytics.js';
-  let analyticsJsRequest = new Request(analyticsJsUrl, {mode: 'no-cors'});
-  let analyticsJsResponse = await fetch(analyticsJsRequest);
-  return cache.put(analyticsJsRequest, analyticsJsResponse.clone());
-};
-
-
 const cacheInitialAssets = async () => {
   const cache = await caches.open(CACHE_NAME);
-  return await [
-    cacheAnalyticsJs(cache),
-    cache.addAll([
-      '/',
-      '/assets/css/main.css',
-      '/assets/javascript/main.js',
-    ])
-  ];
+  return cache.addAll([
+    '/',
+    '/assets/analytics.js',
+    '/assets/css/main.css',
+    '/assets/javascript/main.js',
+  ]);
 };
 
 

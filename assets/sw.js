@@ -1,4 +1,5 @@
-const offlineGoogleAnalytics = require('sw-helpers/projects/sw-offline-google-analytics/src');
+const offlineGoogleAnalytics = require(
+    'sw-helpers/projects/sw-offline-google-analytics/src');
 
 
 const CACHE_NAME = 'philipwalton:v1';
@@ -43,15 +44,26 @@ const cacheInitialAssets = async () => {
 };
 
 
-const networkFirstWithCacheFallback = async (request) => {
+const addToCache = async (request, networkResponse) => {
   const cache = await caches.open(CACHE_NAME);
+  cache.put(request, networkResponse.clone());
+};
+
+
+const getCacheResponse = async (request) => {
+  const cache = await caches.open(CACHE_NAME);
+  const cachedResponse = await cache.match(request);
+  return cachedResponse;
+};
+
+
+const getNetworkOrCacheResponse = async (request) => {
   try {
     const networkResponse = await fetch(request);
-    await cache.put(request, networkResponse.clone());
+    addToCache(request, networkResponse);
     return networkResponse;
-  }
-  catch (err) {
-    const cacheResponse = await cache.match(request);
+  } catch (err) {
+    const cacheResponse = await getCacheResponse(request);
     return cacheResponse || Response.error();
   }
 };
@@ -59,7 +71,7 @@ const networkFirstWithCacheFallback = async (request) => {
 
 self.addEventListener('fetch', (event) => {
   if (assetUrlParts.some((part) => event.request.url.includes(part))) {
-    event.respondWith(networkFirstWithCacheFallback(event.request));
+    event.respondWith(getNetworkOrCacheResponse(event.request));
   }
 });
 

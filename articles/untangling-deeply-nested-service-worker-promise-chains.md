@@ -1,13 +1,13 @@
-If you've been in this industry for a few years, you've probably heard terms like "callback hell" and "spaghetti code". When JavaScript Promises came out, callback hell was supposed to be a thing of the past; unfortunately since more and more new web APIs are asynchronous and return promises, spaghetti code is still alive and well.
+If you've been writing JavaScript for a while, you've probably heard terms like [callback hell](http://callbackhell.com/) or the [pyramid of doom](https://en.wikipedia.org/wiki/Pyramid_of_doom_(programming)). When [Promises](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) were added to JavaScript a few years ago, I remember reading a lot of blog posts claiming that these problems would be solved; unfortunately, that was a little too optimistic. With more and more web APIs becoming promise-based, we've proven that even promises don't prevent us from writing overly-nested, hard-to-read code.
 
-Where I'm seeing this happen a lot today is in service worker tutorials and boilerplate.
+The place I'm seeing this happen a lot these days is in [Service Worker](https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API) scripts that are heavily promise-based. Specifically, blog posts and tutorials that are supposed to be showing us the proper way to use Service Worker.
 
-Consider the following "basic" example of a *network-first with cache fallback* fetch strategy:
+The following code is a so-called "basic" example of how use Service Worker to implement a *network-first with cache fallback* strategy for offline support. This exact code (or a variation of it) can be found in numerous tutorials on the web:
 
 ```js
 self.addEventListener('fetch', (event) => {
   event.respondWith(
-    caches.open('site-cache').then((cache) => {
+    caches.open('cache:v1').then((cache) => {
       return fetch(event.request).then((response) => {
         cache.put(event.request, response.clone());
         return response;
@@ -21,41 +21,59 @@ self.addEventListener('fetch', (event) => {
 });
 ```
 
-If you look at the above code and can quickly understand exactly what's going on (and you're confident everyone on your team will be able do the same), then you can stop reading now.
+While I suppose this code could be considered "basic" in the sense that it's only a few lines and the strategy is conceptually simple, I'd argue that the control flow makes it anything but basic. Unless you're *very* familiar with the new [`Fetch`](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) and [`CacheStorage`](https://developer.mozilla.org/en-US/docs/Web/API/CacheStorage) APIs, and unless you have a solid understanding of all the [nuances of promises](https://pouchdb.com/2015/05/18/we-have-a-problem-with-promises.html), it's probably going to take you a few reads to really grok how this code works.
 
-But if you're like me and you really have to stop and think about it, carefully reading over each statement before you can follow the logic, then this article is for you.
+Speaking from personal experience, about a week ago I started playing around with Service Worker for the first time: I wanted to add basic caching and [offline analytics](https://developers.google.com/web/updates/2016/07/offline-google-analytics) to this site. But after completing my initial implementation, I was pretty unsatisfied with the code I'd written. It wasn't clear, it wasn't self-documenting, and it seemed far to complex for the relatively simple problem I was trying to solve.
 
-After implementing a service worker on a couple of sites for the first time recently, I wanted to share a few strategies I used to keep my code clear, readable, and (hopefully) more maintainable going forward.
+After spending a few hours refactoring and really exploring these new APIs, I came up with a few strategies for improving the readability of my code that I think others might benefit from.
 
-## What is this code doing?
+In the rest of this article I'm going to take the above code and show how I went about refactoring it. But before I do, I want to make sure everyone reading is clear on exactly what this code is doing.
 
-When adding a `fetch` event listener to a service worker, you typically call `event.repondWith` and pass a `Promise` object that resolves to a `Response` object. But when you pass a promise chain like the code example&mdash;with multiple levels of nesting `then` and `catch` calls&mdash;it can be pretty hard to see all the points at which the resolution can happen.
+<div class="Callout">
 
-Here is the above promise logic, step by step:
+**Note:** my intent here is not to critique people who have written Service Worker tutorials. I've learned a great deal from that content, and I think it's invaluable. I also understand that when writing blog posts, concise examples often have a place.
 
-1. Open the `'site-cache'` cache.
-2. Make a `fetch()` over the network for `event.request`.
-3. If the `fetch()` succeeds:
-   a. Put a copy of the network response in the cache.
-   b. Resolve the promise with the network response.
-4. If the `fetch()` fails:
-   a. Attempt to find a matching request in the cache.
-   b. If a match is found:
-      i. Resolve the promise with the cached response.
-   c. If a match is not found:
-      i. Resolve the promise with a generic `Response.error()` object.
+This article is primarily meant to encourage readers of such tutorials to make sure their own implementations are readable and maintainable; to resist the urge to simply copy and paste boilerplate examples without fully understanding them.
 
+</div>
 
-## Betting variable naming
+## What the code is doing
 
-When writing service worker code you'll find yourself dealing with a lot of `request` and `response` objects, and it can be tempting to just use these names in every occurrence of these objects in your code (after all, we all know coming up with good names is hard).
+When adding a `fetch` event listener to a service worker, you typically call `event.respondWith` and pass a `Promise` object that resolves to a `Response` object. But when you pass a promise chain like in the above code example (with multiple levels of nested `then` and `catch` calls), it can be pretty hard to see all the points at which the resolution can happen.
 
-However, in the above code we're writing a promise that can either be fulfilled with a network response or a cache response, so quick and easy way to bring clarity to the code is to differentiate between these two responses with new names:
+Here is a step-by-step explanation, in plain English, of what happens inside the `fetch` event handler in the code example above:
+
+1. The `event` object calls `respondWith()` and passes it a promise chain that will eventually resolve to a `Response` object.
+2. The promise chain starts by opening the cache called: `cache:v1`.
+3. Once the cache is open, it makes a `fetch()` over the network for a request object specified by `event.request`.
+4. If the `fetch()` succeeds:
+    1. It puts a copy of the network response in the cache.
+    2. It resolves the promise with the network response.
+5. If the `fetch()` fails:
+    1. It attempts to find a matching request in the cache.
+    2. If a match is found:
+        1. It resolves the promise with the cached response.
+    3. If a match is not found:
+        1. It resolves the promise with a generic `Response.error()` object.
+
+I mentioned above that `respondWith()` takes a promise that eventually resolves to a `Response` object. In the above logic outline, that resolution could happen in three different places: `4.b`, `5.b.i`, or `5.c.i`.
+
+## How the code could be improved
+
+Each of the follow sections introduces a technique or a principle to help make your code more readable and ultimately easier for your (and others) to work with in the future. The techniques start out simple and get more complex as they go&mdash;each one building on the previous one.
+
+### Give variables more descriptive names
+
+When writing service worker code you'll find yourself dealing with a lot of `request` and `response` objects, and it can be tempting to just use those names with every occurrence of these objects in your code. And if each `request` or `response` object appears in its own distinct scope, there isn't a technical reason to name them anything else.
+
+However, in the case of our code service worker `fetch` example, there is a distinct fork in the logic that could result in two very different types of responses: a network response or a cache response.
+
+An easy way to indicate to a reader which condition they're in is to give each `response` object a name specific to that condition:
 
 ```js
 self.addEventListener('fetch', (event) => {
   event.respondWith(
-    caches.open('site-cache').then((cache) => {
+    caches.open('cache:v1').then((cache) => {
       return fetch(event.request).then((**networkResponse**) => {
         cache.put(event.request, **networkResponse**.clone());
         return **networkResponse**;
@@ -69,38 +87,56 @@ self.addEventListener('fetch', (event) => {
 });
 ```
 
-Any time you're returning a response based on some specific condition, an easy way to add clarity to your code is to give the response a more meaningful name.
+### Avoid code that looks like it might be a mistake
 
-## Removing red flags
-
-If you look at the last five lines of the original code example here's what you see:
+If you look at the last five lines of our original code example, here's what you see. Notice that there's no semicolon at the end of the middle line:
 
 ```js
           // ...
         });
       });
-    **})**
+    })
   );
 });
 ```
 
-When I first saw this, I assumed the author of the tutorial I was reading had missed a semicolon, but I was wrong.
+When I first saw this, I assumed it was simply an omission, but I was wrong.
 
-What was actually happening is the following line was so long that the argument to `respondWith()` was move to a new line and indented:
+In reality, the expression starting with `caches.open()` was moved to its own line and indented&mdash;presumably to avoid having too much logic on a single line.
+
+While I support the desire to break the code into more manageable chunks, doing it this way just lead to something that looked like a mistake (which is confusing).
+
+If you have an expression that's so long/complex that you feel the need to visually separate it, why not *actually* separate it: evaluate the expression elsewhere and assign the result to a variable.
 
 ```js
-event.respondWith(
-  caches.open('site-cache').then((cache) => {
-  // ...
+self.addEventListener('fetch', (event) => {
+  const **networkOrCacheResponse** = caches.open('cache:v1').then((cache) => {
+    return fetch(event.request).then((networkResponse) => {
+      cache.put(event.request, networkResponse.clone());
+      return networkResponse;
+    }).catch(() => {
+      return cache.match(event.request).then((cacheResponse) => {
+        return cacheResponse || Response.error();
+      });
+    });
+  });
+
+  event.respondWith(**networkOrCacheResponse**);
+});
 ```
 
-Any time you see code that looks like it's a mistake but actually isn't, you've probably found code that should be refactored. Similarly, any time the argument to a function is so long you have to move it to its own line and indent, you've probably found an opportunity to abstract that logic into its own function.
+### Abstract logical units into single-purpose functions
 
-By abstracting the argument to `respondWith()` into its own function with a meaningful name, the code becomes significantly easier to follow, it's also much more reusable and testable:
+Assigning the result of a complex expression to a variable prior to passing it to another method is good for readability, but we can still do better.
+
+As it stands in the above code example, the `networkOrCacheResponse` object can only be used inside this particular `fetch` handler. If you wanted to use the *network-first with cache fallback* strategy elsewhere, you'd have to rewrite the logic.
+
+To solve this problem we can write a utility function that accepts a `Request` object and returns a promise that will resolve to either the network or cache response to that request. Such a function might look like this:
+
 
 ```js
-const **networkFirstWithCacheFallback** = (request) => {
-  return caches.open('site-cache').then((cache) => {
+const **getNetworkOrCacheResponse** = (request) => {
+  return caches.open('cache:v1').then((cache) => {
     return fetch(request).then((networkResponse) => {
       cache.put(request, networkResponse.clone());
       return networkResponse;
@@ -110,215 +146,154 @@ const **networkFirstWithCacheFallback** = (request) => {
       });
     });
   });
-}
+};
 
 self.addEventListener('fetch', (event) => {
-  event.respondWith(**networkFirstWithCacheFallback()**)
+  event.respondWith(**getNetworkOrCacheResponse**(event.request));
 });
 ```
 
-## Abstracting logical units into utility functions
+While this function is now more reusable, it's still a bit complex.
 
-Whenever you see multiple levels of nested callback or promises in JavaScript, it's usually a sign of logic that's doing too much. In other words, it has [too many responsibilities](https://en.wikipedia.org/wiki/Single_responsibility_principle).
+You'll notice there are multiple levels of nested promises, and whenever you see a lot of nesting in a function, it's usually a sign that the function is doing too much. In other words, it has [too many responsibilities](https://en.wikipedia.org/wiki/Single_responsibility_principle).
 
-In the initial tutorial code we find logic that makes both network and cache requests and responds based on the success or failure of the network request. But by breaking this code up in to logical chunks, each part can be separately tested and nesting can be removed.
+The `getNetworkOrCacheResponse` function contains logic that deals with two very separate concerns:
 
-I attempted to separate the logic that did the network request from the logic that dealt with the cache, and in doing so not only did I eliminate some of the nesting, but I also discovered an obvious optimization that I'd previously missed (possibly due to the complexity).
+- Making the network request.
+- Interacting with the cache storage.
 
-Here are the two utility functions I created:
-
-```js
-const addRequestToCache = (request, response) => {
-  return caches.open('site-cache')
-    .then((cache) => cache.put(request, response.clone());
-}
-
-const getResponseFromCache = (request) => {
-  return caches.open('site-cache').then((cache) => {
-    return cache.match(event.request);
-  });
-}
-```
-
-You'll notice that each of these functions makes a call to `open()` before either reading from or writing to the cache. In the initial code, only a single call to `open()` was made.
-
-While at first it might seem like this abstraction will end up doing more work, what actually happened is I discovered an optimization that was missing from the original code.
-
-Consider the case where the service worker makes a network request that is successful. This is the most common case, so we should optimize for it (i.e. get the response to the user as quickly as possible). In the tutorial code, the first step of the logic was to open the cache, and then only respond with a network request once the cache was open.
-
-This is absolutely not necessary. While it's true that we do need to write to the cache even in the network case, that write doesn't need to block the response to the user. It can easily happen in parallel.
-
-With these two new utility functions, the code now looks like this:
+To improve readability, we can abstract the cache-related logic into separate, self-contained functions:
 
 ```js
-const addRequestToCache = (request, response) => {
-  return caches.open('site-cache')
-    .then((cache) => cache.put(request, response.clone());
+const **addRequestToCache** = (request, response) => {
+  return caches.open('cache:v1')
+    .then((cache) => cache.put(request, response.clone()));
 }
 
-const getResponseFromCache = (request) => {
-  return caches.open('site-cache').then((cache) => {
-    return cache.match(event.request);
+const **getCacheResponse** = (request) => {
+  return caches.open('cache:v1').then((cache) => {
+    return cache.match(request);
   });
 }
 
-const networkFirstWithCacheFallbackPromise = (request) => {
-  return fetch(event.request).then((networkResponse) => {
-    addRequestToCache(event.request, networkResponse);
+const getNetworkOrCacheResponse = (request) => {
+  return fetch(request).then((networkResponse) => {
+    **addRequestToCache**(request, networkResponse);
     return networkResponse;
-  })
-  .catch(() => {
-    return getResponseFromCache(request)
+  }).catch(() => {
+    return **getCacheResponse**(request)
       .then((cacheResponse) => cacheResponse || Response.error());
   });
 };
 
 self.addEventListener('fetch', (event) => {
-  event.respondWith(networkFirstWithCacheFallback(event.request));
+  event.respondWith(getNetworkOrCacheResponse(event.request));
 });
 ```
 
-## Clarifying the intent of a promise
+If you compare this new logic to the logic in the original function, you'll notice one significant difference. In the original code, the first thing to happen was a call to `caches.open()`, and that call only happened once. In the refactored code, there is a call to `caches.open()` in each of the utility functions that directly deals with the cache.
 
-A promise is a JavaScript object that will eventually resolve to a value, but with multiple levels of nesting and promises chained to other promises, it's not always easy to look at a piece of code and know what that resolved value will be.
+While at first it might seem like this abstraction will end up doing more work, it's actually an optimization over the original code&mdash;one I only discovered *after* I started separating the concerns.
 
-In the `respondWith()` method, we know that the promise will eventually resolve to a `Response` object, but in the tutorial code it's not immediately clear (at least to me) where that happens (and keep in mind this is a "basic" example).
+Consider the case where the service worker makes a network request that is successful. This is the most common case, so we should optimize for it (i.e. get the response to the user as quickly as possible). In the original code, the first step of the logic was to open the cache, and then only respond with a network request once the cache was open.
 
-Even in our refactored, `networkFirstWithCacheFallback` utility function, it might not be completely obvious where the resolution is:
+This is absolutely not necessary. While it's true that we need to write to the cache even in the network case, this write doesn't need to block the response to the user. It can easily happen in parallel.
+
+If you're wondering why it's important to write functions with only a single responsibility, there are two basic reasons:
+
+- The function is more reusable. (The more responsibilities a function has, the more specific a function is to a particular use-case.)
+- The function is easier to test. (N functions that each do one thing can be tested with N tests. By contrast, 1 function that does N things usually needs to account for N! possible outcomes.)
+
+### Clarify the resolution of a promise
+
+A promise is a JavaScript object that will eventually resolve to a value, but with multiple levels of nesting and promises chained to other promises, it's not always easy to tell what that resolved value will eventually be.
+
+In the `respondWith()` method, we know that the promise is supposed to resolve to a `Response` object, but in the original code it's not immediately clear (at least to me) where that resolution happens (and keep in mind this is a "basic" example).
+
+Even in our refactored, `getNetworkOrCacheResponse` function, it might not be completely obvious where the resolution is:
 
 ```js
-const networkFirstWithCacheFallbackPromise = (request) => {
-  return fetch(event.request).then((networkResponse) => {
-    addRequestToCache(event.request, networkResponse);
+const getNetworkOrCacheResponse = (request) => {
+  return fetch(request).then((networkResponse) => {
+    addRequestToCache(request, networkResponse);
     return networkResponse;
-  })
-  .catch(() => {
-    return getResponseFromCache(request)
+  }).catch(() => {
+    return getCacheResponse(request)
       .then((cacheResponse) => cacheResponse || Response.error());
   });
 };
 ```
 
-In situations like these, you can add resolution clarity by wrapping the whole function in a promise. Then all readers of the code have to look for is where the `resolve()` function appears:
+In situations like these, you can add resolution clarity by wrapping the whole function in a `new Promise()`. Then readers can easily spot the resolution points by looking for the `resolve()` calls:
 
 ```js
-const networkFirstWithCacheFallback = (request) => {
+const getNetworkOrCacheResponse = (request) => {
   return new Promise((resolve) => {
-    fetch(event.request).then((networkResponse) => {
-      addRequestToCache(event.request, networkResponse);
+    fetch(request).then((networkResponse) => {
+      addRequestToCache(request, networkResponse);
       **resolve(networkResponse);**
-    })
-    .catch(() => {
-      return getResponseFromCache(request).then((cacheResponse) => {
-        **resolve(cacheResponse || Response.error())**
+    }).catch(() => {
+      getCacheResponse(request).then((cacheResponse) => {
+        **resolve(cacheResponse || Response.error());**
       });
-    }
+    });
   });
 };
 ```
 
-## Removing nesting entirely with async/await
+### Use `async`/`await` to remove nesting entirely
 
-Perhaps the most significant way to improve the readability of complex promise code is to use [`async`/`await`](https://tc39.github.io/ecmascript-asyncawait/).
+Perhaps the most significant way to improve the readability of complex promise code is to use the new [`async`/`await`](https://tc39.github.io/ecmascript-asyncawait/) syntax that is currently in the process of being standardized.
 
-To give an *extremely* brief overview of `async` and `await`, the `await` keyword can be used in front of a promise to halt execution of the current code until that promise is resolved, and that expression evaluates to the resolved value of the promise. Complementary to that, an `async` function is syntactic sugar for a regular function that, instead of returning a value, will instead return a promise that will resolved to the return value.
+The `async` keyword is used to declare that a function will be executed asynchronously (rather than synchronously). In other words, instead of returning a value right away, an `async` function returns a `Promise` that will eventually resolve to the function's `return` value.
 
-To give an example, our code above that opens the cache looks like this:
+The `await` keyword can be used within an `async` function. It is prepended to an expression (any expression that evaluates to a promise) and when the interpretor encounters it, it halts the execution of the function until the promise is resolved. Once the promise is resolved, the awaited expression "returns" that value.
 
-```js
-caches.open('site-cache').then((cache) => {
-  // Use `cache` here.
-}
-```
-
-But it can be rewritten using the `await` keywords as follows:
+To make that more clear, consider the `getNetworkOrCacheResponse()` function defined in the section above (the one with the `new Promise()` wrapper). Here's how that function would look as an `async` function using the `await` keyword:
 
 ```js
-const cache = await caches.open('site-cache');
-```
-
-This is already substantially clearer, and it removes the need for an entire level of nesting.
-
-`async` functions can similarly remove a lot of nesting a boilerplate. Consider the `getResponseFromCache` utility function we abstracted above:
-
-```js
-const getResponseFromCache = (request) => {
-  return caches.open('site-cache').then((cache) => {
-    return cache.match(event.request);
-  });
-}
-```
-
-This can be rewritten to use `async` and `await` as follows:
-
-```js
-const getResponseFromCache = async (request) => {
-  const cache = await caches.open('site-cache');
-  const cachedResponse = await cache.match(event.request);
-  return cachedResponse;
-}
-```
-
-Notice how in the above code the function returns the value `cachedResponse`. Since this is an `async` function, it will actually return a promise that resolves to the value `cachedResponse`, which allows it to be used in conjunction with the `await` keyword (since `await` requires the expression it prefixes to evaluate to a promise).
-
-With a basic understanding of how `async` and `await` work, compare the `async` and non-`async` version of our `networkFirstWithCacheFallback` function below:
-
-**non-async version**
-
-```js
-const networkFirstWithCacheFallback = (request) => {
-  return new Promise((resolve) => {
-    fetch(event.request).then((networkResponse) => {
-      addRequestToCache(event.request, networkResponse);
-      resolve(networkResponse);
-    })
-    .catch(() => {
-      return getResponseFromCache(request).then((cacheResponse) => {
-        resolve(cacheResponse || Response.error())
-      });
-    }
-  });
-};
-```
-
-**async version**
-
-```js
-const networkFirstWithCacheFallback = async (request) => {
+const getNetworkOrCacheResponse = async (request) => {
   try {
     const networkResponse = await fetch(request);
     addRequestToCache(request, networkResponse);
     return networkResponse;
-  }
-  catch (err) {
-    const cacheResponse = await getResponseFromCache(request);
+  } catch (err) {
+    const cacheResponse = await getCacheResponse(request);
     return cacheResponse || Response.error();
   }
 }
 ```
 
-As you can see, the `async` version is substantially more concise and easier to follow.
+There are several important things to notice about the `async` version of this function:
+
+- You can use a `try`/`catch` block instead of `.then()/.catch()` chains, and the error is handled the way it normally is in a `try`/`catch` block.
+- Since `await` expressions halt execution and evaluate to a `Promise`, what was originally multiple levels of nesting can now be represented as successive, top-level assignment expressions (with no nesting).
+- Since an `async` function is sugar for a promise that resolves to its `return` value, you no longer need the `new Promise()` wrapper to clarify what the `Promise` resolves to. That can now be easily inferred by looking for the `return` statement(s).
+
+These improvements are substantial! They make your code much easier to both read and write.
 
 ### Using `async`/`await` today
 
-I've known about `async`/`await` for a while now, and I've also known that you can use it today in code if you transpile it to ES5 with babel. Unfortunately, to use `async`/`await` in all browsers today, you also have to include the `babel-polyfill`, which includes Facebook's regenerator runtime.
+The `async`/`await` syntax has been around for a while now, and you can compile it to ES5 using [Babel](http://babeljs.io/). However, in order to use that compiled code you *also* have to include the the `babel-polyfill` library (which bundles Facebook's [regenerator](https://github.com/facebook/regenerator) runtime).
 
-While this might make sense for some projects, the added code weight of the polyfill is an absolutely unacceptable cost for a 50-line service worker script.
+While this might make sense for some projects, the added code weight of the polyfill is an absolutely unacceptable cost for a 50-line service worker script (in my testing it added ~60K).
 
 Fortunately, when it comes to service worker scripts, there's another way!
 
-Since all browsers that support service worker *also* support generators, you can avoid the regenerator runtime and compile your code with just a single babel transform: `async-to-generator`.
+Since all browsers that support service worker *also* support most ES2015 features (specifically [generators](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Iterators_and_Generators)), you can avoid the regenerator runtime and compile your code with just a single Babel transform: [`async-to-generator`](https://babeljs.io/docs/plugins/transform-async-to-generator/).
 
-This transform adds less than 1K of extra code to your built file, so its file size is negligible.
+In my code, using the `async-to-generator` transform only added an additional 258 bytes, and since I was already using [browserify](http://browserify.org/) to load the dependencies, supporting `async`/`await` was a no-brainer!
 
 ## Wrapping up
 
-Compare the initial tutorial version with the version containing all our refactoring:
+With all those improvements in place, compare the readability of the original code to the refactored code.
+
+**Original code:**
 
 ```js
 self.addEventListener('fetch', (event) => {
   event.respondWith(
-    caches.open('site-cache').then((cache) => {
+    caches.open('cache:v1').then((cache) => {
       return fetch(event.request).then((response) => {
         cache.put(event.request, response.clone());
         return response;
@@ -332,38 +307,36 @@ self.addEventListener('fetch', (event) => {
 });
 ```
 
+**Refactored code:**
+
 ```js
 const addRequestToCache = async (request, response) => {
-  const cache = await caches.open('site-cache');
+  const cache = await caches.open('cache:v1');
   cache.put(request, response.clone());
 }
 
-const getResponseFromCache = async (request) => {
-  const cache = await caches.open('site-cache');
+const getCacheResponse = async (request) => {
+  const cache = await caches.open('cache:v1');
   const cachedResponse = await cache.match(event.request);
   return cachedResponse;
 }
 
-const networkFirstWithCacheFallback = async (request) => {
+const getNetworkOrCacheResponse = async (request) => {
   try {
     const networkResponse = await fetch(request);
     addRequestToCache(request, networkResponse);
     return networkResponse;
-  }
-  catch (err) {
-    const cacheResponse = await getResponseFromCache(request);
+  } catch (err) {
+    const cacheResponse = await getCacheResponse(request);
     return cacheResponse || Response.error();
   }
 };
 
 self.addEventListener('fetch', (event) => {
-  event.respondWith(networkFirstWithCacheFallback(event.request));
+  event.respondWith(getNetworkOrCacheResponse(event.request));
 });
 ```
 
-While our version is longer and contains more code, it's clearer and easier to follow, which means it will be easier to update in the future and less likely to result in bugs from developers misunderstanding the logic.
+While the refactored version is longer and contains more code, it's definitely easier to read and understand, which means it will be easier to update in the future, both for you and others. It's also more modular, which will make it easier to test and reuse in other contexts.
 
-It's also more modular, which makes it easier to test and reuse in other situations that require similar logic.
-
-
-
+This article introduced several concepts and strategies to help you refactor complex, promise-based code into individual, reusable parts. Hopefully some of the techniques introduced were helpful; at a minimum, I hope I've encouraged you to strive to make your code as readable and maintainable as possible.

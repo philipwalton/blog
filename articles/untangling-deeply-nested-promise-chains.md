@@ -1,4 +1,4 @@
-If you've been writing JavaScript for a while, you've probably heard terms like [callback hell](http://callbackhell.com/) or the [pyramid of doom](https://en.wikipedia.org/wiki/Pyramid_of_doom_(programming)). When [Promises](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) were added to JavaScript a few years ago, I remember reading a lot of blog posts claiming that these problems would be solved; unfortunately, that was a little too optimistic. With more and more web APIs becoming promise-based, we've proven that even promises don't prevent us from writing overly-nested, hard-to-read code.
+If you've been writing JavaScript for a while, you've probably heard terms like [callback hell](http://callbackhell.com/) or the [pyramid of doom](https://en.wikipedia.org/wiki/Pyramid_of_doom_(programming)). When [promises](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) were added to JavaScript a few years ago, I remember reading a lot of blog posts claiming that these problems would be solved; unfortunately, that was a little too optimistic. With more and more web APIs becoming promise-based, we've proven that even promises don't prevent us from writing overly-nested, hard-to-read code.
 
 The place I'm seeing this happen a lot these days is in [Service Worker](https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API) scripts that are heavily promise-based. Specifically, blog posts and tutorials that are supposed to be showing us the proper way to use Service Worker.
 
@@ -208,7 +208,7 @@ If you're wondering why it's important to write functions with only a single res
 
 A promise is a JavaScript object that will eventually resolve to a value, but with multiple levels of nesting and promises chained to other promises, it's not always easy to tell what that resolved value will eventually be.
 
-In the `respondWith()` method, we know that the promise is supposed to resolve to a `Response` object, but in the original code it's not immediately clear (at least to me) where that resolution happens (and keep in mind this is a "basic" example).
+In the `respondWith()` method, we know that the promise is supposed to resolve to a `Response` object, but in the original code it wasn't immediately clear (at least to me) where that resolution happens (and keep in mind this is a "basic" example).
 
 Even in our refactored, `getNetworkOrCacheResponse` function, it might not be completely obvious where the resolution is:
 
@@ -280,28 +280,9 @@ While this might make sense for some projects, the added code weight of the poly
 
 Fortunately, when it comes to Service Worker scripts, there's another way!
 
-Since all browsers that support Service Worker *also* support most ES2015 features (specifically [generators](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Iterators_and_Generators)), you can avoid the regenerator runtime and compile your code with just a single Babel transform: [`async-to-generator`](https://babeljs.io/docs/plugins/transform-async-to-generator/).
+Since all browsers that support Service Worker *also* support most ES2015 features (specifically, they support [generators](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Iterators_and_Generators)), you can avoid the regenerator runtime and compile your code with just a single Babel transform: [`async-to-generator`](https://babeljs.io/docs/plugins/transform-async-to-generator/).
 
-In my code, using the `async-to-generator` transform only added an additional 258 bytes, and since I was already using [browserify](http://browserify.org/) to load the dependencies, using async functions was a no-brainer!
-
-### Running multiple async functions simultaneously
-
-When working with asynchronous APIs, you typically find yourself wanting to do multiple asynchronous tasks in parallel and then take some action once all of the tasks have completed. The way most people do this today is with [`Promise.all()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/all).
-
-Within an async function you can mimic this behavior by prepending the `await` keyword to an array of expressions that all return promises.
-
-For example, the following function fetches the results from the `/foo.json` and `/bar.json` endpoints at the same time and logs the results to the console once both requests have completed:
-
-```js
-const getFooAndBar = async () => {
-  const [fooResponse, barResponse] = await [
-    fetch('/foo.json'),
-    fetch('/bar.json'),
-  ];
-  console.log(fooResponse);
-  console.log(barResponse);
-};
-```
+In my Service Worker code on this site, using the `async-to-generator` transform only added an additional 258 bytes, and since I was already using [browserify](http://browserify.org/) to load the dependencies, using async functions was a no-brainer!
 
 ## Wrapping up
 

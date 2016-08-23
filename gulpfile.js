@@ -169,25 +169,6 @@ gulp.task('javascript', function(done) {
 });
 
 
-// TODO(philipwalton): this task fetches the analytics.js script so it
-// can be hosted locally as a temporary fix to this issue:
-// https://github.com/GoogleChrome/sw-helpers/issues/40
-gulp.task('analyticsjs', ['javascript'], function() {
-  return request
-      .get('https://www.google-analytics.com/analytics.js')
-      .on('response', function(response) {
-        if (response.statusCode >= 400 ||
-            response.headers['content-type'] != 'text/javascript') {
-          this.emit('error', new gutil.PluginError({
-            plugin: 'analyticsjs',
-            message: 'Invalid response from www.google-analytics.com'
-          }));
-        }
-      })
-      .pipe(fs.createWriteStream(path.join(DEST, './assets/analytics.js')));
-});
-
-
 gulp.task('static', function() {
   return gulp.src(['./assets/favicon.ico']).pipe(gulp.dest(DEST));
 });

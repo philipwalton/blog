@@ -12,25 +12,31 @@ const dimensions = {
 
 
 const assetUrlParts = [
-  location.hostname,
-  'googleapis.com',
-  'gstatic.com'
+  new RegExp('^' + location.origin),
+  /^https?:\/\/fonts\.googleapis\.com/,
+  /^https?:\/\/www\.gstatic\.com/,
+  /^https?:\/\/www\.google\-analytics\.com\/analytics\.js/
 ];
 
 
-offlineGoogleAnalytics.initialize({
-  parameterOverrides: {[dimensions.SERVICE_WORKER_REPLAY]: 'replay'}
-});
+const cacheAnalyticsJs = async (cache) => {
+  let analyticsJsUrl = 'https://www.google-analytics.com/analytics.js';
+  let analyticsJsRequest = new Request(analyticsJsUrl, {mode: 'no-cors'});
+  let analyticsJsResponse = await fetch(analyticsJsRequest);
+  return cache.put(analyticsJsRequest, analyticsJsResponse.clone());
+};
 
 
 const cacheInitialAssets = async () => {
   const cache = await caches.open(CACHE_NAME);
-  return cache.addAll([
-    '/',
-    '/assets/analytics.js',
-    '/assets/css/main.css',
-    '/assets/javascript/main.js',
-  ]);
+  return await [
+    cacheAnalyticsJs(cache),
+    cache.addAll([
+      '/',
+      '/assets/css/main.css',
+      '/assets/javascript/main.js'
+    ])
+  ];
 };
 
 
@@ -60,7 +66,7 @@ const getNetworkOrCacheResponse = async (request) => {
 
 
 self.addEventListener('fetch', (event) => {
-  if (assetUrlParts.some((part) => event.request.url.includes(part))) {
+  if (assetUrlParts.some((part) => part.test(event.request.url))) {
     event.respondWith(getNetworkOrCacheResponse(event.request));
   }
 });
@@ -73,4 +79,9 @@ self.addEventListener('install', (event) => {
 
 self.addEventListener('activate', (event) => {
   event.waitUntil(self.clients.claim());
+});
+
+
+offlineGoogleAnalytics.initialize({
+  parameterOverrides: {[dimensions.SERVICE_WORKER_REPLAY]: 'replay'}
 });

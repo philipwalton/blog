@@ -22,6 +22,9 @@ handlers:
   static_files: build/assets/\1
   upload: build/assets/(.+)
   secure: always
+- url: /\.well-known/(.+)
+  script: lets-encrypt.app
+  secure: always
 - url: /.*
   script: main.app
   secure: always

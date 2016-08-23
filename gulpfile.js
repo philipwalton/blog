@@ -23,7 +23,6 @@ const MarkdownIt = require('markdown-it');
 const markdownItAnchor = require('markdown-it-anchor');
 const merge = require('merge-stream');
 const path = require('path');
-const request = require('request');
 const seleniumServerJar = require('selenium-server-standalone-jar');
 const through = require('through2');
 const buffer = require('vinyl-buffer');

@@ -54,7 +54,6 @@
     "mocha": "^3.0.1",
     "moment-timezone": "^0.5.5",
     "normalize.css": "^4.2.0",
-    "request": "^2.74.0",
     "selenium-server-standalone-jar": "^2.53.1",
     "sw-helpers": "philipwalton/sw-helpers",
     "through2": "^2.0.1",

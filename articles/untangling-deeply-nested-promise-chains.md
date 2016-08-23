@@ -204,43 +204,6 @@ If you're wondering why it's important to write functions with only a single res
 - The function is more reusable. (The more responsibilities a function has, the more specific a function is to a particular use-case.)
 - The function is easier to test. (N functions that each do one thing can be tested with N tests. By contrast, 1 function that does N things usually needs to account for N! possible outcomes.)
 
-### Clarify the resolution of a promise
-
-A promise is a JavaScript object that will eventually resolve to a value, but with multiple levels of nesting and promises chained to other promises, it's not always easy to tell what that resolved value will eventually be.
-
-In the `respondWith()` method, we know that the promise is supposed to resolve to a `Response` object, but in the original code it wasn't immediately clear (at least to me) where that resolution happens (and keep in mind this is a "basic" example).
-
-Even in our refactored, `getNetworkOrCacheResponse` function, it might not be completely obvious where the resolution is:
-
-```js
-const getNetworkOrCacheResponse = (request) => {
-  return fetch(request).then((networkResponse) => {
-    addToCache(request, networkResponse);
-    return networkResponse;
-  }).catch(() => {
-    return getCacheResponse(request)
-      .then((cacheResponse) => cacheResponse || Response.error());
-  });
-};
-```
-
-In situations like these, you can add resolution clarity by wrapping the whole function in a `new Promise()`. Then readers can easily spot the resolution points by looking for the `resolve()` calls:
-
-```js
-const getNetworkOrCacheResponse = (request) => {
-  return new Promise((resolve) => {
-    fetch(request).then((networkResponse) => {
-      addToCache(request, networkResponse);
-      **resolve(networkResponse);**
-    }).catch(() => {
-      getCacheResponse(request).then((cacheResponse) => {
-        **resolve(cacheResponse || Response.error());**
-      });
-    });
-  });
-};
-```
-
 ### Use async functions to remove nesting entirely
 
 Perhaps the most significant way to improve the readability of complex promise code is to use [async functions](https://tc39.github.io/ecmascript-asyncawait/), a new JavaScript feature that helps make asynchronous logic read more like synchronous code.
@@ -249,7 +212,7 @@ Async functions are declared with the new `async` keyword, and instead of return
 
 Within the body of an async function you'll usually find one or more `await` keywords. The `await` keyword is prepended to a promise (or an expression that evaluates to a promise) and when the interpreter encounters the `await` keyword, it halts the execution of the function until the promise is resolved. Once the promise is resolved, the awaited expression "returns" that value.
 
-To make this more clear, consider the `getNetworkOrCacheResponse()` function defined in the section above (the one with the `new Promise()` wrapper). Here's how that function would look as an async function:
+To make this more clear, consider the `getNetworkOrCacheResponse()` function defined in the section above. Here's how that function would look as an async function:
 
 ```js
 const getNetworkOrCacheResponse = async (request) => {
@@ -268,7 +231,7 @@ There are several important things to notice about the `async` version of this f
 
 - You can use a `try`/`catch` block instead of `.then()`/`.catch()` chains, and the error is handled the way it normally is in a `try`/`catch` block.
 - Since `await` expressions halt execution and evaluate to a `Promise`, what was originally multiple levels of nesting can now be represented as successive, top-level assignment expressions (with no nesting).
-- Since an `async` function is sugar for a promise that resolves to its `return` value, you no longer need the `new Promise()` wrapper to clarify what the `Promise` resolves to. That can now be easily inferred by looking for the `return` statement(s).
+- Since an `async` function is sugar for a promise that resolves to its `return` value, it makes it much more clear where the promise resolution happens. With nested promise chains, that resolution can be much more obscured.
 
 These improvements are substantial! They make your code much easier to both read and write.
 

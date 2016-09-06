@@ -49,6 +49,9 @@ let gaTest = createGaProxy(TEST_TRACKER);
 
 
 export function init() {
+  createTrackers();
+  trackErrors();
+
   setDefaultDimensionValues();
   requirePlugins();
   trackClientId();
@@ -64,6 +67,36 @@ export function init() {
 
 export function trackError(err) {
   gaAll('send', 'event', 'Script', 'error', err.stack);
+}
+
+
+function createTrackers() {
+  for (let tracker of ALL_TRACKERS) {
+    window.ga('create', tracker.trackingId, 'auto', tracker.name, {
+      siteSpeedSampleRate: 10
+    });
+  }
+}
+
+
+function trackErrors() {
+  // Errors that have occurred prior to this script running are stored on
+  // the `q` property of the window.onerror function.
+  let errorQueue = window.onerror.q || [];
+
+  // Override the temp `onerror()` handler to now send hits to GA.
+  window.onerror = function(msg, file, line, col, error) {
+    gaAll('send', 'event', {
+      eventCategory: 'Script',
+      eventAction: 'uncaught error',
+      eventLabel: error ? error.stack : `${msg}\n${file}:${line}:${col}`
+    });
+  };
+
+  // Replay any stored errors in the queue.
+  for (let error of errorQueue) {
+    window.onerror(...error);
+  }
 }
 
 

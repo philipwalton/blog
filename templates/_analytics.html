@@ -1,17 +1,5 @@
 <script>
 window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
-
-ga('create', 'UA-21292978-1', 'auto', {siteSpeedSampleRate: 10});
-ga('create', 'UA-21292978-3', 'auto', 'testing', {siteSpeedSampleRate: 10});
-
-window.onerror = function(msg, file, line, col, error) {
-  var fields = {
-    eventCategory: 'Script',
-    eventAction: 'uncaught error',
-    eventLabel: error ? error.stack : msg+'\n'+file+':'+line+':'+col
-  }
-  ga('send', 'event', fields);
-  ga('testing.send', 'event', fields);
-}
+window.onerror=function fn(){fn.q=fn.q||[];fn.q.push(arguments)};
 </script>
 <script async src="https://www.google-analytics.com/analytics.js"></script>

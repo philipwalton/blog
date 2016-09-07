@@ -25,8 +25,8 @@ const ALL_TRACKERS = shuffleArray([
 ]);
 
 
-const TEST_TRACKERS = ALL_TRACKERS.filter(({name}) => /test/.test(name));
 const PROD_TRACKERS = ALL_TRACKERS.filter(({name}) => !/test/.test(name));
+const TEST_TRACKERS = ALL_TRACKERS.filter(({name}) => /test/.test(name));
 const NULL_VALUE = '(not set)';
 
 
@@ -81,23 +81,21 @@ export function trackError(err) {
 
 
 function createTrackers() {
-  let data = getStoredData();
   let fields = {siteSpeedSampleRate: 10};
-
+  let data = getStoredData();
   for (let tracker of PROD_TRACKERS) {
     window.ga('create', tracker.trackingId, 'auto', tracker.name, fields);
   }
-
-  for (let tracker of TEST_TRACKERS) {
-    if (window.localStorage) {
-      fields.clientId = data.clientId;
-      fields.storage = 'none';
-    }
-    window.ga('create', tracker.trackingId, 'auto', tracker.name, fields);
-  }
-  gaTest(function(tracker) {
-    data.clientId = tracker.get('clientId');
+  window.ga(function() {
+    let tracker = window.ga.getAll()[0];
+    data.clientId = tracker.get('clientId') || data.clientId;
     setStoredData(data);
+
+    for (let tracker of TEST_TRACKERS) {
+      if (data.clientId) fields.clientId = data.clientId;
+      if (window.localStorage) fields.storage = 'none';
+      window.ga('create', tracker.trackingId, 'auto', tracker.name, fields);
+    }
   });
 }
 
@@ -246,8 +244,8 @@ function trackNetworkStatus() {
 function initSessionControl() {
 
   gaTest(function(tracker) {
-    let originalSendHitTask = tracker.get('sendHitTask');
-    tracker.set('sendHitTask', function(model) {
+    let originalSendHitTask = tracker.get('buildHitTask');
+    tracker.set('buildHitTask', function(model) {
 
       let now = +new Date;
       let name = tracker.get('name');
@@ -255,7 +253,7 @@ function initSessionControl() {
       trackerData.index = trackerData.index || 0;
       trackerData.time = trackerData.time || now;
 
-      model.set(dimensions.HIT_INDEX, String(++trackerData.index));
+      model.set(dimensions.HIT_INDEX, String(++trackerData.index), true);
 
       // if (hasSessionTimedOut()) { /* Do something... */ }
 

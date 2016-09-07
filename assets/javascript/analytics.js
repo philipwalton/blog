@@ -7,6 +7,14 @@ import 'autotrack/lib/plugins/page-visibility-tracker';
 import 'autotrack/lib/plugins/url-change-tracker';
 
 
+import {
+  getStoredData,
+  getStoredTrackerData,
+  setStoredData,
+  setStoredTrackerData
+} from './analytics-storage';
+
+
 /**
  * A global list of tracker object, randomized to ensure no one tracker
  * data is always sent first.
@@ -17,9 +25,8 @@ const ALL_TRACKERS = shuffleArray([
 ]);
 
 
-const TEST_TRACKER = ALL_TRACKERS.filter(({name}) => /test/.test(name));
-
-
+const TEST_TRACKERS = ALL_TRACKERS.filter(({name}) => /test/.test(name));
+const PROD_TRACKERS = ALL_TRACKERS.filter(({name}) => !/test/.test(name));
 const NULL_VALUE = '(not set)';
 
 
@@ -39,13 +46,14 @@ const dimensions = {
   CLIENT_ID: 'dimension7',
   SERVICE_WORKER_REPLAY: 'dimension8',
   SERVICE_WORKER_STATUS: 'dimension9',
-  NETWORK_STATUS: 'dimension10'
+  NETWORK_STATUS: 'dimension10',
+  HIT_INDEX: 'dimension11'
 };
 
 
 // The command queue proxies.
 let gaAll = createGaProxy(ALL_TRACKERS);
-let gaTest = createGaProxy(TEST_TRACKER);
+let gaTest = createGaProxy(TEST_TRACKERS);
 
 
 export function init() {
@@ -57,6 +65,8 @@ export function init() {
   trackClientId();
   trackServiceWorkerStatus();
   trackNetworkStatus();
+
+  initSessionControl();
 
   sendInitialPageview();
   measureCssBlockTime();
@@ -71,11 +81,24 @@ export function trackError(err) {
 
 
 function createTrackers() {
-  for (let tracker of ALL_TRACKERS) {
-    window.ga('create', tracker.trackingId, 'auto', tracker.name, {
-      siteSpeedSampleRate: 10
-    });
+  let data = getStoredData();
+  let fields = {siteSpeedSampleRate: 10};
+
+  for (let tracker of PROD_TRACKERS) {
+    window.ga('create', tracker.trackingId, 'auto', tracker.name, fields);
   }
+
+  for (let tracker of TEST_TRACKERS) {
+    if (window.localStorage) {
+      fields.clientId = data.clientId;
+      fields.storage = 'none';
+    }
+    window.ga('create', tracker.trackingId, 'auto', tracker.name, fields);
+  }
+  gaTest(function(tracker) {
+    data.clientId = tracker.get('clientId');
+    setStoredData(data);
+  });
 }
 
 
@@ -217,6 +240,30 @@ function trackNetworkStatus() {
 
   window.addEventListener('online', updateNetworkStatus);
   window.addEventListener('offline', updateNetworkStatus);
+}
+
+
+function initSessionControl() {
+
+  gaTest(function(tracker) {
+    let originalSendHitTask = tracker.get('sendHitTask');
+    tracker.set('sendHitTask', function(model) {
+
+      let now = +new Date;
+      let name = tracker.get('name');
+      let trackerData = getStoredTrackerData(name);
+      trackerData.index = trackerData.index || 0;
+      trackerData.time = trackerData.time || now;
+
+      model.set(dimensions.HIT_INDEX, String(++trackerData.index));
+
+      // if (hasSessionTimedOut()) { /* Do something... */ }
+
+      originalSendHitTask(model);
+      setStoredTrackerData(name, trackerData);
+    });
+
+  });
 }
 
 

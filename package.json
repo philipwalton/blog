@@ -48,6 +48,7 @@
     "highlight.js": "^9.5.0",
     "imagemin-pngquant": "^5.0.0",
     "js-yaml": "^3.6.1",
+    "lodash": "^4.15.0",
     "markdown-it": "^7.0.0",
     "markdown-it-anchor": "^2.5.0",
     "merge-stream": "^1.0.0",

@@ -49,7 +49,8 @@ const dimensions = {
   NETWORK_STATUS: 'dimension10',
   PREVIOUS_HIT_INDEX: 'dimension11',
   PREVIOUS_HIT_PAYLOAD: 'dimension12',
-  HIT_TYPE: 'dimension13'
+  HIT_TYPE: 'dimension13',
+  HIT_UUID: 'dimension14'
 };
 
 
@@ -244,22 +245,18 @@ function trackNetworkStatus() {
 
 
 function initSessionControl() {
-
   gaTest(function(tracker) {
     let originalBuildHitTask = tracker.get('buildHitTask');
     let originalSendHitTask = tracker.get('sendHitTask');
-
 
     tracker.set('buildHitTask', function(model) {
       let name = tracker.get('name');
       let trackerData = getStoredTrackerData(name);
 
-      model.set(dimensions.HIT_TYPE, model.get('hitType'));
-
-      if (trackerData.index) {
-        model.set(
-            dimensions.PREVIOUS_HIT_INDEX, String(trackerData.index), true);
-      }
+      model.set(dimensions.HIT_TYPE, model.get('hitType'), true);
+      model.set(dimensions.HIT_UUID, uuid(), true);
+      model.set(dimensions.PREVIOUS_HIT_INDEX,
+          String(trackerData.index || 0), true);
 
       if (trackerData.payload) {
         model.set(
@@ -270,7 +267,6 @@ function initSessionControl() {
 
       originalBuildHitTask(model);
     });
-
 
     tracker.set('sendHitTask', function(model) {
       let now = +new Date;
@@ -394,16 +390,17 @@ function createGaProxy(trackers) {
 
 
 function serializeHit(model) {
-  let hit = {
-    hitType: model.get('hitType'),
-    page: model.get('page'),
-  };
+  let hitType = model.get('hitType');
+  let page = model.get('page');
+  let hitSource = model.get(dimensions.HIT_SOURCE);
+
+  let hit = {hitType, page};
+  if (hitSource && hitSource != NULL_VALUE) hit.hitSource = hitSource;
 
   if (hit.hitType == 'event') {
     hit.eventCategory = model.get('eventCategory');
     hit.eventAction = model.get('eventAction');
     hit.eventLabel = model.get('eventLabel');
-    hit.eventValue = model.get('eventValue');
   }
 
   return Object.keys(hit)
@@ -433,3 +430,9 @@ function shuffleArray(array) {
   }
   return array;
 }
+
+
+/*eslint-disable */
+// https://gist.github.com/jed/982883
+const uuid = function b(a){return a?(a^Math.random()*16>>a/4).toString(16):([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g,b)};
+/*eslint-enable */

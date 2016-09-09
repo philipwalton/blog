@@ -1,6 +1,20 @@
 const GA_LOCAL_STORAGE_KEY = '_ga';
 
 
+// Schema:
+// ---------------------
+// {
+//   clientId: String(),
+//   trackers: {
+//     [name]: {
+//       index: Number,
+//       time: Number,
+//       payload: String
+//     }
+//   }
+// }
+
+
 export function getStoredData() {
   let data;
   try {

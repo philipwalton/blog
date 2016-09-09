@@ -47,7 +47,9 @@ const dimensions = {
   SERVICE_WORKER_REPLAY: 'dimension8',
   SERVICE_WORKER_STATUS: 'dimension9',
   NETWORK_STATUS: 'dimension10',
-  HIT_INDEX: 'dimension11'
+  PREVIOUS_HIT_INDEX: 'dimension11',
+  PREVIOUS_HIT_PAYLOAD: 'dimension12',
+  HIT_TYPE: 'dimension13'
 };
 
 
@@ -244,21 +246,42 @@ function trackNetworkStatus() {
 function initSessionControl() {
 
   gaTest(function(tracker) {
-    let originalSendHitTask = tracker.get('buildHitTask');
-    tracker.set('buildHitTask', function(model) {
+    let originalBuildHitTask = tracker.get('buildHitTask');
+    let originalSendHitTask = tracker.get('sendHitTask');
 
-      let now = +new Date;
+
+    tracker.set('buildHitTask', function(model) {
       let name = tracker.get('name');
       let trackerData = getStoredTrackerData(name);
-      trackerData.index = trackerData.index || 0;
-      trackerData.time = trackerData.time || now;
 
-      model.set(dimensions.HIT_INDEX, String(++trackerData.index), true);
+      model.set(dimensions.HIT_TYPE, model.get('hitType'));
+
+      if (trackerData.index) {
+        model.set(
+            dimensions.PREVIOUS_HIT_INDEX, String(trackerData.index), true);
+      }
+
+      if (trackerData.payload) {
+        model.set(
+            dimensions.PREVIOUS_HIT_PAYLOAD, trackerData.payload, true);
+      }
 
       // if (hasSessionTimedOut()) { /* Do something... */ }
 
-      originalSendHitTask(model);
+      originalBuildHitTask(model);
+    });
+
+
+    tracker.set('sendHitTask', function(model) {
+      let now = +new Date;
+      let name = tracker.get('name');
+      let trackerData = getStoredTrackerData(name);
+      trackerData.index = (trackerData.index || 0) + 1;
+      trackerData.time = trackerData.time || now;
+      trackerData.payload = serializeHit(model);
       setStoredTrackerData(name, trackerData);
+
+      originalSendHitTask(model);
     });
 
   });
@@ -367,6 +390,24 @@ function createGaProxy(trackers) {
       }
     }
   };
+}
+
+
+function serializeHit(model) {
+  let hit = {
+    hitType: model.get('hitType'),
+    page: model.get('page'),
+  };
+
+  if (hit.hitType == 'event') {
+    hit.eventCategory = model.get('eventCategory');
+    hit.eventAction = model.get('eventAction');
+    hit.eventLabel = model.get('eventLabel');
+    hit.eventValue = model.get('eventValue');
+  }
+
+  return Object.keys(hit)
+      .map((key) => `${key}=${decodeURIComponent(hit[key])}`).join('&');
 }
 
 

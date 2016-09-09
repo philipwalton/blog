@@ -42,7 +42,7 @@ const cacheInitialAssets = async () => {
 
 const addToCache = async (request, networkResponse) => {
   const cache = await caches.open(CACHE_NAME);
-  cache.put(request, networkResponse.clone());
+  return cache.put(request, networkResponse.clone());
 };
 
 
@@ -56,7 +56,7 @@ const getCacheResponse = async (request) => {
 const getNetworkOrCacheResponse = async (request) => {
   try {
     const networkResponse = await fetch(request);
-    addToCache(request, networkResponse);
+    await addToCache(request, networkResponse);
     return networkResponse;
   } catch (err) {
     const cacheResponse = await getCacheResponse(request);

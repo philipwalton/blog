@@ -47,10 +47,11 @@ const dimensions = {
   SERVICE_WORKER_REPLAY: 'dimension8',
   SERVICE_WORKER_STATUS: 'dimension9',
   NETWORK_STATUS: 'dimension10',
-  PREVIOUS_HIT_INDEX: 'dimension11',
+  HIT_INDEX: 'dimension11',
   PREVIOUS_HIT_PAYLOAD: 'dimension12',
   HIT_TYPE: 'dimension13',
-  HIT_UUID: 'dimension14'
+  HIT_UUID: 'dimension14',
+  HIT_TIME: 'dimension15',
 };
 
 
@@ -254,32 +255,28 @@ function initSessionControl() {
       let trackerData = getStoredTrackerData(name);
 
       model.set(dimensions.HIT_TYPE, model.get('hitType'), true);
+      model.set(dimensions.HIT_INDEX, String(trackerData.index || 0), true);
+      model.set(dimensions.HIT_TIME, String(+new Date), true);
       model.set(dimensions.HIT_UUID, uuid(), true);
-      model.set(dimensions.PREVIOUS_HIT_INDEX,
-          String(trackerData.index || 0), true);
 
       if (trackerData.payload) {
-        model.set(
-            dimensions.PREVIOUS_HIT_PAYLOAD, trackerData.payload, true);
+        model.set(dimensions.PREVIOUS_HIT_PAYLOAD, trackerData.payload, true);
       }
-
-      // if (hasSessionTimedOut()) { /* Do something... */ }
 
       originalBuildHitTask(model);
     });
 
     tracker.set('sendHitTask', function(model) {
-      let now = +new Date;
       let name = tracker.get('name');
+      let hitTime = model.get(dimensions.HIT_TIME);
       let trackerData = getStoredTrackerData(name);
       trackerData.index = (trackerData.index || 0) + 1;
-      trackerData.time = trackerData.time || now;
+      trackerData.time = hitTime;
       trackerData.payload = serializeHit(model);
       setStoredTrackerData(name, trackerData);
 
       originalSendHitTask(model);
     });
-
   });
 }
 
@@ -390,11 +387,12 @@ function createGaProxy(trackers) {
 
 
 function serializeHit(model) {
-  let hitType = model.get('hitType');
-  let page = model.get('page');
-  let hitSource = model.get(dimensions.HIT_SOURCE);
+  let hit = {
+    hitType: model.get('hitType'),
+    page: model.get('page'),
+  };
 
-  let hit = {hitType, page};
+  let hitSource = model.get(dimensions.HIT_SOURCE);
   if (hitSource && hitSource != NULL_VALUE) hit.hitSource = hitSource;
 
   if (hit.hitType == 'event') {
@@ -402,6 +400,9 @@ function serializeHit(model) {
     hit.eventAction = model.get('eventAction');
     hit.eventLabel = model.get('eventLabel');
   }
+
+  hit.hitUuid = model.get(dimensions.HIT_UUID);
+  hit.hitTime = model.get(dimensions.HIT_TIME);
 
   return Object.keys(hit)
       .map((key) => `${key}=${decodeURIComponent(hit[key])}`).join('&');

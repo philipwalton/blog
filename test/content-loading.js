@@ -10,19 +10,27 @@ const titleSuffix = ' \u2014 Philip Walton';
 describe('The content loader', () => {
 
   function getUrlPath() {
-    let {value: urlPath} = browser.execute(() => location.pathname);
+    // Don't use an arrow function since this is eval'ed in test browsers.
+    let {value: urlPath} = browser.execute(function() {
+      return location.pathname;
+    });
     return urlPath;
   }
 
 
   beforeEach(() => {
-    browser.url('/').execute(() => window.__INITIAL_PAGE_LOAD__ = true);
+    // Don't use an arrow function since this is eval'ed in test browsers.
+    browser.url('/').execute(function() {
+      return window.__INITIAL_PAGE_LOAD__ = true;
+    });
   });
 
 
   afterEach(() => {
-    let {value: isInitialPageLoad} = browser
-        .execute(() => window.__INITIAL_PAGE_LOAD__);
+    // Don't use an arrow function since this is eval'ed in test browsers.
+    let {value: isInitialPageLoad} = browser.execute(function() {
+      return window.__INITIAL_PAGE_LOAD__;
+    });
 
     assert(isInitialPageLoad);
   });
@@ -56,25 +64,29 @@ describe('The content loader', () => {
 
 
     // Navigates back to the article.
-    browser.back().getTitle();
+    browser.back();
+    browser.getTitle();
     browser.waitUntil(() =>
         browser.getTitle() == book.articles[0].title + titleSuffix &&
         getUrlPath() == book.articles[0].path);
 
     // Navigates back home.
-    browser.back().getTitle();
+    browser.back();
+    browser.getTitle();
     browser.waitUntil(() =>
         browser.getTitle() == book.pages[0].title + titleSuffix &&
         getUrlPath() == book.pages[0].path);
 
     // Navigates forward to the article.
-    browser.forward().getTitle();
+    browser.forward();
+    browser.getTitle();
     browser.waitUntil(() =>
         browser.getTitle() == book.articles[0].title + titleSuffix &&
         getUrlPath() == book.articles[0].path);
 
     // Navigates forward to the page.
-    browser.forward().getTitle();
+    browser.forward();
+    browser.getTitle();
     browser.waitUntil(() =>
         browser.getTitle() == book.pages[2].title + titleSuffix &&
         getUrlPath() == book.pages[2].path);

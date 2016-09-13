@@ -11,8 +11,11 @@ describe('The home page', () => {
 
   before(() => {
     browser.url('/').setViewportSize({width: 800, height: 600}, false);
-    let {value: href} = browser
-        .execute(() => location.protocol + '//' + location.host);
+
+    // Don't use an arrow function since this is eval'ed in test browsers.
+    let {value: href} = browser.execute(function() {
+      return location.protocol + '//' + location.host;
+    });
 
     book.site.baseUrl = href;
   });
@@ -33,7 +36,7 @@ describe('The home page', () => {
       let linkQuery = `.ArticleList-item:nth-last-child(${i}) a`;
 
       // Waits for the link to appear to reduce flakiness.
-      browser.url('/').waitForVisible(linkQuery);
+      browser.click('a[href="/"]').waitForVisible(linkQuery);
 
       let title = browser.getText(headingQuery);
       let href = browser.getAttribute(linkQuery, 'href');
@@ -53,7 +56,7 @@ describe('The home page', () => {
       let linkQuery = `.Header a[title="${page.title}"]`;
 
       // Waits for the link to appear to reduce flakiness.
-      browser.url('/').waitForVisible(linkQuery);
+      browser.click('a[href="/"]').waitForVisible(linkQuery);
 
       let href = browser.getAttribute(linkQuery, 'href');
       assert.equal(href, book.site.baseUrl + page.path);

@@ -22,6 +22,7 @@ const pngquant = require('imagemin-pngquant');
 const MarkdownIt = require('markdown-it');
 const markdownItAnchor = require('markdown-it-anchor');
 const merge = require('merge-stream');
+const ngrok = require('ngrok');
 const path = require('path');
 const seleniumServerJar = require('selenium-server-standalone-jar');
 const through = require('through2');
@@ -237,6 +238,16 @@ gulp.task('selenium', function(done) {
 });
 
 
+gulp.task('tunnel', ['serve'], function(done) {
+  ngrok.connect(9090, function(err, url) {
+    if (err) return done(err);
+
+    process.env.BASE_URL = url;
+    done();
+  });
+});
+
+
 gulp.task('watch', ['build', 'serve'], function() {
   gulp.watch('./assets/css/**/*.css', ['css']);
   gulp.watch('./assets/images/*', ['images']);
@@ -247,10 +258,11 @@ gulp.task('watch', ['build', 'serve'], function() {
 });
 
 
-gulp.task('test', ['lint', 'build', 'serve', 'selenium'], function() {
+gulp.task('test', ['lint', 'build', 'tunnel', 'selenium'], function() {
   function stopServers() {
     devServer.kill();
     seleniumServer.kill();
+    ngrok.kill();
   }
   return gulp.src('./wdio.conf.js')
       .pipe(webdriver())

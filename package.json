@@ -54,6 +54,7 @@
     "merge-stream": "^1.0.0",
     "mocha": "^3.0.1",
     "moment-timezone": "^0.5.5",
+    "ngrok": "^2.2.2",
     "normalize.css": "^4.2.0",
     "selenium-server-standalone-jar": "^2.53.1",
     "sw-helpers": "philipwalton/sw-helpers",
@@ -61,6 +62,8 @@
     "vinyl-buffer": "^1.0.0",
     "vinyl-source-stream": "^1.1.0",
     "wdio-mocha-framework": "^0.4.0",
+    "wdio-sauce-service": "^0.2.4",
+    "wdio-spec-reporter": "0.0.3",
     "webdriverio": "^4.2.3"
   }
 }

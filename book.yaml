@@ -95,3 +95,6 @@ articles:
 - title: "Untangling Deeply-Nested Promise Chains"
   path: /articles/untangling-deeply-nested-promise-chains/
   date: 2016-08-17T07:53:31-07:00
+- title: "Loading Polyfills Only When Needed"
+  path: /articles/loading-polyfills-only-when-needed/
+  date: 2016-09-10T15:53:49-07:00

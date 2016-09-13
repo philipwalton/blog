@@ -10,6 +10,12 @@
         <h1 class="Header-title">Philip Walton</h1>
         <p class="Header-tagline">Engineer @ Google</p>
       </a>
+      <button class="Header-drawerToggle UnstyledButton" id="drawer-toggle">
+        <span class="VisuallyHidden">Menu</span>
+        <svg class="Icon" viewBox="0 0 24 24">
+          <use xlink:href="#icon-menu"></use>
+        </svg>
+      </button>
       <div class="Header-drawer" id="drawer-contents">
         <div class="Drawer">
           <nav class="Drawer-site">
@@ -19,11 +25,6 @@
             {% include '_social-nav.html' %}
           </nav>
         </div>
-      </div>
-      <div class="Header-drawerToggle" id="drawer-toggle">
-        <svg class="Icon" viewBox="0 0 24 24">
-          <use xlink:href="#icon-menu"></use>
-        </svg>
       </div>
     </header>
   </div>

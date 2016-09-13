@@ -52,12 +52,9 @@
 }
 
 .Header-drawerToggle {
+  color: var(--light-text-color);
   cursor: pointer;
   display: flex;
-}
-
-.Header-drawerToggle {
-  color: var(--light-text-color);
   font-size: 1.5em;
 }
 

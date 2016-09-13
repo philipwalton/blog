@@ -17,3 +17,6 @@ __pycache__/
 
 # Python modules
 python_modules
+
+# Sauce Labs test script
+sauce.sh

@@ -1,127 +1,47 @@
 import parseUrl from 'dom-utils/lib/parse-url';
 
 
-function History2() {
+export default class History2 {
 
-  // Store the current url information.
-  this.currentPage = parseUrl(window.location.href);
-  this.currentPage.title = document.title;
+  constructor(onChange) {
+    this._onChange = onChange;
 
-  // Add history state initially so the first `popstate` event contains data.
-  history.replaceState(
-      this.currentPage,
-      this.currentPage.title,
-      this.currentPage.href);
+    const state = parseUrl(location.href);
+    state.title = document.title;
 
-  this._queue = [];
+    // Add history state initially so the first `popstate` event contains data.
+    history.replaceState(state, state.title, state.href);
 
-  // Listen for popstate changes and log them.
-  var self = this;
-  window.addEventListener('popstate', function(event) {
-    var state = event.state;
-    var title = state && state.title;
-    self.add(window.location.href, title, state, event);
-  });
-}
-
-
-History2.prototype.add = function(url, title, state, event) {
-
-  // Ignore urls pointing to the current address
-  if (url == this.currentPage.href) return;
-
-  this.nextPage = parseUrl(url);
-  this.nextPage.title = title;
-  this.nextPage.state = state;
-
-  this._processQueue(event);
-};
-
-
-/**
- * Register a plugin with the History2 instance.
- * @param {Function} plugin A plugin that runs some task and informs the next
- *     plugin in the queue when it's done.
- * @return {History2} Returns the instance.
- */
-History2.prototype.use = function(plugin) {
-  this._queue.push(plugin);
-
-  return this;
-};
-
-
-/**
- * Register a handler to catch any errors.
- * @param {Function} onError The function to handle the error.
- * @return {History2} Returns the instance.
- */
-History2.prototype.catch = function(onError) {
-  this._onError = onError;
-
-  return this;
-};
-
-
-History2.prototype._onError = function(error) {
-  // Left blank so calling `_onError` never fails.
-  console.error(error.stack);
-};
-
-
-History2.prototype._onComplete = function(event) {
-
-  if (this.nextPage.title) document.title = this.nextPage.title;
-
-  // Popstate triggered navigation is already handled by the browser,
-  // so we only add to the history in non-popstate cases.
-  if (!(event && event.type == 'popstate')) {
-    history.pushState(
-        this.nextPage,
-        this.nextPage.title,
-        this.nextPage.href);
+    // Listen for popstate changes and log them.
+    window.addEventListener('popstate', (event) => {
+      const {state = {}} = event;
+      const {title} = state;
+      const url = window.location.href;
+      this.add({url, title, state, isPopState: true});
+    });
   }
 
-  // Update the last url to the current url
-  this.currentPage = this.nextPage;
-  this.nextPage = null;
-};
 
-
-History2.prototype._processQueue = function(event) {
-  var self = this;
-  var i = 0;
-
-  (function next() {
-
-    var plugin = self._queue[i++];
-    var isSync = plugin && !plugin.length;
-
-    if (!plugin) return self._onComplete(event);
-
-    // The callback for async plugins.
-    function done(error) {
-      if (error) {
-        self._onError(error);
-      }
-      else {
-        next();
+  add({url, title, isPopState}) {
+    // Non-popstate `add()` calls should not generate a history entry if the
+    // new URL points to the same resource.
+    if (!isPopState) {
+      const currentPage = parseUrl(location.href);
+      if (url == currentPage.href) {
+        return Promise.resolve(null);
       }
     }
 
-    try {
-      plugin.apply(self, isSync ? [] : [done]);
-    }
-    catch(error) {
-      return self._onError(error);
-    }
+    const nextPage = parseUrl(url);
+    nextPage.title = title;
 
-    // Sync plugins are done by now and can immediately process
-    // the next item in the queue.
-    if (isSync) next();
-
-  }());
-};
-
-
-export default History2;
+    return this._onChange(nextPage).then(() => {
+      // Popstate triggered navigation is already handled by the browser,
+      // so we only add to the history in non-popstate cases.
+      if (!isPopState) {
+        history.pushState(nextPage, title, nextPage.href);
+      }
+      document.title = title ? title : document.title;
+    });
+  }
+}

@@ -4,9 +4,7 @@ import contentLoader from './content-loader';
 import drawer from './drawer';
 
 
-alerts.init();
-contentLoader.init();
-drawer.init();
+const POLYFILL_PATH = '/assets/javascript/polyfills.js';
 
 
 // Delays running any analytics or registering the service worker
@@ -19,3 +17,30 @@ window.onload = function() {
         .catch(analytics.trackError);
   }
 };
+
+
+window.main = function() {
+  alerts.init();
+  contentLoader.init();
+  drawer.init();
+};
+
+
+function supportsAllRequiredApis() {
+  return window.Promise && window.fetch && window.Symbol;
+}
+
+
+function loadPolyfills() {
+  var js = document.createElement('script');
+  var fjs = document.getElementsByTagName('script')[0];
+  js.src = POLYFILL_PATH;
+  fjs.parentNode.insertBefore(js, fjs);
+}
+
+
+if (supportsAllRequiredApis()) {
+  window.main();
+} else {
+  loadPolyfills();
+}

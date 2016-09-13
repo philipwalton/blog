@@ -144,7 +144,7 @@ gulp.task('css', function() {
 });
 
 
-gulp.task('javascript', function(done) {
+gulp.task('javascript:main', function(done) {
   let entry = './assets/javascript/main.js';
   browserify(entry, {
     debug: true,
@@ -153,13 +153,8 @@ gulp.task('javascript', function(done) {
   .transform(babelify, {presets: ['es2015']})
   .transform(envify)
   .bundle()
-
-  // TODO(philipwalton): Add real error handling.
-  // This temporary hack fixes an issue with tasks not restarting in
-  // watch mode after a syntax error is fixed.
   .on('error', (err) => {gutil.beep(); done(err); })
   .on('end', done)
-
   .pipe(source(entry))
   .pipe(buffer())
   .pipe(sourcemaps.init({loadMaps: true}))
@@ -167,6 +162,22 @@ gulp.task('javascript', function(done) {
   .pipe(sourcemaps.write('./'))
   .pipe(gulp.dest(DEST));
 });
+
+
+gulp.task('javascript:polyfills', function(done) {
+  let entry = './assets/javascript/polyfills.js';
+  browserify(entry)
+  .bundle()
+  .on('error', (err) => {gutil.beep(); done(err); })
+  .on('end', done)
+  .pipe(source(entry))
+  .pipe(buffer())
+  .pipe(gulpIf(isProd(), uglify()))
+  .pipe(gulp.dest(DEST));
+});
+
+
+gulp.task('javascript', ['javascript:main', 'javascript:polyfills']);
 
 
 gulp.task('static', function() {
@@ -251,7 +262,9 @@ gulp.task('tunnel', ['serve'], function(done) {
 gulp.task('watch', ['build', 'serve'], function() {
   gulp.watch('./assets/css/**/*.css', ['css']);
   gulp.watch('./assets/images/*', ['images']);
-  gulp.watch('./assets/javascript/*', ['javascript']);
+  gulp.watch(['./assets/javascript/*', '!./assets/javascript/polyfills.js'],
+      ['javascript:main']);
+  gulp.watch(['./assets/javascript/polyfills.js'], ['javascript:polyfills']);
   gulp.watch('./assets/favicon.ico', ['static']);
   gulp.watch(['./assets/sw.js'], ['service-worker']);
   gulp.watch(['./articles/*'], ['content']);

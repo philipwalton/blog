@@ -28,6 +28,7 @@
     "babel-preset-es2015": "^6.9.0",
     "babelify": "^7.3.0",
     "browserify": "^13.1.0",
+    "core-js": "^2.4.1",
     "cssnext": "^1.8.4",
     "del": "^2.2.1",
     "dom-utils": "^0.2.2",
@@ -63,7 +64,7 @@
     "vinyl-source-stream": "^1.1.0",
     "wdio-mocha-framework": "^0.4.0",
     "wdio-sauce-service": "^0.2.4",
-    "wdio-spec-reporter": "0.0.3",
-    "webdriverio": "^4.2.3"
+    "webdriverio": "^4.2.3",
+    "whatwg-fetch": "^1.0.0"
   }
 }

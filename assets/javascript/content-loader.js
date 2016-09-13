@@ -26,44 +26,44 @@ function getMainContent(content) {
 }
 
 
-function loadPageContent(done) {
-  var path = this.nextPage.path;
-  if (pageCache[path]) return done();
-
-  var xhr = new XMLHttpRequest();
-  xhr.open('GET', path);
-  xhr.onload = function() {
-    if (xhr.status >= 200 && xhr.status < 400) {
-      let content = getMainContent(xhr.responseText);
+function loadPageContent(path) {
+  if (pageCache[path]) {
+    return Promise.resolve(pageCache[path]);
+  } else {
+    return fetch(path).then((response) => {
+      if (response.ok) {
+        return response.text();
+      } else {
+        throw new Error(
+            `Response: (${response.status}) ${response.statusText}`);
+      }
+    })
+    .then((body) => {
+      let content = getMainContent(body);
       if (!content) {
-        done(new Error(`Could not parse content from response: ${path}`));
+        throw new Error(`Could not parse content from response: ${path}`);
       }
       else {
-        pageCache[path] = content;
-        done();
+        return pageCache[path] = content;
       }
-    }
-    else {
+    })
+    .catch((err) => {
+      let message = (err instanceof TypeError) ?
+          'Check your network connection to ensure you\'re still online.' :
+          err.message;
+
       alerts.add({
         title: `Oops, there was an error making your request`,
-        body: `(${xhr.status}) ${xhr.statusText}`
+        body: message
       });
-      done(new Error(`(${xhr.status})' ${path}`));
-    }
-  };
-  xhr.onerror = function() {
-    alerts.add({
-      title: `Oops, there was an error making your request`,
-      body: `Check your network connection to ensure you're still online.`
+      // Rethrow to be able to catch it again in an outer scope.
+      throw err;
     });
-    done(new Error(`Error making request to: ${path}`));
-  };
-  xhr.send();
+  }
 }
 
 
-function showPageContent() {
-  var content = pageCache[this.nextPage.path];
+function showPageContent(content) {
   container.innerHTML = content;
 }
 
@@ -73,8 +73,7 @@ function closeDrawer() {
 }
 
 
-function setScroll() {
-  var hash = this.nextPage.hash;
+function setScroll(hash) {
   if (hash) {
     var target = document.getElementById(hash.slice(1));
   }
@@ -98,14 +97,17 @@ module.exports = {
     container = document.querySelector('main');
     pageCache[location.pathname] = container.innerHTML;
 
-    var history2 = new History2()
-        .use(loadPageContent)
-        .use(showPageContent)
-        .use(closeDrawer)
-        .use(setScroll)
-        .catch(trackError);
 
-    delegate(document, 'click', 'a[href]', function(event) {
+    var history2 = new History2((state) => {
+      return loadPageContent(state.path)
+          .then((content) => showPageContent(content))
+          .then(() => closeDrawer())
+          .then(() => setScroll(state.hash))
+          .catch((err) => trackError(err));
+    });
+
+
+    delegate(document, 'click', 'a[href]', function(event, delegateTarget) {
 
       // Don't load content if the user is doing anything other than a normal
       // left click to open a page in the same window.
@@ -123,7 +125,7 @@ module.exports = {
           event.which > 1) return;
 
       var page = parseUrl(location.href);
-      var link = parseUrl(this.href);
+      var link = parseUrl(delegateTarget.href);
 
       // Don't do anything when clicking on links to the current URL.
       if (link.href == page.href) event.preventDefault();
@@ -132,7 +134,10 @@ module.exports = {
       // prevent the browser from navigating there and load the page via ajax.
       if ((link.origin == page.origin) && (link.path != page.path)) {
         event.preventDefault();
-        history2.add(link.href, getTitle(this));
+        history2.add({
+          url: link.href,
+          title: getTitle(delegateTarget)
+        });
       }
     });
   }

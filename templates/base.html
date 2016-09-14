@@ -5,7 +5,7 @@
 </head>
 <body class="Site">
   <div class="Site-header">
-    <header class="Header" id="drawer-container">
+    <header class="Header" id="header">
       <a class="Header-info" href="/" title="Home">
         <h1 class="Header-title">Philip Walton</h1>
         <p class="Header-tagline">Engineer @ Google</p>
@@ -16,14 +16,16 @@
           <use xlink:href="#icon-menu"></use>
         </svg>
       </button>
-      <div class="Header-drawer" id="drawer-contents">
-        <div class="Drawer">
-          <nav class="Drawer-site">
-            {% include '_site-nav.html' %}
-          </nav>
-          <nav class="Drawer-social">
-            {% include '_social-nav.html' %}
-          </nav>
+      <div class="Header-drawer">
+        <div class="Drawer Drawer--closed" id="drawer">
+          <div class="Drawer-content">
+            <nav class="Drawer-social">
+              {% include '_social-nav.html' %}
+            </nav>
+            <nav class="Drawer-site">
+              {% include '_site-nav.html' %}
+            </nav>
+          </div>
         </div>
       </div>
     </header>

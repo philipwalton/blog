@@ -1,4 +1,33 @@
 .Drawer {
+  box-shadow: var(--shadow);
+  transform: translate3d(0, 0, 0);
+  transition: transform .25s var(--quantum-easing),
+              opacity .25s var(--quantum-easing);
+}
+
+.Drawer--closed {
+  visibility: hidden;
+}
+.Drawer--open {
+  opacity: 1;
+  transform: translate3d(0, 100%, 0);
+}
+
+.Drawer--opening,
+.Drawer--closing {
+  visibility: visible;
+}
+
+.Drawer--closing {
+  opacity: 0;
+  transform: translate3d(0, 0, 0);
+}
+.Drawer--opening {
+  opacity: 1;
+  transform: translate3d(0, 100%, 0);
+}
+
+.Drawer-content {
   align-items: center;
 
   /*background: #fff;*/
@@ -14,18 +43,20 @@
   flex: 1 0 0%;
 }
 
-.Drawer-social {
-  order: -1;
-}
-
 @media (--break-md) {
-  .Drawer {
+  .Drawer-content {
     padding: var(--vgap-md) var(--hgap-md);
   }
 }
 
 @media (--break-lg) {
   .Drawer {
+    box-shadow: none;
+    transform: translate3d(0, 0, 0);
+    transition: none;
+    visibility: visible;
+  }
+  .Drawer-content {
     padding: 0;
   }
   .Drawer-site {

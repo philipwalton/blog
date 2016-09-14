@@ -9,7 +9,7 @@
   transition: border-color .5s var(--quantum-easing),
               box-shadow .5s var(--quantum-easing);
 }
-.is-drawerOpen .Header {
+.Header--drawerOpen {
   box-shadow: var(--shadow);
 }
 
@@ -35,20 +35,11 @@
 }
 
 .Header-drawer {
-  z-index: -1;
-  position: absolute;
-  left: 0;
-  right: 0;
   bottom: 0;
-  opacity: 0;
-  transform: translate3d(0, 0, 0);
-  transition: transform .25s var(--quantum-easing),
-              opacity .25s var(--quantum-easing);
-}
-.is-drawerOpen .Header-drawer {
-  box-shadow: var(--shadow);
-  opacity: 1;
-  transform: translate3d(0, 100%, 0);
+  left: 0;
+  position: absolute;
+  right: 0;
+  z-index: -1;
 }
 
 .Header-drawerToggle {
@@ -67,9 +58,12 @@
 @media (--break-lg) {
   .Header {
     background: var(--bg-color);
+    transition: transform .25s var(--quantum-easing),
+                  opacity .25s var(--quantum-easing);
+
     padding: var(--vgap-lg) var(--hgap-lg);
   }
-  .is-drawerOpen .Header {
+  .Header--drawerOpen {
     box-shadow: none;
   }
   .Header-info {
@@ -89,13 +83,7 @@
   }
   .Header-drawer {
     flex: 2 0 0%;
-    opacity: 1;
     position: static;
-    transition: none;
     z-index: 0;
-  }
-  .is-drawerOpen .Header-drawer {
-    box-shadow: none;
-    transform: translate3d(0,0%,0);
   }
 }

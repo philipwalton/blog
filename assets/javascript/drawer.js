@@ -2,7 +2,26 @@ import closest from 'dom-utils/lib/closest';
 
 
 var drawerToggle = document.getElementById('drawer-toggle');
+var drawer = document.getElementById('drawer');
+var header = document.getElementById('header');
+
 var isOpen = false;
+
+const TRANSITION_END = (function getTransitionEndEvent() {
+  const transitionStylePropToEventNameMap = {
+    transition: 'transitionend',
+    WebkitTransition: 'webkitTransitionEnd',
+    MozTransition: 'transitionend',
+    OTransition: 'oTransitionEnd',
+  }
+  const html = document.documentElement;
+  for (let prop in transitionStylePropToEventNameMap) {
+    if (html.style[prop] !== undefined) {
+      return transitionStylePropToEventNameMap[prop];
+    }
+  }
+  return 'transitionend'; // Fallback to the standard event.
+}());
 
 
 function addClass(element, className) {
@@ -39,6 +58,8 @@ function removeClass(element, className) {
 }
 
 
+
+
 function handleDrawerToggleClick(event) {
   event.preventDefault();
   isOpen ? close() : open();
@@ -47,19 +68,40 @@ function handleDrawerToggleClick(event) {
 
 function handleClickOutsideDrawerContainer(event) {
   // Closes an open menu if the user clicked outside of the nav element.
-  if (isOpen && !closest(event.target, '#drawer-container', true)) close();
+  if (isOpen && !closest(event.target, '#header', true)) close();
 }
 
 
 function open() {
   isOpen = true;
-  addClass(document.documentElement, 'is-drawerOpen');
+
+  drawer.addEventListener(TRANSITION_END, function fn() {
+    removeClass(drawer, 'Drawer--opening');
+    removeClass(drawer, 'Drawer--closed');
+    addClass(drawer, 'Drawer--open');
+
+    drawer.removeEventListener(TRANSITION_END, fn);
+  });
+
+  addClass(drawer, 'Drawer--opening');
+  addClass(header, 'Header--drawerOpen');
 }
 
 
 function close() {
   isOpen = false;
-  removeClass(document.documentElement, 'is-drawerOpen');
+
+  drawer.addEventListener(TRANSITION_END, function fn() {
+    removeClass(drawer, 'Drawer--closing');
+    removeClass(drawer, 'Drawer--open');
+    addClass(drawer, 'Drawer--closed');
+
+    drawer.removeEventListener(TRANSITION_END, fn);
+  });
+
+
+  addClass(drawer, 'Drawer--closing');
+  removeClass(header, 'Header--drawerOpen');
 }
 
 

@@ -1,31 +1,18 @@
 import closest from 'dom-utils/lib/closest';
+import {getActiveBreakpoint} from './breakpoints';
 
 
-var drawerToggle = document.getElementById('drawer-toggle');
-var drawer = document.getElementById('drawer');
-var header = document.getElementById('header');
+const TRANSITION_DURATION = 250;
+const drawerToggle = document.getElementById('drawer-toggle');
+const drawer = document.getElementById('drawer');
+const header = document.getElementById('header');
 
-var isOpen = false;
 
-const TRANSITION_END = (function getTransitionEndEvent() {
-  const transitionStylePropToEventNameMap = {
-    transition: 'transitionend',
-    WebkitTransition: 'webkitTransitionEnd',
-    MozTransition: 'transitionend',
-    OTransition: 'oTransitionEnd',
-  }
-  const html = document.documentElement;
-  for (let prop in transitionStylePropToEventNameMap) {
-    if (html.style[prop] !== undefined) {
-      return transitionStylePropToEventNameMap[prop];
-    }
-  }
-  return 'transitionend'; // Fallback to the standard event.
-}());
+let isOpen = false;
 
 
 function addClass(element, className) {
-  var cls = element.className;
+  const cls = element.className;
   if (!cls) {
     element.className = className;
     return;
@@ -40,12 +27,12 @@ function addClass(element, className) {
 
 
 function removeClass(element, className) {
-  var cls = element.className;
+  const cls = element.className;
   if (cls.indexOf(className) < 0) return;
 
-  var prevClasses = cls.split(/\s/);
-  var newClasses = [];
-  for (var i = 0, len = prevClasses.length; i < len; i++) {
+  const prevClasses = cls.split(/\s/);
+  const newClasses = [];
+  for (let i = 0, len = prevClasses.length; i < len; i++) {
     if (className != prevClasses[i]) newClasses.push(prevClasses[i]);
   }
 
@@ -56,8 +43,6 @@ function removeClass(element, className) {
     element.className = newClasses.join(' ');
   }
 }
-
-
 
 
 function handleDrawerToggleClick(event) {
@@ -73,35 +58,37 @@ function handleClickOutsideDrawerContainer(event) {
 
 
 function open() {
-  isOpen = true;
+  if (drawerIsUsable()) {
+    isOpen = true;
+    setTimeout(function fn() {
+      removeClass(drawer, 'Drawer--opening');
+      removeClass(drawer, 'Drawer--closed');
+      addClass(drawer, 'Drawer--open');
+    }, TRANSITION_DURATION);
 
-  drawer.addEventListener(TRANSITION_END, function fn() {
-    removeClass(drawer, 'Drawer--opening');
-    removeClass(drawer, 'Drawer--closed');
-    addClass(drawer, 'Drawer--open');
-
-    drawer.removeEventListener(TRANSITION_END, fn);
-  });
-
-  addClass(drawer, 'Drawer--opening');
-  addClass(header, 'Header--drawerOpen');
+    addClass(drawer, 'Drawer--opening');
+    addClass(header, 'Header--drawerOpen');
+  }
 }
 
 
 function close() {
-  isOpen = false;
+  if (drawerIsUsable()) {
+    isOpen = false;
+    setTimeout(function fn() {
+      removeClass(drawer, 'Drawer--closing');
+      removeClass(drawer, 'Drawer--open');
+      addClass(drawer, 'Drawer--closed');
+    }, TRANSITION_DURATION);
 
-  drawer.addEventListener(TRANSITION_END, function fn() {
-    removeClass(drawer, 'Drawer--closing');
-    removeClass(drawer, 'Drawer--open');
-    addClass(drawer, 'Drawer--closed');
-
-    drawer.removeEventListener(TRANSITION_END, fn);
-  });
+    addClass(drawer, 'Drawer--closing');
+    removeClass(header, 'Header--drawerOpen');
+  }
+}
 
 
-  addClass(drawer, 'Drawer--closing');
-  removeClass(header, 'Header--drawerOpen');
+function drawerIsUsable() {
+  return getActiveBreakpoint().name != 'lg';
 }
 
 

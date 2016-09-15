@@ -5,6 +5,7 @@ import 'autotrack/lib/plugins/media-query-tracker';
 import 'autotrack/lib/plugins/outbound-link-tracker';
 import 'autotrack/lib/plugins/page-visibility-tracker';
 import 'autotrack/lib/plugins/url-change-tracker';
+import {breakpoints} from './breakpoints';
 
 
 import {
@@ -164,11 +165,7 @@ function requirePlugins() {
       {
         name: 'Breakpoint',
         dimensionIndex: getDefinitionIndex(dimensions.BREAKPOINT),
-        items: [
-          {name: 'sm', media: 'all'},
-          {name: 'md', media: '(min-width: 36em)'},
-          {name: 'lg', media: '(min-width: 48em)'}
-        ]
+        items: breakpoints
       },
       {
         name: 'Resolution',

@@ -52,6 +52,7 @@
 @media (--break-lg) {
   .Drawer {
     box-shadow: none;
+    opacity: 1;
     transform: translate3d(0, 0, 0);
     transition: none;
     visibility: visible;

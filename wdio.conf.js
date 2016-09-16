@@ -65,11 +65,11 @@ exports.config = {
   baseUrl: process.env.BASE_URL || 'http://localhost:9090',
   //
   // Default timeout for all waitFor* commands.
-  waitforTimeout: 1e5,
+  waitforTimeout: 1e4,
   //
   // Default timeout in milliseconds for request
   // if Selenium Grid doesn't send response
-  connectionRetryTimeout: 1e5,
+  connectionRetryTimeout: 1e4,
   //
   // Default request retries count
   connectionRetryCount: 3,
@@ -195,14 +195,14 @@ function getCapabilities() {
 
   if (isSauceLabs) {
     capabilities = [
-      {
-        browserName: 'chrome',
-        platform: 'Windows 10'
-      },
+      // {
+      //   browserName: 'chrome',
+      //   platform: 'Windows 10',
+      // },
       // {
       //   browserName: 'firefox',
       //   platform: 'OS X 10.11',
-      //   version: '46' // TODO(philipwalton): 47 has issues, use 46 until fixed.
+      //   version: '46', // TODO(philipwalton): 47 has issues, use 46 until fixed.
       // },
       // {
       //   browserName: 'safari',
@@ -212,25 +212,25 @@ function getCapabilities() {
       // {
       //   browserName: 'safari',
       //   platform: 'OS X 10.8',
-      //   version: '6'
+      //   version: '6',
       // },
       // TODO(philipwalton) Edge webdriver is too flaky to support at this time.
       // Wait for full support and then re-add:
       // https://dev.windows.com/en-us/microsoft-edge/platform/status/webdriver/details/
       // {
       //   browserName: 'MicrosoftEdge',
-      //   platform: 'Windows 10'
+      //   platform: 'Windows 10',
       // },
       // {
       //   browserName: 'internet explorer',
       //   platform: 'Windows 8.1',
-      //   version: '11'
+      //   version: '11',
       // },
-      // {
-      //   browserName: 'internet explorer',
-      //   platform: 'Windows 8',
-      //   version: '10'
-      // },
+      {
+        browserName: 'internet explorer',
+        platform: 'Windows 8',
+        version: '10',
+      },
     ];
 
     capabilities.forEach(function(cap) {

@@ -52,8 +52,10 @@ function handleDrawerToggleClick(event) {
 
 
 function handleClickOutsideDrawerContainer(event) {
-  // Closes an open menu if the user clicked outside of the nav element.
-  if (isOpen && !closest(event.target, '#header', true)) close();
+  // Closes an open drawer if the user clicked outside of the nav element.
+  if (isOpen && drawerIsUsable() && !closest(event.target, '#header', true)) {
+    close();
+  }
 }
 
 

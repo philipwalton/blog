@@ -102,7 +102,8 @@ describe('The content loader', () => {
 
 
   it('should jump to an anchor for URLs with hash fragments', () => {
-    // Adds a hash fragments to an article URL
+    // Adds a hash fragments to an article URL.
+    // Don't use an arrow function since this is eval'ed in test browsers.
     browser.execute(function() {
       document.querySelector('.ArticleList-item:last-child a').href += '#share';
     }).click('.ArticleList-item:last-child a').waitForVisible('#share');

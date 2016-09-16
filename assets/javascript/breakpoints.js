@@ -17,7 +17,7 @@ function handleChanges() {
 }
 
 
-function init() {
+export function init() {
   for (let breakpoint of breakpoints) {
     breakpoint.mql = window.matchMedia(breakpoint.media);
     breakpoint.mql.addListener(handleChanges);
@@ -31,6 +31,3 @@ function init() {
 export function getActiveBreakpoint() {
   return activeBreakpoint;
 }
-
-
-init();

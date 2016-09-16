@@ -21,8 +21,15 @@ describe('The home page', () => {
   });
 
 
+  beforeEach(() => {
+    if (browser.url().value != '/') {
+      browser.click('a[href="/"]');
+    }
+  });
+
+
   it('should have the right title', () => {
-    let actualTitle = browser.url('/').getTitle();
+    let actualTitle = browser.getTitle();
     let expectedTitle = book.pages[0].title + titleSuffix;
     assert.equal(actualTitle, expectedTitle);
   });

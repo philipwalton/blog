@@ -22,7 +22,7 @@ describe('Navigation drawer', () => {
   it('should show the nav links but no menu icon on large screens', () => {
     browser
         .setViewportSize({width: 800, height: 600}, false)
-        .waitForVisible('#drawer-contents');
+        .waitForVisible('#drawer');
 
     assert(!browser.isVisible('#drawer-toggle'));
   });
@@ -32,7 +32,7 @@ describe('Navigation drawer', () => {
     browser
         .setViewportSize({width: 375, height: 627}, false)
         .click('#drawer-toggle')
-        .waitForVisible('#drawer-contents');
+        .waitForVisible('#drawer');
   });
 
 
@@ -40,11 +40,11 @@ describe('Navigation drawer', () => {
     browser
         .setViewportSize({width: 375, height: 627}, false)
         .click('#drawer-toggle')
-        .waitForVisible('#drawer-contents');
+        .waitForVisible('#drawer');
 
     browser
         .click('#drawer-toggle')
-        .waitUntil(() => !browser.isVisible('#drawer-contents'));
+        .waitUntil(() => !browser.isVisible('#drawer'));
   });
 
 
@@ -59,7 +59,7 @@ describe('Navigation drawer', () => {
     browser.waitUntil(() =>
         browser.getTitle() == book.pages[2].title + titleSuffix);
 
-    browser.waitUntil(() => !browser.isVisible('#drawer-contents'));
+    browser.waitUntil(() => !browser.isVisible('#drawer'));
   });
 
 
@@ -68,11 +68,11 @@ describe('Navigation drawer', () => {
 
     browser
         .click('#drawer-toggle')
-        .waitForVisible('#drawer-contents');
+        .waitForVisible('#drawer');
 
     browser
         .click('body')
-        .waitUntil(() => !browser.isVisible('#drawer-contents'));
+        .waitUntil(() => !browser.isVisible('#drawer'));
   });
 
 });

@@ -8,7 +8,7 @@ import drawer from './drawer';
 const POLYFILL_PATH = '/assets/javascript/polyfills.js';
 
 
-window.main = function() {
+function main() {
   alerts.init();
   breakpoints.init();
   contentLoader.init();
@@ -27,21 +27,22 @@ window.main = function() {
 };
 
 
-function supportsAllRequiredApis() {
+function browserSupportsAllFeatures() {
   return window.Promise && window.fetch && window.Symbol;
 }
 
 
-function loadPolyfills() {
+function loadScript(src, callback) {
   var js = document.createElement('script');
   var fjs = document.getElementsByTagName('script')[0];
-  js.src = POLYFILL_PATH;
+  js.src = src;
+  js.onload = callback;
   fjs.parentNode.insertBefore(js, fjs);
 }
 
 
-if (supportsAllRequiredApis()) {
-  window.main();
+if (browserSupportsAllFeatures()) {
+  main();
 } else {
-  loadPolyfills();
+  loadScript(POLYFILL_PATH, main);
 }

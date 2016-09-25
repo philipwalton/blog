@@ -12,7 +12,7 @@ import {
   getStoredData,
   getStoredTrackerData,
   setStoredData,
-  setStoredTrackerData
+  setStoredTrackerData,
 } from './analytics-storage';
 
 
@@ -22,7 +22,7 @@ import {
  */
 const ALL_TRACKERS = shuffleArray([
   {name: 't0', trackingId: 'UA-21292978-1'},
-  {name: 'testing', trackingId: 'UA-21292978-3'}
+  {name: 'testing', trackingId: 'UA-21292978-3'},
 ]);
 
 
@@ -33,7 +33,7 @@ const NULL_VALUE = '(not set)';
 
 const metrics = {
   PAGE_VISIBLE: 'metric1',
-  PAGE_HIDDEN: 'metric2'
+  PAGE_HIDDEN: 'metric2',
 };
 
 
@@ -115,7 +115,7 @@ function trackErrors() {
     gaAll('send', 'event', {
       eventCategory: 'Script',
       eventAction: 'uncaught error',
-      eventLabel: error ? error.stack : `${msg}\n${file}:${line}:${col}`
+      eventLabel: error ? error.stack : `${msg}\n${file}:${line}:${col}`,
     });
   };
 
@@ -138,13 +138,13 @@ function requirePlugins() {
     stripQuery: true,
     queryDimensionIndex: getDefinitionIndex(dimensions.URL_QUERY_PARAMS),
     indexFilename: 'index.html',
-    trailingSlash: 'add'
+    trailingSlash: 'add',
   });
   gaAll('require', 'eventTracker');
   gaAll('require', 'impressionTracker', {
     elements: [{
       id: 'share',
-      trackFirstImpressionOnly: false
+      trackFirstImpressionOnly: false,
     }],
     hitFilter: (function() {
       let page = null;
@@ -152,58 +152,57 @@ function requirePlugins() {
         if (page == model.get('page')) {
           // Throw to abort hit since an impression for this page
           // was already tracked.
-          throw 0;
-        }
-        else {
+          throw new Error();
+        } else {
           page = model.get('page');
         }
       };
-    }())
+    }()),
   });
   gaAll('require', 'mediaQueryTracker', {
     definitions: [
       {
         name: 'Breakpoint',
         dimensionIndex: getDefinitionIndex(dimensions.BREAKPOINT),
-        items: breakpoints
+        items: breakpoints,
       },
       {
         name: 'Resolution',
         dimensionIndex: getDefinitionIndex(dimensions.RESOLUTION),
         items: [
-          {name: '1x',   media: 'all'},
+          {name: '1x', media: 'all'},
           {name: '1.5x', media: '(-webkit-min-device-pixel-ratio: 1.5), ' +
                                 '(min-resolution: 144dpi)'},
-          {name: '2x',   media: '(-webkit-min-device-pixel-ratio: 2), ' +
-                                '(min-resolution: 192dpi)'}
-        ]
+          {name: '2x', media: '(-webkit-min-device-pixel-ratio: 2), ' +
+                              '(min-resolution: 192dpi)'},
+        ],
       },
       {
         name: 'Orientation',
         dimensionIndex: getDefinitionIndex(dimensions.ORIENTATION),
         items: [
           {name: 'landscape', media: '(orientation: landscape)'},
-          {name: 'portrait',  media: '(orientation: portrait)'}
-        ]
-      }
-    ]
+          {name: 'portrait', media: '(orientation: portrait)'},
+        ],
+      },
+    ],
   });
   gaAll('require', 'outboundLinkTracker', {
-    events: ['click', 'contextmenu']
+    events: ['click', 'contextmenu'],
   });
   gaAll('require', 'pageVisibilityTracker', {
     visibleMetricIndex: getDefinitionIndex(metrics.PAGE_VISIBLE),
     hiddenMetricIndex: getDefinitionIndex(metrics.PAGE_HIDDEN),
     fieldsObj: {
       nonInteraction: null, // Ensure all events are interactive.
-      [dimensions.HIT_SOURCE]: 'pageVisibilityTracker'
+      [dimensions.HIT_SOURCE]: 'pageVisibilityTracker',
     },
     hitFilter: function(model) {
       model.set(dimensions.METRIC_VALUE, String(model.get('eventValue')), true);
-    }
+    },
   });
   gaAll('require', 'urlChangeTracker', {
-    fieldsObj: {[dimensions.HIT_SOURCE]: 'urlChangeTracker'}
+    fieldsObj: {[dimensions.HIT_SOURCE]: 'urlChangeTracker'},
   });
 }
 
@@ -291,7 +290,7 @@ function measureCssBlockTime() {
       eventLabel: 'local',
       eventValue: cssUnblockTime,
       nonInteraction: true,
-      [dimensions.METRIC_VALUE]: String(cssUnblockTime)
+      [dimensions.METRIC_VALUE]: String(cssUnblockTime),
     });
   }
 }
@@ -305,7 +304,7 @@ function measureJavaSciptLoadTime() {
       eventLabel: 'local',
       eventValue: jsExecuteTime,
       nonInteraction: true,
-      [dimensions.METRIC_VALUE]: String(jsExecuteTime)
+      [dimensions.METRIC_VALUE]: String(jsExecuteTime),
     });
   }
 }
@@ -318,8 +317,7 @@ function measureWebfontPerfAndFailures() {
       let success = loaded && !loaded[1]; // No "in" in the capture group.
       if (loaded) {
         success ? resolve() : reject();
-      }
-      else {
+      } else {
         let originalAciveCallback = window.WebFontConfig.active;
         window.WebFontConfig.inactive = reject;
         window.WebFontConfig.active = function() {
@@ -329,8 +327,7 @@ function measureWebfontPerfAndFailures() {
         // In case the webfont.js script failed to load.
         setTimeout(reject, window.WebFontConfig.timeout);
       }
-    })
-    .then(function() {
+    }).then(function() {
       let fontsActiveTime = measureDuration('fonts:active');
       if (fontsActiveTime) {
         // Tracks the amount of time the web fonts take to activate.
@@ -338,11 +335,10 @@ function measureWebfontPerfAndFailures() {
           eventLabel: 'google',
           eventValue: fontsActiveTime,
           nonInteraction: true,
-          [dimensions.METRIC_VALUE]: String(fontsActiveTime)
+          [dimensions.METRIC_VALUE]: String(fontsActiveTime),
         });
       }
-    })
-    .catch(function() {
+    }).catch(function() {
       gaTest('send', 'event', 'Fonts', 'error', 'google');
     });
   }
@@ -374,8 +370,7 @@ function createGaProxy(trackers) {
         window.ga(function() {
           command(window.ga.getByName(name));
         });
-      }
-      else {
+      } else {
         window.ga(`${name}.${command}`, ...args);
       }
     }

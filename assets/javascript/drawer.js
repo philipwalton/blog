@@ -16,11 +16,9 @@ function addClass(element, className) {
   if (!cls) {
     element.className = className;
     return;
-  }
-  else if (cls.indexOf(className) > -1) {
+  } else if (cls.indexOf(className) > -1) {
     return;
-  }
-  else {
+  } else {
     element.className = cls + ' ' + className;
   }
 }
@@ -38,8 +36,7 @@ function removeClass(element, className) {
 
   if (!newClasses.length) {
     element.removeAttribute('class');
-  }
-  else {
+  } else {
     element.className = newClasses.join(' ');
   }
 }
@@ -103,5 +100,5 @@ export default {
     document.addEventListener('touchend', handleClickOutsideDrawerContainer);
   },
   open: open,
-  close: close
+  close: close,
 };

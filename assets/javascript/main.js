@@ -24,7 +24,7 @@ function main() {
           .catch(analytics.trackError);
     }
   };
-};
+}
 
 
 function browserSupportsAllFeatures() {
@@ -33,8 +33,8 @@ function browserSupportsAllFeatures() {
 
 
 function loadScript(src, callback) {
-  var js = document.createElement('script');
-  var fjs = document.getElementsByTagName('script')[0];
+  const js = document.createElement('script');
+  const fjs = document.getElementsByTagName('script')[0];
   js.src = src;
   js.onload = callback;
   fjs.parentNode.insertBefore(js, fjs);

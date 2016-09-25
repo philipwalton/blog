@@ -7,7 +7,7 @@ const CACHE_NAME = 'philipwalton:v1';
 
 // Maps relevant custom dimension names to their index.
 const dimensions = {
-  SERVICE_WORKER_REPLAY: 'cd8'
+  SERVICE_WORKER_REPLAY: 'cd8',
 };
 
 
@@ -15,7 +15,7 @@ const assetUrlParts = [
   new RegExp('^' + location.origin),
   /^https?:\/\/fonts\.googleapis\.com/,
   /^https?:\/\/www\.gstatic\.com/,
-  /^https?:\/\/www\.google\-analytics\.com\/analytics\.js/
+  /^https?:\/\/www\.google\-analytics\.com\/analytics\.js/,
 ];
 
 
@@ -34,8 +34,8 @@ const cacheInitialAssets = async () => {
     cache.addAll([
       '/',
       '/assets/css/main.css',
-      '/assets/javascript/main.js'
-    ])
+      '/assets/javascript/main.js',
+    ]),
   ];
 };
 
@@ -83,5 +83,5 @@ self.addEventListener('activate', (event) => {
 
 
 offlineGoogleAnalytics.initialize({
-  parameterOverrides: {[dimensions.SERVICE_WORKER_REPLAY]: 'replay'}
+  parameterOverrides: {[dimensions.SERVICE_WORKER_REPLAY]: 'replay'},
 });

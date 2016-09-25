@@ -5,24 +5,21 @@ const yaml = require('js-yaml');
 const book = yaml.safeLoad(fs.readFileSync('./book.yaml', 'utf-8'));
 
 
-describe('Code syntax highlighting', function() {
-
-
-  beforeEach(function() {
-    let specificityArticle = book.articles.find((article) =>
-        article.path.indexOf('do-we-actually-need-specificity-in-css') > -1);
+describe('Code syntax highlighting', () => {
+  beforeEach(() => {
+    const specificityArticleSlug = 'do-we-actually-need-specificity-in-css';
+    const specificityArticle = book.articles.find((article) => {
+      return article.path.includes(specificityArticleSlug);
+    });
 
     browser.url(specificityArticle.path);
   });
 
-
-  it('should be present on code blocks', function() {
+  it('should be present on code blocks', () => {
     browser.waitForExist('pre code.language-css');
   });
 
-
-  it('should allow for marking specific sections', function() {
+  it('should allow for marking specific sections', () => {
     browser.waitForExist('pre code.language-css mark');
   });
-
 });

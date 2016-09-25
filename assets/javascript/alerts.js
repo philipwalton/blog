@@ -62,5 +62,5 @@ export default {
 
     alert.offsetTop; // Force a paint.
     alert.classList.add('Alert--active');
-  }
+  },
 };

@@ -7,21 +7,21 @@ import History2 from './history2';
 
 
 // Cache the container element to avoid multiple lookups.
-var container;
+let container;
 
 // Store the result of page content requests to avoid multiple
 // lookups when navigation to a previously seen page.
-var pageCache = {};
+const pageCache = {};
 
 
 function getTitle(a) {
-  var title = a.title || a.innerText;
+  const title = a.title || a.innerText;
   return title ? title + ' \u2014 Philip Walton' : null;
 }
 
 
 function getMainContent(content) {
-  var match = /<main[^>]*>([\s\S]*)<\/main>/.exec(content);
+  const match = /<main[^>]*>([\s\S]*)<\/main>/.exec(content);
   return match && match[1];
 }
 
@@ -37,24 +37,21 @@ function loadPageContent(path) {
         throw new Error(
             `Response: (${response.status}) ${response.statusText}`);
       }
-    })
-    .then((body) => {
-      let content = getMainContent(body);
+    }).then((body) => {
+      const content = getMainContent(body);
       if (!content) {
         throw new Error(`Could not parse content from response: ${path}`);
-      }
-      else {
+      } else {
         return pageCache[path] = content;
       }
-    })
-    .catch((err) => {
-      let message = (err instanceof TypeError) ?
+    }).catch((err) => {
+      const message = (err instanceof TypeError) ?
           'Check your network connection to ensure you\'re still online.' :
           err.message;
 
       alerts.add({
         title: `Oops, there was an error making your request`,
-        body: message
+        body: message,
       });
       // Rethrow to be able to catch it again in an outer scope.
       throw err;
@@ -74,10 +71,10 @@ function closeDrawer() {
 
 
 function setScroll(hash) {
-  if (hash) {
-    var target = document.getElementById(hash.slice(1));
-  }
-  var scrollPos = target ? target.offsetTop : 0;
+  let target;
+  if (hash) target = document.getElementById(hash.slice(1));
+
+  const scrollPos = target ? target.offsetTop : 0;
 
   // TODO: There's a weird chrome bug were sometime this function
   // doesn't do anything if Chrome has already visited this page and
@@ -89,7 +86,6 @@ function setScroll(hash) {
 module.exports = {
 
   init: function() {
-
     // Only load external content via AJAX if the browser support pushState.
     if (!(window.history && window.history.pushState)) return;
 
@@ -97,8 +93,7 @@ module.exports = {
     container = document.querySelector('main');
     pageCache[location.pathname] = container.innerHTML;
 
-
-    var history2 = new History2((state) => {
+    const history2 = new History2((state) => {
       return loadPageContent(state.path)
           .then((content) => showPageContent(content))
           .then(() => closeDrawer())
@@ -106,9 +101,7 @@ module.exports = {
           .catch((err) => trackError(err));
     });
 
-
     delegate(document, 'click', 'a[href]', function(event, delegateTarget) {
-
       // Don't load content if the user is doing anything other than a normal
       // left click to open a page in the same window.
       if (// On mac, command clicking will open a link in a new tab. Control
@@ -124,8 +117,8 @@ module.exports = {
           // a click event.
           event.which > 1) return;
 
-      var page = parseUrl(location.href);
-      var link = parseUrl(delegateTarget.href);
+      const page = parseUrl(location.href);
+      const link = parseUrl(delegateTarget.href);
 
       // Don't do anything when clicking on links to the current URL.
       if (link.href == page.href) event.preventDefault();
@@ -136,9 +129,9 @@ module.exports = {
         event.preventDefault();
         history2.add({
           url: link.href,
-          title: getTitle(delegateTarget)
+          title: getTitle(delegateTarget),
         });
       }
     });
-  }
+  },
 };

@@ -1,7 +1,7 @@
 export const breakpoints = [
   {name: 'sm', media: 'all'},
   {name: 'md', media: '(min-width: 36em)'},
-  {name: 'lg', media: '(min-width: 48em)'}
+  {name: 'lg', media: '(min-width: 48em)'},
 ];
 
 

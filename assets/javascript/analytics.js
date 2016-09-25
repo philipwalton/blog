@@ -247,7 +247,7 @@ function trackNetworkStatus() {
  * Tracks a unique ID per unique page load. This help distinguish hits from
  * multiple tabs open at the same time.
  */
-functPageloadavigationId() {
+function trackPageloadId() {
   gaTest('set', dimensions.PAGELOAD_ID, uuid());
 }
 

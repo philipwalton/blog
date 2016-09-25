@@ -91,7 +91,7 @@ function shouldRenderArticle(article) {
   if (!isProd()) {
     return true;
   } else {
-    return !article.draft
+    return !article.draft;
   }
 }
 
@@ -102,7 +102,7 @@ function renderContent() {
 
   const transform = function transform(file, enc, done) {
     const article = data.articles.find((a) => {
-      return path.basename(a.path) == path.basename(file.path, '.md')
+      return path.basename(a.path) == path.basename(file.path, '.md');
     });
 
     if (shouldRenderArticle(article)) {

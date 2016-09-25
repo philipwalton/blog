@@ -87,19 +87,36 @@ function renderMarkdown(content) {
 }
 
 
+function shouldRenderArticle(article) {
+  if (!isProd()) {
+    return true;
+  } else {
+    return !article.draft
+  }
+}
+
+
 function renderContent() {
   const data = yaml.safeLoad(fs.readFileSync('./book.yaml', 'utf-8'));
   data.site.buildTime = new Date();
 
   const transform = function transform(file, enc, done) {
-    const article = data.articles.find((a) =>
-        path.basename(a.path) == path.basename(file.path, '.md'));
+    const article = data.articles.find((a) => {
+      return path.basename(a.path) == path.basename(file.path, '.md')
+    });
 
-    article.content = renderMarkdown(file.contents.toString());
+    if (shouldRenderArticle(article)) {
+      article.content = renderMarkdown(file.contents.toString());
+    }
+
     done();
   };
 
   const flush = function flush(done) {
+    data.articles = data.articles.filter((article) => {
+      return shouldRenderArticle(article);
+    });
+
     this.push(new gutil.File({
       path: './data.json',
       contents: new Buffer(JSON.stringify(data, null, 2)),

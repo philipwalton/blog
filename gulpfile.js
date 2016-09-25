@@ -5,7 +5,6 @@ const browserify = require('browserify');
 const spawn = require('child_process').spawn;
 const del = require('del');
 const envify = require('envify');
-const fs = require('fs');
 const gulp = require('gulp');
 const cssnext = require('gulp-cssnext');
 const eslint = require('gulp-eslint');
@@ -30,11 +29,7 @@ const seleniumServerJar = require('selenium-server-standalone-jar');
 const through = require('through2');
 const buffer = require('vinyl-buffer');
 const source = require('vinyl-source-stream');
-const yaml = require('js-yaml');
-
-
-// Defaults to development mode.
-process.env.NODE_ENV = process.env.NODE_ENV || 'development';
+const book = require('./book');
 
 
 /**
@@ -87,25 +82,15 @@ function renderMarkdown(content) {
 }
 
 
-function shouldRenderArticle(article) {
-  if (!isProd()) {
-    return true;
-  } else {
-    return !article.draft;
-  }
-}
-
-
 function renderContent() {
-  const data = yaml.safeLoad(fs.readFileSync('./book.yaml', 'utf-8'));
-  data.site.buildTime = new Date();
+  book.site.buildTime = new Date();
 
   const transform = function transform(file, enc, done) {
-    const article = data.articles.find((a) => {
+    const article = book.articles.find((a) => {
       return path.basename(a.path) == path.basename(file.path, '.md');
     });
 
-    if (shouldRenderArticle(article)) {
+    if (article) {
       article.content = renderMarkdown(file.contents.toString());
     }
 
@@ -113,13 +98,9 @@ function renderContent() {
   };
 
   const flush = function flush(done) {
-    data.articles = data.articles.filter((article) => {
-      return shouldRenderArticle(article);
-    });
-
     this.push(new gutil.File({
-      path: './data.json',
-      contents: new Buffer(JSON.stringify(data, null, 2)),
+      path: './book.json',
+      contents: new Buffer(JSON.stringify(book, null, 2)),
     }));
     done();
   };

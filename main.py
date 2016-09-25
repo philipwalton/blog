@@ -21,8 +21,8 @@ with open('book.yaml') as file:
 
 
 # This only needs to be loaded once.
-with open('build/data.json') as file:
-  data = json.load(file)
+with open('build/book.json') as file:
+  book = json.load(file)
 
 
 def to_local_dt(utc_dt, tz_str):
@@ -41,17 +41,17 @@ env.filters['datetimeformat'] = datetimeformat
 
 def get_page(slug):
   path = '/' + (slug + '/' if slug != 'index' else '')
-  return [p for p in data['pages'] if p['path'] == path][0]
+  return [p for p in book['pages'] if p['path'] == path][0]
 
 
 def get_article(slug):
   path = '/articles/' + slug + '/'
-  return [a for a in data['articles'] if a['path'] == path][0]
+  return [a for a in book['articles'] if a['path'] == path][0]
 
 
 def respond_404(response):
   template = env.get_template('404.html')
-  template_data = copy.deepcopy(data)
+  template_data = copy.deepcopy(book)
   template_data['page'] = {'title': 'Page Not Found'}
   response.status = 404
   response.write(minify_html(template.render(template_data)));
@@ -69,7 +69,7 @@ class FeedHandler(webapp2.RequestHandler):
   def get(self):
     try:
       template = env.get_template('atom.xml')
-      html = template.render(data)
+      html = template.render(book)
       self.response.content_type = 'application/xml; charset=utf-8'
       self.response.write(html)
     except Exception as err:
@@ -81,7 +81,7 @@ class PageHandler(webapp2.RequestHandler):
   def get(self, slug='index'):
     try:
       template = env.get_template(slug + '.html')
-      template_data = copy.deepcopy(data)
+      template_data = copy.deepcopy(book)
       template_data['page'] = get_page(slug)
 
       html = minify_html(template.render(template_data))
@@ -95,7 +95,7 @@ class ArticleHandler(webapp2.RequestHandler):
   def get(self, slug):
     try:
       template = env.get_template('article.html')
-      template_data = copy.deepcopy(data)
+      template_data = copy.deepcopy(book)
       template_data['page'] = get_article(slug)
 
       html = minify_html(template.render(template_data))

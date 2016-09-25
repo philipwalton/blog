@@ -1,8 +1,4 @@
-const fs = require('fs');
-const yaml = require('js-yaml');
-
-
-const book = yaml.safeLoad(fs.readFileSync('./book.yaml', 'utf-8'));
+const book = require('../book');
 
 
 describe('Code syntax highlighting', () => {

@@ -1,9 +1,7 @@
 const assert = require('assert');
-const fs = require('fs');
-const yaml = require('js-yaml');
+const book = require('../book');
 
 
-const book = yaml.safeLoad(fs.readFileSync('./book.yaml', 'utf-8'));
 const titleSuffix = ' \u2014 Philip Walton';
 
 

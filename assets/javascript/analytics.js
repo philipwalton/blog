@@ -53,6 +53,7 @@ const dimensions = {
   HIT_TYPE: 'dimension13',
   HIT_UUID: 'dimension14',
   HIT_TIME: 'dimension15',
+  PAGELOAD_ID: 'dimension16',
 };
 
 
@@ -70,6 +71,7 @@ export function init() {
   trackClientId();
   trackServiceWorkerStatus();
   trackNetworkStatus();
+  trackPageloadId();
 
   initSessionControl();
 
@@ -238,6 +240,15 @@ function trackNetworkStatus() {
 
   window.addEventListener('online', updateNetworkStatus);
   window.addEventListener('offline', updateNetworkStatus);
+}
+
+
+/**
+ * Tracks a unique ID per unique page load. This help distinguish hits from
+ * multiple tabs open at the same time.
+ */
+functPageloadavigationId() {
+  gaTest('set', dimensions.PAGELOAD_ID, uuid());
 }
 
 

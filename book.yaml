@@ -96,6 +96,5 @@ articles:
   path: /articles/untangling-deeply-nested-promise-chains/
   date: 2016-08-17T07:53:31-07:00
 - title: "Loading Polyfills Only When Needed"
-  draft: true
   path: /articles/loading-polyfills-only-when-needed/
-  date: 2016-09-10T15:53:49-07:00
+  date: 2016-09-27T15:41:26-07:00

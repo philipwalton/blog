@@ -14,7 +14,7 @@ export default class History2 {
 
     // Listen for popstate changes and log them.
     window.addEventListener('popstate', (event) => {
-      const {state = {}} = event;
+      const state = event.state || {};
       const {title} = state;
       const url = window.location.href;
       this.add({url, title, state, isPopState: true});

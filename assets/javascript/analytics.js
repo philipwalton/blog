@@ -74,7 +74,10 @@ export function init() {
   trackPageloadId();
 
   initSessionControl();
+}
 
+
+export function trackPageload() {
   sendInitialPageview();
   measureCssBlockTime();
   measureJavaSciptLoadTime();
@@ -83,7 +86,7 @@ export function init() {
 
 
 export function trackError(err) {
-  gaAll('send', 'event', 'Script', 'error', err.stack);
+  gaAll('send', 'event', 'Script', 'error', err.stack || err.toString());
 }
 
 

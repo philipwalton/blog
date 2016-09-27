@@ -8,7 +8,7 @@ import drawer from './drawer';
 const POLYFILL_PATH = '/assets/javascript/polyfills.js';
 
 
-function main() {
+function main(err) {
   alerts.init();
   breakpoints.init();
   contentLoader.init();
@@ -18,6 +18,10 @@ function main() {
   // to ensure the don't compete for load resources.
   window.onload = function() {
     analytics.init();
+    analytics.trackPageload();
+    if (err) {
+      analytics.trackError(err);
+    }
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker
           .register('/sw.js')
@@ -28,16 +32,20 @@ function main() {
 
 
 function browserSupportsAllFeatures() {
-  return window.Promise && window.fetch && window.Symbol;
+  return false && window.Promise && window.fetch && window.Symbol;
 }
 
 
-function loadScript(src, callback) {
+function loadScript(src, done) {
   const js = document.createElement('script');
-  const fjs = document.getElementsByTagName('script')[0];
   js.src = src;
-  js.onload = callback;
-  fjs.parentNode.insertBefore(js, fjs);
+  js.onload = function() {
+    done();
+  };
+  js.onerror = function() {
+    done(new Error('Failed to load script ' + src));
+  };
+  document.head.appendChild(js);
 }
 
 

@@ -5,43 +5,46 @@ export default class History2 {
 
   constructor(onChange) {
     this._onChange = onChange;
-
-    const state = parseUrl(location.href);
-    state.title = document.title;
+    this.state = getState(location.href, document.title);
 
     // Add history state initially so the first `popstate` event contains data.
-    history.replaceState(state, state.title, state.href);
+    history.replaceState(this.state, this.state.title, this.state.href);
 
     // Listen for popstate changes and log them.
     window.addEventListener('popstate', (event) => {
-      const state = event.state || {};
-      const {title} = state;
-      const url = window.location.href;
-      this.add({url, title, state, isPopState: true});
+      // If there's no state, that means this handler was initiated by a
+      // forward history addition like clicking on a hash link.
+      const url = location.href;
+      const title = event.state && event.state.title;
+
+      this.add({url, title, isPopState: true});
     });
   }
 
 
   add({url, title, isPopState}) {
-    // Non-popstate `add()` calls should not generate a history entry if the
-    // new URL points to the same resource.
-    if (!isPopState) {
-      const currentPage = parseUrl(location.href);
-      if (url == currentPage.href) {
-        return Promise.resolve(null);
-      }
-    }
+    const prevState = this.state;
+    const nextState = getState(url, title);
 
-    const nextPage = parseUrl(url);
-    nextPage.title = title;
+    this.state = nextState;
 
-    return this._onChange(nextPage).then(() => {
+    // Entries that point to the same resource should be ignored.
+    if (prevState.path == nextState.path) return Promise.resolve(null);
+
+    return this._onChange(nextState).then(() => {
       // Popstate triggered navigation is already handled by the browser,
       // so we only add to the history in non-popstate cases.
       if (!isPopState) {
-        history.pushState(nextPage, title, nextPage.href);
+        history.pushState(nextState, title, url);
       }
-      document.title = title ? title : document.title;
+      if (title) document.title = title;
     });
   }
+}
+
+
+function getState(url, title) {
+  const state = parseUrl(url);
+  state.title = document.title;
+  return state;
 }

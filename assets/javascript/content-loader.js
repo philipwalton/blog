@@ -71,20 +71,17 @@ function closeDrawer() {
 
 
 function setScroll(hash) {
-  let target;
-  if (hash) target = document.getElementById(hash.slice(1));
-
+  const target = hash && document.getElementById(hash.slice(1));
   const scrollPos = target ? target.offsetTop : 0;
 
-  // TODO: There's a weird chrome bug were sometime this function
-  // doesn't do anything if Chrome has already visited this page and
-  // thinks it has a scroll position in mind. Just chrome, weird...
+  // TODO: There's a weird bug were sometime this function doesn't do anything
+  // if the browser has already visited the page and thinks it has a scroll
+  // position in mind.
   window.scrollTo(0, scrollPos);
 }
 
 
 module.exports = {
-
   init: function() {
     // Only load external content via AJAX if the browser support pushState.
     if (!(window.history && window.history.pushState)) return;

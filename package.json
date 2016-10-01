@@ -66,6 +66,7 @@
     "vinyl-source-stream": "^1.1.0",
     "wdio-mocha-framework": "^0.4.0",
     "wdio-sauce-service": "^0.2.4",
+    "wdio-spec-reporter": "0.0.3",
     "webdriverio": "^4.2.3",
     "whatwg-fetch": "^1.0.0"
   }

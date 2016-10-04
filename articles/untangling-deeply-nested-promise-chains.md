@@ -165,9 +165,9 @@ The `getNetworkOrCacheResponse` function contains logic that deals with two very
 To improve readability, we can abstract the cache-related logic into separate, self-contained functions:
 
 ```js
-const **addToCache** = (request, networkResponse) => {
+const **addToCache** = (request, networkResponseClone) => {
   return caches.open('cache:v1')
-    .then((cache) => cache.put(request, networkResponse.clone()));
+    .then((cache) => cache.put(request, networkResponseClone));
 }
 
 const **getCacheResponse** = (request) => {
@@ -178,7 +178,7 @@ const **getCacheResponse** = (request) => {
 
 const getNetworkOrCacheResponse = (request) => {
   return fetch(request).then((networkResponse) => {
-    **addToCache**(request, networkResponse);
+    **addToCache**(request, networkResponse.clone());
     return networkResponse;
   }).catch(() => {
     return **getCacheResponse**(request)
@@ -218,7 +218,7 @@ To make this more clear, consider the `getNetworkOrCacheResponse()` function def
 const getNetworkOrCacheResponse = async (request) => {
   try {
     const networkResponse = await fetch(request);
-    addToCache(request, networkResponse);
+    addToCache(request, networkResponse.clone());
     return networkResponse;
   } catch (err) {
     const cacheResponse = await getCacheResponse(request);
@@ -273,9 +273,9 @@ self.addEventListener('fetch', (event) => {
 **Refactored code:**
 
 ```js
-const addToCache = async (request, networkResponse) => {
+const addToCache = async (request, networkResponseClone) => {
   const cache = await caches.open('cache:v1');
-  cache.put(request, networkResponse.clone());
+  return cache.put(request, networkResponseClone);
 };
 
 const getCacheResponse = async (request) => {
@@ -287,7 +287,7 @@ const getCacheResponse = async (request) => {
 const getNetworkOrCacheResponse = async (request) => {
   try {
     const networkResponse = await fetch(request);
-    addToCache(request, networkResponse);
+    addToCache(request, networkResponse.clone());
     return networkResponse;
   } catch (err) {
     const cacheResponse = await getCacheResponse(request);

@@ -40,9 +40,9 @@ const cacheInitialAssets = async () => {
 };
 
 
-const addToCache = async (request, networkResponse) => {
+const addToCache = async (request, networkResponseClone) => {
   const cache = await caches.open(CACHE_NAME);
-  return cache.put(request, networkResponse.clone());
+  return cache.put(request, networkResponseClone);
 };
 
 
@@ -53,13 +53,13 @@ const getCacheResponse = async (request) => {
 };
 
 
-const getNetworkOrCacheResponse = async (request) => {
+const getNetworkOrCacheResponse = async (event) => {
   try {
-    const networkResponse = await fetch(request);
-    await addToCache(request, networkResponse);
+    const networkResponse = await fetch(event.request);
+    event.waitUntil(addToCache(event.request, networkResponse.clone()));
     return networkResponse;
   } catch (err) {
-    const cacheResponse = await getCacheResponse(request);
+    const cacheResponse = await getCacheResponse(event.request);
     return cacheResponse || Response.error();
   }
 };
@@ -67,7 +67,7 @@ const getNetworkOrCacheResponse = async (request) => {
 
 self.addEventListener('fetch', (event) => {
   if (assetUrlParts.some((part) => part.test(event.request.url))) {
-    event.respondWith(getNetworkOrCacheResponse(event.request));
+    event.respondWith(getNetworkOrCacheResponse(event));
   }
 });
 

@@ -4,6 +4,7 @@ import alerts from './alerts';
 import {trackError} from './analytics';
 import drawer from './drawer';
 import History2 from './history2';
+import {mark, measure, track} from './user-timing';
 
 
 // Cache the container element to avoid multiple lookups.
@@ -12,6 +13,23 @@ let container;
 // Store the result of page content requests to avoid multiple
 // lookups when navigation to a previously seen page.
 const pageCache = {};
+
+
+function trackPageFetchStart() {
+  mark('pagefetch:start');
+}
+
+
+function trackPageFetchEnd({path, fromCache}) {
+  mark('pagefetch:end');
+  measure('pagefetch', 'pagefetch:start', 'pagefetch:end');
+  track('pagefetch', {
+    eventCategory: 'Virtual Pageviews',
+    eventAction: 'fetch',
+    eventLabel: fromCache ? 'cache' : 'network',
+    page: path,
+  });
+}
 
 
 function getTitle(a) {
@@ -26,8 +44,10 @@ function getMainContent(content) {
 }
 
 
-function loadPageContent(path) {
+function fetchPageContent(path) {
+  trackPageFetchStart();
   if (pageCache[path]) {
+    trackPageFetchEnd({page: path, fromCache: true});
     return Promise.resolve(pageCache[path]);
   } else {
     return fetch(path).then((response) => {
@@ -42,7 +62,9 @@ function loadPageContent(path) {
       if (!content) {
         throw new Error(`Could not parse content from response: ${path}`);
       } else {
-        return pageCache[path] = content;
+        trackPageFetchEnd({page: path, fromCache: false});
+        pageCache[path] = content;
+        return content;
       }
     }).catch((err) => {
       const message = (err instanceof TypeError) ?
@@ -91,7 +113,7 @@ module.exports = {
     pageCache[location.pathname] = container.innerHTML;
 
     const history2 = new History2((state) => {
-      return loadPageContent(state.path)
+      return fetchPageContent(state.path)
           .then((content) => showPageContent(content))
           .then(() => closeDrawer())
           .then(() => setScroll(state.hash))

@@ -152,10 +152,10 @@ gulp.task('javascript:main', (done) => {
     debug: true,
     detectGlobals: false,
   })
-  .transform(babelify, {presets: ['es2015']})
+  .transform(babelify, {presets: ['es2015', 'stage-2']})
   .transform(envify)
   .bundle()
-  .on('error', (err) => gutil.beep() && done(err))
+  .on('error', done)
   .on('end', done)
   .pipe(source(entry))
   .pipe(buffer())
@@ -195,7 +195,7 @@ gulp.task('service-worker', (done) => {
   // TODO(philipwalton): Add real error handling.
   // This temporary hack fixes an issue with tasks not restarting in
   // watch mode after a syntax error is fixed.
-  .on('error', (err) => gutil.beep() && done(err))
+  .on('error', done)
   .on('end', done)
 
   .pipe(source('sw.js'))

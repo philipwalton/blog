@@ -62,6 +62,9 @@ let gaAll = createGaProxy(ALL_TRACKERS);
 let gaTest = createGaProxy(TEST_TRACKERS);
 
 
+export {metrics, dimensions, gaAll, gaTest};
+
+
 export function init() {
   createTrackers();
   trackErrors();

@@ -47,7 +47,7 @@ function getMainContent(content) {
 function fetchPageContent(path) {
   trackPageFetchStart();
   if (pageCache[path]) {
-    trackPageFetchEnd({page: path, fromCache: true});
+    trackPageFetchEnd({path, fromCache: true});
     return Promise.resolve(pageCache[path]);
   } else {
     return fetch(path).then((response) => {
@@ -62,7 +62,7 @@ function fetchPageContent(path) {
       if (!content) {
         throw new Error(`Could not parse content from response: ${path}`);
       } else {
-        trackPageFetchEnd({page: path, fromCache: false});
+        trackPageFetchEnd({path, fromCache: false});
         pageCache[path] = content;
         return content;
       }

@@ -85,7 +85,7 @@ The second principle of my strategy is to keep things simple. They way I do that
 - It supports both X and Y.
 - It supports X but not Y.
 - It supports Y but not X.
-- It supports neither a nor Y.
+- It supports neither X nor Y.
 
 If you want to use five new features, the browser can now be in 32 different states. You can see how this gets out of hand rather quickly.
 

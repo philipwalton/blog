@@ -1,3 +1,6 @@
+require('async-waituntil-polyfill');
+
+
 const offlineGoogleAnalytics = require(
     'sw-helpers/projects/sw-offline-google-analytics/src');
 
@@ -29,14 +32,15 @@ const cacheAnalyticsJs = async (cache) => {
 
 const cacheInitialAssets = async () => {
   const cache = await caches.open(CACHE_NAME);
-  return await [
+  return Promise.all([
     cacheAnalyticsJs(cache),
     cache.addAll([
       '/',
       '/assets/css/main.css',
       '/assets/javascript/main.js',
+      '/assets/javascript/polyfills.js',
     ]),
-  ];
+  ]);
 };
 
 
@@ -53,21 +57,18 @@ const getCacheResponse = async (request) => {
 };
 
 
-const getNetworkOrCacheResponse = async (event) => {
-  try {
-    const networkResponse = await fetch(event.request);
-    event.waitUntil(addToCache(event.request, networkResponse.clone()));
-    return networkResponse;
-  } catch (err) {
-    const cacheResponse = await getCacheResponse(event.request);
-    return cacheResponse || Response.error();
-  }
-};
-
-
 self.addEventListener('fetch', (event) => {
   if (assetUrlParts.some((part) => part.test(event.request.url))) {
-    event.respondWith(getNetworkOrCacheResponse(event));
+    event.respondWith((async () => {
+      try {
+        const networkResponse = await fetch(event.request);
+        event.waitUntil(addToCache(event.request, networkResponse.clone()));
+        return networkResponse;
+      } catch (err) {
+        const cacheResponse = await getCacheResponse(event.request);
+        return cacheResponse || err;
+      }
+    })());
   }
 });
 

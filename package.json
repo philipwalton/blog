@@ -21,6 +21,7 @@
     "url": "https://github.com/philipwalton/blog/issues"
   },
   "devDependencies": {
+    "async-waituntil-polyfill": "^1.0.1",
     "autotrack": "^1.0.0",
     "babel-core": "^6.11.4",
     "babel-eslint": "^6.1.2",

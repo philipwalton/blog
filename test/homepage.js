@@ -64,6 +64,11 @@ describe('The home page', () => {
 });
 
 
+/**
+ * Returns whether the passed URL matches the URL for the current page.
+ * @param {string} expectedUrl The URL to test against.
+ * @return {boolean} True if the passed URL matches.
+ */
 function urlMatches(expectedUrl) {
   return () => browser.url().value.includes(expectedUrl);
 }

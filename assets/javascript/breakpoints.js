@@ -8,6 +8,10 @@ export const breakpoints = [
 let activeBreakpoint;
 
 
+/**
+ * A callback for each MediaQueryList that handles detecting the active
+ * media query and stores that on the `activeBreakpoint` variable.
+ */
 function handleChanges() {
   for (let breakpoint of breakpoints) {
     if (breakpoint.mql.matches) {
@@ -17,6 +21,10 @@ function handleChanges() {
 }
 
 
+/**
+ * Initializes listening for changes to breakpoints as well as determining the
+ * current active breakpoint.
+ */
 export function init() {
   for (let breakpoint of breakpoints) {
     breakpoint.mql = window.matchMedia(breakpoint.media);
@@ -28,6 +36,9 @@ export function init() {
 }
 
 
+/**
+ * @return {Object} The currently active breakpoint.
+ */
 export function getActiveBreakpoint() {
   return activeBreakpoint;
 }

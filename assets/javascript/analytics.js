@@ -58,13 +58,17 @@ const dimensions = {
 
 
 // The command queue proxies.
-let gaAll = createGaProxy(ALL_TRACKERS);
-let gaTest = createGaProxy(TEST_TRACKERS);
+const gaAll = createGaProxy(ALL_TRACKERS);
+const gaTest = createGaProxy(TEST_TRACKERS);
 
 
 export {metrics, dimensions, gaAll, gaTest};
 
 
+/**
+ * Initializes all the analytics setup. Creates trackers and sets initial
+ * values on the trackers.
+ */
 export function init() {
   createTrackers();
   trackErrors();
@@ -80,6 +84,9 @@ export function init() {
 }
 
 
+/**
+ * Tracks the initial pageload and performance timing data associated with it.
+ */
 export function trackPageload() {
   sendInitialPageview();
   measureCssBlockTime();
@@ -88,20 +95,27 @@ export function trackPageload() {
 }
 
 
+/**
+ * Tracks a JavaScript error.
+ * @param {Error} err The error object to track.
+ */
 export function trackError(err) {
   gaAll('send', 'event', 'Script', 'error', err.stack || err.toString());
 }
 
 
+/**
+ * Creates the trackers and stores the users client ID to localStorage.
+ */
 function createTrackers() {
-  let fields = {siteSpeedSampleRate: 10};
-  let data = getStoredData();
+  const fields = {siteSpeedSampleRate: 10};
+  const data = getStoredData();
   for (let tracker of PROD_TRACKERS) {
     window.ga('create', tracker.trackingId, 'auto', tracker.name, fields);
   }
   window.ga(function() {
-    let tracker = window.ga.getAll()[0];
-    data.clientId = tracker.get('clientId') || data.clientId;
+    const firstTracker = window.ga.getAll()[0];
+    data.clientId = firstTracker.get('clientId') || data.clientId;
     setStoredData(data);
 
     for (let tracker of TEST_TRACKERS) {
@@ -113,10 +127,14 @@ function createTrackers() {
 }
 
 
+/**
+ * Tracks any errors that may have occured on the page prior to analytics being
+ * initialized, then adds an event handler to track future errors.
+ */
 function trackErrors() {
   // Errors that have occurred prior to this script running are stored on
   // the `q` property of the window.onerror function.
-  let errorQueue = window.onerror.q || [];
+  const errorQueue = window.onerror.q || [];
 
   // Override the temp `onerror()` handler to now send hits to GA.
   window.onerror = function(msg, file, line, col, error) {
@@ -134,6 +152,9 @@ function trackErrors() {
 }
 
 
+/**
+ * Sets a default dimension value for all custom dimensions on all trackers.
+ */
 function setDefaultDimensionValues() {
   Object.keys(dimensions).forEach((key) => {
     gaAll('set', dimensions[key], NULL_VALUE);
@@ -141,6 +162,9 @@ function setDefaultDimensionValues() {
 }
 
 
+/**
+ * Requires select autotrack plugins for each tracker.
+ */
 function requirePlugins() {
   gaAll('require', 'cleanUrlTracker', {
     stripQuery: true,
@@ -215,14 +239,20 @@ function requirePlugins() {
 }
 
 
+/**
+ * Sets the client ID as a custom dimension on each tracker.
+ */
 function trackClientId() {
   gaAll(function(tracker) {
-    let clientId = tracker.get('clientId');
+    const clientId = tracker.get('clientId');
     tracker.set(dimensions.CLIENT_ID, clientId);
   });
 }
 
 
+/**
+ * Sets the service worker status as a custom dimension on each tracker.
+ */
 function trackServiceWorkerStatus() {
   const serviceWorkerStatus = 'serviceWorker' in navigator
     ? (navigator.serviceWorker.controller ? 'controlled' : 'supported')
@@ -235,6 +265,10 @@ function trackServiceWorkerStatus() {
 }
 
 
+/**
+ * Sets the network status as a custom dimension on each tracker and adds
+ * event listeners to detect future network changes.
+ */
 function trackNetworkStatus() {
   gaTest('set', dimensions.NETWORK_STATUS,
       navigator.onLine ? 'online' : 'offline');
@@ -258,14 +292,18 @@ function trackPageloadId() {
 }
 
 
+/**
+ * Adds tracking to record each hit type, time, index,
+ * and unique identifier to better detect missing hits.
+ */
 function initSessionControl() {
   gaTest(function(tracker) {
-    let originalBuildHitTask = tracker.get('buildHitTask');
-    let originalSendHitTask = tracker.get('sendHitTask');
+    const originalBuildHitTask = tracker.get('buildHitTask');
+    const originalSendHitTask = tracker.get('sendHitTask');
 
     tracker.set('buildHitTask', function(model) {
-      let name = tracker.get('name');
-      let trackerData = getStoredTrackerData(name);
+      const name = tracker.get('name');
+      const trackerData = getStoredTrackerData(name);
 
       model.set(dimensions.HIT_TYPE, model.get('hitType'), true);
       model.set(dimensions.HIT_INDEX, String(trackerData.index || 0), true);
@@ -280,9 +318,9 @@ function initSessionControl() {
     });
 
     tracker.set('sendHitTask', function(model) {
-      let name = tracker.get('name');
-      let hitTime = model.get(dimensions.HIT_TIME);
-      let trackerData = getStoredTrackerData(name);
+      const name = tracker.get('name');
+      const hitTime = model.get(dimensions.HIT_TIME);
+      const trackerData = getStoredTrackerData(name);
       trackerData.index = (trackerData.index || 0) + 1;
       trackerData.time = hitTime;
       trackerData.payload = serializeHit(model);
@@ -294,13 +332,19 @@ function initSessionControl() {
 }
 
 
+/**
+ * Sends the initial pageview.
+ */
 function sendInitialPageview() {
   gaAll('send', 'pageview', {[dimensions.HIT_SOURCE]: 'pageload'});
 }
 
 
+/**
+ * Tracks the time the CSS stopped blocking rendering.
+ */
 function measureCssBlockTime() {
-  let cssUnblockTime = measureDuration('css:unblock');
+  const cssUnblockTime = measureDuration('css:unblock');
   if (cssUnblockTime) {
     // Tracks the amount of time the CSS blocks rendering.
     gaTest('send', 'event', 'CSS', 'unblock', {
@@ -313,8 +357,11 @@ function measureCssBlockTime() {
 }
 
 
+/**
+ * Tracks the point the main JavaScript code was loaded.
+ */
 function measureJavaSciptLoadTime() {
-  let jsExecuteTime = measureDuration('js:execute');
+  const jsExecuteTime = measureDuration('js:execute');
   if (jsExecuteTime) {
     // Tracks the amount of time the JavaScript takes to download and execute.
     gaTest('send', 'event', 'JavaScript', 'execute', {
@@ -327,47 +374,55 @@ function measureJavaSciptLoadTime() {
 }
 
 
+/**
+ * Tracks the point at which the webfonts were active as well as whether an
+ * error occurred loading them.
+ */
 function measureWebfontPerfAndFailures() {
-  if (window.Promise) {
-    new Promise(function(resolve, reject) {
-      let loaded = /wf-(in)?active/.exec(document.documentElement.className);
-      let success = loaded && !loaded[1]; // No "in" in the capture group.
-      if (loaded) {
-        success ? resolve() : reject();
-      } else {
-        let originalAciveCallback = window.WebFontConfig.active;
-        window.WebFontConfig.inactive = reject;
-        window.WebFontConfig.active = function() {
-          originalAciveCallback();
-          resolve();
-        };
-        // In case the webfont.js script failed to load.
-        setTimeout(reject, window.WebFontConfig.timeout);
-      }
-    }).then(function() {
-      let fontsActiveTime = measureDuration('fonts:active');
-      if (fontsActiveTime) {
-        // Tracks the amount of time the web fonts take to activate.
-        gaTest('send', 'event', 'Fonts', 'active', {
-          eventLabel: 'google',
-          eventValue: fontsActiveTime,
-          nonInteraction: true,
-          [dimensions.METRIC_VALUE]: String(fontsActiveTime),
-        });
-      }
-    }).catch(function() {
-      gaTest('send', 'event', 'Fonts', 'error', 'google');
-    });
-  }
+  new Promise(function(resolve, reject) {
+    const loaded = /wf-(in)?active/.exec(document.documentElement.className);
+    const success = loaded && !loaded[1]; // No "in" in the capture group.
+    if (loaded) {
+      success ? resolve() : reject();
+    } else {
+      const originalAciveCallback = window.WebFontConfig.active;
+      window.WebFontConfig.inactive = reject;
+      window.WebFontConfig.active = function() {
+        originalAciveCallback();
+        resolve();
+      };
+      // In case the webfont.js script failed to load.
+      setTimeout(reject, window.WebFontConfig.timeout);
+    }
+  }).then(function() {
+    const fontsActiveTime = measureDuration('fonts:active');
+    if (fontsActiveTime) {
+      // Tracks the amount of time the web fonts take to activate.
+      gaTest('send', 'event', 'Fonts', 'active', {
+        eventLabel: 'google',
+        eventValue: fontsActiveTime,
+        nonInteraction: true,
+        [dimensions.METRIC_VALUE]: String(fontsActiveTime),
+      });
+    }
+  }).catch(function() {
+    gaTest('send', 'event', 'Fonts', 'error', 'google');
+  });
 }
 
 
+/**
+ * Measures the time between a PerformanceMark object and a reference time.
+ * @param {PerformanceMark} mark The mark to measure duration until.
+ * @param {string=} reference The timing reference to measure from.
+ * @return {number} The duration in milliseconds.
+ */
 function measureDuration(mark, reference = 'responseEnd') {
   if (window.__perf) {
-    let name = `${reference}:${mark}`;
+    const name = `${reference}:${mark}`;
     performance.clearMeasures(name);
     performance.measure(name, reference, mark);
-    let measure = performance.getEntriesByName(name)[0];
+    const measure = performance.getEntriesByName(name)[0];
     return measure && Math.round(measure.duration);
   }
 }
@@ -395,13 +450,19 @@ function createGaProxy(trackers) {
 }
 
 
+/**
+ * Takes a tracker model and extracts the most interesting fields into a
+ * serialized string.
+ * @param {Object} model The tracker model.
+ * @return {string} The serialized model string.
+ */
 function serializeHit(model) {
-  let hit = {
+  const hit = {
     hitType: model.get('hitType'),
     page: model.get('page'),
   };
 
-  let hitSource = model.get(dimensions.HIT_SOURCE);
+  const hitSource = model.get(dimensions.HIT_SOURCE);
   if (hitSource && hitSource != NULL_VALUE) hit.hitSource = hitSource;
 
   if (hit.hitType == 'event') {
@@ -418,23 +479,26 @@ function serializeHit(model) {
 }
 
 
-// Accepts a custom dimension or metric and returns it's numerical index.
+/**
+ * Accepts a custom dimension or metric and returns it's numerical index.
+ * @param {string} definition The definition string (e.g. 'dimension1').
+ * @return {number} The definition index.
+ */
 function getDefinitionIndex(definition) {
   return +/\d+$/.exec(definition)[0];
 }
 
 
 /**
- * Randomize array element order in-place.
- * Using Durstenfeld shuffle algorithm.
+ * Randomizes array element order in-place using Durstenfeld shuffle algorithm.
  * http://goo.gl/91pjZs
  * @param {Array} array The input array.
  * @return {Array} The randomized array.
  */
 function shuffleArray(array) {
   for (let i = array.length - 1; i > 0; i--) {
-    let j = Math.floor(Math.random() * (i + 1));
-    let temp = array[i];
+    const j = Math.floor(Math.random() * (i + 1));
+    const temp = array[i];
     array[i] = array[j];
     array[j] = temp;
   }

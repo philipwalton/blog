@@ -1,13 +1,18 @@
-import alerts from './alerts';
+import * as alerts from './alerts';
 import * as analytics from './analytics';
 import * as breakpoints from './breakpoints';
-import contentLoader from './content-loader';
-import drawer from './drawer';
+import * as contentLoader from './content-loader';
+import * as drawer from './drawer';
 
 
 const POLYFILL_PATH = '/assets/javascript/polyfills.js';
 
 
+/**
+ * The main script entry point for the site. Initalizes all the sub modules
+ * analytics tracking, and the service worker.
+ * @param {?Error} err Present if an error occurred loading the polyfills.
+ */
 function main(err) {
   alerts.init();
   breakpoints.init();
@@ -31,11 +36,24 @@ function main(err) {
 }
 
 
+/**
+ * The primary site feature detect. Determines whether polyfills are needed.
+ * @return {boolean} True if the browser supports all required features and
+ *     no polyfills are needed.
+ */
 function browserSupportsAllFeatures() {
   return false && window.Promise && window.fetch && window.Symbol;
 }
 
 
+/**
+ * Creates a new `<script>` element for the passed `src`, and invokes the
+ * passed callback once done.
+ * @param {string} src The src attribute for the script.
+ * @param {Function<?Error>} done A callback to be invoked once the script has
+ *     loaded, if an error occurs loading the script the function is invoked
+ *     with the error object.
+ */
 function loadScript(src, done) {
   const js = document.createElement('script');
   js.src = src;

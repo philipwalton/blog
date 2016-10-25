@@ -5,10 +5,13 @@ let alertContainer = null;
 let alertShowing = false;
 
 
+/**
+ * Removes all shown alerts.
+ */
 function remove() {
   if (!alertShowing) return;
 
-  let alert = alertContainer.firstChild;
+  const alert = alertContainer.firstChild;
   alert.classList.remove('Alert--active');
   alertShowing = false;
 
@@ -18,6 +21,13 @@ function remove() {
 }
 
 
+/**
+ * Creates an alert with the passed title and body.
+ * @param {{title: (string), body: (string)}} arg1
+ *     title: The alert title text.
+ *     body: The alert body text.
+ * @return {Element} The alert DOM element.
+ */
 function createAlert({title, body}) {
   const alert = document.createElement('div');
   alert.className = 'Alert';
@@ -32,6 +42,11 @@ function createAlert({title, body}) {
 }
 
 
+/**
+ * Returns the markup to generate an SVG icon.
+ * @param {string} id The icon id from the main icons file.
+ * @return {string} The icon markup.
+ */
 function renderIcon(id) {
   return `<svg class="Icon" viewBox="0 0 24 24">
     <use xmlns:xlink="http://www.w3.org/1999/xlink"
@@ -39,28 +54,36 @@ function renderIcon(id) {
 }
 
 
-export default {
-  init: function() {
-    alertContainer = document.createElement('div');
-    alertContainer.className = 'AlertContainer';
+/**
+ * Initializes the alert DOM containers and event handlers to remove
+ * added alerts.
+ */
+export function init() {
+  alertContainer = document.createElement('div');
+  alertContainer.className = 'AlertContainer';
 
-    delegate(alertContainer, 'click', '.Alert-close', remove);
-    document.body.addEventListener('click', (e) => {
-      const insideAlertContainer = !!closest(e.target, '.AlertContainer');
-      if (!insideAlertContainer) remove();
-    });
+  delegate(alertContainer, 'click', '.Alert-close', remove);
+  document.body.addEventListener('click', (e) => {
+    const insideAlertContainer = !!closest(e.target, '.AlertContainer');
+    if (!insideAlertContainer) remove();
+  });
 
-    document.body.appendChild(alertContainer);
-  },
+  document.body.appendChild(alertContainer);
+}
 
-  add: function({title, body}) {
-    if (alertShowing) remove();
+/**
+ * Adds an alert with the passed title and body.
+ * @param {{title: (string), body: (string)}} arg1
+ *     title: The alert title text.
+ *     body: The alert body text.
+ */
+export function add({title, body}) {
+  if (alertShowing) remove();
 
-    let alert = createAlert({title, body});
-    alertContainer.appendChild(alert);
-    alertShowing = true;
+  const alert = createAlert({title, body});
+  alertContainer.appendChild(alert);
+  alertShowing = true;
 
-    alert.offsetTop; // Force a paint.
-    alert.classList.add('Alert--active');
-  },
-};
+  alert.offsetTop; // Force a paint.
+  alert.classList.add('Alert--active');
+}

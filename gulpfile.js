@@ -50,17 +50,30 @@ let devServer;
 let seleniumServer;
 
 
+/**
+ * @return {boolean} True if NODE_ENV is production.
+ */
 function isProd() {
   return process.env.NODE_ENV == 'production';
 }
 
 
+/**
+ * A callback passed to a stream's error handlers that beeps and logs and
+ * error if passed one.
+ * @param {Error} err The stream error.
+ */
 function streamError(err) {
   gutil.beep();
   gutil.log(err instanceof gutil.PluginError ? err.toString() : err.stack);
 }
 
 
+/**
+ * Renders markdown content as HTML with syntax highlighted code blocks.
+ * @param {string} content A markdown string.
+ * @return {string} The rendered HTML.
+ */
 function renderMarkdown(content) {
   const md = new MarkdownIt({
     html: true,
@@ -82,6 +95,10 @@ function renderMarkdown(content) {
 }
 
 
+/**
+ * Creates a transform stream that renders markdown files to HTML content.
+ * @return {TransformStream} The transform stream.
+ */
 function renderContent() {
   book.site.buildTime = new Date();
 
@@ -134,7 +151,7 @@ gulp.task('images', () => {
 
 
 gulp.task('css', () => {
-  let opts = {
+  const opts = {
     browsers: '> 1%, last 2 versions, Safari > 5, ie > 9, Firefox ESR',
     compress: isProd(),
     url: {url: 'inline'},
@@ -147,7 +164,7 @@ gulp.task('css', () => {
 
 
 gulp.task('javascript:main', (done) => {
-  let entry = './assets/javascript/main.js';
+  const entry = './assets/javascript/main.js';
   browserify(entry, {
     debug: true,
     detectGlobals: false,
@@ -167,7 +184,7 @@ gulp.task('javascript:main', (done) => {
 
 
 gulp.task('javascript:polyfills', (done) => {
-  let entry = './assets/javascript/polyfills.js';
+  const entry = './assets/javascript/polyfills.js';
   browserify(entry)
   .bundle()
   .on('error', (err) => gutil.beep() && done(err))

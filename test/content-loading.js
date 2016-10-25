@@ -5,15 +5,6 @@ const book = require('../book');
 const titleSuffix = ' \u2014 Philip Walton';
 
 
-function getUrlPath() {
-  // Don't use an arrow function since this is eval'ed in test browsers.
-  let {value: urlPath} = browser.execute(function() {
-    return location.pathname;
-  });
-  return urlPath;
-}
-
-
 describe('The content loader', () => {
   beforeEach(() => {
     // Don't use an arrow function since this is eval'ed in test browsers.
@@ -24,7 +15,7 @@ describe('The content loader', () => {
 
   afterEach(() => {
     // Don't use an arrow function since this is eval'ed in test browsers.
-    let {value: isInitialPageLoad} = browser.execute(function() {
+    const {value: isInitialPageLoad} = browser.execute(function() {
       return window.__INITIAL_PAGE_LOAD__;
     });
 
@@ -97,3 +88,16 @@ describe('The content loader', () => {
     }).click('.ArticleList-item:last-child a').waitForVisible('#share');
   });
 });
+
+
+/**
+ * Gets the URL path for the given page.
+ * @return {string} The URL path.
+ */
+function getUrlPath() {
+  // Don't use an arrow function since this is eval'ed in test browsers.
+  const {value: urlPath} = browser.execute(function() {
+    return location.pathname;
+  });
+  return urlPath;
+}

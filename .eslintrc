@@ -14,15 +14,5 @@
   },
   "extends": [
     "eslint:recommended", "google"
-  ],
-  "plugins": [
-    "babel"
-  ],
-  "rules": {
-    // Undo Google rules
-    "require-jsdoc": 0,
-    // Babel
-    "arrow-parens": 0, // Undo base rule.
-    "babel/arrow-parens": [2, "always"]
-  }
+  ]
 }

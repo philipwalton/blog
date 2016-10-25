@@ -11,6 +11,11 @@ const header = document.getElementById('header');
 let isOpen = false;
 
 
+/**
+ * Adds a class to an element.
+ * @param {Element} element The HTML element to add the class to.
+ * @param {string} className The class name to add.
+ */
 function addClass(element, className) {
   const cls = element.className;
   if (!cls) {
@@ -24,6 +29,11 @@ function addClass(element, className) {
 }
 
 
+/**
+ * Removes a class from an element.
+ * @param {Element} element The HTML element to remove the class from.
+ * @param {string} className The class name to remove.
+ */
 function removeClass(element, className) {
   const cls = element.className;
   if (cls.indexOf(className) < 0) return;
@@ -42,12 +52,21 @@ function removeClass(element, className) {
 }
 
 
+/**
+ * A callback that handles clicks on the drawer menu icon.
+ * @param {Event} event The event associated with the click.
+ */
 function handleDrawerToggleClick(event) {
   event.preventDefault();
   isOpen ? close() : open();
 }
 
 
+/**
+ * A callback that closes the drawer if the click originated from outside
+ * the drawer element.
+ * @param {Event} event The event associated with the click.
+ */
 function handleClickOutsideDrawerContainer(event) {
   // Closes an open drawer if the user clicked outside of the nav element.
   if (isOpen && drawerIsUsable() && !closest(event.target, '#header', true)) {
@@ -56,7 +75,31 @@ function handleClickOutsideDrawerContainer(event) {
 }
 
 
-function open() {
+/**
+ * Returns whether or not the drawer menu icon is visible and thus actionable.
+ * @return {boolean} True if the drawer menu icon is visible.
+ */
+function drawerIsUsable() {
+  return getActiveBreakpoint().name != 'lg';
+}
+
+
+/**
+ * Adds event handlers to the drawer menu button.
+ */
+export function init() {
+  drawerToggle.addEventListener('click', handleDrawerToggleClick);
+  drawerToggle.addEventListener('touchend', handleDrawerToggleClick);
+
+  document.addEventListener('click', handleClickOutsideDrawerContainer);
+  document.addEventListener('touchend', handleClickOutsideDrawerContainer);
+}
+
+
+/**
+ * Opens a closed drawer.
+ */
+export function open() {
   if (drawerIsUsable()) {
     isOpen = true;
     setTimeout(function fn() {
@@ -71,7 +114,10 @@ function open() {
 }
 
 
-function close() {
+/**
+ * Closes an open drawer.
+ */
+export function close() {
   if (drawerIsUsable()) {
     isOpen = false;
     setTimeout(function fn() {
@@ -84,21 +130,3 @@ function close() {
     removeClass(header, 'Header--drawerOpen');
   }
 }
-
-
-function drawerIsUsable() {
-  return getActiveBreakpoint().name != 'lg';
-}
-
-
-export default {
-  init: function() {
-    drawerToggle.addEventListener('click', handleDrawerToggleClick);
-    drawerToggle.addEventListener('touchend', handleDrawerToggleClick);
-
-    document.addEventListener('click', handleClickOutsideDrawerContainer);
-    document.addEventListener('touchend', handleClickOutsideDrawerContainer);
-  },
-  open: open,
-  close: close,
-};

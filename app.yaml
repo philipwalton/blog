@@ -1,6 +1,3 @@
-application: philipwalton-site
-version: 14
-
 runtime: python27
 api_version: 1
 threadsafe: true

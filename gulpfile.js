@@ -305,8 +305,12 @@ gulp.task('deploy', ['test', 'build'], (done) => {
   if (!isProd()) {
     throw new Error('The deploy task must be run in production mode.');
   }
+  const appId = 'philipwalton-site';
+  const version = process.env.APP_ENGINE_VERSION || `v${Date.now()}`;
 
-  const appConfig = spawn('appcfg.py', ['update', '.']);
+  const appConfig =
+      spawn('appcfg.py', ['update', '-A', appId, '-V', version, '.']);
+
   appConfig.stderr.on('data', (data) => process.stdout.write(data));
   appConfig.on('close', () => done());
 });

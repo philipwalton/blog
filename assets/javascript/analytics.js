@@ -100,7 +100,9 @@ export function trackPageload() {
  * @param {Error} err The error object to track.
  */
 export function trackError(err) {
-  gaAll('send', 'event', 'Script', 'error', err.stack || err.toString());
+  gaAll('send', 'event', 'Script', 'error', err.stack || err.toString(), {
+    nonInteraction: true,
+  });
 }
 
 
@@ -142,6 +144,7 @@ function trackErrors() {
       eventCategory: 'Script',
       eventAction: 'uncaught error',
       eventLabel: error ? error.stack : `${msg}\n${file}:${line}:${col}`,
+      nonInteraction: true,
     });
   };
 
@@ -218,6 +221,12 @@ function requirePlugins() {
         ],
       },
     ],
+    // Make all media query change events nonInteraction.
+    // TODO(philipwalton): needed until this bug is fixed:
+    // https://github.com/googleanalytics/autotrack/issues/112
+    fieldsObj: {
+      nonInteraction: true,
+    },
   });
   gaAll('require', 'outboundLinkTracker', {
     events: ['click', 'contextmenu'],
@@ -275,7 +284,9 @@ function trackNetworkStatus() {
 
   const updateNetworkStatus = ({type}) => {
     gaTest('set', dimensions.NETWORK_STATUS, type);
-    gaTest('send', 'event', 'Network', 'change', type);
+    gaTest('send', 'event', 'Network', 'change', type, {
+      nonInteraction: true,
+    });
   };
 
   window.addEventListener('online', updateNetworkStatus);

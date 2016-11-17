@@ -8,14 +8,6 @@ import 'autotrack/lib/plugins/url-change-tracker';
 import {breakpoints} from './breakpoints';
 
 
-import {
-  getStoredData,
-  getStoredTrackerData,
-  setStoredData,
-  setStoredTrackerData,
-} from './analytics-storage';
-
-
 /**
  * A global list of tracker object, randomized to ensure no one tracker
  * data is always sent first.
@@ -26,7 +18,6 @@ const ALL_TRACKERS = shuffleArray([
 ]);
 
 
-const PROD_TRACKERS = ALL_TRACKERS.filter(({name}) => !/test/.test(name));
 const TEST_TRACKERS = ALL_TRACKERS.filter(({name}) => /test/.test(name));
 const NULL_VALUE = '(not set)';
 
@@ -48,12 +39,11 @@ const dimensions = {
   SERVICE_WORKER_REPLAY: 'dimension8',
   SERVICE_WORKER_STATUS: 'dimension9',
   NETWORK_STATUS: 'dimension10',
-  HIT_INDEX: 'dimension11',
-  PREVIOUS_HIT_PAYLOAD: 'dimension12',
+  PAGELOAD_ID: 'dimension11',
+  VISIBILITY_STATE: 'dimension12',
   HIT_TYPE: 'dimension13',
   HIT_UUID: 'dimension14',
   HIT_TIME: 'dimension15',
-  PAGELOAD_ID: 'dimension16',
 };
 
 
@@ -79,8 +69,7 @@ export function init() {
   trackServiceWorkerStatus();
   trackNetworkStatus();
   trackPageloadId();
-
-  initSessionControl();
+  trackHitDimensions();
 }
 
 
@@ -110,22 +99,11 @@ export function trackError(err) {
  * Creates the trackers and stores the users client ID to localStorage.
  */
 function createTrackers() {
-  const fields = {siteSpeedSampleRate: 10};
-  const data = getStoredData();
-  for (let tracker of PROD_TRACKERS) {
-    window.ga('create', tracker.trackingId, 'auto', tracker.name, fields);
+  for (let tracker of ALL_TRACKERS) {
+    window.ga('create', tracker.trackingId, 'auto', tracker.name, {
+      siteSpeedSampleRate: 10
+    });
   }
-  window.ga(function() {
-    const firstTracker = window.ga.getAll()[0];
-    data.clientId = firstTracker.get('clientId') || data.clientId;
-    setStoredData(data);
-
-    for (let tracker of TEST_TRACKERS) {
-      if (data.clientId) fields.clientId = data.clientId;
-      if (window.localStorage) fields.storage = 'none';
-      window.ga('create', tracker.trackingId, 'auto', tracker.name, fields);
-    }
-  });
 }
 
 
@@ -139,7 +117,7 @@ function trackErrors() {
   const errorQueue = window.onerror.q || [];
 
   // Override the temp `onerror()` handler to now send hits to GA.
-  window.onerror = function(msg, file, line, col, error) {
+  window.onerror = (msg, file, line, col, error) => {
     gaAll('send', 'event', {
       eventCategory: 'Script',
       eventAction: 'uncaught error',
@@ -176,24 +154,7 @@ function requirePlugins() {
     trailingSlash: 'add',
   });
   gaAll('require', 'eventTracker');
-  gaAll('require', 'impressionTracker', {
-    elements: [{
-      id: 'share',
-      trackFirstImpressionOnly: false,
-    }],
-    hitFilter: (function() {
-      let page = null;
-      return function hitFilter(model) {
-        if (page == model.get('page')) {
-          // Throw to abort hit since an impression for this page
-          // was already tracked.
-          throw new Error();
-        } else {
-          page = model.get('page');
-        }
-      };
-    }()),
-  });
+  gaAll('require', 'impressionTracker', {elements: ['share']});
   gaAll('require', 'mediaQueryTracker', {
     definitions: [
       {
@@ -221,12 +182,6 @@ function requirePlugins() {
         ],
       },
     ],
-    // Make all media query change events nonInteraction.
-    // TODO(philipwalton): needed until this bug is fixed:
-    // https://github.com/googleanalytics/autotrack/issues/112
-    fieldsObj: {
-      nonInteraction: true,
-    },
   });
   gaAll('require', 'outboundLinkTracker', {
     events: ['click', 'contextmenu'],
@@ -234,11 +189,11 @@ function requirePlugins() {
   gaAll('require', 'pageVisibilityTracker', {
     visibleMetricIndex: getDefinitionIndex(metrics.PAGE_VISIBLE),
     hiddenMetricIndex: getDefinitionIndex(metrics.PAGE_HIDDEN),
-    fieldsObj: {
-      nonInteraction: null, // Ensure all events are interactive.
-      [dimensions.HIT_SOURCE]: 'pageVisibilityTracker',
-    },
-    hitFilter: function(model) {
+    heartbeatTimeout: 1,
+    sessionTimeout: 30,
+    timeZone: 'America/Los_Angeles',
+    fieldsObj: {[dimensions.HIT_SOURCE]: 'pageVisibilityTracker'},
+    hitFilter: (model) => {
       model.set(dimensions.METRIC_VALUE, String(model.get('eventValue')), true);
     },
   });
@@ -252,7 +207,7 @@ function requirePlugins() {
  * Sets the client ID as a custom dimension on each tracker.
  */
 function trackClientId() {
-  gaAll(function(tracker) {
+  gaAll((tracker) => {
     const clientId = tracker.get('clientId');
     tracker.set(dimensions.CLIENT_ID, clientId);
   });
@@ -307,37 +262,15 @@ function trackPageloadId() {
  * Adds tracking to record each hit type, time, index,
  * and unique identifier to better detect missing hits.
  */
-function initSessionControl() {
-  gaTest(function(tracker) {
+function trackHitDimensions() {
+  gaTest((tracker) => {
     const originalBuildHitTask = tracker.get('buildHitTask');
-    const originalSendHitTask = tracker.get('sendHitTask');
-
-    tracker.set('buildHitTask', function(model) {
-      const name = tracker.get('name');
-      const trackerData = getStoredTrackerData(name);
-
+    tracker.set('buildHitTask', (model) => {
+      model.set(dimensions.VISIBILITY_STATE, document.visibilityState, true);
       model.set(dimensions.HIT_TYPE, model.get('hitType'), true);
-      model.set(dimensions.HIT_INDEX, String(trackerData.index || 0), true);
-      model.set(dimensions.HIT_TIME, String(+new Date), true);
       model.set(dimensions.HIT_UUID, uuid(), true);
-
-      if (trackerData.payload) {
-        model.set(dimensions.PREVIOUS_HIT_PAYLOAD, trackerData.payload, true);
-      }
-
+      model.set(dimensions.HIT_TIME, String(+new Date), true);
       originalBuildHitTask(model);
-    });
-
-    tracker.set('sendHitTask', function(model) {
-      const name = tracker.get('name');
-      const hitTime = model.get(dimensions.HIT_TIME);
-      const trackerData = getStoredTrackerData(name);
-      trackerData.index = (trackerData.index || 0) + 1;
-      trackerData.time = hitTime;
-      trackerData.payload = serializeHit(model);
-      setStoredTrackerData(name, trackerData);
-
-      originalSendHitTask(model);
     });
   });
 }
@@ -390,7 +323,7 @@ function measureJavaSciptLoadTime() {
  * error occurred loading them.
  */
 function measureWebfontPerfAndFailures() {
-  new Promise(function(resolve, reject) {
+  new Promise((resolve, reject) => {
     const loaded = /wf-(in)?active/.exec(document.documentElement.className);
     const success = loaded && !loaded[1]; // No "in" in the capture group.
     if (loaded) {
@@ -398,14 +331,14 @@ function measureWebfontPerfAndFailures() {
     } else {
       const originalAciveCallback = window.WebFontConfig.active;
       window.WebFontConfig.inactive = reject;
-      window.WebFontConfig.active = function() {
+      window.WebFontConfig.active = () => {
         originalAciveCallback();
         resolve();
       };
       // In case the webfont.js script failed to load.
       setTimeout(reject, window.WebFontConfig.timeout);
     }
-  }).then(function() {
+  }).then(() => {
     const fontsActiveTime = measureDuration('fonts:active');
     if (fontsActiveTime) {
       // Tracks the amount of time the web fonts take to activate.
@@ -416,7 +349,7 @@ function measureWebfontPerfAndFailures() {
         [dimensions.METRIC_VALUE]: String(fontsActiveTime),
       });
     }
-  }).catch(function() {
+  }).catch(() => {
     gaTest('send', 'event', 'Fonts', 'error', 'google');
   });
 }
@@ -447,10 +380,10 @@ function measureDuration(mark, reference = 'responseEnd') {
  * @return {Function} The proxied ga() function.
  */
 function createGaProxy(trackers) {
-  return function(command, ...args) {
+  return (command, ...args) => {
     for (let {name} of trackers) {
       if (typeof command == 'function') {
-        window.ga(function() {
+        window.ga(() => {
           command(window.ga.getByName(name));
         });
       } else {
@@ -460,34 +393,6 @@ function createGaProxy(trackers) {
   };
 }
 
-
-/**
- * Takes a tracker model and extracts the most interesting fields into a
- * serialized string.
- * @param {Object} model The tracker model.
- * @return {string} The serialized model string.
- */
-function serializeHit(model) {
-  const hit = {
-    hitType: model.get('hitType'),
-    page: model.get('page'),
-  };
-
-  const hitSource = model.get(dimensions.HIT_SOURCE);
-  if (hitSource && hitSource != NULL_VALUE) hit.hitSource = hitSource;
-
-  if (hit.hitType == 'event') {
-    hit.eventCategory = model.get('eventCategory');
-    hit.eventAction = model.get('eventAction');
-    hit.eventLabel = model.get('eventLabel');
-  }
-
-  hit.hitUuid = model.get(dimensions.HIT_UUID);
-  hit.hitTime = model.get(dimensions.HIT_TIME);
-
-  return Object.keys(hit)
-      .map((key) => `${key}=${decodeURIComponent(hit[key])}`).join('&');
-}
 
 
 /**

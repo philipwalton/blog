@@ -22,7 +22,7 @@
   },
   "devDependencies": {
     "async-waituntil-polyfill": "^1.0.1",
-    "autotrack": "^1.0.0",
+    "autotrack": "googleanalytics/autotrack#session-control",
     "babel-core": "^6.11.4",
     "babel-eslint": "^6.1.2",
     "babel-plugin-transform-async-to-generator": "^6.8.0",

@@ -96,7 +96,7 @@ export function trackError(err) {
 
 
 /**
- * Creates the trackers and stores the users client ID to localStorage.
+ * Creates the trackers and sets the default fields.
  */
 function createTrackers() {
   for (let tracker of ALL_TRACKERS) {
@@ -104,6 +104,7 @@ function createTrackers() {
       siteSpeedSampleRate: 10
     });
   }
+  gaAll('set', 'transport', 'beacon');
 }
 
 

@@ -32,6 +32,10 @@ const source = require('vinyl-source-stream');
 const book = require('./book');
 
 
+// Default to development mode.
+if (!process.env.NODE_ENV) process.env.NODE_ENV = 'development';
+
+
 /**
  * The output directory for all the built files.
  */

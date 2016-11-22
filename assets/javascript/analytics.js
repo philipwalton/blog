@@ -116,6 +116,38 @@ function createTrackers() {
   }
   gaAll('set', 'transport', 'beacon');
   gaTest('set', dimensions.TRACKING_VERSION, TRACKING_VERSION);
+
+  // Log hits in non-production environments.
+  if (process.env.NODE_ENV != 'production') {
+    gaAll('set', 'sendHitTask', function(model) {
+      var paramsToIgnore = ['v', 'did', 't', 'tid', 'ec', 'ea', 'el', 'ev',
+          'a', 'z', 'ul', 'de', 'sd', 'sr', 'vp', 'je', 'fl', 'jid'];
+
+      var hitType = model.get('&t');
+      var hitPayload = model.get('hitPayload');
+      var hit = hitPayload
+          .split('&')
+          .map(decodeURIComponent)
+          .filter((item) => {
+            const [param, value] = item.split('=');
+            return !(param.charAt(0) === '_' ||
+                paramsToIgnore.indexOf(param) > -1);
+          });
+
+      var parts = [model.get('&tid'), hitType];
+      if (hitType == 'event') {
+        parts = [
+          ...parts,
+          model.get('&ec'),
+          model.get('&ea'),
+          model.get('&el'),
+        ];
+        if (model.get('&ev')) parts.push(model.get('&ev'));
+      }
+
+      window['console'].log(...parts, hit);
+    });
+  }
 }
 
 

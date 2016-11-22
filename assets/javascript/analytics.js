@@ -9,6 +9,14 @@ import {breakpoints} from './breakpoints';
 
 
 /**
+ * Bump this when making backwards incompatible changes to the tracking
+ * implementation. This allows you to create a segment or view filter
+ * that isolates only data captured with the most recent tracking changes.
+ */
+const TRACKING_VERSION = '1';
+
+
+/**
  * A global list of tracker object, randomized to ensure no one tracker
  * data is always sent first.
  */
@@ -44,6 +52,7 @@ const dimensions = {
   HIT_TYPE: 'dimension13',
   HIT_UUID: 'dimension14',
   HIT_TIME: 'dimension15',
+  TRACKING_VERSION: 'dimension16',
 };
 
 
@@ -96,7 +105,8 @@ export function trackError(err) {
 
 
 /**
- * Creates the trackers and sets the default fields.
+ * Creates the trackers and sets the default transport and tracking
+ * version fields. In non-production environments it also logs hits.
  */
 function createTrackers() {
   for (let tracker of ALL_TRACKERS) {
@@ -105,6 +115,7 @@ function createTrackers() {
     });
   }
   gaAll('set', 'transport', 'beacon');
+  gaTest('set', dimensions.TRACKING_VERSION, TRACKING_VERSION);
 }
 
 
@@ -260,17 +271,17 @@ function trackPageloadId() {
 
 
 /**
- * Adds tracking to record each hit type, time, index,
- * and unique identifier to better detect missing hits.
+ * Adds tracking to record each the type, time, uuid, and visibility state
+ * of each hit immediately before it's sent.
  */
 function trackHitDimensions() {
   gaTest((tracker) => {
     const originalBuildHitTask = tracker.get('buildHitTask');
     tracker.set('buildHitTask', (model) => {
-      model.set(dimensions.VISIBILITY_STATE, document.visibilityState, true);
       model.set(dimensions.HIT_TYPE, model.get('hitType'), true);
-      model.set(dimensions.HIT_UUID, uuid(), true);
       model.set(dimensions.HIT_TIME, String(+new Date), true);
+      model.set(dimensions.HIT_UUID, uuid(), true);
+      model.set(dimensions.VISIBILITY_STATE, document.visibilityState, true);
       originalBuildHitTask(model);
     });
   });

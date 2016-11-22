@@ -129,7 +129,7 @@ function createTrackers() {
           .split('&')
           .map(decodeURIComponent)
           .filter((item) => {
-            const [param, value] = item.split('=');
+            const [param] = item.split('=');
             return !(param.charAt(0) === '_' ||
                 paramsToIgnore.indexOf(param) > -1);
           });

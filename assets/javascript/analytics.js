@@ -47,7 +47,7 @@ const dimensions = {
   SERVICE_WORKER_REPLAY: 'dimension8',
   SERVICE_WORKER_STATUS: 'dimension9',
   NETWORK_STATUS: 'dimension10',
-  PAGELOAD_ID: 'dimension11',
+  WINDOW_ID: 'dimension11',
   VISIBILITY_STATE: 'dimension12',
   HIT_TYPE: 'dimension13',
   HIT_UUID: 'dimension14',
@@ -72,13 +72,9 @@ export function init() {
   createTrackers();
   trackErrors();
 
-  setDefaultDimensionValues();
-  requirePlugins();
-  trackClientId();
-  trackServiceWorkerStatus();
-  trackNetworkStatus();
-  trackPageloadId();
-  trackHitDimensions();
+  trackCustomDimensions();
+  trackNetworkStatusChanges();
+  requireAutotrackPlugins();
 }
 
 
@@ -114,8 +110,10 @@ function createTrackers() {
       siteSpeedSampleRate: 10
     });
   }
+
+  // Ensures all hits are sent via `navigator.sendBeacon()`.
+  // Note: this cannot via the `create` command.
   gaAll('set', 'transport', 'beacon');
-  gaTest('set', dimensions.TRACKING_VERSION, TRACKING_VERSION);
 
   // Log hits in non-production environments.
   if (process.env.NODE_ENV != 'production') {
@@ -180,17 +178,59 @@ function trackErrors() {
 /**
  * Sets a default dimension value for all custom dimensions on all trackers.
  */
-function setDefaultDimensionValues() {
+function trackCustomDimensions() {
+  // Sets a default dimension value for all custom dimensions on all trackers.
+  // This obviously must be done before setting any other custom dimensions.
   Object.keys(dimensions).forEach((key) => {
     gaAll('set', dimensions[key], NULL_VALUE);
   });
+
+  // Adds tracking of dimensions known at page load time.
+  gaTest((tracker) => {
+    tracker.set({
+      [dimensions.TRACKING_VERSION]: TRACKING_VERSION,
+      [dimensions.CLIENT_ID]: tracker.get('clientId'),
+      [dimensions.WINDOW_ID]: uuid(),
+      [dimensions.SERVICE_WORKER_STATUS]: getServiceWorkerStatus(),
+      [dimensions.NETWORK_STATUS]: navigator.onLine ? 'online' : 'offline',
+    });
+  });
+
+  // Adds tracking to record each the type, time, uuid, and visibility state
+  // of each hit immediately before it's sent.
+  gaTest((tracker) => {
+    const originalBuildHitTask = tracker.get('buildHitTask');
+    tracker.set('buildHitTask', (model) => {
+      model.set(dimensions.HIT_TYPE, model.get('hitType'), true);
+      model.set(dimensions.HIT_TIME, String(+new Date), true);
+      model.set(dimensions.HIT_UUID, uuid(), true);
+      model.set(dimensions.VISIBILITY_STATE, document.visibilityState, true);
+      originalBuildHitTask(model);
+    });
+  });
+}
+
+
+/**
+ * Sets the network status as a custom dimension on each tracker and adds
+ * event listeners to detect future network changes.
+ */
+function trackNetworkStatusChanges() {
+  const updateNetworkStatus = ({type}) => {
+    gaTest('set', dimensions.NETWORK_STATUS, type);
+    gaTest('send', 'event', 'Network', 'change', type, {
+      nonInteraction: true,
+    });
+  };
+  window.addEventListener('online', updateNetworkStatus);
+  window.addEventListener('offline', updateNetworkStatus);
 }
 
 
 /**
  * Requires select autotrack plugins for each tracker.
  */
-function requirePlugins() {
+function requireAutotrackPlugins() {
   gaAll('require', 'cleanUrlTracker', {
     stripQuery: true,
     queryDimensionIndex: getDefinitionIndex(dimensions.URL_QUERY_PARAMS),
@@ -243,79 +283,6 @@ function requirePlugins() {
   });
   gaAll('require', 'urlChangeTracker', {
     fieldsObj: {[dimensions.HIT_SOURCE]: 'urlChangeTracker'},
-  });
-}
-
-
-/**
- * Sets the client ID as a custom dimension on each tracker.
- */
-function trackClientId() {
-  gaAll((tracker) => {
-    const clientId = tracker.get('clientId');
-    tracker.set(dimensions.CLIENT_ID, clientId);
-  });
-}
-
-
-/**
- * Sets the service worker status as a custom dimension on each tracker.
- */
-function trackServiceWorkerStatus() {
-  const serviceWorkerStatus = 'serviceWorker' in navigator
-    ? (navigator.serviceWorker.controller ? 'controlled' : 'supported')
-    : 'unsupported';
-
-  // Note: the service worker may start controlling the page at some point
-  // after the initial page load, but since we're primarily concerned with
-  // what the status was at initial load, we don't listen for changes.
-  gaTest('set', dimensions.SERVICE_WORKER_STATUS, serviceWorkerStatus);
-}
-
-
-/**
- * Sets the network status as a custom dimension on each tracker and adds
- * event listeners to detect future network changes.
- */
-function trackNetworkStatus() {
-  gaTest('set', dimensions.NETWORK_STATUS,
-      navigator.onLine ? 'online' : 'offline');
-
-  const updateNetworkStatus = ({type}) => {
-    gaTest('set', dimensions.NETWORK_STATUS, type);
-    gaTest('send', 'event', 'Network', 'change', type, {
-      nonInteraction: true,
-    });
-  };
-
-  window.addEventListener('online', updateNetworkStatus);
-  window.addEventListener('offline', updateNetworkStatus);
-}
-
-
-/**
- * Tracks a unique ID per unique page load. This help distinguish hits from
- * multiple tabs open at the same time.
- */
-function trackPageloadId() {
-  gaTest('set', dimensions.PAGELOAD_ID, uuid());
-}
-
-
-/**
- * Adds tracking to record each the type, time, uuid, and visibility state
- * of each hit immediately before it's sent.
- */
-function trackHitDimensions() {
-  gaTest((tracker) => {
-    const originalBuildHitTask = tracker.get('buildHitTask');
-    tracker.set('buildHitTask', (model) => {
-      model.set(dimensions.HIT_TYPE, model.get('hitType'), true);
-      model.set(dimensions.HIT_TIME, String(+new Date), true);
-      model.set(dimensions.HIT_UUID, uuid(), true);
-      model.set(dimensions.VISIBILITY_STATE, document.visibilityState, true);
-      originalBuildHitTask(model);
-    });
   });
 }
 
@@ -447,6 +414,19 @@ function createGaProxy(trackers) {
 function getDefinitionIndex(definition) {
   return +/\d+$/.exec(definition)[0];
 }
+
+
+/**
+ * Gets the service worker status. It will be either: 'supported',
+ * 'unsupported', or 'controlled'.
+ * @return {string} The service worker status.
+ */
+function getServiceWorkerStatus() {
+  return 'serviceWorker' in navigator
+    ? (navigator.serviceWorker.controller ? 'controlled' : 'supported')
+    : 'unsupported';
+}
+
 
 
 /**

@@ -42,7 +42,7 @@ function main(err) {
  *     no polyfills are needed.
  */
 function browserSupportsAllFeatures() {
-  return false && window.Promise && window.fetch && window.Symbol;
+  return window.Promise && window.fetch && window.Symbol;
 }
 
 

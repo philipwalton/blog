@@ -12,8 +12,8 @@ pre {
 
 /* Allow for highlighting specific parts of a code block. */
 pre mark {
-  background-color: #ff9;
-  box-shadow: 0 0 0 .1em #ff9;
+  background-color: hsla(60, 100%, 50%, 0.4);
+  box-shadow: 0 0 0 .1em hsla(60, 100%, 50%, 0.4);
   font-style: normal;
 }
 

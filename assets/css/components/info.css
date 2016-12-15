@@ -1,0 +1,25 @@
+.Info {
+  background: hsla(120, 100%, 50%, .05);
+  border-radius: var(--border-radius);
+  margin: var(--vgap) -var(--hgap);
+  padding: var(--vgap) var(--hgap);
+}
+
+.Info :last-child {
+  margin-bottom: 0;
+}
+
+
+@media (--break-md) {
+  .Info {
+    margin: var(--vgap-md) -var(--hgap-md);
+    padding: var(--vgap-md) var(--hgap-md);
+  }
+}
+
+@media (--break-lg) {
+  .Info {
+    margin: var(--vgap-md) 0;
+    padding: var(--vgap-md) var(--hgap-md);
+  }
+}

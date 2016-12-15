@@ -149,6 +149,9 @@ gulp.task('images', () => {
         .pipe(resize({width: 1400}))
         .pipe(imagemin({use: [pngquant()]}))
         .pipe(rename((path) => path.basename += '-1400w'))
+        .pipe(gulp.dest(DEST)),
+
+    gulp.src('./assets/images/*.svg', {base: '.'})
         .pipe(gulp.dest(DEST))
   );
 });

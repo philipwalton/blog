@@ -98,3 +98,6 @@ articles:
 - title: "Loading Polyfills Only When Needed"
   path: /articles/loading-polyfills-only-when-needed/
   date: 2016-09-27T15:41:26-07:00
+- title: "The Dark Side of Polyfilling CSS"
+  path: /articles/the-dark-side-of-polyfilling-css/
+  date: 2016-12-06T08:40:44+01:00

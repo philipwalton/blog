@@ -1,14 +1,14 @@
-Earlier this year I wrote an [article for Smashing Magazine](https://www.smashingmagazine.com/2016/03/houdini-maybe-the-most-exciting-development-in-css-youve-never-heard-of/) about [Houdini](https://github.com/w3c/css-houdini-drafts/wiki), and I called it the "most exciting development in CSS you've never heard of". In the article I argue that Houdini APIs will (among other things) make it possible to polyfill CSS features in a way the cannot be easily accomplished today.
+Earlier this year I wrote an [article for Smashing Magazine](https://www.smashingmagazine.com/2016/03/houdini-maybe-the-most-exciting-development-in-css-youve-never-heard-of/) about [Houdini](https://github.com/w3c/css-houdini-drafts/wiki), and I called it the "most exciting development in CSS you've never heard of". In the article I argue that Houdini APIs will (among other things) make it possible to polyfill CSS features in a way that simply cannot be done today.
 
 While the article was generally quite well-received, I did notice the same question popping up over and over again in my inbox and on Twitter. The basic gist of the question was:
 
-> What's so hard about polyfilling CSS? I've used lot of CSS polyfills, and they worked fine for me.
+> What's so hard about polyfilling CSS? I've used lots of CSS polyfills, and they worked fine for me.
 
 And I realized&mdash;of course people have this question. If you've never tried writing a CSS polyfill yourself, then you've probably never experienced the pain.
 
 So the best way I can think of to answer this question&mdash;and explain why I'm excited about Houdini&mdash;is to show you exactly why polyfilling CSS is hard.
 
-And the best way to show you is to build a polyfill ourselves.
+And the best way to do that is to write a polyfill ourselves.
 
 <div class="Callout">
 
@@ -18,9 +18,9 @@ And the best way to show you is to build a polyfill ourselves.
 
 ## The `random` keyword
 
-The feature we're going to polyfill is a (pretend) new CSS keyword called `random`. Random is a number between 0 and 1, just like what `Math.random()` returns in JavaScript.
+The feature we're going to polyfill is a (pretend) new CSS keyword called `random`, which evaluates to a number between 0 and 1 (just like what `Math.random()` returns in JavaScript).
 
-Here's an example showing how random might be used in CSS:
+Here's an example showing how random might be used:
 
 ```css
 .foo {
@@ -127,15 +127,15 @@ for (const stylesheet of document.styleSheets) {
 
 If you load [demo #2](https://philipwalton.github.io/talks/2016-12-02/demos/2/) and paste the above code into the JavaScript console and run it, it'll actually do what it's supposed to do, but you won't see any random-width progress bars when it's done.
 
-The reason is because rules containing the `random` keyword *aren't in the CSSOM*!
+The reason is because *none* of the rules containing the `random` keyword are in the CSSOM!
 
-As you're probably aware, when a browser encounters a CSS rule it doesn't understand, it simply ignores it. In most situations that's a good thing because it means you can load CSS in old browsers and the page doesn't completely break. Unfortunately, it also means if you want access to the raw, unaltered CSS, you have to fetch it yourself.
+As you're probably aware, when a browser encounters a CSS rule it doesn't understand, it simply ignores it. In most situations that's a good thing because it means you can load CSS in an old browser and the page won't complete break. Unfortunately, it also means if you need access to the raw, unaltered CSS, you have to fetch it yourself.
 
 ### Fetching the page styles manually
 
 CSS rules can be added to a page with either `<style>` elements or `<link rel="stylesheet">` elements, so to get the raw, unaltered CSS you can do a `querySelectorAll()` on the document and manually get the `innerHTML` contents of any `<style>` tags or `fetch()` the URL resources of any `<link ref="stylesheet">` tags:
 
-The following code defines a `getPageStyles` utility function that returns a promise that will resolve to the full CSS text:
+The following code defines a `getPageStyles` utility function that returns a promise that will resolve with the full CSS text of all page styles:
 
 ```js
 const getPageStyles = () => {
@@ -155,7 +155,7 @@ const getPageStyles = () => {
 }
 ```
 
-If you open [demo #3](https://philipwalton.github.io/talks/2016-12-02/demos/3/) and paste the above code into the JavaScript console (which defines the function), you'll then be able to run the following code to get the full CSS text:
+If you open [demo #3](https://philipwalton.github.io/talks/2016-12-02/demos/3/) and paste the above code into the JavaScript console to define the `getPageStyles()` function, you'll then be able to run the code below to log the full CSS text:
 
 ```js
 getPageStyles().then((cssText) => {
@@ -167,7 +167,7 @@ getPageStyles().then((cssText) => {
 
 Once you have the raw CSS text, you need to parse it.
 
-You might thinking that since the browser already has a CSS parser you'd be able to call some function to parse the CSS. Unfortunately, that's not the case. And even if the browser did expose a `parseCSS()` function, it doesn't change the fact that the browser doesn't understand the `random` keyword, so if its `parseCSS()` function would likely not work anyway (hopefully future parse specs will allow for unknown keywords that otherwise comply with the existing grammar).
+You might be thinking that since the browser already has a CSS parser you'd be able to call some function to parse the CSS. Unfortunately, that's not the case. And even if the browser did expose a `parseCSS()` function, it doesn't change the fact that the browser doesn't understand the `random` keyword, so its `parseCSS()` function would likely still not work (hopefully future parse specs will allow for unknown keywords that otherwise comply with the existing grammar).
 
 There are several good, open-source CSS parsers out there, and for the purposes of this demo, we're going to use [PostCSS](http://postcss.org/) (since it can be browserified and includes a plugin system that we'll take advantage of later).
 
@@ -202,7 +202,7 @@ you'll get something like this:
 
 This is what's known as an [abstract syntax tree](https://en.wikipedia.org/wiki/Abstract_syntax_tree) (AST), and you can think of it like our own version of the CSSOM.
 
-So now that we have a utility function to get the full CSS text, as well as a function to parse it, here's what our polyfill looks like so far:
+Now that we have a utility function to get the full CSS text, as well as a function to parse it, here's what our polyfill looks like so far:
 
 ```js
 import postcss from 'postcss';
@@ -245,7 +245,7 @@ const randomKeywordPlugin = postcss.plugin('random-keyword', () => {
 
 ### Stringifying the AST back into CSS
 
-Another nice thing about using PostCSS plugins is they already have built-in logic for stringify the AST back into CSS. All you have to do is create a PostCSS instance, pass it the plugin (or plugins) you want to use, and then run `process()`, which returns a promise that resolves with an object containing the stringified CSS:
+Another nice thing about using PostCSS plugins is they already have built-in logic for stringifying the AST back into CSS. All you have to do is create a PostCSS instance, pass it the plugin (or plugins) you want to use, and then run `process()`, which returns a promise that resolves with an object containing the stringified CSS:
 
 ```js
 postcss([randomKeywordPlugin]).process(css).then((result) => {
@@ -255,7 +255,7 @@ postcss([randomKeywordPlugin]).process(css).then((result) => {
 
 ### Replacing the page styles
 
-We also have to write a utility function (similar to `getPageStyles()`) that updates the styles on the page with the new CSS:
+To replace the page styles we can write a utility function (similar to `getPageStyles()`) that finds all `<style>` and `<link rel="stylesheet">` elements and removes them. It also creates a new `<style>` tag and sets its style contents to whatever CSS text is passed to the function:
 
 ```js
 const replacePageStyles = (css) => {
@@ -272,8 +272,6 @@ const replacePageStyles = (css) => {
   existingStyles.forEach((el) => el.parentElement.removeChild(el));
 };
 ```
-
-The code above finds all `<style>` and `<link rel="stylesheet">` elements and removes them. It also creates a new `<style>` tag and sets its style contents to whatever CSS text is passed to the function.
 
 ### Putting it all together
 
@@ -298,11 +296,11 @@ If you open [demo #5](https://philipwalton.github.io/talks/2016-12-02/demos/5/),
 
 While the plugin is technically working, it's applying the same random value to every element matching the selector.
 
-This makes perfect sense when we think about what we've done&mdash;we've just rewritten a single property in a single rule.
+This makes perfect sense when we think about what we've done&mdash;we've just rewritten a single property on a single rule.
 
-The truth is all but the simplest CSS polyfills require more than just rewriting individual property values. Most of them require knowledge of the DOM as well as specific details (size, order, contents, etc.) of the individual matching elements.
+The truth is all but the simplest CSS polyfills require more than just rewriting individual property values. Most of them require knowledge of the DOM as well as specific details (size, contents, order, etc.) of the individual matching elements. This is why preprocessors and server-side solutions to this problem will never be sufficient alone.
 
-This is why preprocessors and server-side solutions to this problem will never be sufficient alone. But it brings up an important question: *how do we update the polyfill to target individual elements?*
+But that brings up an important question: *how do we update the polyfill to target individual elements?*
 
 ## Targeting individual, matching elements
 
@@ -348,7 +346,7 @@ The above codes states that all progress bar elements should have a random width
 
 Of course this won't work, because we're applying inline styles directly to the element, which means those styles will be more specific than the styles defined on `#some-container .progress-bar`.
 
-This means our polyfill breaks some fundamental assumptions we make when working with CSS (and personally, I find this unacceptable).
+This means our polyfill breaks some fundamental assumptions we make when working with CSS (so personally, I find this option unacceptable).
 
 ### Option #2: Use inline styles, but try to account for the gotchas of option #1
 
@@ -367,15 +365,15 @@ While it's definitely *possible* to re-implement the cascade in JavaScript, it w
 
 ### Option #3: Rewrite the CSS to target individual, matching elements while maintaining cascade order.
 
-The third options&mdash;which I consider to be the best of the bad options&mdash;is to rewrite the CSS to convert rules containing a single selector targeting multiple DOM elements into multiple rules containing selectors that all match only a single DOM element.
+The third option&mdash;which I consider to be the best of the bad options&mdash;is to rewrite the CSS and convert rules with one selector that matches many elements into many rules, each of which only matches a single element, all the while not changing the final set of matching elements.
 
-That's probably not super clear, so consider the following CSS file, which is included on a page that contains three paragraph elements:
+Since that last sentence probably didn't make a whole lot of sense, let me clarify with an example. Consider the following CSS file, which is included on a page that contains three paragraph elements:
 
 ```css
 * {
   box-sizing: border-box;
 }
-p {
+p { /* Will match 3 paragraphs on the page. */
   opacity: random;
 }
 .foo {
@@ -403,7 +401,7 @@ p**[data-pid="3"]** {
 }
 ```
 
-Of course, if you're paying attention, this still doesn't quite work because it alters the specificity of these selectors, which will likely affect the cascade order. *However*, we can ensure the proper cascade order is maintained by increasing *every other selector* on the page by the same specificity amount with some clever hackery:
+Of course, if you're paying attention, this still doesn't quite work because it alters the specificity of these selectors, which will likely lead to unintended side-effects. *However*, we can ensure the proper cascade order is maintained by increasing *every other selector* on the page by the same specificity amount with some clever hackery:
 
 ```css
 *​**:not(.z)** {
@@ -423,16 +421,16 @@ p[data-pid="3"] {
 }
 ```
 
-The changes above apply the `:not()` functional, pseudo-class selector and pass it the name of a class that's not in the DOM (which means if you use the class `.z`, you'd have to pick a different name). And since `:not()` will always match an element that doesn't exist, it can be used to increase the specificity of a selector without changing what it matches.
+The changes above apply the `:not()` functional, pseudo-class selector and pass it the name of a class we know isn't found in the DOM (in this case I've chosen `.z`; which means if you use the class `.z` in the DOM you'd have to pick a different name). And since `:not()` will always match an element that doesn't exist, it can be used to increase the specificity of a selector without changing what it matches.
 
 [Demo #7](https://philipwalton.github.io/talks/2016-12-02/demos/5/), shows the result of implementing this strategy, and you can refer to the [demo source code](https://github.com/philipwalton/talks/blob/b0a2b9a3de509dd39368516e7e304a4159b41b08/2016-12-02/demos/src/random-keyword-plugin.js
 ) to see the full set of changes to the `random-keyword` plugin.
 
-The best part about option #3 is it continues to let the browser handle the cascade, which the browser is already good at. This means you can use media queries, `!important`, custom properties, `@support` rules, or any CSS feature, and it will still just work.
+The best part about option #3 is it continues to let the browser handle the cascade, which the browser is already really good at. This means you can use media queries, `!important` declarations, custom properties, `@support` rules, or any CSS feature, and it will still just work.
 
 ## Downsides
 
-It might seem like with option #3 I've solved all of the problems with CSS polyfills, but that couldn't be farther from the truth. There are still a lot of remaining issues, some of which can be resolved (with a lot of extra work), and some of which cannot be resolved.
+It might seem like with option #3 I've solved all of the problems with CSS polyfills, but that couldn't be further from the truth. There are still a lot of remaining issues, some of which can be resolved (with a lot of extra work), and some of which are impossible to resovle and therefore unavoidable.
 
 ### Unresolved issues
 
@@ -447,19 +445,19 @@ We also haven't even considered the possibility of what happens when the DOM cha
 
 ### Unavoidable problems
 
-And in addition to the problems I've just described (which are hard, but doable), there are also problems that just can't be avoided:
+In addition to the problems I've just described (which are hard, but doable), there are some problems that just can't be avoided:
 
 - It requires *a ton* of extra code.
 - It doesn't work with cross-origin (non-CORS) stylesheets.
 - It performs horribly if/when changes are needed (e.g. DOM changes, scroll/resize handlers, etc.)
 
-Our `random` keyword polyfill is a rather simple case, but I'm sure you can easily imagine a polyfill for something like `position: sticky`, in which all the logic I've described here would have to be re-run every time the user scrolled, which would absolutely *horrible* for performance.
+Our `random` keyword polyfill is a rather simple case, but I'm sure you can easily imagine a polyfill for something like `position: sticky`, in which all the logic I've described here would have to be re-run every time the user scrolled, which would be absolutely *horrible* for performance.
 
 #### Possibilities for improvement
 
-One solution I didn't address in my talk (due to time constraints) that would potentially alleviate the first two bullets above is to do the parsing and fetching of the CSS server-side in a build step.
+One solution I didn't address in my talk (due to limited time) that would potentially alleviate the first two bullets above is to do the parsing and fetching of the CSS server-side in a build step.
 
-And instead of loading a CSS file containing styles, you'd load a JavaScript file containing an AST and the first thing it would do is stringify itself and add the styles to the page. You could even include a `<noscript>` tag which references the original CSS file in the event the user had disabled JavaScript.
+Then instead of loading a CSS file containing styles, you'd load a JavaScript file containing an AST and the first thing it would do is stringify the AST and add the styles to the page. You could even include a `<noscript>` tag which references the original CSS file in the event the user has JavaScript disabled.
 
 For example, instead of this:
 
@@ -480,7 +478,7 @@ No matter what you try, you'll always have to rewrite the CSS whenever a change 
 
 ## Understanding the performance implications
 
-In order to understand why the performance of CSS polyfills is so bad, you really have to understand the browser rendering pipeline&mdash;specifically the steps in the pipeline that you as a developer have access to change.
+In order to understand why the performance of CSS polyfills is so bad, you really have to understand the browser rendering pipeline&mdash;specifically the steps in the pipeline that you as a developer have access to.
 
 <figure>
   <img

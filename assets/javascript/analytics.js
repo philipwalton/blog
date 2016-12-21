@@ -14,7 +14,7 @@ import {breakpoints} from './breakpoints';
  * implementation. This allows you to create a segment or view filter
  * that isolates only data captured with the most recent tracking changes.
  */
-const TRACKING_VERSION = '3';
+const TRACKING_VERSION = '4';
 
 
 /**
@@ -301,6 +301,9 @@ function requireAutotrackPlugins() {
     timeZone: 'America/Los_Angeles',
     fieldsObj: {[dimensions.HIT_SOURCE]: 'pageVisibilityTracker'},
     hitFilter: (model) => {
+      const path = model.get('page') || parseUrl(model.get('location')).path;
+      model.set('eventLabel', path, true);
+
       model.set(dimensions.METRIC_VALUE, String(model.get('eventValue')), true);
     },
   });

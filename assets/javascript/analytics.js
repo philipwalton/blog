@@ -14,7 +14,7 @@ import {breakpoints} from './breakpoints';
  * implementation. This allows you to create a segment or view filter
  * that isolates only data captured with the most recent tracking changes.
  */
-const TRACKING_VERSION = '2';
+const TRACKING_VERSION = '3';
 
 
 /**
@@ -214,6 +214,23 @@ function trackCustomDimensions() {
       originalBuildHitTask(model);
     });
   });
+
+  // Send "fake" pageviews as events immediately after any real pageviews.
+  gaTest((tracker) => {
+    const originalSendHitTask = tracker.get('sendHitTask');
+    tracker.set('sendHitTask', (model) => {
+      var hitSource = model.get(dimensions.HIT_SOURCE);
+      var hitType = model.get('hitType');
+
+      originalSendHitTask(model);
+      if (hitType == 'pageview') {
+        gaTest('send', 'event', 'Fake', 'pageview', NULL_VALUE, {
+          [metrics.PAGEVIEWS]: 1,
+          [dimensions.HIT_SOURCE]: hitSource,
+        });
+      }
+    });
+  });
 }
 
 
@@ -285,19 +302,10 @@ function requireAutotrackPlugins() {
     fieldsObj: {[dimensions.HIT_SOURCE]: 'pageVisibilityTracker'},
     hitFilter: (model) => {
       model.set(dimensions.METRIC_VALUE, String(model.get('eventValue')), true);
-      if (model.get('name') == TEST_TRACKERS[0].name &&
-          model.get('hitType') == 'pageview') {
-        model.set('hitCallback', sendFakePageview, true);
-      }
     },
   });
   gaAll('require', 'urlChangeTracker', {
     fieldsObj: {[dimensions.HIT_SOURCE]: 'urlChangeTracker'},
-    hitFilter: (model) => {
-      if (model.get('name') == TEST_TRACKERS[0].name) {
-        model.set('hitCallback', sendFakePageview, true);
-      }
-    }
   });
 }
 
@@ -307,17 +315,6 @@ function requireAutotrackPlugins() {
  */
 function sendInitialPageview() {
   gaAll('send', 'pageview', {[dimensions.HIT_SOURCE]: 'pageload'});
-  sendFakePageview();
-}
-
-
-/**
- * Sends an event with the "Pageviews" metric set, as an experiment.
- */
-function sendFakePageview() {
-  gaTest('send', 'event', 'Fake', 'pageview', NULL_VALUE, {
-    [metrics.PAGEVIEWS]: 1
-  });
 }
 
 

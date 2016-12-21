@@ -5,6 +5,7 @@ import 'autotrack/lib/plugins/media-query-tracker';
 import 'autotrack/lib/plugins/outbound-link-tracker';
 import 'autotrack/lib/plugins/page-visibility-tracker';
 import 'autotrack/lib/plugins/url-change-tracker';
+import parseUrl from 'dom-utils/lib/parse-url';
 import {breakpoints} from './breakpoints';
 
 
@@ -33,6 +34,7 @@ const NULL_VALUE = '(not set)';
 const metrics = {
   PAGE_VISIBLE: 'metric1',
   PAGE_HIDDEN: 'metric2',
+  PAGEVIEWS: 'metric3',
 };
 
 
@@ -53,6 +55,7 @@ const dimensions = {
   HIT_UUID: 'dimension14',
   HIT_TIME: 'dimension15',
   TRACKING_VERSION: 'dimension16',
+  PAGE_PATH: 'dimension17',
 };
 
 
@@ -201,6 +204,9 @@ function trackCustomDimensions() {
   gaTest((tracker) => {
     const originalBuildHitTask = tracker.get('buildHitTask');
     tracker.set('buildHitTask', (model) => {
+      const path = model.get('page') || parseUrl(model.get('location')).path;
+      model.set(dimensions.PAGE_PATH, path),
+
       model.set(dimensions.HIT_TYPE, model.get('hitType'), true);
       model.set(dimensions.HIT_TIME, String(+new Date), true);
       model.set(dimensions.HIT_UUID, uuid(), true);
@@ -279,10 +285,19 @@ function requireAutotrackPlugins() {
     fieldsObj: {[dimensions.HIT_SOURCE]: 'pageVisibilityTracker'},
     hitFilter: (model) => {
       model.set(dimensions.METRIC_VALUE, String(model.get('eventValue')), true);
+      if (model.get('name') == TEST_TRACKERS[0].name &&
+          model.get('hitType') == 'pageview') {
+        model.set('hitCallback', sendFakePageview, true);
+      }
     },
   });
   gaAll('require', 'urlChangeTracker', {
     fieldsObj: {[dimensions.HIT_SOURCE]: 'urlChangeTracker'},
+    hitFilter: (model) => {
+      if (model.get('name') == TEST_TRACKERS[0].name) {
+        model.set('hitCallback', sendFakePageview, true);
+      }
+    }
   });
 }
 
@@ -292,6 +307,17 @@ function requireAutotrackPlugins() {
  */
 function sendInitialPageview() {
   gaAll('send', 'pageview', {[dimensions.HIT_SOURCE]: 'pageload'});
+  sendFakePageview();
+}
+
+
+/**
+ * Sends an event with the "Pageviews" metric set, as an experiment.
+ */
+function sendFakePageview() {
+  gaTest('send', 'event', 'Fake', 'pageview', NULL_VALUE, {
+    [metrics.PAGEVIEWS]: 1
+  });
 }
 
 

@@ -11,9 +11,16 @@ So the best way I can think of to answer this question&mdash;and explain why I'm
 And the best way to do that is to write a polyfill ourselves.
 
 <div class="Callout">
-
-**Note:** this article is a complement to a talk I gave at dotCSS on December 2, 2016. This article goes into a bit more detail, but if you'd prefer to watch the video (22 minutes), you can find it on the dotCSS YouTube channel.
-
+  <div class="Media">
+    <div class="Media-subject">
+      <div class="VideoContainer">
+        <iframe class="VideoContainer-frame" width="240" height="135" src="https://www.youtube.com/embed/ZskP7cvj3WA" frameborder="0" allowfullscreen></iframe>
+      </div>
+    </div>
+    <div class="Media-body">
+      <strong>Note:</strong> this article is a written version of a talk I gave at <a href="http://www.thedotpost.com/2016/12/philip-walton-the-dark-side-of-polyfilling-css">dotCSS on December 2, 2016</a>. The article goes into quite a bit more detail, but if you'd rather watch the video (23 minutes), I've included it as well.
+    </div>
+  </div>
 </div>
 
 ## The `random` keyword

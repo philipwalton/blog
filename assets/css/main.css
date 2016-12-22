@@ -16,12 +16,14 @@
 @import "./components/header.css";
 @import "./components/icon.css";
 @import "./components/info.css";
+@import "./components/media.css";
 @import "./components/share.css";
 @import "./components/site.css";
 @import "./components/site-nav.css";
 @import "./components/social-nav.css";
 @import "./components/thanks.css";
 @import "./components/unstyled-button.css";
+@import "./components/video-container.css";
 @import "./components/visually-hidden.css";
 
 @import "./vendor/highlight.css";

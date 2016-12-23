@@ -34,7 +34,6 @@ const NULL_VALUE = '(not set)';
 const metrics = {
   PAGE_VISIBLE: 'metric1',
   PAGE_HIDDEN: 'metric2',
-  PAGEVIEWS: 'metric3',
 };
 
 
@@ -212,23 +211,6 @@ function trackCustomDimensions() {
       model.set(dimensions.HIT_UUID, uuid(), true);
       model.set(dimensions.VISIBILITY_STATE, document.visibilityState, true);
       originalBuildHitTask(model);
-    });
-  });
-
-  // Send "fake" pageviews as events immediately after any real pageviews.
-  gaTest((tracker) => {
-    const originalSendHitTask = tracker.get('sendHitTask');
-    tracker.set('sendHitTask', (model) => {
-      var hitSource = model.get(dimensions.HIT_SOURCE);
-      var hitType = model.get('hitType');
-
-      originalSendHitTask(model);
-      if (hitType == 'pageview') {
-        gaTest('send', 'event', 'Fake', 'pageview', NULL_VALUE, {
-          [metrics.PAGEVIEWS]: 1,
-          [dimensions.HIT_SOURCE]: hitSource,
-        });
-      }
     });
   });
 }

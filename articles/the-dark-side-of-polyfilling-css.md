@@ -430,7 +430,7 @@ p[data-pid="3"] {
 
 The changes above apply the `:not()` functional, pseudo-class selector and pass it the name of a class we know isn't found in the DOM (in this case I've chosen `.z`; which means if you use the class `.z` in the DOM you'd have to pick a different name). And since `:not()` will always match an element that doesn't exist, it can be used to increase the specificity of a selector without changing what it matches.
 
-[Demo #7](https://philipwalton.github.io/talks/2016-12-02/demos/5/), shows the result of implementing this strategy, and you can refer to the [demo source code](https://github.com/philipwalton/talks/blob/b0a2b9a3de509dd39368516e7e304a4159b41b08/2016-12-02/demos/src/random-keyword-plugin.js
+[Demo #7](https://philipwalton.github.io/talks/2016-12-02/demos/7/), shows the result of implementing this strategy, and you can refer to the [demo source code](https://github.com/philipwalton/talks/blob/b0a2b9a3de509dd39368516e7e304a4159b41b08/2016-12-02/demos/src/random-keyword-plugin.js
 ) to see the full set of changes to the `random-keyword` plugin.
 
 The best part about option #3 is it continues to let the browser handle the cascade, which the browser is already really good at. This means you can use media queries, `!important` declarations, custom properties, `@support` rules, or any CSS feature, and it will still just work.

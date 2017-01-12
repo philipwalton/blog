@@ -1,20 +1,18 @@
 /* eslint no-invalid-this: 0 */
 
-const babelify = require('babelify');
-const browserify = require('browserify');
+const babel = require('babel-core');
 const spawn = require('child_process').spawn;
 const del = require('del');
-const envify = require('envify');
+const fs = require('fs');
+const glob = require('glob');
+const {compile} = require('google-closure-compiler-js');
 const gulp = require('gulp');
 const cssnext = require('gulp-cssnext');
 const eslint = require('gulp-eslint');
-const gulpIf = require('gulp-if');
 const resize = require('gulp-image-resize');
 const imagemin = require('gulp-imagemin');
 const plumber = require('gulp-plumber');
 const rename = require('gulp-rename');
-const sourcemaps = require('gulp-sourcemaps');
-const uglify = require('gulp-uglify');
 const gutil = require('gulp-util');
 const webdriver = require('gulp-webdriver');
 const he = require('he');
@@ -25,10 +23,12 @@ const markdownItAnchor = require('markdown-it-anchor');
 const merge = require('merge-stream');
 const ngrok = require('ngrok');
 const path = require('path');
+const {rollup} = require('rollup');
+const nodeResolve = require('rollup-plugin-node-resolve');
 const seleniumServerJar = require('selenium-server-standalone-jar');
+const {SourceMapGenerator, SourceMapConsumer} = require('source-map');
 const through = require('through2');
-const buffer = require('vinyl-buffer');
-const source = require('vinyl-source-stream');
+const webpack = require('webpack');
 const book = require('./book');
 
 
@@ -171,36 +171,103 @@ gulp.task('css', () => {
 
 
 gulp.task('javascript:main', (done) => {
-  const entry = './assets/javascript/main.js';
-  browserify(entry, {
-    debug: true,
-    detectGlobals: false,
+  const entry = 'assets/javascript/main.js';
+  rollup({
+    entry: entry,
+    plugins: [nodeResolve()],
   })
-  .transform(babelify, {presets: ['es2015', 'stage-2']})
-  .transform(envify)
-  .bundle()
-  .on('error', done)
-  .on('end', done)
-  .pipe(source(entry))
-  .pipe(buffer())
-  .pipe(sourcemaps.init({loadMaps: true}))
-  .pipe(gulpIf(isProd(), uglify()))
-  .pipe(sourcemaps.write('./'))
-  .pipe(gulp.dest(DEST));
+  .then((bundle) => {
+    // In production mode, use Closure Compiler to bundle the script,
+    // otherwise just output the rollup result as it's much faster.
+    if (isProd()) {
+      const rollupResult = bundle.generate({
+        format: 'es',
+        dest: path.basename(entry),
+        sourceMap: true,
+      });
+
+      const externs = [
+        'assets/javascript/externs.js',
+        ...glob.sync('./node_modules/autotrack/lib/externs/*.js'),
+      ].reduce((acc, cur) => acc + fs.readFileSync(cur, 'utf-8'), '');
+
+      const closureFlags = {
+        jsCode: [{
+          src: rollupResult.code,
+          path: path.basename(entry),
+          sourceMap: rollupResult.map,
+        }],
+        compilationLevel: 'ADVANCED',
+        useTypesForOptimization: true,
+        outputWrapper:
+            `(function(){%output%})();\n` +
+            `//# sourceMappingURL=${path.basename(entry)}.map`,
+        assumeFunctionWrapper: true,
+        rewritePolyfills: false,
+        warningLevel: 'VERBOSE',
+        applyInputSourceMaps: true,
+        createSourceMap: true,
+        externs: [{src: externs}],
+      };
+      const closureResult = compile(closureFlags);
+
+      if (closureResult.errors.length || closureResult.warnings.length) {
+        fs.writeFileSync(path.join(DEST, entry), rollupResult.code, 'utf-8');
+        const results = {
+          errors: closureResult.errors,
+          warnings: closureResult.warnings,
+        };
+        done(new Error(JSON.stringify(results, null, 2)));
+      } else {
+        // Currently, closure compiler doesn't support applying its generated
+        // source map to an existing source map, so we do it manually.
+        const fromMap = JSON.parse(closureResult.sourceMap);
+        const toMap = rollupResult.map;
+        const generator = SourceMapGenerator.fromSourceMap(
+            new SourceMapConsumer(fromMap));
+
+        generator.applySourceMap(new SourceMapConsumer(toMap));
+
+        fs.writeFileSync(path.join(DEST, entry),
+            closureResult.compiledCode, 'utf-8');
+        fs.writeFileSync(path.join(DEST, entry) + '.map',
+            generator.toString(), 'utf-8');
+        done();
+      }
+    } else {
+      bundle.write({
+        dest: path.join(DEST, entry),
+        format: 'iife',
+        sourceMap: true,
+      }).then(() => done());
+    }
+  });
 });
 
 
-gulp.task('javascript:polyfills', (done) => {
-  const entry = './assets/javascript/polyfills.js';
-  browserify(entry)
-  .bundle()
-  .on('error', (err) => gutil.beep() && done(err))
-  .on('end', done)
-  .pipe(source(entry))
-  .pipe(buffer())
-  .pipe(gulpIf(isProd(), uglify()))
-  .pipe(gulp.dest(DEST));
-});
+gulp.task('javascript:polyfills', ((compiler) => {
+  const createCompiler = () => {
+    const entry = './assets/javascript/polyfills.js';
+    return webpack({
+      entry: entry,
+      output: {
+        path: path.dirname(path.join(DEST, entry)),
+        filename: path.basename(entry),
+      },
+      devtool: '#source-map',
+      plugins: [new webpack.optimize.UglifyJsPlugin({sourceMap: true})],
+      performance: {hints: false},
+      cache: {},
+    });
+  };
+  return (done) => {
+    (compiler || (compiler = createCompiler())).run(function(err, stats) {
+      if (err) throw new gutil.PluginError('webpack', err);
+      gutil.log('[webpack]', stats.toString('minimal'));
+      done();
+    });
+  };
+})());
 
 
 gulp.task('javascript', ['javascript:main', 'javascript:polyfills']);
@@ -211,21 +278,60 @@ gulp.task('static', () => {
 });
 
 
-gulp.task('service-worker', (done) => {
-  browserify('./assets/sw.js')
-  .transform(babelify, {plugins: ['transform-async-to-generator']})
-  .bundle()
+gulp.task('service-worker', ((compiler) => {
+  const createCompiler = () => {
+    const entry = './assets/sw.js';
+    return webpack({
+      entry: entry,
+      output: {
+        path: path.dirname(path.join(DEST, path.basename(entry))),
+        filename: path.basename(entry),
+      },
+      // devtool: '#source-map',
+      module: {
+        loaders: [{
+          test: /\.js$/,
+          exclude: [/node_modules/],
+          loader: 'babel-loader',
+          query: {
+            babelrc: false,
+            cacheDirectory: false,
+            presets: ['babili'],
+            plugins: ['transform-async-to-generator'],
+          },
+        }],
+      },
+      performance: {hints: false},
+      cache: {},
+    });
+  };
+  return (done) => {
+    (compiler || (compiler = createCompiler())).run(function(err, stats) {
+      if (err) throw new gutil.PluginError('webpack', err);
+      gutil.log('[webpack]', stats.toString('minimal'));
 
-  // TODO(philipwalton): Add real error handling.
-  // This temporary hack fixes an issue with tasks not restarting in
-  // watch mode after a syntax error is fixed.
-  .on('error', done)
-  .on('end', done)
+      // Minify the final file.
+      // const {code, map} = babel.transformFileSync('build/sw.js', {
+      const {code} = babel.transformFileSync('build/sw.js', {
+        comments: false,
+        presets: ['babili'],
+      });
 
-  .pipe(source('sw.js'))
-  .pipe(buffer())
-  .pipe(gulp.dest(DEST));
-});
+      // TODO(philipwalton): transform the source map.
+      // const fromMap =
+      //     JSON.parse(fs.readFileSync('build/sw.js.map', 'utf-8'));
+      // const toMap = map;
+      // const generator = SourceMapGenerator.fromSourceMap(
+      //     new SourceMapConsumer(fromMap));
+
+      // generator.applySourceMap(new SourceMapConsumer(toMap));
+      // fs.writeFileSync('build/sw.js.map', generator.toString(), 'utf-8');
+
+      fs.writeFileSync('build/sw.js', code, 'utf-8');
+      done();
+    });
+  };
+})());
 
 
 gulp.task('lint', () => {

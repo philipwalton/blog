@@ -29,7 +29,7 @@ export function measure(name, startMark, endMark) {
  * Accepts a PerformanceMeasure entry name and tracks the duration of the
  * measure along with the passed fields.
  * @param {string} name The PerformanceMeasure name.
- * @param {Object} fieldsObj The analytics.js fields object.
+ * @param {!Object} fieldsObj The analytics.js fields object.
  */
 export function track(name, fieldsObj) {
   if (window.__perf) {
@@ -37,11 +37,10 @@ export function track(name, fieldsObj) {
     const lastEntry = entries[entries.length - 1];
     if (lastEntry) {
       const duration = Math.round(lastEntry.duration);
-      gaTest('send', 'event', {
+      gaTest('send', 'event', Object.assign({
         eventValue: duration,
         [dimensions.METRIC_VALUE]: duration,
-        ...fieldsObj,
-      });
+      }, fieldsObj));
     }
   }
 }

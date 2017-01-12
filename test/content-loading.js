@@ -47,28 +47,25 @@ describe('The content loader', () => {
 
     // Navigates back to the article.
     browser.back();
-    browser.getTitle();
     browser.waitUntil(() =>
         browser.getTitle() == book.articles[0].title + titleSuffix &&
         getUrlPath() == book.articles[0].path);
 
+
     // Navigates back home.
     browser.back();
-    browser.getTitle();
     browser.waitUntil(() =>
         browser.getTitle() == book.pages[0].title + titleSuffix &&
         getUrlPath() == book.pages[0].path);
 
     // Navigates forward to the article.
     browser.forward();
-    browser.getTitle();
     browser.waitUntil(() =>
         browser.getTitle() == book.articles[0].title + titleSuffix &&
         getUrlPath() == book.articles[0].path);
 
     // Navigates forward to the page.
     browser.forward();
-    browser.getTitle();
     browser.waitUntil(() =>
         browser.getTitle() == book.pages[2].title + titleSuffix &&
         getUrlPath() == book.pages[2].path);

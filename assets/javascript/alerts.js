@@ -1,5 +1,5 @@
-import closest from 'dom-utils/lib/closest';
-import delegate from 'dom-utils/lib/delegate';
+import {closest, delegate} from 'dom-utils';
+
 
 let alertContainer = null;
 let alertShowing = false;
@@ -26,7 +26,7 @@ function remove() {
  * @param {{title: (string), body: (string)}} arg1
  *     title: The alert title text.
  *     body: The alert body text.
- * @return {Element} The alert DOM element.
+ * @return {!Element} The alert DOM element.
  */
 function createAlert({title, body}) {
   const alert = document.createElement('div');
@@ -64,7 +64,9 @@ export function init() {
 
   delegate(alertContainer, 'click', '.Alert-close', remove);
   document.body.addEventListener('click', (e) => {
-    const insideAlertContainer = !!closest(e.target, '.AlertContainer');
+    const insideAlertContainer = !!closest(
+            /** @type {!Element} */ (e.target),
+            '.AlertContainer');
     if (!insideAlertContainer) remove();
   });
 
@@ -84,6 +86,6 @@ export function add({title, body}) {
   alertContainer.appendChild(alert);
   alertShowing = true;
 
-  alert.offsetTop; // Force a paint.
-  alert.classList.add('Alert--active');
+  // Use a timeout so the CSS transition is triggered.
+  setTimeout(() => alert.classList.add('Alert--active'), 0);
 }

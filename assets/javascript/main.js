@@ -11,9 +11,9 @@ const POLYFILL_PATH = '/assets/javascript/polyfills.js';
 /**
  * The main script entry point for the site. Initalizes all the sub modules
  * analytics tracking, and the service worker.
- * @param {?Error} err Present if an error occurred loading the polyfills.
+ * @param {Error=} err Present if an error occurred loading the polyfills.
  */
-function main(err) {
+function main(err = undefined) {
   alerts.init();
   breakpoints.init();
   contentLoader.init();
@@ -30,7 +30,7 @@ function main(err) {
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker
           .register('/sw.js')
-          .catch(analytics.trackError);
+          .catch((err) => analytics.trackError(/** @type {!Error} */ (err)));
     }
   };
 }
@@ -42,7 +42,7 @@ function main(err) {
  *     no polyfills are needed.
  */
 function browserSupportsAllFeatures() {
-  return window.Promise && window.fetch && window.Symbol;
+  return !!(Object.assign && window.Promise && window.fetch);
 }
 
 
@@ -50,19 +50,15 @@ function browserSupportsAllFeatures() {
  * Creates a new `<script>` element for the passed `src`, and invokes the
  * passed callback once done.
  * @param {string} src The src attribute for the script.
- * @param {Function<?Error>} done A callback to be invoked once the script has
+ * @param {!Function<?Error>} done A callback to be invoked once the script has
  *     loaded, if an error occurs loading the script the function is invoked
  *     with the error object.
  */
 function loadScript(src, done) {
   const js = document.createElement('script');
   js.src = src;
-  js.onload = function() {
-    done();
-  };
-  js.onerror = function() {
-    done(new Error('Failed to load script ' + src));
-  };
+  js.onload = () => done();
+  js.onerror = () => done(new Error('Failed to load script ' + src));
   document.head.appendChild(js);
 }
 

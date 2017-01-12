@@ -1,6 +1,5 @@
-import delegate from 'dom-utils/lib/delegate';
-import parseUrl from 'dom-utils/lib/parse-url';
-import alerts from './alerts';
+import {delegate, parseUrl} from 'dom-utils';
+import * as alerts from './alerts';
 import {gaAll, trackError} from './analytics';
 import * as drawer from './drawer';
 import History2 from './history2';
@@ -45,12 +44,12 @@ function trackPageFetchEnd({path, fromCache}) {
 
 /**
  * Gets the title of a page from a link element.
- * @param {Element} a The `<a>`` element.
+ * @param {!Element} a The `<a>`` element.
  * @return {string} The title of the page the link will load.
  */
 function getTitle(a) {
   const title = a.title || a.innerText;
-  return title ? title + ' \u2014 Philip Walton' : null;
+  return title ? title + ' \u2014 Philip Walton' : '';
 }
 
 
@@ -61,7 +60,7 @@ function getTitle(a) {
  */
 function getMainContent(html) {
   const match = /<main[^>]*>([\s\S]*)<\/main>/.exec(html);
-  return match && match[1];
+  return match ? match[1] : '';
 }
 
 
@@ -71,7 +70,7 @@ function getMainContent(html) {
  * unnecessary fetch request. If an error occurs making the request, show
  * an alert to the user.
  * @param {string} path The page path to load.
- * @return {Promise<string>} A promise that fulfills with the HTML content of a
+ * @return {!Promise} A promise that fulfills with the HTML content of a
  *    page or rejects with the network error.
  */
 function fetchPageContent(path) {
@@ -164,7 +163,7 @@ export function init() {
         .then(() => drawer.close())
         .then(() => setScroll(state.hash))
         .then(() => resetImpressionTracking())
-        .catch((err) => trackError(err));
+        .catch((err) => trackError(/** @type {!Error} */ (err)));
   });
 
   delegate(document, 'click', 'a[href]', function(event, delegateTarget) {

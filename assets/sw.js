@@ -38,7 +38,6 @@ const cacheInitialAssets = async () => {
       '/',
       '/assets/css/main.css',
       '/assets/javascript/main.js',
-      '/assets/javascript/polyfills.js',
     ]),
   ]);
 };

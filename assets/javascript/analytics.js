@@ -5,7 +5,7 @@ import 'autotrack/lib/plugins/media-query-tracker';
 import 'autotrack/lib/plugins/outbound-link-tracker';
 import 'autotrack/lib/plugins/page-visibility-tracker';
 import 'autotrack/lib/plugins/url-change-tracker';
-import parseUrl from 'dom-utils/lib/parse-url';
+import {parseUrl} from 'dom-utils';
 import {breakpoints} from './breakpoints';
 
 
@@ -93,7 +93,7 @@ export function trackPageload() {
 
 /**
  * Tracks a JavaScript error.
- * @param {Error} err The error object to track.
+ * @param {!Error} err The error object to track.
  */
 export function trackError(err) {
   gaAll('send', 'event', 'Script', 'error', err.stack || err.toString(), {
@@ -109,45 +109,13 @@ export function trackError(err) {
 function createTrackers() {
   for (let tracker of ALL_TRACKERS) {
     window.ga('create', tracker.trackingId, 'auto', tracker.name, {
-      siteSpeedSampleRate: 10
+      siteSpeedSampleRate: 10,
     });
   }
 
   // Ensures all hits are sent via `navigator.sendBeacon()`.
   // Note: this cannot via the `create` command.
   gaAll('set', 'transport', 'beacon');
-
-  // Log hits in non-production environments.
-  if (process.env.NODE_ENV != 'production') {
-    gaAll('set', 'sendHitTask', function(model) {
-      var paramsToIgnore = ['v', 'did', 't', 'tid', 'ec', 'ea', 'el', 'ev',
-          'a', 'z', 'ul', 'de', 'sd', 'sr', 'vp', 'je', 'fl', 'jid'];
-
-      var hitType = model.get('&t');
-      var hitPayload = model.get('hitPayload');
-      var hit = hitPayload
-          .split('&')
-          .map(decodeURIComponent)
-          .filter((item) => {
-            const [param] = item.split('=');
-            return !(param.charAt(0) === '_' ||
-                paramsToIgnore.indexOf(param) > -1);
-          });
-
-      var parts = [model.get('&tid'), hitType];
-      if (hitType == 'event') {
-        parts = [
-          ...parts,
-          model.get('&ec'),
-          model.get('&ea'),
-          model.get('&el'),
-        ];
-        if (model.get('&ev')) parts.push(model.get('&ev'));
-      }
-
-      window['console'].log(...parts, hit);
-    });
-  }
 }
 
 
@@ -160,7 +128,14 @@ function trackErrors() {
   // the `q` property of the window.onerror function.
   const errorQueue = window.onerror.q || [];
 
-  // Override the temp `onerror()` handler to now send hits to GA.
+  /**
+   * Overrides the temp `onerror()` handler to now send hits to GA.
+   * @param {string} msg
+   * @param {string} file
+   * @param {number} line
+   * @param {number=} col
+   * @param {Error=} error
+   */
   window.onerror = (msg, file, line, col, error) => {
     gaAll('send', 'event', {
       eventCategory: 'Script',
@@ -277,8 +252,6 @@ function requireAutotrackPlugins() {
   });
   gaAll('require', 'pageVisibilityTracker', {
     visibleMetricIndex: getDefinitionIndex(metrics.PAGE_VISIBLE),
-    hiddenMetricIndex: getDefinitionIndex(metrics.PAGE_HIDDEN),
-    heartbeatTimeout: 1,
     sessionTimeout: 30,
     timeZone: 'America/Los_Angeles',
     fieldsObj: {[dimensions.HIT_SOURCE]: 'pageVisibilityTracker'},
@@ -375,8 +348,8 @@ function measureWebfontPerfAndFailures() {
 
 
 /**
- * Measures the time between a PerformanceMark object and a reference time.
- * @param {PerformanceMark} mark The mark to measure duration until.
+ * Measures the time between a PerformanceEntry object and a reference time.
+ * @param {string} mark The mark name to measure duration until.
  * @param {string=} reference The timing reference to measure from.
  * @return {number} The duration in milliseconds.
  */
@@ -386,7 +359,9 @@ function measureDuration(mark, reference = 'responseEnd') {
     performance.clearMeasures(name);
     performance.measure(name, reference, mark);
     const measure = performance.getEntriesByName(name)[0];
-    return measure && Math.round(measure.duration);
+    return measure ? Math.round(measure.duration) : 0;
+  } else {
+    return 0;
   }
 }
 
@@ -394,9 +369,9 @@ function measureDuration(mark, reference = 'responseEnd') {
 /**
  * Creates a ga() proxy function that calls commands on all but the
  * excluded trackers.
- * @param {Array} trackers an array or objects containing the `name` and
+ * @param {!Array} trackers an array or objects containing the `name` and
  *     `trackingId` fields.
- * @return {Function} The proxied ga() function.
+ * @return {!Function} The proxied ga() function.
  */
 function createGaProxy(trackers) {
   return (command, ...args) => {
@@ -440,8 +415,8 @@ function getServiceWorkerStatus() {
 /**
  * Randomizes array element order in-place using Durstenfeld shuffle algorithm.
  * http://goo.gl/91pjZs
- * @param {Array} array The input array.
- * @return {Array} The randomized array.
+ * @param {!Array} array The input array.
+ * @return {!Array} The randomized array.
  */
 function shuffleArray(array) {
   for (let i = array.length - 1; i > 0; i--) {
@@ -456,5 +431,6 @@ function shuffleArray(array) {
 
 /*eslint-disable */
 // https://gist.github.com/jed/982883
+/** @param {?=} a */
 const uuid = function b(a){return a?(a^Math.random()*16>>a/4).toString(16):([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g,b)};
 /*eslint-enable */

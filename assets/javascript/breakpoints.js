@@ -5,7 +5,9 @@ export const breakpoints = [
 ];
 
 
-let activeBreakpoint;
+// Set a default initially, which will be overridden at `init()` time
+// if anything matches.
+let activeBreakpoint = breakpoints[0];
 
 
 /**
@@ -37,7 +39,7 @@ export function init() {
 
 
 /**
- * @return {Object} The currently active breakpoint.
+ * @return {!Object} The currently active breakpoint.
  */
 export function getActiveBreakpoint() {
   return activeBreakpoint;

@@ -1,19 +1,24 @@
-import closest from 'dom-utils/lib/closest';
+import {closest} from 'dom-utils';
 import {getActiveBreakpoint} from './breakpoints';
 
 
+const drawerToggle = /** @type {!Element} */ (
+    document.getElementById('drawer-toggle'));
+
+const drawer = /** @type {!Element} */ (
+    document.getElementById('drawer'));
+
+const header = /** @type {!Element} */ (
+    document.getElementById('header'));
+
+
 const TRANSITION_DURATION = 250;
-const drawerToggle = document.getElementById('drawer-toggle');
-const drawer = document.getElementById('drawer');
-const header = document.getElementById('header');
-
-
 let isOpen = false;
 
 
 /**
  * Adds a class to an element.
- * @param {Element} element The HTML element to add the class to.
+ * @param {!Element} element The HTML element to add the class to.
  * @param {string} className The class name to add.
  */
 function addClass(element, className) {
@@ -31,7 +36,7 @@ function addClass(element, className) {
 
 /**
  * Removes a class from an element.
- * @param {Element} element The HTML element to remove the class from.
+ * @param {!Element} element The HTML element to remove the class from.
  * @param {string} className The class name to remove.
  */
 function removeClass(element, className) {
@@ -54,7 +59,7 @@ function removeClass(element, className) {
 
 /**
  * A callback that handles clicks on the drawer menu icon.
- * @param {Event} event The event associated with the click.
+ * @param {!Event} event The event associated with the click.
  */
 function handleDrawerToggleClick(event) {
   event.preventDefault();
@@ -65,11 +70,12 @@ function handleDrawerToggleClick(event) {
 /**
  * A callback that closes the drawer if the click originated from outside
  * the drawer element.
- * @param {Event} event The event associated with the click.
+ * @param {!Event} event The event associated with the click.
  */
 function handleClickOutsideDrawerContainer(event) {
+  const target = /** @type {!Element} */ (event.target);
   // Closes an open drawer if the user clicked outside of the nav element.
-  if (isOpen && drawerIsUsable() && !closest(event.target, '#header', true)) {
+  if (isOpen && drawerIsUsable() && !closest(target, '#header', true)) {
     close();
   }
 }

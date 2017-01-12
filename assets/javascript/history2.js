@@ -1,4 +1,4 @@
-import parseUrl from 'dom-utils/lib/parse-url';
+import {parseUrl} from 'dom-utils';
 
 /**
  * A class than wraps a lot of the complexity around adding items to the
@@ -7,7 +7,7 @@ import parseUrl from 'dom-utils/lib/parse-url';
 export default class History2 {
   /**
    * Initializes the instance with a change handler.
-   * @param {Function} onChange A callback invoked every time a new entry is
+   * @param {!Function} onChange A callback invoked every time a new entry is
    *     added to the history that returns a promise, resolved once the next
    *     page is loaded.
    */
@@ -31,11 +31,15 @@ export default class History2 {
 
   /**
    * Adds a new entry to the history.
-   * @param {{url: (string), title: (string), isPopState: (boolean)}} arg1
-   *     url: The URL for the next page in the history.
-   *     title: The title of the next page in the history.
-   *     isPopState: true if the entry was added from a popState event.
-   * @return {Promise} A promise that is resolved once the next entry is the
+   * @param {{
+   *   url: (string),
+   *   title: (string),
+   *   isPopState: (boolean|undefined),
+   * }} arg1
+   * - url: The URL for the next page in the history.
+   * - title: The title of the next page in the history.
+   * - isPopState: true if the entry was added from a popState event.
+   * @return {!Promise} A promise that is resolved once the next entry is the
    *     history is loaded.
    */
   add({url, title, isPopState}) {
@@ -64,10 +68,10 @@ export default class History2 {
  * URL object with an additional `title` property.
  * @param {string} url The page URL.
  * @param {string} title The page title.
- * @return {Object} The state object.
+ * @return {!Object} The state object.
  */
 function getState(url, title) {
   const state = parseUrl(url);
-  state.title = document.title;
+  state.title = title;
   return state;
 }

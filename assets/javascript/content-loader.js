@@ -1,6 +1,6 @@
 import {delegate, parseUrl} from 'dom-utils';
 import * as alerts from './alerts';
-import {gaAll, trackError} from './analytics';
+import {trackError} from './analytics';
 import * as drawer from './drawer';
 import History2 from './history2';
 import {mark, measure, track} from './user-timing';

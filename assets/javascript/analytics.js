@@ -1,6 +1,6 @@
 import 'autotrack/lib/plugins/clean-url-tracker';
 import 'autotrack/lib/plugins/event-tracker';
-import 'autotrack/lib/plugins/impression-tracker';
+import 'autotrack/lib/plugins/max-scroll-tracker';
 import 'autotrack/lib/plugins/media-query-tracker';
 import 'autotrack/lib/plugins/outbound-link-tracker';
 import 'autotrack/lib/plugins/page-visibility-tracker';
@@ -33,7 +33,7 @@ const NULL_VALUE = '(not set)';
 
 const metrics = {
   PAGE_VISIBLE: 'metric1',
-  PAGE_HIDDEN: 'metric2',
+  MAX_SCROLL_PERCENTAGE: 'metric2',
 };
 
 
@@ -218,7 +218,11 @@ function requireAutotrackPlugins() {
     trailingSlash: 'add',
   });
   gaAll('require', 'eventTracker');
-  gaAll('require', 'impressionTracker', {elements: ['share']});
+  gaTest('require', 'maxScrollTracker', {
+    sessionTimeout: 30,
+    timeZone: 'America/Los_Angeles',
+    maxScrollMetricIndex: getDefinitionIndex(metrics.MAX_SCROLL_PERCENTAGE),
+  });
   gaAll('require', 'mediaQueryTracker', {
     definitions: [
       {

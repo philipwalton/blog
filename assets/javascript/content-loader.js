@@ -137,16 +137,6 @@ function setScroll(hash) {
 
 
 /**
- * Removes and re-adds impression observation on the #share call to action
- * since a new page has loaded and thus a new impression should be possible.
- */
-function resetImpressionTracking() {
-  gaAll('impressionTracker:unobserveAllElements');
-  gaAll('impressionTracker:observeElements', ['share']);
-}
-
-
-/**
  * Initializes the dynamic, page-loading code.
  */
 export function init() {
@@ -162,7 +152,6 @@ export function init() {
         .then((content) => showPageContent(content))
         .then(() => drawer.close())
         .then(() => setScroll(state.hash))
-        .then(() => resetImpressionTracking())
         .catch((err) => trackError(/** @type {!Error} */ (err)));
   });
 

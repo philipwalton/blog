@@ -1,6 +1,6 @@
 import {delegate, parseUrl} from 'dom-utils';
 import * as alerts from './alerts';
-import {trackError} from './analytics';
+import {gaTest, trackError} from './analytics';
 import * as drawer from './drawer';
 import History2 from './history2';
 import {mark, measure, track} from './user-timing';
@@ -137,6 +137,15 @@ function setScroll(hash) {
 
 
 /**
+ * Removes and re-adds impression observation on the #share call to action
+ * since a new page has loaded and thus a new impression should be possible.
+ */
+function resetImpressionTracking() {
+  gaTest('impressionTracker:unobserveAllElements');
+  gaTest('impressionTracker:observeElements', ['share']);
+}
+
+/**
  * Initializes the dynamic, page-loading code.
  */
 export function init() {
@@ -152,6 +161,7 @@ export function init() {
         .then((content) => showPageContent(content))
         .then(() => drawer.close())
         .then(() => setScroll(state.hash))
+        .then(() => resetImpressionTracking())
         .catch((err) => trackError(/** @type {!Error} */ (err)));
   });
 

@@ -1,5 +1,6 @@
 import 'autotrack/lib/plugins/clean-url-tracker';
 import 'autotrack/lib/plugins/event-tracker';
+import 'autotrack/lib/plugins/impression-tracker';
 import 'autotrack/lib/plugins/max-scroll-tracker';
 import 'autotrack/lib/plugins/media-query-tracker';
 import 'autotrack/lib/plugins/outbound-link-tracker';
@@ -14,7 +15,7 @@ import {breakpoints} from './breakpoints';
  * implementation. This allows you to create a segment or view filter
  * that isolates only data captured with the most recent tracking changes.
  */
-const TRACKING_VERSION = '6';
+const TRACKING_VERSION = '7';
 
 
 /**
@@ -34,6 +35,7 @@ const NULL_VALUE = '(not set)';
 const metrics = {
   PAGE_VISIBLE: 'metric1',
   MAX_SCROLL_PERCENTAGE: 'metric2',
+  SHARE_IMPRESSIONS: 'metric3',
 };
 
 
@@ -218,6 +220,12 @@ function requireAutotrackPlugins() {
     trailingSlash: 'add',
   });
   gaAll('require', 'eventTracker');
+  gaTest('require', 'impressionTracker', {
+    elements: ['share'],
+    hitFilter: (model) => {
+      model.set(metrics.SHARE_IMPRESSIONS, 1, true);
+    },
+  });
   gaTest('require', 'maxScrollTracker', {
     sessionTimeout: 30,
     timeZone: 'America/Los_Angeles',

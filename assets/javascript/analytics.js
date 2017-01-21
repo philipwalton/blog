@@ -41,7 +41,7 @@ const metrics = {
 
 const dimensions = {
   BREAKPOINT: 'dimension1',
-  RESOLUTION: 'dimension2',
+  PIXEL_DENSITY: 'dimension2',
   ORIENTATION: 'dimension3',
   HIT_SOURCE: 'dimension4',
   URL_QUERY_PARAMS: 'dimension5',
@@ -239,8 +239,8 @@ function requireAutotrackPlugins() {
         items: breakpoints,
       },
       {
-        name: 'Resolution',
-        dimensionIndex: getDefinitionIndex(dimensions.RESOLUTION),
+        name: 'Pixel Density',
+        dimensionIndex: getDefinitionIndex(dimensions.PIXEL_DENSITY),
         items: [
           {name: '1x', media: 'all'},
           {name: '1.5x', media: '(-webkit-min-device-pixel-ratio: 1.5), ' +

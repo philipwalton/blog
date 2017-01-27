@@ -157,7 +157,7 @@ export function init() {
   pageCache[location.pathname] = container.innerHTML;
 
   const history2 = new History2((state) => {
-    return fetchPageContent(state.path)
+    return fetchPageContent(state.pathname)
         .then((content) => showPageContent(content))
         .then(() => drawer.close())
         .then(() => setScroll(state.hash))
@@ -189,7 +189,7 @@ export function init() {
 
     // If the clicked link is on the same site but has a different path,
     // prevent the browser from navigating there and load the page via ajax.
-    if ((link.origin == page.origin) && (link.path != page.path)) {
+    if ((link.origin == page.origin) && (link.pathname != page.pathname)) {
       event.preventDefault();
       history2.add({
         url: link.href,

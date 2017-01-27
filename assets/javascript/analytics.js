@@ -6,7 +6,6 @@ import 'autotrack/lib/plugins/media-query-tracker';
 import 'autotrack/lib/plugins/outbound-link-tracker';
 import 'autotrack/lib/plugins/page-visibility-tracker';
 import 'autotrack/lib/plugins/url-change-tracker';
-import {parseUrl} from 'dom-utils';
 import {breakpoints} from './breakpoints';
 
 
@@ -15,7 +14,7 @@ import {breakpoints} from './breakpoints';
  * implementation. This allows you to create a segment or view filter
  * that isolates only data captured with the most recent tracking changes.
  */
-const TRACKING_VERSION = '8';
+const TRACKING_VERSION = '9';
 
 
 /**
@@ -77,7 +76,6 @@ export function init() {
   trackErrors();
 
   trackCustomDimensions();
-  trackNetworkStatusChanges();
   requireAutotrackPlugins();
 }
 
@@ -171,7 +169,6 @@ function trackCustomDimensions() {
       [dimensions.CLIENT_ID]: tracker.get('clientId'),
       [dimensions.WINDOW_ID]: uuid(),
       [dimensions.SERVICE_WORKER_STATUS]: getServiceWorkerStatus(),
-      [dimensions.NETWORK_STATUS]: navigator.onLine ? 'online' : 'offline',
     });
   });
 
@@ -180,13 +177,16 @@ function trackCustomDimensions() {
   gaTest((tracker) => {
     const originalBuildHitTask = tracker.get('buildHitTask');
     tracker.set('buildHitTask', (model) => {
-      const path = model.get('page') || parseUrl(model.get('location')).path;
+      const path = model.get('page') || location.pathname;
       model.set(dimensions.PAGE_PATH, path),
 
       model.set(dimensions.HIT_TYPE, model.get('hitType'), true);
       model.set(dimensions.HIT_TIME, String(+new Date), true);
       model.set(dimensions.HIT_UUID, uuid(), true);
       model.set(dimensions.VISIBILITY_STATE, document.visibilityState, true);
+      model.set(dimensions.NETWORK_STATUS,
+          navigator.onLine ? 'online' : 'offline', true);
+
       originalBuildHitTask(model);
     });
   });
@@ -194,19 +194,21 @@ function trackCustomDimensions() {
 
 
 /**
+ // TODO(philipwalton): consider re-adding but not before making sure not to
+ // send network change hits if the session has expired.
  * Sets the network status as a custom dimension on each tracker and adds
  * event listeners to detect future network changes.
  */
-function trackNetworkStatusChanges() {
-  const updateNetworkStatus = ({type}) => {
-    gaTest('set', dimensions.NETWORK_STATUS, type);
-    gaTest('send', 'event', 'Network', 'change', type, {
-      nonInteraction: true,
-    });
-  };
-  window.addEventListener('online', updateNetworkStatus);
-  window.addEventListener('offline', updateNetworkStatus);
-}
+// function trackNetworkStatusChanges() {
+//   const updateNetworkStatus = ({type}) => {
+//     gaTest('set', dimensions.NETWORK_STATUS, type);
+//     gaTest('send', 'event', 'Network', 'change', type, {
+//       nonInteraction: true,
+//     });
+//   };
+//   window.addEventListener('online', updateNetworkStatus);
+//   window.addEventListener('offline', updateNetworkStatus);
+// }
 
 
 /**
@@ -262,17 +264,11 @@ function requireAutotrackPlugins() {
   gaAll('require', 'outboundLinkTracker', {
     events: ['click', 'contextmenu'],
   });
-  gaAll('require', 'pageVisibilityTracker', {
+  gaTest('require', 'pageVisibilityTracker', {
     visibleMetricIndex: getDefinitionIndex(metrics.PAGE_VISIBLE),
     sessionTimeout: 30,
     timeZone: 'America/Los_Angeles',
     fieldsObj: {[dimensions.HIT_SOURCE]: 'pageVisibilityTracker'},
-    hitFilter: (model) => {
-      const path = model.get('page') || parseUrl(model.get('location')).path;
-      model.set('eventLabel', path, true);
-
-      model.set(dimensions.METRIC_VALUE, String(model.get('eventValue')), true);
-    },
   });
   gaAll('require', 'urlChangeTracker', {
     fieldsObj: {[dimensions.HIT_SOURCE]: 'urlChangeTracker'},

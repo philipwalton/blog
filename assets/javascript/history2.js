@@ -49,7 +49,7 @@ export default class History2 {
     this.state = nextState;
 
     // Entries that point to the same resource should be ignored.
-    if (prevState.path == nextState.path) return Promise.resolve(null);
+    if (prevState.pathname == nextState.pathname) return Promise.resolve(null);
 
     return this._onChange(nextState).then(() => {
       // Popstate triggered navigation is already handled by the browser,

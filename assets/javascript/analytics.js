@@ -14,31 +14,63 @@ import {breakpoints} from './breakpoints';
  * implementation. This allows you to create a segment or view filter
  * that isolates only data captured with the most recent tracking changes.
  */
-const TRACKING_VERSION = '9';
+const TRACKING_VERSION = '10';
 
 
 /**
- * A global list of tracker object, randomized to ensure no one tracker
- * data is always sent first.
+ * A global list of tracker object.
  */
-const ALL_TRACKERS = shuffleArray([
+const ALL_TRACKERS = [
   {name: 't0', trackingId: 'UA-21292978-1'},
   {name: 'testing', trackingId: 'UA-21292978-3'},
-]);
+];
 
 
+/**
+ * Just the trackers with a name matching `test`.
+ */
 const TEST_TRACKERS = ALL_TRACKERS.filter(({name}) => /test/.test(name));
-const NULL_VALUE = '(not set)';
 
 
-const metrics = {
-  PAGE_VISIBLE: 'metric1',
-  MAX_SCROLL_PERCENTAGE: 'metric2',
-  SHARE_IMPRESSIONS: 'metric3',
+/**
+ * Creates a ga() proxy function that calls commands on all but the
+ * excluded trackers.
+ * @param {!Array} trackers an array or objects containing the `name` and
+ *     `trackingId` fields.
+ * @return {!Function} The proxied ga() function.
+ */
+const createGaProxy = (trackers) => {
+  return (command, ...args) => {
+    for (let {name} of trackers) {
+      if (typeof command == 'function') {
+        window.ga(() => command(window.ga.getByName(name)));
+      } else {
+        window.ga(`${name}.${command}`, ...args);
+      }
+    }
+  };
 };
 
 
-const dimensions = {
+/**
+ * Command queue proxies.
+ */
+export const gaAll = createGaProxy(ALL_TRACKERS);
+export const gaTest = createGaProxy(TEST_TRACKERS);
+
+
+/**
+ * A default value for dimensions so unset values always are reported as
+ * something. This is needed since Google Analytics will drop empty dimension
+ * values in reports.
+ */
+const NULL_VALUE = '(not set)';
+
+
+/**
+ * A maping between custom dimension names and their indexes.
+ */
+export const dimensions = {
   BREAKPOINT: 'dimension1',
   PIXEL_DENSITY: 'dimension2',
   ORIENTATION: 'dimension3',
@@ -52,61 +84,45 @@ const dimensions = {
   WINDOW_ID: 'dimension11',
   VISIBILITY_STATE: 'dimension12',
   HIT_TYPE: 'dimension13',
-  HIT_UUID: 'dimension14',
+  HIT_ID: 'dimension14',
   HIT_TIME: 'dimension15',
   TRACKING_VERSION: 'dimension16',
   PAGE_PATH: 'dimension17',
 };
 
 
-// The command queue proxies.
-const gaAll = createGaProxy(ALL_TRACKERS);
-const gaTest = createGaProxy(TEST_TRACKERS);
-
-
-export {metrics, dimensions, gaAll, gaTest};
+/**
+ * A maping between custom dimension names and their indexes.
+ */
+export const metrics = {
+  PAGE_VISIBLE: 'metric1',
+  MAX_SCROLL_PERCENTAGE: 'metric2',
+  SHARE_IMPRESSIONS: 'metric3',
+  DOM_LOAD_TIME: 'metric4',
+  WINDOW_LOAD_TIME: 'metric5',
+};
 
 
 /**
  * Initializes all the analytics setup. Creates trackers and sets initial
  * values on the trackers.
  */
-export function init() {
+export const init = () => {
   createTrackers();
   trackErrors();
-
   trackCustomDimensions();
   requireAutotrackPlugins();
-}
-
-
-/**
- * Tracks the initial pageload and performance timing data associated with it.
- */
-export function trackPageload() {
   sendInitialPageview();
-  measureCssBlockTime();
-  measureJavaSciptLoadTime();
-  measureWebfontPerfAndFailures();
-}
-
-
-/**
- * Tracks a JavaScript error.
- * @param {!Error} err The error object to track.
- */
-export function trackError(err) {
-  gaAll('send', 'event', 'Script', 'error', err.stack || err.toString(), {
-    nonInteraction: true,
-  });
-}
+  sendPageloadMetrics();
+  sendWebfontPerfAndFailures();
+};
 
 
 /**
  * Creates the trackers and sets the default transport and tracking
  * version fields. In non-production environments it also logs hits.
  */
-function createTrackers() {
+const createTrackers = () => {
   for (let tracker of ALL_TRACKERS) {
     window.ga('create', tracker.trackingId, 'auto', tracker.name, {
       siteSpeedSampleRate: 10,
@@ -116,48 +132,63 @@ function createTrackers() {
   // Ensures all hits are sent via `navigator.sendBeacon()`.
   // Note: this cannot via the `create` command.
   gaAll('set', 'transport', 'beacon');
-}
+};
+
+
+/**
+ * Tracks a JavaScript error with optional fields object overrides.
+ * This function is exported so it can be used in other parts of the codebase.
+ * E.g.:
+ *
+ *    `fetch('/api.json').catch(trackError);`
+ *
+ * @param {Error|undefined} error
+ * @param {FieldsObj=} fieldsObj
+ */
+export const trackError = (error, fieldsObj = {}) => {
+  gaAll('send', 'event', Object.assign({
+    eventCategory: 'Script',
+    eventAction: 'error',
+    eventLabel: (error && error.stack) || NULL_VALUE,
+    nonInteraction: true,
+  }, fieldsObj));
+};
+
 
 
 /**
  * Tracks any errors that may have occured on the page prior to analytics being
  * initialized, then adds an event handler to track future errors.
  */
-function trackErrors() {
+const trackErrors = () => {
   // Errors that have occurred prior to this script running are stored on
-  // the `q` property of the window.onerror function.
-  const errorQueue = window.onerror.q || [];
+  // `window.__e.q`, as specified in `index.html`.
+  const loadErrorEvents = window.__e && window.__e.q || [];
 
-  /**
-   * Overrides the temp `onerror()` handler to now send hits to GA.
-   * @param {string} msg
-   * @param {string} file
-   * @param {number} line
-   * @param {number=} col
-   * @param {Error=} error
-   */
-  window.onerror = (msg, file, line, col, error) => {
-    gaAll('send', 'event', {
-      eventCategory: 'Script',
-      eventAction: 'uncaught error',
-      eventLabel: error ? error.stack : `${msg}\n${file}:${line}:${col}`,
-      nonInteraction: true,
-    });
-  };
+  // Use a different eventAction for uncaught errors.
+  /** @type {FieldsObj} */
+  const fieldsObj = {eventAction: 'uncaught error'};
 
-  // Replay any stored errors in the queue.
-  for (let error of errorQueue) {
-    window.onerror(...error);
+  // Replay any stored load error events.
+  for (let event of loadErrorEvents) {
+    trackError(event.error, fieldsObj);
   }
-}
+
+  // Add a new listener to track event immediately.
+  window.addEventListener('error', (event) => {
+    trackError(event.error, fieldsObj);
+  });
+};
 
 
 /**
  * Sets a default dimension value for all custom dimensions on all trackers.
  */
-function trackCustomDimensions() {
-  // Sets a default dimension value for all custom dimensions on all trackers.
-  // This obviously must be done before setting any other custom dimensions.
+const trackCustomDimensions = () => {
+  // Sets a default dimension value for all custom dimensions to ensure
+  // that every dimension in every hit has *some* value. This is necessary
+  // because Google Analytics will drop rows with empty dimension values
+  // in your reports.
   Object.keys(dimensions).forEach((key) => {
     gaAll('set', dimensions[key], NULL_VALUE);
   });
@@ -177,20 +208,21 @@ function trackCustomDimensions() {
   gaTest((tracker) => {
     const originalBuildHitTask = tracker.get('buildHitTask');
     tracker.set('buildHitTask', (model) => {
-      const path = model.get('page') || location.pathname;
-      model.set(dimensions.PAGE_PATH, path),
-
-      model.set(dimensions.HIT_TYPE, model.get('hitType'), true);
+      model.set(dimensions.HIT_ID, uuid(), true);
       model.set(dimensions.HIT_TIME, String(+new Date), true);
-      model.set(dimensions.HIT_UUID, uuid(), true);
+      model.set(dimensions.HIT_TYPE, model.get('hitType'), true);
       model.set(dimensions.VISIBILITY_STATE, document.visibilityState, true);
-      model.set(dimensions.NETWORK_STATUS,
-          navigator.onLine ? 'online' : 'offline', true);
+
+      const networkStatus = navigator.onLine ? 'online' : 'offline';
+      model.set(dimensions.NETWORK_STATUS, networkStatus, true);
+
+      const page = model.get('page') || location.pathname;
+      model.set(dimensions.PAGE_PATH, page, true);
 
       originalBuildHitTask(model);
     });
   });
-}
+};
 
 
 /**
@@ -199,7 +231,7 @@ function trackCustomDimensions() {
  * Sets the network status as a custom dimension on each tracker and adds
  * event listeners to detect future network changes.
  */
-// function trackNetworkStatusChanges() {
+// const trackNetworkStatusChanges = () => {
 //   const updateNetworkStatus = ({type}) => {
 //     gaTest('set', dimensions.NETWORK_STATUS, type);
 //     gaTest('send', 'event', 'Network', 'change', type, {
@@ -214,7 +246,7 @@ function trackCustomDimensions() {
 /**
  * Requires select autotrack plugins for each tracker.
  */
-function requireAutotrackPlugins() {
+const requireAutotrackPlugins = () => {
   gaAll('require', 'cleanUrlTracker', {
     stripQuery: true,
     queryDimensionIndex: getDefinitionIndex(dimensions.URL_QUERY_PARAMS),
@@ -273,56 +305,53 @@ function requireAutotrackPlugins() {
   gaAll('require', 'urlChangeTracker', {
     fieldsObj: {[dimensions.HIT_SOURCE]: 'urlChangeTracker'},
   });
-}
+};
 
 
 /**
  * Sends the initial pageview.
  */
-function sendInitialPageview() {
+const sendInitialPageview = () => {
   gaAll('send', 'pageview', {[dimensions.HIT_SOURCE]: 'pageload'});
-}
+};
 
 
 /**
- * Tracks the time the CSS stopped blocking rendering.
+ * Gets the DOM and window load times and sends them as custom metrics to
+ * Google Analytics via an event hit.
  */
-function measureCssBlockTime() {
-  const cssUnblockTime = measureDuration('css:unblock');
-  if (cssUnblockTime) {
-    // Tracks the amount of time the CSS blocks rendering.
-    gaTest('send', 'event', 'CSS', 'unblock', {
-      eventLabel: 'local',
-      eventValue: cssUnblockTime,
-      nonInteraction: true,
-      [dimensions.METRIC_VALUE]: String(cssUnblockTime),
-    });
-  }
-}
+const sendPageloadMetrics = () => {
+  // Only track performance in supporting browsers.
+  if (!(window.performance && window.performance.timing)) return;
 
+  whenWindowLoaded(() => {
+    const nt = performance.timing;
+    const navStart = nt.navigationStart;
 
-/**
- * Tracks the point the main JavaScript code was loaded.
- */
-function measureJavaSciptLoadTime() {
-  const jsExecuteTime = measureDuration('js:execute');
-  if (jsExecuteTime) {
-    // Tracks the amount of time the JavaScript takes to download and execute.
-    gaTest('send', 'event', 'JavaScript', 'execute', {
-      eventLabel: 'local',
-      eventValue: jsExecuteTime,
+    // Ignore cases where navStart is 0
+    // https://www.w3.org/2010/webperf/track/actions/23
+    if (!navStart) return;
+
+    const domLoaded = nt.domContentLoadedEventStart - navStart;
+    const windowLoaded = nt.loadEventStart - navStart;
+
+    gaTest('send', 'event', {
+      eventCategory: 'Performance',
+      eventAction: 'track',
+      eventLabel: 'pageload',
       nonInteraction: true,
-      [dimensions.METRIC_VALUE]: String(jsExecuteTime),
+      [metrics.DOM_LOAD_TIME]: domLoaded,
+      [metrics.WINDOW_LOAD_TIME]: windowLoaded,
     });
-  }
-}
+  });
+};
 
 
 /**
  * Tracks the point at which the webfonts were active as well as whether an
  * error occurred loading them.
  */
-function measureWebfontPerfAndFailures() {
+const sendWebfontPerfAndFailures = () => {
   new Promise((resolve, reject) => {
     const loaded = /wf-(in)?active/.exec(document.documentElement.className);
     const success = loaded && !loaded[1]; // No "in" in the capture group.
@@ -352,7 +381,7 @@ function measureWebfontPerfAndFailures() {
   }).catch(() => {
     gaTest('send', 'event', 'Fonts', 'error', 'google');
   });
-}
+};
 
 
 /**
@@ -361,7 +390,7 @@ function measureWebfontPerfAndFailures() {
  * @param {string=} reference The timing reference to measure from.
  * @return {number} The duration in milliseconds.
  */
-function measureDuration(mark, reference = 'responseEnd') {
+const measureDuration = (mark, reference = 'responseEnd') => {
   if (window.__perf) {
     const name = `${reference}:${mark}`;
     performance.clearMeasures(name);
@@ -371,30 +400,7 @@ function measureDuration(mark, reference = 'responseEnd') {
   } else {
     return 0;
   }
-}
-
-
-/**
- * Creates a ga() proxy function that calls commands on all but the
- * excluded trackers.
- * @param {!Array} trackers an array or objects containing the `name` and
- *     `trackingId` fields.
- * @return {!Function} The proxied ga() function.
- */
-function createGaProxy(trackers) {
-  return (command, ...args) => {
-    for (let {name} of trackers) {
-      if (typeof command == 'function') {
-        window.ga(() => {
-          command(window.ga.getByName(name));
-        });
-      } else {
-        window.ga(`${name}.${command}`, ...args);
-      }
-    }
-  };
-}
-
+};
 
 
 /**
@@ -402,9 +408,9 @@ function createGaProxy(trackers) {
  * @param {string} definition The definition string (e.g. 'dimension1').
  * @return {number} The definition index.
  */
-function getDefinitionIndex(definition) {
+const getDefinitionIndex = (definition) => {
   return +/\d+$/.exec(definition)[0];
-}
+};
 
 
 /**
@@ -412,33 +418,37 @@ function getDefinitionIndex(definition) {
  * 'unsupported', or 'controlled'.
  * @return {string} The service worker status.
  */
-function getServiceWorkerStatus() {
+const getServiceWorkerStatus = () => {
   return 'serviceWorker' in navigator
     ? (navigator.serviceWorker.controller ? 'controlled' : 'supported')
     : 'unsupported';
-}
-
+};
 
 
 /**
- * Randomizes array element order in-place using Durstenfeld shuffle algorithm.
- * http://goo.gl/91pjZs
- * @param {!Array} array The input array.
- * @return {!Array} The randomized array.
+ * Runs a callback when the load event fires (or immediately if the window
+ * is already loaded).
+ * @param {Function} callback
  */
-function shuffleArray(array) {
-  for (let i = array.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    const temp = array[i];
-    array[i] = array[j];
-    array[j] = temp;
+const whenWindowLoaded = (callback) => {
+  if (document.readyState == 'complete') {
+    callback();
+  } else {
+    window.addEventListener('load', function f() {
+      window.removeEventListener('load', f);
+      callback();
+    });
   }
-  return array;
-}
+};
 
 
-/*eslint-disable */
-// https://gist.github.com/jed/982883
-/** @param {?=} a */
-const uuid = function b(a){return a?(a^Math.random()*16>>a/4).toString(16):([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g,b)};
-/*eslint-enable */
+/**
+ * Generates a UUID.
+ * https://gist.github.com/jed/982883
+ * @param {string|undefined=} a
+ * @return {string}
+ */
+const uuid = function b(a) {
+  return a ? (a ^ Math.random() * 16 >> a / 4).toString(16) :
+      ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, b);
+};

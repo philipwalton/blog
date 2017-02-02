@@ -39,7 +39,7 @@ export function track(name, fieldsObj) {
       const duration = Math.round(lastEntry.duration);
       gaTest('send', 'event', Object.assign({
         eventValue: duration,
-        [dimensions.METRIC_VALUE]: duration,
+        [dimensions.METRIC_VALUE]: String(duration),
       }, fieldsObj));
     }
   }

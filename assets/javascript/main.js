@@ -23,7 +23,6 @@ function main(err = undefined) {
   // to ensure the don't compete for load resources.
   window.onload = function() {
     analytics.init();
-    analytics.trackPageload();
     if (err) {
       analytics.trackError(err);
     }

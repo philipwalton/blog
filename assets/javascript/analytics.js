@@ -14,7 +14,7 @@ import {breakpoints} from './breakpoints';
  * implementation. This allows you to create a segment or view filter
  * that isolates only data captured with the most recent tracking changes.
  */
-const TRACKING_VERSION = '10';
+const TRACKING_VERSION = '11';
 
 
 /**
@@ -100,6 +100,7 @@ export const metrics = {
   SHARE_IMPRESSIONS: 'metric3',
   DOM_LOAD_TIME: 'metric4',
   WINDOW_LOAD_TIME: 'metric5',
+  RESPONSE_END_TIME: 'metric6',
 };
 
 
@@ -113,7 +114,7 @@ export const init = () => {
   trackCustomDimensions();
   requireAutotrackPlugins();
   sendInitialPageview();
-  sendPageloadMetrics();
+  sendNavigationTimingMetrics();
   sendWebfontPerfAndFailures();
 };
 
@@ -320,7 +321,7 @@ const sendInitialPageview = () => {
  * Gets the DOM and window load times and sends them as custom metrics to
  * Google Analytics via an event hit.
  */
-const sendPageloadMetrics = () => {
+const sendNavigationTimingMetrics = () => {
   // Only track performance in supporting browsers.
   if (!(window.performance && window.performance.timing)) return;
 
@@ -332,14 +333,15 @@ const sendPageloadMetrics = () => {
     // https://www.w3.org/2010/webperf/track/actions/23
     if (!navStart) return;
 
-    const domLoaded = nt.domContentLoadedEventStart - navStart;
-    const windowLoaded = nt.loadEventStart - navStart;
+    const responseEnd = Math.round(nt.responseEnd - navStart);
+    const domLoaded = Math.round(nt.domContentLoadedEventStart - navStart);
+    const windowLoaded = Math.round(nt.loadEventStart - navStart);
 
     gaTest('send', 'event', {
-      eventCategory: 'Performance',
+      eventCategory: 'Navigation Timing',
       eventAction: 'track',
-      eventLabel: 'pageload',
       nonInteraction: true,
+      [metrics.RESPONSE_END_TIME]: responseEnd,
       [metrics.DOM_LOAD_TIME]: domLoaded,
       [metrics.WINDOW_LOAD_TIME]: windowLoaded,
     });

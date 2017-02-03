@@ -33,6 +33,14 @@ const TEST_TRACKERS = ALL_TRACKERS.filter(({name}) => /test/.test(name));
 
 
 /**
+ * A default value for dimensions so unset values always are reported as
+ * something. This is needed since Google Analytics will drop empty dimension
+ * values in reports.
+ */
+const NULL_VALUE = '(not set)';
+
+
+/**
  * Creates a ga() proxy function that calls commands on all but the
  * excluded trackers.
  * @param {!Array} trackers an array or objects containing the `name` and
@@ -60,14 +68,6 @@ export const gaTest = createGaProxy(TEST_TRACKERS);
 
 
 /**
- * A default value for dimensions so unset values always are reported as
- * something. This is needed since Google Analytics will drop empty dimension
- * values in reports.
- */
-const NULL_VALUE = '(not set)';
-
-
-/**
  * A maping between custom dimension names and their indexes.
  */
 export const dimensions = {
@@ -87,7 +87,6 @@ export const dimensions = {
   HIT_ID: 'dimension14',
   HIT_TIME: 'dimension15',
   TRACKING_VERSION: 'dimension16',
-  PAGE_PATH: 'dimension17',
 };
 
 
@@ -156,7 +155,6 @@ export const trackError = (error, fieldsObj = {}) => {
 };
 
 
-
 /**
  * Tracks any errors that may have occured on the page prior to analytics being
  * initialized, then adds an event handler to track future errors.
@@ -216,9 +214,6 @@ const trackCustomDimensions = () => {
 
       const networkStatus = navigator.onLine ? 'online' : 'offline';
       model.set(dimensions.NETWORK_STATUS, networkStatus, true);
-
-      const page = model.get('page') || location.pathname;
-      model.set(dimensions.PAGE_PATH, page, true);
 
       originalBuildHitTask(model);
     });

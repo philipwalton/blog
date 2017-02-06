@@ -9,12 +9,15 @@ import 'autotrack/lib/plugins/url-change-tracker';
 import {breakpoints} from './breakpoints';
 
 
+/* global ga */
+
+
 /**
  * Bump this when making backwards incompatible changes to the tracking
  * implementation. This allows you to create a segment or view filter
  * that isolates only data captured with the most recent tracking changes.
  */
-const TRACKING_VERSION = '11';
+const TRACKING_VERSION = '12';
 
 
 /**
@@ -38,33 +41,6 @@ const TEST_TRACKERS = ALL_TRACKERS.filter(({name}) => /test/.test(name));
  * values in reports.
  */
 const NULL_VALUE = '(not set)';
-
-
-/**
- * Creates a ga() proxy function that calls commands on all but the
- * excluded trackers.
- * @param {!Array} trackers an array or objects containing the `name` and
- *     `trackingId` fields.
- * @return {!Function} The proxied ga() function.
- */
-const createGaProxy = (trackers) => {
-  return (command, ...args) => {
-    for (let {name} of trackers) {
-      if (typeof command == 'function') {
-        window.ga(() => command(window.ga.getByName(name)));
-      } else {
-        window.ga(`${name}.${command}`, ...args);
-      }
-    }
-  };
-};
-
-
-/**
- * Command queue proxies.
- */
-export const gaAll = createGaProxy(ALL_TRACKERS);
-export const gaTest = createGaProxy(TEST_TRACKERS);
 
 
 /**
@@ -104,10 +80,41 @@ export const metrics = {
 
 
 /**
+ * Creates a ga() proxy function that calls commands on all passed trackers.
+ * @param {!Array} trackers an array or objects containing the `name` and
+ *     `trackingId` fields.
+ * @return {!Function} The proxied ga() function.
+ */
+const createGaProxy = (trackers) => {
+  return (command, ...args) => {
+    for (let {name} of trackers) {
+      if (typeof command == 'function') {
+        ga(() => {
+          command(ga.getByName(name));
+        });
+      } else {
+        ga(`${name}.${command}`, ...args);
+      }
+    }
+  };
+}
+
+
+/**
+ * Command queue proxies.
+ */
+export const gaAll = createGaProxy(ALL_TRACKERS);
+export const gaTest = createGaProxy(TEST_TRACKERS);
+
+
+/**
  * Initializes all the analytics setup. Creates trackers and sets initial
  * values on the trackers.
  */
 export const init = () => {
+  // Initialize the command queue in case analytics.js hasn't loaded yet.
+  window.ga = window.ga || ((...args) => (ga.q = ga.q || []).push(args));
+
   createTrackers();
   trackErrors();
   trackCustomDimensions();
@@ -124,13 +131,12 @@ export const init = () => {
  */
 const createTrackers = () => {
   for (let tracker of ALL_TRACKERS) {
-    window.ga('create', tracker.trackingId, 'auto', tracker.name, {
+    ga('create', tracker.trackingId, 'auto', tracker.name, {
       siteSpeedSampleRate: 10,
     });
   }
 
   // Ensures all hits are sent via `navigator.sendBeacon()`.
-  // Note: this cannot via the `create` command.
   gaAll('set', 'transport', 'beacon');
 };
 
@@ -305,7 +311,7 @@ const requireAutotrackPlugins = () => {
 
 
 /**
- * Sends the initial pageview.
+ * Sends the initial pageview to Google Analytics.
  */
 const sendInitialPageview = () => {
   gaAll('send', 'pageview', {[dimensions.HIT_SOURCE]: 'pageload'});
@@ -324,22 +330,27 @@ const sendNavigationTimingMetrics = () => {
     const nt = performance.timing;
     const navStart = nt.navigationStart;
 
-    // Ignore cases where navStart is 0
-    // https://www.w3.org/2010/webperf/track/actions/23
-    if (!navStart) return;
-
     const responseEnd = Math.round(nt.responseEnd - navStart);
     const domLoaded = Math.round(nt.domContentLoadedEventStart - navStart);
     const windowLoaded = Math.round(nt.loadEventStart - navStart);
 
-    gaTest('send', 'event', {
-      eventCategory: 'Navigation Timing',
-      eventAction: 'track',
-      nonInteraction: true,
-      [metrics.RESPONSE_END_TIME]: responseEnd,
-      [metrics.DOM_LOAD_TIME]: domLoaded,
-      [metrics.WINDOW_LOAD_TIME]: windowLoaded,
-    });
+    // In some edge cases browsers return very obviously incorrect NT values,
+    // e.g. 0, negative, or future times. This validates values before sending.
+    const allValuesAreValid = (...values) => {
+      return values.every((value) => value > 0 && value < 1e6);
+    };
+
+    if (allValuesAreValid(responseEnd, domLoaded, windowLoaded)) {
+      // Only sends perf events via the test tracker.
+      gaTest('send', 'event', {
+        eventCategory: 'Navigation Timing',
+        eventAction: 'track',
+        nonInteraction: true,
+        [metrics.RESPONSE_END_TIME]: responseEnd,
+        [metrics.DOM_LOAD_TIME]: domLoaded,
+        [metrics.WINDOW_LOAD_TIME]: windowLoaded,
+      });
+    }
   });
 };
 
@@ -400,15 +411,6 @@ const measureDuration = (mark, reference = 'responseEnd') => {
 };
 
 
-/**
- * Accepts a custom dimension or metric and returns it's numerical index.
- * @param {string} definition The definition string (e.g. 'dimension1').
- * @return {number} The definition index.
- */
-const getDefinitionIndex = (definition) => {
-  return +/\d+$/.exec(definition)[0];
-};
-
 
 /**
  * Gets the service worker status. It will be either: 'supported',
@@ -437,6 +439,14 @@ const whenWindowLoaded = (callback) => {
     });
   }
 };
+
+
+/**
+ * Accepts a custom dimension or metric and returns it's numerical index.
+ * @param {string} definition The definition string (e.g. 'dimension1').
+ * @return {number} The definition index.
+ */
+const getDefinitionIndex = (definition) => +/\d+$/.exec(definition)[0];
 
 
 /**

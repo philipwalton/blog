@@ -184,6 +184,8 @@ export function init() {
     const page = parseUrl(location.href);
     const link = parseUrl(delegateTarget.href);
 
+    if (/\.(png|svg)$/.test(link.href)) return;
+
     // Don't do anything when clicking on links to the current URL.
     if (link.href == page.href) event.preventDefault();
 

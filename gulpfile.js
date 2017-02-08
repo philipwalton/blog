@@ -339,6 +339,7 @@ gulp.task('lint', () => {
     'gulpfile.js',
     'assets/sw.js',
     'assets/javascript/**/*.js',
+    '!assets/javascript/externs.js',
     'test/**/*.js',
   ])
   .pipe(eslint({fix: true}))

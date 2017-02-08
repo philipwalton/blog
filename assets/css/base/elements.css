@@ -118,6 +118,7 @@ figure {
 
 figcaption {
   color: #666;
+  font-style: italic;
   font-size: .8em;
   padding: 0 .5em;
   text-align: right;

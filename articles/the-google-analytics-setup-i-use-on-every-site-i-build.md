@@ -144,7 +144,7 @@ Here's what the segment definition I use looks like (as you can see, I'm on vers
     <img srcset="
       ../../assets/images/segment-tracking-version-1400w.png 1400w,
       ../../assets/images/segment-tracking-version.png 700w"
-      src="../../assets/images/segment-tracking-version-properties.png"
+      src="../../assets/images/segment-tracking-version.png"
       alt="Time to first paint distribution for the Google I/O WebApp (Mobile)">
   </a>
   <figcaption>
@@ -473,7 +473,7 @@ For example, in the section on tracking custom data I mentioned isolating indivi
     <img srcset="
       ../../assets/images/custom-report-user-session-1400w.png 1400w,
       ../../assets/images/custom-report-user-session.png 700w"
-      src="../../assets/images/custom-report-user-session-properties.png"
+      src="../../assets/images/custom-report-user-session.png"
       alt="A Google Analytics custom report">
   </a>
   <figcaption>
@@ -490,7 +490,7 @@ To create this report I picked a random client ID and session from one of my oth
     <img srcset="
       ../../assets/images/custom-report-config-user-session-1400w.png 1400w,
       ../../assets/images/custom-report-config-user-session.png 700w"
-      src="../../assets/images/custom-report-config-user-session-properties.png"
+      src="../../assets/images/custom-report-config-user-session.png"
       alt="The configuration for above custom report">
   </a>
   <figcaption>
@@ -513,7 +513,7 @@ Here's a screenshot of a custom report I created showing pages with the highest 
     <img srcset="
       ../../assets/images/max-scroll-report-1400w.png 1400w,
       ../../assets/images/max-scroll-report.png 700w"
-      src="../../assets/images/max-scroll-report-properties.png"
+      src="../../assets/images/max-scroll-report.png"
       alt="A Google Analytics custom report">
   </a>
   <figcaption>
@@ -528,7 +528,7 @@ And the following screenshot shows how this calculated metric is configured:
     <img srcset="
       ../../assets/images/calculated-metric-definition-1400w.png 1400w,
       ../../assets/images/calculated-metric-definition.png 700w"
-      src="../../assets/images/calculated-metric-definition-properties.png"
+      src="../../assets/images/calculated-metric-definition.png"
       alt="A Google Analytics custom report">
   </a>
   <figcaption>
@@ -555,7 +555,7 @@ The histogram below shows a distribution of max scroll percentage (per session) 
     <img srcset="
       ../../assets/images/max-scroll-percentage-histogram-1400w.png 1400w,
       ../../assets/images/max-scroll-percentage-histogram.png 700w"
-      src="../../assets/images/max-scroll-percentage-histogram-properties.png"
+      src="../../assets/images/max-scroll-percentage-histogram.png"
       alt="Max Scroll Percentage distribution">
   </a>
   <figcaption>Max Scroll Percentage distribution.</figcaption>
@@ -574,7 +574,7 @@ On desktop the median time to first paint was **583 ms** when controlled by a se
     <img srcset="
       ../../assets/images/fp-histogram-desktop-1400w.png 1400w,
       ../../assets/images/fp-histogram-desktop.png 700w"
-      src="../../assets/images/fp-histogram-desktop-properties.png"
+      src="../../assets/images/fp-histogram-desktop.png"
       alt="Time to first paint distribution for the Google I/O WebApp (Desktop)">
   </a>
   <figcaption>
@@ -589,7 +589,7 @@ On mobile the median was **1634 ms** when controlled by a service worker vs. **1
     <img srcset="
       ../../assets/images/fp-histogram-mobile-1400w.png 1400w,
       ../../assets/images/fp-histogram-mobile.png 700w"
-      src="../../assets/images/fp-histogram-mobile-properties.png"
+      src="../../assets/images/fp-histogram-mobile.png"
       alt="Time to first paint distribution for the Google I/O WebApp (Mobile)">
   </a>
   <figcaption>

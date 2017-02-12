@@ -335,7 +335,7 @@ Here's how we could update our PostCSS plugin to do just that:
 // ...
 ```
 
-[Demo #6](https://philipwalton.github.io/talks/2016-12-02/demos/5/), shows the following code in action.
+[Demo #6](https://philipwalton.github.io/talks/2016-12-02/demos/6/), shows the following code in action.
 
 At first it seems to work great, unfortunately, it's easy to break. Consider if we update the CSS to add another rule after our `.progress-bar` rule.
 

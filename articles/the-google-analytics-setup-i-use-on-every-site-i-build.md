@@ -1,4 +1,4 @@
-Google Analytics is a powerful yet quite complicated tool. And unfortunately, the truth is most people who use it don't reap it's full benefits.
+Google Analytics is a powerful yet quite complicated tool. And unfortunately, the truth is most people who use it don't reap its full benefits.
 
 There's a lot of excellent and free content out there that explains how to use Google Analytics, but most of it is rather narrowly focused on use cases that primarily apply to marketers and advertisers; very little is geared toward web developers who simply want to better understand how people are using the sites they build.
 

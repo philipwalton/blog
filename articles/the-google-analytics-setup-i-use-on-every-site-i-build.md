@@ -413,7 +413,7 @@ A must have since Google Analytics doesn't track navigations to external domains
 
 Hate seeing a bunch of marketing params in the URLs of your page reports? Yeah, me too. This plugin solves that problem in a developer-friendly way (as opposed to having to use [view filters](https://support.google.com/analytics/answer/1033162)).
 
-[**`maxScrollTracker`**](https://github.com/googleanalytics/autotrack/blob/master/docs/plugins/media-query-tracker.md)
+[**`maxScrollTracker`**](https://github.com/googleanalytics/autotrack/blob/master/docs/plugins/max-scroll-tracker.md)
 
 Tracking how far down the page a user scrolls is actually a fairly complex problem. It's also pretty easy to accidently cripple your user's scroll experience when not done right. This plugin handles all of these complications for you.
 

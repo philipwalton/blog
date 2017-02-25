@@ -22,7 +22,7 @@
   },
   "devDependencies": {
     "async-waituntil-polyfill": "^1.0.1",
-    "autotrack": "^2.0.1",
+    "autotrack": "googleanalytics/autotrack#storage-errors",
     "babel-core": "^6.21.0",
     "babel-eslint": "^7.1.1",
     "babel-loader": "^6.2.10",

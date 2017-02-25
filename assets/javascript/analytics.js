@@ -17,7 +17,7 @@ import {breakpoints} from './breakpoints';
  * implementation. This allows you to create a segment or view filter
  * that isolates only data captured with the most recent tracking changes.
  */
-const TRACKING_VERSION = '13';
+const TRACKING_VERSION = '15';
 
 
 /**
@@ -148,14 +148,14 @@ const createTrackers = () => {
  *
  *    `fetch('/api.json').catch(trackError);`
  *
- * @param {Error|undefined} error
+ * @param {Error|undefined} err
  * @param {FieldsObj=} fieldsObj
  */
-export const trackError = (error, fieldsObj = {}) => {
+export const trackError = (err, fieldsObj = {}) => {
   gaAll('send', 'event', Object.assign({
     eventCategory: 'Script',
-    eventAction: 'error',
-    eventLabel: (error && error.stack) || NULL_VALUE,
+    eventAction: err.name,
+    eventLabel: `${err.message}\n${err.stack || '(no stack trace)'}`,
     nonInteraction: true,
   }, fieldsObj));
 };
@@ -256,13 +256,13 @@ const requireAutotrackPlugins = () => {
     trailingSlash: 'add',
   });
   gaAll('require', 'eventTracker');
-  gaTest('require', 'impressionTracker', {
+  gaAll('require', 'impressionTracker', {
     elements: ['share'],
     hitFilter: (model) => {
       model.set(metrics.SHARE_IMPRESSIONS, 1, true);
     },
   });
-  gaTest('require', 'maxScrollTracker', {
+  gaAll('require', 'maxScrollTracker', {
     sessionTimeout: 30,
     timeZone: 'America/Los_Angeles',
     maxScrollMetricIndex: getDefinitionIndex(metrics.MAX_SCROLL_PERCENTAGE),
@@ -298,7 +298,7 @@ const requireAutotrackPlugins = () => {
   gaAll('require', 'outboundLinkTracker', {
     events: ['click', 'contextmenu'],
   });
-  gaTest('require', 'pageVisibilityTracker', {
+  gaAll('require', 'pageVisibilityTracker', {
     visibleMetricIndex: getDefinitionIndex(metrics.PAGE_VISIBLE),
     sessionTimeout: 30,
     timeZone: 'America/Los_Angeles',
@@ -342,7 +342,7 @@ const sendNavigationTimingMetrics = () => {
   // In some edge cases browsers return very obviously incorrect NT values,
   // e.g. 0, negative, or future times. This validates values before sending.
   const allValuesAreValid = (...values) => {
-    return values.every((value) => value > 0 && value < 1e6);
+    return values.every((value) => value > 0 && value < 6e6);
   };
 
   if (allValuesAreValid(responseEnd, domLoaded, windowLoaded)) {

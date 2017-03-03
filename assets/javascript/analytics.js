@@ -17,7 +17,7 @@ import {breakpoints} from './breakpoints';
  * implementation. This allows you to create a segment or view filter
  * that isolates only data captured with the most recent tracking changes.
  */
-const TRACKING_VERSION = '16';
+const TRACKING_VERSION = '17';
 
 
 /**

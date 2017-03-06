@@ -17,7 +17,7 @@ import {breakpoints} from './breakpoints';
  * implementation. This allows you to create a segment or view filter
  * that isolates only data captured with the most recent tracking changes.
  */
-const TRACKING_VERSION = '17';
+const TRACKING_VERSION = '18';
 
 
 /**
@@ -153,9 +153,10 @@ const createTrackers = () => {
  */
 export const trackError = (err, fieldsObj = {}) => {
   gaAll('send', 'event', Object.assign({
-    eventCategory: 'Error',
-    eventAction: err.name,
-    eventLabel: `${err.message}\n${err.stack || '(no stack trace)'}`,
+    eventCategory: 'Script',
+    eventAction: 'error',
+    eventLabel: `${err.name}: ${err.message}\n`
+        + `${err.stack || '(no stack trace)'}`,
     nonInteraction: true,
   }, fieldsObj));
 };
@@ -170,9 +171,9 @@ const trackErrors = () => {
   // `window.__e.q`, as specified in `index.html`.
   const loadErrorEvents = window.__e && window.__e.q || [];
 
-  // Use a different eventCategory for uncaught errors.
+  // Use a different eventAction for uncaught errors.
   /** @type {FieldsObj} */
-  const fieldsObj = {eventCategory: 'Uncaught Error'};
+  const fieldsObj = {eventAction: 'error:uncaught'};
 
   // Replay any stored load error events.
   for (let event of loadErrorEvents) {
@@ -214,9 +215,11 @@ const trackCustomDimensions = () => {
     const originalBuildHitTask = tracker.get('buildHitTask');
     tracker.set('buildHitTask', (model) => {
       model.set(dimensions.HIT_ID, uuid(), true);
-      model.set(dimensions.HIT_TIME, String(+new Date), true);
       model.set(dimensions.HIT_TYPE, model.get('hitType'), true);
       model.set(dimensions.VISIBILITY_STATE, document.visibilityState, true);
+
+      const qt = model.get('queueTime') || 0;
+      model.set(dimensions.HIT_TIME, String(new Date - qt), true);
 
       const networkStatus = navigator.onLine ? 'online' : 'offline';
       model.set(dimensions.NETWORK_STATUS, networkStatus, true);

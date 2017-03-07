@@ -18,10 +18,10 @@ const webdriver = require('gulp-webdriver');
 const he = require('he');
 const hljs = require('highlight.js');
 const pngquant = require('imagemin-pngquant');
+const localtunnel = require('localtunnel');
 const MarkdownIt = require('markdown-it');
 const markdownItAnchor = require('markdown-it-anchor');
 const merge = require('merge-stream');
-const ngrok = require('ngrok');
 const path = require('path');
 const {rollup} = require('rollup');
 const nodeResolve = require('rollup-plugin-node-resolve');
@@ -52,6 +52,12 @@ let devServer;
  * A reference to the selenium server standalone subprocess.
  */
 let seleniumServer;
+
+
+/**
+ * A reference to the localtunnel instance.
+ */
+let testTunnel;
 
 
 /**
@@ -381,11 +387,14 @@ gulp.task('selenium', (done) => {
 
 
 gulp.task('tunnel', ['serve'], (done) => {
-  ngrok.connect(9090, function(err, url) {
-    if (err) return done(err);
-
-    process.env.BASE_URL = url;
-    done();
+  localtunnel(9090, (err, tunnel) => {
+    if (err) {
+      done(err);
+    } else {
+      testTunnel = tunnel;
+      process.env.BASE_URL = tunnel.url;
+      done();
+    }
   });
 });
 
@@ -407,7 +416,7 @@ gulp.task('test', ['lint', 'build', 'tunnel', 'selenium'], () => {
   const stopServers = () => {
     devServer.kill();
     seleniumServer.kill();
-    ngrok.kill();
+    testTunnel.close();
   };
   return gulp.src('./wdio.conf.js')
       .pipe(webdriver())

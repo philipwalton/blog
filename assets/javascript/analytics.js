@@ -148,15 +148,14 @@ const createTrackers = () => {
  *
  *    `fetch('/api.json').catch(trackError);`
  *
- * @param {Error|undefined} err
+ * @param {(Error|Object)=} err
  * @param {FieldsObj=} fieldsObj
  */
-export const trackError = (err, fieldsObj = {}) => {
+export const trackError = (err = {}, fieldsObj = {}) => {
   gaAll('send', 'event', Object.assign({
-    eventCategory: 'Script',
-    eventAction: 'error',
-    eventLabel: `${err.name}: ${err.message}\n`
-        + `${err.stack || '(no stack trace)'}`,
+    eventCategory: 'Error',
+    eventAction: err.name,
+    eventLabel: `${err.message}\n${err.stack || '(no stack trace)'}`,
     nonInteraction: true,
   }, fieldsObj));
 };
@@ -171,19 +170,26 @@ const trackErrors = () => {
   // `window.__e.q`, as specified in `index.html`.
   const loadErrorEvents = window.__e && window.__e.q || [];
 
-  // Use a different eventAction for uncaught errors.
-  /** @type {FieldsObj} */
-  const fieldsObj = {eventAction: 'error:uncaught'};
+  const trackErrorEvent = (event) => {
+    // Use a different eventCategory for uncaught errors.
+    /** @type {FieldsObj} */
+    const fieldsObj = {eventCategory: 'Uncaught Error'};
+
+    // Some browsers don't have an error property, so we fake it.
+    const err = event.error || {
+      message: `${event.message} (${event.lineno}:${event.colno})`,
+    };
+
+    trackError(err, fieldsObj);
+  };
 
   // Replay any stored load error events.
   for (let event of loadErrorEvents) {
-    trackError(event.error, fieldsObj);
+    trackErrorEvent(event);
   }
 
   // Add a new listener to track event immediately.
-  window.addEventListener('error', (event) => {
-    trackError(event.error, fieldsObj);
-  });
+  window.addEventListener('error', trackErrorEvent);
 };
 
 

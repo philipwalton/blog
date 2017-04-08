@@ -17,7 +17,7 @@ import {breakpoints} from './breakpoints';
  * implementation. This allows you to create a segment or view filter
  * that isolates only data captured with the most recent tracking changes.
  */
-const TRACKING_VERSION = '18';
+const TRACKING_VERSION = '19';
 
 
 /**
@@ -76,6 +76,7 @@ export const metrics = {
   DOM_LOAD_TIME: 'metric4',
   WINDOW_LOAD_TIME: 'metric5',
   RESPONSE_END_TIME: 'metric6',
+  PAGELOADS: 'metric7',
 };
 
 
@@ -119,7 +120,6 @@ export const init = () => {
   trackErrors();
   trackCustomDimensions();
   requireAutotrackPlugins();
-  sendInitialPageview();
   sendNavigationTimingMetrics();
   sendWebfontPerfAndFailures();
 };
@@ -154,7 +154,7 @@ const createTrackers = () => {
 export const trackError = (err = {}, fieldsObj = {}) => {
   gaAll('send', 'event', Object.assign({
     eventCategory: 'Error',
-    eventAction: err.name,
+    eventAction: err.name || '(no error name)',
     eventLabel: `${err.message}\n${err.stack || '(no stack trace)'}`,
     nonInteraction: true,
   }, fieldsObj));
@@ -308,22 +308,15 @@ const requireAutotrackPlugins = () => {
     events: ['click', 'contextmenu'],
   });
   gaAll('require', 'pageVisibilityTracker', {
+    sendInitialPageview: true,
+    pageloadMetricIndex: getDefinitionIndex(metrics.PAGELOADS),
     visibleMetricIndex: getDefinitionIndex(metrics.PAGE_VISIBLE),
-    sessionTimeout: 30,
     timeZone: 'America/Los_Angeles',
     fieldsObj: {[dimensions.HIT_SOURCE]: 'pageVisibilityTracker'},
   });
   gaAll('require', 'urlChangeTracker', {
     fieldsObj: {[dimensions.HIT_SOURCE]: 'urlChangeTracker'},
   });
-};
-
-
-/**
- * Sends the initial pageview to Google Analytics.
- */
-const sendInitialPageview = () => {
-  gaAll('send', 'pageview', {[dimensions.HIT_SOURCE]: 'pageload'});
 };
 
 

@@ -17,7 +17,7 @@ import {breakpoints} from './breakpoints';
  * implementation. This allows you to create a segment or view filter
  * that isolates only data captured with the most recent tracking changes.
  */
-const TRACKING_VERSION = '19';
+const TRACKING_VERSION = '20';
 
 
 /**
@@ -76,7 +76,7 @@ export const metrics = {
   DOM_LOAD_TIME: 'metric4',
   WINDOW_LOAD_TIME: 'metric5',
   RESPONSE_END_TIME: 'metric6',
-  PAGELOADS: 'metric7',
+  PAGE_LOADS: 'metric7',
 };
 
 
@@ -220,8 +220,9 @@ const trackCustomDimensions = () => {
   gaTest((tracker) => {
     const originalBuildHitTask = tracker.get('buildHitTask');
     tracker.set('buildHitTask', (model) => {
+      const hitType = model.get('hitType');
       model.set(dimensions.HIT_ID, uuid(), true);
-      model.set(dimensions.HIT_TYPE, model.get('hitType'), true);
+      model.set(dimensions.HIT_TYPE, hitType, true);
       model.set(dimensions.VISIBILITY_STATE, document.visibilityState, true);
 
       const qt = model.get('queueTime') || 0;
@@ -229,6 +230,12 @@ const trackCustomDimensions = () => {
 
       const networkStatus = navigator.onLine ? 'online' : 'offline';
       model.set(dimensions.NETWORK_STATUS, networkStatus, true);
+
+      // TODO(philipwalton): temporary fix to address an analytics.js bug where
+      // custom metrics on the initial pageview are added to timing hits.
+      if (hitType == 'timing') {
+        model.set(metrics.PAGE_LOADS, undefined, true);
+      }
 
       originalBuildHitTask(model);
     });
@@ -309,7 +316,7 @@ const requireAutotrackPlugins = () => {
   });
   gaAll('require', 'pageVisibilityTracker', {
     sendInitialPageview: true,
-    pageloadMetricIndex: getDefinitionIndex(metrics.PAGELOADS),
+    pageLoadMetricIndex: getDefinitionIndex(metrics.PAGE_LOADS),
     visibleMetricIndex: getDefinitionIndex(metrics.PAGE_VISIBLE),
     timeZone: 'America/Los_Angeles',
     fieldsObj: {[dimensions.HIT_SOURCE]: 'pageVisibilityTracker'},

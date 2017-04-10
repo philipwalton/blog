@@ -312,7 +312,7 @@ const requireAutotrackPlugins = () => {
     ],
   });
   gaAll('require', 'outboundLinkTracker', {
-    events: ['click', 'contextmenu'],
+    events: ['click', 'auxclick', 'contextmenu'],
   });
   gaAll('require', 'pageVisibilityTracker', {
     sendInitialPageview: true,

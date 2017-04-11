@@ -316,7 +316,7 @@ const requireAutotrackPlugins = () => {
   });
   gaAll('require', 'pageVisibilityTracker', {
     sendInitialPageview: true,
-    pageLoadMetricIndex: getDefinitionIndex(metrics.PAGE_LOADS),
+    pageLoadsMetricIndex: getDefinitionIndex(metrics.PAGE_LOADS),
     visibleMetricIndex: getDefinitionIndex(metrics.PAGE_VISIBLE),
     timeZone: 'America/Los_Angeles',
     fieldsObj: {[dimensions.HIT_SOURCE]: 'pageVisibilityTracker'},

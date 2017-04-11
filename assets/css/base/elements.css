@@ -19,6 +19,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
   letter-spacing: -0.02em;
+  margin: 0;
 }
 .wf-active body {
   font-family: var(--font);

@@ -253,11 +253,12 @@ gulp.task('javascript:main', (done) => {
 
 gulp.task('javascript:polyfills', ((compiler) => {
   const createCompiler = () => {
-    const entry = './assets/javascript/polyfills.js';
+    const entryPath = './assets/javascript/polyfills.js';
+    const entry = path.resolve(__dirname, entryPath);
     return webpack({
       entry: entry,
       output: {
-        path: path.dirname(path.join(DEST, entry)),
+        path: path.dirname(path.resolve(__dirname, DEST, entryPath)),
         filename: path.basename(entry),
       },
       devtool: '#source-map',
@@ -290,7 +291,7 @@ gulp.task('service-worker', ((compiler) => {
     return webpack({
       entry: entry,
       output: {
-        path: path.dirname(path.join(DEST, path.basename(entry))),
+        path: path.dirname(path.resolve(__dirname, DEST, path.basename(entry))),
         filename: path.basename(entry),
       },
       // devtool: '#source-map',

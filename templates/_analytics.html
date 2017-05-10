@@ -1,2 +1,31 @@
 <script>addEventListener('error', window.__e=function f(e){f.q=f.q||[];f.q.push(e)});</script>
 <script async src="https://www.google-analytics.com/analytics.js"></script>
+
+<script>
+!function() {
+if (window.PerformanceLongTaskTiming) {
+  var g = window.__tti = {e: []};
+  g.o = new PerformanceObserver(function(l){
+    g.e=g.e.concat(l.getEntries())
+  });
+  g.o.observe({entryTypes:['longtask']});
+}
+}();
+</script>
+
+<script>
+window.__trackAbandons = () => {
+  const ANALYTICS_URL = 'https://www.google-analytics.com/collect';
+  const TRACKING_ID = 'UA-21292978-3';
+  const CLIENT_ID = document.cookie.replace(
+    /(?:(?:^|.*;)\s*_ga\s*\=\s*(?:\w+\.\d\.)([^;]*).*$)|^.*$/, '$1');
+
+  navigator.sendBeacon && navigator.sendBeacon(ANALYTICS_URL, [
+    'v=1', 't=event', 'ec=Load', 'ea=abandon', 'el=pre-load',
+    'tid=' + TRACKING_ID,
+    'cid=' + (CLIENT_ID || `${+new Date}.${(Math.random() * 2**52)}`),
+    'ev=' + Math.round(performance.now()),
+  ].join('&'));
+};
+window.addEventListener('unload', window.__trackAbandons);
+</script>

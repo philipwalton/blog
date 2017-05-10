@@ -9,7 +9,10 @@ import 'autotrack/lib/plugins/url-change-tracker';
 import {breakpoints} from './breakpoints';
 
 
-/* global ga */
+import {getFirstConsistentlyInteractive} from 'tti-polyfill/src';
+
+
+/* global ga, ENVIRONMENT */
 
 
 /**
@@ -17,7 +20,7 @@ import {breakpoints} from './breakpoints';
  * implementation. This allows you to create a segment or view filter
  * that isolates only data captured with the most recent tracking changes.
  */
-const TRACKING_VERSION = '20';
+const TRACKING_VERSION = '22';
 
 
 /**
@@ -77,6 +80,7 @@ export const metrics = {
   WINDOW_LOAD_TIME: 'metric5',
   RESPONSE_END_TIME: 'metric6',
   PAGE_LOADS: 'metric7',
+  TTCI: 'metric8',
 };
 
 
@@ -120,6 +124,8 @@ export const init = () => {
   trackErrors();
   trackCustomDimensions();
   requireAutotrackPlugins();
+  stopPreloadAbandonTracking();
+  trackTimeToFirstConsistentlyInteractive();
   sendNavigationTimingMetrics();
   sendWebfontPerfAndFailures();
 };
@@ -138,6 +144,39 @@ const createTrackers = () => {
 
   // Ensures all hits are sent via `navigator.sendBeacon()`.
   gaAll('set', 'transport', 'beacon');
+
+  // Log hits in non-production environments.
+  if (ENVIRONMENT != 'production') {
+    gaAll('set', 'sendHitTask', function(model) {
+      let paramsToIgnore = ['v', 'did', 't', 'tid', 'ec', 'ea', 'el', 'ev',
+          'a', 'z', 'ul', 'de', 'sd', 'sr', 'vp', 'je', 'fl', 'jid'];
+
+      let hitType = model.get('&t');
+      let hitPayload = model.get('hitPayload');
+      let hit = hitPayload
+          .split('&')
+          .map(decodeURIComponent)
+          .filter((item) => {
+            const [param] = item.split('=');
+            return !(param.charAt(0) === '_' ||
+                paramsToIgnore.indexOf(param) > -1);
+          });
+
+      let parts = [model.get('&tid'), hitType];
+      if (hitType == 'event') {
+        parts = [
+          ...parts,
+          model.get('&ec'),
+          model.get('&ea'),
+          model.get('&el'),
+        ];
+        if (model.get('&ev')) parts.push(model.get('&ev'));
+      }
+
+      // eslint-disable-next-line no-console
+      console.log(...parts, hit);
+    });
+  }
 };
 
 
@@ -323,6 +362,46 @@ const requireAutotrackPlugins = () => {
   });
   gaAll('require', 'urlChangeTracker', {
     fieldsObj: {[dimensions.HIT_SOURCE]: 'urlChangeTracker'},
+  });
+};
+
+
+const stopPreloadAbandonTracking = () => {
+  window.removeEventListener('unload', window.__trackAbandons);
+}
+
+
+const trackTimeToFirstConsistentlyInteractive = () => {
+  const postLoadAbandonTracking = () => {
+    gaTest('send', 'event', 'Load', 'abandon', {
+      eventCategory: 'Load',
+      eventAction: 'abandon',
+      eventLabel: 'post-load',
+      eventValue: Math.round(performance.now()),
+    });
+  };
+  window.addEventListener('unload', postLoadAbandonTracking);
+
+  getFirstConsistentlyInteractive().then((ttci) => {
+    console.log('ttci', ttci);
+    if (ttci > 0) {
+      gaTest('send', 'event', {
+        eventCategory: 'PW Metrics',
+        eventAction: 'track',
+        eventLabel: NULL_VALUE,
+        eventValue: 1, // Number of metrics track with event.
+        nonInteraction: true,
+        [metrics.TTCI]: Math.round(ttci),
+      });
+    }
+  })
+  .catch((err) => {
+    console.log(err);
+    trackError(err);
+  })
+  .then(() => {
+    console.log('removing post load postLoadAbandonTracking');
+    window.removeEventListener('unload', postLoadAbandonTracking)
   });
 };
 

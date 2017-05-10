@@ -19,19 +19,15 @@ function main(err = undefined) {
   contentLoader.init();
   drawer.init();
 
-  // Delays running any analytics or registering the service worker
-  // to ensure the don't compete for load resources.
-  window.onload = function() {
-    analytics.init();
-    if (err) {
-      analytics.trackError(err);
-    }
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker
-          .register('/sw.js')
-          .catch((err) => analytics.trackError(/** @type {!Error} */ (err)));
-    }
-  };
+  analytics.init();
+  if (err) {
+    analytics.trackError(err);
+  }
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker
+        .register('/sw.js')
+        .catch((err) => analytics.trackError(/** @type {!Error} */ (err)));
+  }
 }
 
 

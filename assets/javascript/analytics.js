@@ -376,6 +376,7 @@ const trackTimeToFirstConsistentlyInteractive = () => {
       eventAction: 'abandon',
       eventLabel: 'post-load',
       eventValue: Math.round(performance.now()),
+      nonInteraction: true,
     });
   };
   window.addEventListener('unload', postLoadAbandonTracking);

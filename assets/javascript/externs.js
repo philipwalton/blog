@@ -7,6 +7,25 @@ window.__tti.e;
 
 
 /**
+ * @typedef {{
+ *   firstPaintTime: (number),
+ * }}
+ */
+var LoadTimes;
+
+
+/**
+ * @type {!Object}
+ */
+window.chrome;
+
+/**
+ * @return {!LoadTimes}
+ */
+window.chrome.loadTimes = function() {};
+
+
+/**
  * @constructor
  */
 function PerformanceObserverEntry() {}

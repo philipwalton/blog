@@ -16,14 +16,16 @@ if (window.PerformanceLongTaskTiming) {
 <script>
 window.__trackAbandons = () => {
   const ANALYTICS_URL = 'https://www.google-analytics.com/collect';
-  const TRACKING_ID = 'UA-21292978-3';
-  const CLIENT_ID = document.cookie.replace(
+  const GA_COOKIE = document.cookie.replace(
     /(?:(?:^|.*;)\s*_ga\s*\=\s*(?:\w+\.\d\.)([^;]*).*$)|^.*$/, '$1');
+  const TRACKING_ID = 'UA-21292978-3';
+  const CLIENT_ID =  GA_COOKIE || (Math.random() * Math.pow(2, 52));
 
   navigator.sendBeacon && navigator.sendBeacon(ANALYTICS_URL, [
-    'v=1', 't=event', 'ec=Load', 'ea=abandon', 'el=pre-load',
+    'v=1', 't=event', 'ec=Load', 'ea=abandon', 'el=pre-load', 'ni=1',
     'tid=' + TRACKING_ID,
-    'cid=' + (CLIENT_ID || `${+new Date}.${(Math.random() * 2**52)}`),
+    'cid=' + CLIENT_ID,
+    'cd7' + CLIENT_ID, // client ID custom dimension
     'ev=' + Math.round(performance.now()),
   ].join('&'));
 };

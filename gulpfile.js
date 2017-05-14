@@ -209,8 +209,8 @@ gulp.task('javascript:main', (done) => {
           path: path.basename(entry),
           sourceMap: rollupResult.map,
         }],
-        // compilationLevel: 'ADVANCED',
-        compilationLevel: 'SIMPLE',
+        compilationLevel: 'ADVANCED',
+        // compilationLevel: 'SIMPLE',
         useTypesForOptimization: true,
         outputWrapper:
             `(function(){%output%})();\n` +

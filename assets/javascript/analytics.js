@@ -6,10 +6,8 @@ import 'autotrack/lib/plugins/media-query-tracker';
 import 'autotrack/lib/plugins/outbound-link-tracker';
 import 'autotrack/lib/plugins/page-visibility-tracker';
 import 'autotrack/lib/plugins/url-change-tracker';
-import {breakpoints} from './breakpoints';
-
-
 import {getFirstConsistentlyInteractive} from 'tti-polyfill/src';
+import {breakpoints} from './breakpoints';
 
 
 /* global ga, ENVIRONMENT */
@@ -20,7 +18,7 @@ import {getFirstConsistentlyInteractive} from 'tti-polyfill/src';
  * implementation. This allows you to create a segment or view filter
  * that isolates only data captured with the most recent tracking changes.
  */
-const TRACKING_VERSION = '23';
+const TRACKING_VERSION = '24';
 
 
 /**
@@ -383,7 +381,6 @@ const trackTimeToFirstConsistentlyInteractive = () => {
   window.addEventListener('unload', postLoadAbandonTracking);
 
   getFirstConsistentlyInteractive().then((ttci) => {
-    console.log('ttci', ttci);
     if (ttci > 0) {
       gaTest('send', 'event', {
         eventCategory: 'PW Metrics',
@@ -396,11 +393,9 @@ const trackTimeToFirstConsistentlyInteractive = () => {
     }
   })
   .catch((err) => {
-    console.log(err);
     trackError(err);
   })
   .then(() => {
-    console.log('removing post load postLoadAbandonTracking');
     window.removeEventListener('unload', postLoadAbandonTracking)
   });
 };

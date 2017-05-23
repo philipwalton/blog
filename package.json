@@ -22,7 +22,7 @@
   },
   "devDependencies": {
     "async-waituntil-polyfill": "^1.0.2",
-    "autotrack": "^2.3.2",
+    "autotrack": "^2.3.3",
     "babel-core": "^6.24.1",
     "babel-eslint": "^7.2.1",
     "babel-loader": "^6.4.1",
@@ -37,7 +37,7 @@
     "eslint": "^3.19.0",
     "eslint-config-google": "^0.7.1",
     "glob": "^7.1.1",
-    "google-closure-compiler-js": "^20170218.0.0",
+    "google-closure-compiler-js": "^20170521.0.0",
     "gulp": "^3.9.1",
     "gulp-cssnext": "^1.0.1",
     "gulp-eslint": "^3.0.1",

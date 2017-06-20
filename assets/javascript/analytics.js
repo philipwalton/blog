@@ -18,7 +18,7 @@ import {breakpoints} from './breakpoints';
  * implementation. This allows you to create a segment or view filter
  * that isolates only data captured with the most recent tracking changes.
  */
-const TRACKING_VERSION = '26';
+const TRACKING_VERSION = '27';
 
 
 /**
@@ -185,7 +185,7 @@ const createTrackers = () => {
  *
  *    `fetch('/api.json').catch(trackError);`
  *
- * @param {(Error|Object)=} err
+ * @param {*=} err
  * @param {FieldsObj=} fieldsObj
  */
 export const trackError = (err = {}, fieldsObj = {}) => {

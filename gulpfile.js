@@ -200,6 +200,7 @@ gulp.task('javascript:main', (done) => {
 
       const externs = [
         'assets/javascript/externs.js',
+        './node_modules/tti-polyfill/src/externs.js',
         ...glob.sync('./node_modules/autotrack/lib/externs/*.js'),
       ].reduce((acc, cur) => acc + fs.readFileSync(cur, 'utf-8'), '');
 
@@ -210,7 +211,6 @@ gulp.task('javascript:main', (done) => {
           sourceMap: rollupResult.map,
         }],
         compilationLevel: 'ADVANCED',
-        // compilationLevel: 'SIMPLE',
         useTypesForOptimization: true,
         outputWrapper:
             `(function(){%output%})();\n` +
@@ -224,7 +224,7 @@ gulp.task('javascript:main', (done) => {
       };
       const closureResult = compile(closureFlags);
 
-      if (closureResult.errors.length/* || closureResult.warnings.length*/) {
+      if (closureResult.errors.length || closureResult.warnings.length) {
         fs.writeFileSync(path.join(DEST, entry), rollupResult.code, 'utf-8');
         const results = {
           errors: closureResult.errors,

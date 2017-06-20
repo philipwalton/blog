@@ -26,7 +26,7 @@ function main(err = undefined) {
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker
         .register('/sw.js')
-        .catch((err) => analytics.trackError(/** @type {!Error} */ (err)));
+        .catch((err) => analytics.trackError(err));
   }
 }
 

@@ -11,9 +11,17 @@ handlers:
   static_files: build/favicon.ico
   upload: build/favicon\.ico
   secure: always
+- url: /manifest\.json
+  static_files: build/manifest.json
+  upload: build/manifest\.json
+  secure: always
 - url: /sw\.js
   static_files: build/sw.js
   upload: build/sw\.js
+  secure: always
+- url: /(.+\.(png|svg|xml))
+  static_files: build/\1
+  upload: build/(.+\.(png|svg|xml))
   secure: always
 - url: /assets/(.+)
   static_files: build/assets/\1

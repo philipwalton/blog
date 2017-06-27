@@ -15,6 +15,9 @@ build
 __pycache__/
 *.py[cod]
 
+# Photoshop assets
+*.psd
+
 # Python modules
 python_modules
 

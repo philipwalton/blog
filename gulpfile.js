@@ -288,8 +288,10 @@ gulp.task('javascript:polyfills', ((compiler) => {
 gulp.task('javascript', ['javascript:main', 'javascript:polyfills']);
 
 
-gulp.task('static', () => {
-  return gulp.src(['./assets/favicon.ico']).pipe(gulp.dest(DEST));
+gulp.task('manifest', () => {
+  return gulp.src([
+    './assets/*.+(ico|json|png|svg|xml)',
+  ]).pipe(gulp.dest(DEST));
 });
 
 
@@ -373,7 +375,7 @@ gulp.task('build', [
   'css',
   'images',
   'javascript',
-  'static',
+  'manifest',
   'service-worker',
 ]);
 
@@ -415,7 +417,7 @@ gulp.task('watch', ['build', 'serve'], () => {
       ['./assets/javascript/*', '!./assets/javascript/polyfills.js'],
       ['javascript:main']);
   gulp.watch(['./assets/javascript/polyfills.js'], ['javascript:polyfills']);
-  gulp.watch('./assets/favicon.ico', ['static']);
+  gulp.watch('./assets/*.+(ico|json|png|svg|xml)', ['manifest']);
   gulp.watch(['./assets/sw.js'], ['service-worker']);
   gulp.watch(['./articles/*'], ['content']);
 });

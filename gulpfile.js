@@ -435,7 +435,7 @@ gulp.task('test', ['lint', 'build', 'tunnel', 'selenium'], () => {
 });
 
 
-gulp.task('deploy', [/*'test',*/ 'build'], (done) => {
+gulp.task('deploy', ['test', 'build'], (done) => {
   if (!isProd()) {
     throw new Error('The deploy task must be run in production mode.');
   }

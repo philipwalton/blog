@@ -18,7 +18,7 @@ import {breakpoints} from './breakpoints';
  * implementation. This allows you to create a segment or view filter
  * that isolates only data captured with the most recent tracking changes.
  */
-const TRACKING_VERSION = '27';
+const TRACKING_VERSION = '28';
 
 
 /**
@@ -100,7 +100,7 @@ const createGaProxy = (trackers) => {
       }
     }
   };
-}
+};
 
 
 /**
@@ -366,7 +366,7 @@ const requireAutotrackPlugins = () => {
 
 const stopPreloadAbandonTracking = () => {
   window.removeEventListener('unload', window.__trackAbandons);
-}
+};
 
 
 const trackTimeToFirstConsistentlyInteractive = () => {
@@ -397,7 +397,7 @@ const trackTimeToFirstConsistentlyInteractive = () => {
     trackError(err);
   })
   .then(() => {
-    window.removeEventListener('unload', postLoadAbandonTracking)
+    window.removeEventListener('unload', postLoadAbandonTracking);
   });
 };
 
@@ -497,7 +497,6 @@ const measureDuration = (mark, reference = 'responseEnd') => {
     return 0;
   }
 };
-
 
 
 /**

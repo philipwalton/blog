@@ -5,21 +5,13 @@
 node_modules
 
 # Static site output
-_site
 build
 
 # Log files
 *.log
 
-# Byte-compiled / optimized / DLL files
-__pycache__/
-*.py[cod]
-
 # Photoshop assets
 *.psd
-
-# Python modules
-python_modules
 
 # Sauce Labs test script
 sauce.sh

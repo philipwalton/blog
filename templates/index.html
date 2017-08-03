@@ -9,10 +9,9 @@
   <ul class="ArticleList">
     {% for article in articles | reverse %}
       <li class="ArticleList-item">
-
         <a href="{{ article.path }}" class="ArticlePreview" title="{{ article.title }}">
-          <time class="ArticlePreview-date" datetime="{{ article.date }}">
-            {{ article.date | datetimeformat }}
+          <time class="ArticlePreview-date" datetime="{{ article.date | format('YYYY-MM-DDTHH:mm:ssZ') }}">
+            {{ article.date | format('MMMM D, YYYY') }}
           </time>
           <h2 class="ArticlePreview-title">{{ article.title }}</h2>
           <p class="ArticlePreview-excerpt">
@@ -21,7 +20,6 @@
             &hellip;
           </p>
         </a>
-
       </li>
     {% endfor %}
   </ul>

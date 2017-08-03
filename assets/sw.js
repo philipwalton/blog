@@ -1,8 +1,9 @@
-require('async-waituntil-polyfill');
+import 'async-waituntil-polyfill';
+import offlineGoogleAnalytics
+    from 'sw-helpers/projects/sw-offline-google-analytics/src';
 
 
-const offlineGoogleAnalytics = require(
-    'sw-helpers/projects/sw-offline-google-analytics/src');
+/* global MAIN_JS_URL, MAIN_CSS_URL */
 
 
 const CACHE_NAME = 'philipwalton:v1';
@@ -18,7 +19,7 @@ const assetUrlParts = [
   new RegExp('^' + location.origin),
   /^https?:\/\/fonts\.googleapis\.com/,
   /^https?:\/\/www\.gstatic\.com/,
-  /^https?:\/\/www\.google\-analytics\.com\/analytics\.js/,
+  /^https?:\/\/www\.google-analytics\.com\/analytics\.js/,
 ];
 
 
@@ -36,8 +37,8 @@ const cacheInitialAssets = async () => {
     cacheAnalyticsJs(cache),
     cache.addAll([
       '/',
-      '/assets/css/main.css',
-      '/assets/javascript/main.js',
+      MAIN_JS_URL,
+      MAIN_CSS_URL,
     ]),
   ]);
 };

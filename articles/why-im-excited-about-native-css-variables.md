@@ -242,9 +242,9 @@ The following demo uses the above code to build a basic site layout that automat
 <figure>
   <a href="http://codepen.io/philipwalton/pen/epLWNO/?editors=110">
     <img srcset="
-      ../../assets/images/custom-properties-responsive-1400w.png 1400w,
-      ../../assets/images/custom-properties-responsive.png 700w"
-      src="../../assets/images/custom-properties-responsive-properties.png"
+      {{ 'custom-properties-responsive-1400w.png' | revision }} 1400w,
+      {{ 'custom-properties-responsive.png' | revision }} 700w"
+      src="{{ 'custom-properties-responsive.png' | revision }}"
       alt="Responsive Properties Demo">
   </a>
   <figcaption>
@@ -306,9 +306,9 @@ The following demo illustrates contextual styling of both links and buttons in t
 <figure>
   <a href="http://codepen.io/philipwalton/pen/KdxmWL/?editors=110">
     <img srcset="
-      ../../assets/images/custom-properties-contextual-styling-1400w.png 1400w,
-      ../../assets/images/custom-properties-contextual-styling.png 700w"
-      src="../../assets/images/custom-properties-contextual-styling.png">
+      {{ 'custom-properties-contextual-styling-1400w.png' | revision }} 1400w,
+      {{ 'custom-properties-contextual-styling.png' | revision }} 700w"
+      src="{{ 'custom-properties-contextual-styling.png' | revision }}">
   </a>
   <figcaption>
     View the demo on CodePen: <a href="http://codepen.io/philipwalton/pen/KdxmWL/?editors=110">editor view</a> / <a href="http://codepen.io/philipwalton/full/KdxmWL/">full page</a>

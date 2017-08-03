@@ -9,6 +9,6 @@ const excludeDraftsInProduction = (item) => {
 const book = yaml.safeLoad(fs.readFileSync('./book.yaml', 'utf-8'));
 book.articles = book.articles.filter(excludeDraftsInProduction);
 book.page = book.pages.filter(excludeDraftsInProduction);
-
+book.buildTime = new Date;
 
 module.exports = book;

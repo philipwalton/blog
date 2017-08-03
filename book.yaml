@@ -1,6 +1,9 @@
 site:
   title: "Philip Walton"
   titleSuffix: " &mdash; Philip Walton"
+  slug: "philipwalton"
+  themeColor: "#ffffff"
+  backgroundColor: "#ffffff"
   description: "Thoughts on web development, open source, software architecture, and the future."
   timezone: "America/Los_Angeles"
   baseUrl: https://philipwalton.com
@@ -12,6 +15,13 @@ pages:
   path: /articles/
 - title: "About"
   path: /about/
+- title: "Page Not Found"
+  path: /404.html
+- title: "RSS Feed"
+  path: /atom.xml
+- title: "Web Manifest"
+  path: /manifest.json
+
 
 articles:
 - title: "CSS Architecture"

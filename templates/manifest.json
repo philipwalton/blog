@@ -1,0 +1,20 @@
+{
+  "name": "{{ site.title }}",
+  "short_name": "{{ site.slug }}",
+  "start_url": "/?utm_source=homescreen",
+  "display": "standalone",
+  "theme_color": "{{ site.themeColor }}",
+  "background_color": "{{ site.backgroundColor }}",
+  "icons": [
+    {
+      "src": "{{ 'android-chrome-192x192.png' | revision }}",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "{{ 'android-chrome-512x512.png' | revision }}",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

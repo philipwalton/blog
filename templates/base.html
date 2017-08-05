@@ -43,8 +43,7 @@
 
   <noscript>
     <!-- Track if JavaScript is disabled -->
-    <!-- TODO(philipwalton): make this a pageview with a random client ID -->
-    <!-- <img src="https://www.google-analytics.com/collect?v=1&t=event&tid=UA-21292978-1&cid=noscript&ec=Window&ea=load&el=noscript&dl={{ site.baseUrl | urlencode}}{{ page.permalink | urlencode }}"> -->
+    <img src="https://www.google-analytics.com/collect?v=1&t=pageview&tid=UA-21292978-3&cid=noscript&dl={{ site.baseUrl | urlencode}}{{ page.path | urlencode }}">
   </noscript>
 
 </body>

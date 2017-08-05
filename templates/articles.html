@@ -7,11 +7,11 @@
   {% for article in articles | reverse %}
 
     {% if loop.first %}
-      {% set currentYear = article.date | datetimeformat('%Y') %}
+      {% set currentYear = article.date | format('YYYY') %}
       <h3>{{currentYear}}</h3>
       <ul>
-    {% elif currentYear != article.date | datetimeformat('%Y') %}
-      {% set currentYear = article.date | datetimeformat('%Y') %}
+    {% elif currentYear != article.date | format('YYYY') %}
+      {% set currentYear = article.date | format('YYYY') %}
       </ul>
       <h3>{{currentYear}}</h3>
       <ul>
@@ -19,7 +19,7 @@
 
     <li>
       <a href="{{ article.path }}" title="{{ article.title }}">
-      {{ article.title }}</a> <em>(<time datetime="{{ article.date }}">{{ article.date | datetimeformat }}</time>)</em>
+      {{ article.title }}</a> (<time datetime="{{ article.date | format('YYYY-MM-DDTHH:mm:ssZ') }}">{{ article.date | format('MMMM D, YYYY') }}</time>)
     </li>
 
     {% if loop.last %}

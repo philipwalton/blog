@@ -5,7 +5,7 @@ import * as contentLoader from './content-loader';
 import * as drawer from './drawer';
 
 
-const POLYFILL_PATH = '/assets/javascript/polyfills.js';
+/* global POLYFILLS_URL */
 
 
 /**
@@ -61,5 +61,5 @@ function loadScript(src, done) {
 if (browserSupportsAllFeatures()) {
   main();
 } else {
-  loadScript(POLYFILL_PATH, main);
+  loadScript(POLYFILLS_URL, main);
 }

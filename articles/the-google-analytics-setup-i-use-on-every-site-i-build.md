@@ -140,11 +140,11 @@ With this new dimension, any time you make a breaking change to your tracking im
 Here's what the segment definition I use looks like (as you can see, I'm on version 13):
 
 <figure>
-  <a href="../../assets/images/segment-tracking-version-1400w.png">
+  <a href="{{ 'segment-tracking-version-1400w.png' | revision }}">
     <img srcset="
-      ../../assets/images/segment-tracking-version-1400w.png 1400w,
-      ../../assets/images/segment-tracking-version.png 700w"
-      src="../../assets/images/segment-tracking-version.png"
+      {{ 'segment-tracking-version-1400w.png' | revision }},
+      {{ 'segment-tracking-version.png' | revision }} 700w"
+      src="{{ 'segment-tracking-version.png' | revision }}"
       alt="Time to first paint distribution for the Google I/O WebApp (Mobile)">
   </a>
   <figcaption>
@@ -469,11 +469,11 @@ The standard reports in Google Analytics are useful, but if you've done anything
 For example, in the section on tracking custom data I mentioned isolating individual users with the *Client ID* dimension and individual page loads with the *Window ID* dimension. Here's a report listing all the pageviews (in *Hit Time* order) from a particular user's first session, showing both *Page* and *Window ID*.
 
 <figure>
-  <a href="../../assets/images/custom-report-user-session-1400w.png">
+  <a href="{{ 'custom-report-user-session-1400w.png' | revision }}">
     <img srcset="
-      ../../assets/images/custom-report-user-session-1400w.png 1400w,
-      ../../assets/images/custom-report-user-session.png 700w"
-      src="../../assets/images/custom-report-user-session.png"
+      {{ 'custom-report-user-session-1400w.png' | revision }} 1400w,
+      {{ 'custom-report-user-session.png' | revision }} 700w"
+      src="{{ 'custom-report-user-session.png' | revision }}"
       alt="A Google Analytics custom report">
   </a>
   <figcaption>
@@ -486,11 +486,11 @@ As you can see from the above report, this user started their session by reading
 To create this report I picked a random client ID and session from one of my other reports (I chose a session that contained multiple unique pageviews to make it more interesting). Then I created a custom report that filtered only hits matching that *Client ID* and *Session Count* dimension:
 
 <figure>
-  <a href="../../assets/images/custom-report-config-user-session-1400w.png">
+  <a href="{{ 'custom-report-config-user-session-1400w.png' | revision }}">
     <img srcset="
-      ../../assets/images/custom-report-config-user-session-1400w.png 1400w,
-      ../../assets/images/custom-report-config-user-session.png 700w"
-      src="../../assets/images/custom-report-config-user-session.png"
+      {{ 'custom-report-config-user-session-1400w.png' | revision }} 1400w,
+      {{ 'custom-report-config-user-session.png' | revision }} 700w"
+      src="{{ 'custom-report-config-user-session.png' | revision }}"
       alt="The configuration for above custom report">
   </a>
   <figcaption>
@@ -509,11 +509,11 @@ However, when you create a calculated metric to compute the average Max Scroll D
 Here's a screenshot of a custom report I created showing pages with the highest average max scroll percentage on this site over the past 7 days.
 
 <figure>
-  <a href="../../assets/images/max-scroll-report-1400w.png">
+  <a href="{{ 'max-scroll-report-1400w.png' | revision }}">
     <img srcset="
-      ../../assets/images/max-scroll-report-1400w.png 1400w,
-      ../../assets/images/max-scroll-report.png 700w"
-      src="../../assets/images/max-scroll-report.png"
+      {{ 'max-scroll-report-1400w.png' | revision }} 1400w,
+      {{ 'max-scroll-report.png' | revision }} 700w"
+      src="{{ 'max-scroll-report.png' | revision }}"
       alt="A Google Analytics custom report">
   </a>
   <figcaption>
@@ -524,11 +524,11 @@ Here's a screenshot of a custom report I created showing pages with the highest 
 And the following screenshot shows how this calculated metric is configured:
 
 <figure>
-  <a href="../../assets/images/calculated-metric-definition-1400w.png">
+  <a href="{{ 'calculated-metric-definition-1400w.png' | revision }}">
     <img srcset="
-      ../../assets/images/calculated-metric-definition-1400w.png 1400w,
-      ../../assets/images/calculated-metric-definition.png 700w"
-      src="../../assets/images/calculated-metric-definition.png"
+      {{ 'calculated-metric-definition-1400w.png' | revision }} 1400w,
+      {{ 'calculated-metric-definition.png' | revision }} 700w"
+      src="{{ 'calculated-metric-definition.png' | revision }}"
       alt="A Google Analytics custom report">
   </a>
   <figcaption>
@@ -551,11 +551,11 @@ The histogram below shows a distribution of max scroll percentage (per session) 
 </div>
 
 <figure>
-  <a href="../../assets/images/max-scroll-percentage-histogram-1400w.png">
+  <a href="{{ 'max-scroll-percentage-histogram-1400w.png' | revision }}">
     <img srcset="
-      ../../assets/images/max-scroll-percentage-histogram-1400w.png 1400w,
-      ../../assets/images/max-scroll-percentage-histogram.png 700w"
-      src="../../assets/images/max-scroll-percentage-histogram.png"
+      {{ 'max-scroll-percentage-histogram-1400w.png' | revision }} 1400w,
+      {{ 'max-scroll-percentage-histogram.png' | revision }} 700w"
+      src="{{ 'max-scroll-percentage-histogram.png' | revision }}"
       alt="Max Scroll Percentage distribution">
   </a>
   <figcaption>Max Scroll Percentage distribution.</figcaption>
@@ -570,11 +570,11 @@ Another good example of visualizing hit-level metric distribution is the perform
 On desktop the median time to first paint was **583 ms** when controlled by a service worker vs. **912 ms** when not controlled.
 
 <figure>
-  <a href="../../assets/images/fp-histogram-desktop-1400w.png">
+  <a href="{{ 'fp-histogram-desktop-1400w.png' | revision }}">
     <img srcset="
-      ../../assets/images/fp-histogram-desktop-1400w.png 1400w,
-      ../../assets/images/fp-histogram-desktop.png 700w"
-      src="../../assets/images/fp-histogram-desktop.png"
+      {{ 'fp-histogram-desktop-1400w.png' | revision }} 1400w,
+      {{ 'fp-histogram-desktop.png' | revision }} 700w"
+      src="{{ 'fp-histogram-desktop.png' | revision }}"
       alt="Time to first paint distribution for the Google I/O WebApp (Desktop)">
   </a>
   <figcaption>
@@ -585,11 +585,11 @@ On desktop the median time to first paint was **583 ms** when controlled by a se
 On mobile the median was **1634 ms** when controlled by a service worker vs. **1933 ms** when not controlled.
 
 <figure>
-  <a href="../../assets/images/fp-histogram-mobile-1400w.png">
+  <a href="{{ 'fp-histogram-mobile-1400w.png' | revision }}">
     <img srcset="
-      ../../assets/images/fp-histogram-mobile-1400w.png 1400w,
-      ../../assets/images/fp-histogram-mobile.png 700w"
-      src="../../assets/images/fp-histogram-mobile.png"
+      {{ 'fp-histogram-mobile-1400w.png' | revision }} 1400w,
+      {{ 'fp-histogram-mobile.png' | revision }} 700w"
+      src="{{ 'fp-histogram-mobile.png' | revision }}"
       alt="Time to first paint distribution for the Google I/O WebApp (Mobile)">
   </a>
   <figcaption>

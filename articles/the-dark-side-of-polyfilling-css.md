@@ -43,9 +43,9 @@ For the rest of this post, we're going to be working with the [demo page](https:
 <figure>
   <a href="https://philipwalton.github.io/talks/2016-12-02/demos/1/">
     <img srcset="
-      ../../assets/images/random-polyfill-demo-page-1400w.png 1400w,
-      ../../assets/images/random-polyfill-demo-page.png 700w"
-      src="../../assets/images/random-polyfill-demo-page.png"
+      {{ 'random-polyfill-demo-page-1400w.png' | revision }} 1400w,
+      {{ 'random-polyfill-demo-page.png' | revision }} 700w"
+      src="{{ 'random-polyfill-demo-page.png' | revision }}"
       alt="Random keywork polyfill demo page">
   </a>
   <figcaption>
@@ -489,7 +489,7 @@ In order to understand why the performance of CSS polyfills is so bad, you reall
 
 <figure>
   <img
-    src="../../assets/images/browser-rendering-pipeline.svg"
+    src="{{ 'browser-rendering-pipeline.svg' | revision }}"
     alt="JavaScript access to the browser rendering pipeline">
   <figcaption>
     JavaScript access to the browser rendering pipeline
@@ -502,7 +502,7 @@ But given the current state of JavaScript access to the browser's rendering pipe
 
 <figure>
   <img
-    src="../../assets/images/browser-rendering-pipeline-polyfill.svg"
+    src="{{ 'browser-rendering-pipeline-polyfill.svg' | revision }}"
     alt="Polyfill entry points to the browser rendering pipeline">
   <figcaption>
     Polyfill entry points to the browser rendering pipeline

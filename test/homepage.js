@@ -48,7 +48,14 @@ describe('The home page', () => {
   });
 
   it('should contain working links to pages', () => {
-    for (let i = 1, page; page = book.pages[i-1]; i++) {
+    const pages = book.pages.filter((page) => {
+      return !(
+          page.path == '/404.html' ||
+          page.path == '/atom.xml' ||
+          page.path == '/manifest.json');
+    });
+
+    for (let i = 1, page; page = pages[i-1]; i++) {
       const linkQuery = `.Header a[title="${page.title}"]`;
 
       // Waits for the link to appear to reduce flakiness.

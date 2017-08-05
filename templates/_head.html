@@ -15,18 +15,17 @@
 {% include '_fonts.html' %}
 {% include '_css.html' %}
 
-<!-- Generated via: realfavicongenerator.net -->
-<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=2bwmKGjvwp">
-<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png?v=2bwmKGjvwp">
-<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png?v=2bwmKGjvwp">
-<link rel="manifest" href="/manifest.json?v=2bwmKGjvwp">
-<link rel="mask-icon" href="/safari-pinned-tab.svg?v=2bwmKGjvwp" color="#4d4d4d">
-<link rel="shortcut icon" href="/favicon.ico?v=2bwmKGjvwp">
-<meta name="apple-mobile-web-app-title" content="Philip Walton">
-<meta name="application-name" content="Philip Walton">
-<meta name="theme-color" content="#ffffff">
+<!-- Generated via: realfavicongenerator.net and modified -->
+<link rel="apple-touch-icon" sizes="180x180" href="{{ 'apple-touch-icon.png' | revision }}">
+<link rel="icon" type="image/png" sizes="32x32" href="{{ 'favicon-32x32.png' | revision }}">
+<link rel="icon" type="image/png" sizes="16x16" href="{{ 'favicon-16x16.png' | revision }}">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="{{ 'safari-pinned-tab.svg' | revision }}" color="#4d4d4d">
+<meta name="apple-mobile-web-app-title" content="{{ site.title }}">
+<meta name="application-name" content="{{ site.title }}">
+<meta name="theme-color" content="{{ site.themeColor }}">
 
-<link href="https://feeds.feedburner.com/philipwalton" rel="alternate" title="{{site.title}}" type="application/atom+ xml">
+<link href="https://feeds.feedburner.com/philipwalton" rel="alternate" title="{{site.title}}" type="application/atom+xml">
 <meta name="description" content="{% if page.excerpt %}{{ page.excerpt }}{% else %}{{ site.description }}{% endif %}">
 <link rel="canonical" href="{{ site.baseUrl }}{{ page.path }}" />
 

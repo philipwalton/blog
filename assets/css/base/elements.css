@@ -143,6 +143,26 @@ img {
   padding: 3px;
 }
 
+table {
+  border-collapse: collapse;
+  margin: 0 0 var(--vgap);
+  max-width: 100%;
+  width: 100%;
+}
+
+table th {
+  background-color: var(--bg-color);
+  vertical-align: bottom;
+}
+
+table th,
+table td {
+  border: 1px solid var(--border-color);
+  padding: .5em;
+  text-align: left;
+  vertical-align: top;
+}
+
 iframe {
   width: 100%;
 }

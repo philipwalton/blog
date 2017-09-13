@@ -10,9 +10,9 @@ const javascript = require('./javascript');
     await Promise.all([
       css.build(),
       images.build(),
-      javascript.build(),
     ]);
 
+    await javascript();
     await content.build();
   } catch (err) {
     console.error(err);

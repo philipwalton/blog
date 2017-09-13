@@ -10,7 +10,7 @@ import {getFirstConsistentlyInteractive} from 'tti-polyfill/src';
 import {breakpoints} from './breakpoints';
 
 
-/* global ga, ENVIRONMENT */
+/* global ga */
 
 
 /**
@@ -144,7 +144,7 @@ const createTrackers = () => {
   gaAll('set', 'transport', 'beacon');
 
   // Log hits in non-production environments.
-  if (ENVIRONMENT != 'production') {
+  if (process.env.NODE_ENV != 'production') {
     gaAll('set', 'sendHitTask', function(model) {
       let paramsToIgnore = ['v', 'did', 't', 'tid', 'ec', 'ea', 'el', 'ev',
           'a', 'z', 'ul', 'de', 'sd', 'sr', 'vp', 'je', 'fl', 'jid'];

@@ -3,7 +3,7 @@ import offlineGoogleAnalytics
     from 'sw-helpers/projects/sw-offline-google-analytics/src';
 
 
-/* global MAIN_JS_URL, MAIN_CSS_URL */
+/* global MAIN_CSS_URL, MAIN_JS_URL, MAIN_RUNTIME_URL */
 
 
 const CACHE_NAME = 'philipwalton:v1';
@@ -37,8 +37,9 @@ const cacheInitialAssets = async () => {
     cacheAnalyticsJs(cache),
     cache.addAll([
       '/',
-      MAIN_JS_URL,
       MAIN_CSS_URL,
+      MAIN_JS_URL,
+      MAIN_RUNTIME_URL,
     ]),
   ]);
 };

@@ -16,8 +16,7 @@ module.exports = {
         'default',
         {discardComments: {removeAll: true}},
       ]}),
-    ])
-    .process(css, {
+    ]).process(css, {
       from: 'assets/css/main.css',
     });
 

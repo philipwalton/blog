@@ -40,6 +40,12 @@ const minifyHtml = (html) => {
   return htmlMinifier.minify(html, opts);
 };
 
+
+const processHtml = (html) => {
+  return process.env.NODE_ENV == 'production' ?
+      minifyHtml(html) : html;
+};
+
 /**
  * Renders markdown content as HTML with syntax highlighted code blocks.
  * @param {string} content A markdown string.
@@ -105,7 +111,7 @@ const buildArticles = async () => {
 
     await fs.outputFile(
         getOutputPathFromPathname(article.path),
-        minifyHtml(html));
+        processHtml(html));
   }
 };
 
@@ -123,7 +129,7 @@ const buildPages = async () => {
 
     await fs.outputFile(
         getOutputPathFromPathname(page.path),
-        page.path.match(/(\/|\.html)$/) ? minifyHtml(content) : content);
+        page.path.match(/(\/|\.html)$/) ? processHtml(content) : content);
   }
 };
 

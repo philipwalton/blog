@@ -50,7 +50,16 @@ const assetCachingPlugins = ({defines, runtimeName}) => {
   ];
 
   if (process.env.NODE_ENV == 'production') {
-    plugins.push(new UglifyJSPlugin({sourceMap: true}));
+    plugins.push(new UglifyJSPlugin({
+      sourceMap: true,
+      uglifyOptions: {
+        mangle: {
+          // Solves this Safari 10 issue:
+          // https://github.com/mishoo/UglifyJS2/issues/1753
+          safari10: true,
+        },
+      },
+    }));
   }
 
   return plugins;

@@ -10,8 +10,8 @@
     "url": "https://philipwalton.com"
   },
   "scripts": {
-    "lint": "eslint --fix assets/**/*.js scripts/**/*.js test/**/*.js",
-    "build": "npm run clean && node scripts/build.js",
+    "lint": "eslint --fix assets/**/*.js tasks/**/*.js test/**/*.js",
+    "build": "npm run clean && node tasks/build.js",
     "start": "firebase serve",
     "clean": "rm -rf build",
     "deploy": "npm run build && firebase deploy -P philipwalton-site",

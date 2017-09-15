@@ -42,23 +42,25 @@ export default class History2 {
    * @return {!Promise} A promise that is resolved once the next entry is the
    *     history is loaded.
    */
-  add({url, title, isPopState}) {
+  async add({url, title, isPopState}) {
     const prevState = this.state;
     const nextState = getState(url, title);
 
     this.state = nextState;
 
     // Entries that point to the same resource should be ignored.
-    if (prevState.pathname == nextState.pathname) return Promise.resolve(null);
+    if (prevState.pathname == nextState.pathname) return;
 
-    return this._onChange(nextState).then(() => {
-      // Popstate triggered navigation is already handled by the browser,
-      // so we only add to the history in non-popstate cases.
-      if (!isPopState) {
-        history.pushState(nextState, title, url);
-      }
-      if (title) document.title = title;
-    });
+    await this._onChange(nextState);
+
+    // Popstate triggered navigation is already handled by the browser,
+    // so we only add to the history in non-popstate cases.
+    if (!isPopState) {
+      history.pushState(nextState, title, url);
+    }
+    if (title) {
+      document.title = title;
+    }
   }
 }
 

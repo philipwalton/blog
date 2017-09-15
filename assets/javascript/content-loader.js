@@ -17,7 +17,7 @@ const pageCache = {};
 /**
  * Marks the beginning of a vitual page fetch.
  */
-function trackPageFetchStart() {
+const trackPageFetchStart = () => {
   mark('pagefetch:start');
 }
 
@@ -30,7 +30,7 @@ function trackPageFetchStart() {
  *     fromCache: True if the content is already cached so no network request
  *         needs to be made.
  */
-function trackPageFetchEnd({path, fromCache}) {
+const trackPageFetchEnd = ({path, fromCache}) => {
   mark('pagefetch:end');
   measure('pagefetch', 'pagefetch:start', 'pagefetch:end');
   track('pagefetch', {
@@ -47,7 +47,7 @@ function trackPageFetchEnd({path, fromCache}) {
  * @param {!Element} a The `<a>`` element.
  * @return {string} The title of the page the link will load.
  */
-function getTitle(a) {
+const getTitle = (a) => {
   const title = a.title || a.innerText;
   return title ? title + ' \u2014 Philip Walton' : '';
 }
@@ -58,7 +58,7 @@ function getTitle(a) {
  * @param {string} html The full HTML document text.
  * @return {string} Just the content inside `<main>`.
  */
-function getMainContent(html) {
+const getMainContent = (html) => {
   const match = /<main[^>]*>([\s\S]*)<\/main>/.exec(html);
   return match ? match[1] : '';
 }
@@ -73,20 +73,23 @@ function getMainContent(html) {
  * @return {!Promise} A promise that fulfills with the HTML content of a
  *    page or rejects with the network error.
  */
-function fetchPageContent(path) {
+const fetchPageContent = async (path) => {
   trackPageFetchStart();
   if (pageCache[path]) {
     trackPageFetchEnd({path, fromCache: true});
-    return Promise.resolve(pageCache[path]);
+    return pageCache[path];
   } else {
-    return fetch(path).then((response) => {
+    try {
+      const response = await fetch(path);
+
+      let html;
       if (response.ok) {
-        return response.text();
+        html = await response.text();
       } else {
         throw new Error(
             `Response: (${response.status}) ${response.statusText}`);
       }
-    }).then((html) => {
+
       const content = getMainContent(html);
       if (!content) {
         throw new Error(`Could not parse content from response: ${path}`);
@@ -95,7 +98,7 @@ function fetchPageContent(path) {
         pageCache[path] = content;
         return content;
       }
-    }).catch((err) => {
+    } catch (err) {
       const message = (err instanceof TypeError) ?
           'Check your network connection to ensure you\'re still online.' :
           err.message;
@@ -106,7 +109,7 @@ function fetchPageContent(path) {
       });
       // Rethrow to be able to catch it again in an outer scope.
       throw err;
-    });
+    }
   }
 }
 
@@ -115,7 +118,7 @@ function fetchPageContent(path) {
  * Adds the new content to the page.
  * @param {string} content The content to set to the page container.
  */
-function showPageContent(content) {
+const showPageContent = (content) => {
   container.innerHTML = content;
 }
 
@@ -125,11 +128,11 @@ function showPageContent(content) {
  * to the position of an element if a hash fragment is passed.
  * @param {string} hash The hash fragment of a URL to match with an element ID.
  */
-function setScroll(hash) {
+const setScroll = (hash) => {
   const target = hash && document.getElementById(hash.slice(1));
   const scrollPos = target ? target.offsetTop : 0;
 
-  // TODO: There's a weird bug were sometime this function doesn't do anything
+  // TODO: There's a weird bug were sometimes this function doesn't do anything
   // if the browser has already visited the page and thinks it has a scroll
   // position in mind.
   window.scrollTo(0, scrollPos);
@@ -140,7 +143,7 @@ function setScroll(hash) {
  * Removes and re-adds impression observation on the #share call to action
  * since a new page has loaded and thus a new impression should be possible.
  */
-function resetImpressionTracking() {
+const resetImpressionTracking = () => {
   gaTest('impressionTracker:unobserveAllElements');
   gaTest('impressionTracker:observeElements', ['share']);
 }
@@ -148,7 +151,7 @@ function resetImpressionTracking() {
 /**
  * Initializes the dynamic, page-loading code.
  */
-export function init() {
+export const init = () => {
   // Only load external content via AJAX if the browser support pushState.
   if (!(window.history && window.history.pushState)) return;
 
@@ -156,13 +159,17 @@ export function init() {
   container = document.querySelector('main');
   pageCache[location.pathname] = container.innerHTML;
 
-  const history2 = new History2((state) => {
-    return fetchPageContent(state.pathname)
-        .then((content) => showPageContent(content))
-        .then(() => drawer.close())
-        .then(() => setScroll(state.hash))
-        .then(() => resetImpressionTracking())
-        .catch((err) => trackError(/** @type {!Error} */ (err)));
+  const history2 = new History2(async (state) => {
+    try {
+      const content = await fetchPageContent(state.pathname);
+
+      showPageContent(content);
+      drawer.close();
+      setScroll(state.hash);
+      resetImpressionTracking();
+    } catch(err) {
+      trackError(/** @type {!Error} */ (err));
+    }
   });
 
   delegate(document, 'click', 'a[href]', function(event, delegateTarget) {

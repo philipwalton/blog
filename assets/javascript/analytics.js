@@ -369,7 +369,7 @@ const stopPreloadAbandonTracking = () => {
 };
 
 
-const trackTimeToFirstConsistentlyInteractive = () => {
+const trackTimeToFirstConsistentlyInteractive = async () => {
   const postLoadAbandonTracking = () => {
     gaTest('send', 'event', 'Load', 'abandon', {
       eventCategory: 'Load',
@@ -381,7 +381,9 @@ const trackTimeToFirstConsistentlyInteractive = () => {
   };
   window.addEventListener('unload', postLoadAbandonTracking);
 
-  getFirstConsistentlyInteractive().then((ttci) => {
+  try {
+    const ttci = await getFirstConsistentlyInteractive();
+
     if (ttci > 0) {
       gaTest('send', 'event', {
         eventCategory: 'PW Metrics',
@@ -392,13 +394,11 @@ const trackTimeToFirstConsistentlyInteractive = () => {
         [metrics.TTCI]: Math.round(ttci),
       });
     }
-  })
-  .catch((err) => {
+  } catch(err) {
     trackError(err);
-  })
-  .then(() => {
-    window.removeEventListener('unload', postLoadAbandonTracking);
-  });
+  }
+
+  window.removeEventListener('unload', postLoadAbandonTracking);
 };
 
 

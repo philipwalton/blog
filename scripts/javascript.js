@@ -106,7 +106,7 @@ const getMainConfig = () => ({
     rules: [
       generateBabelEnvLoader([
         // The last two versions of each browser, excluding versions
-        // that don't support <script type="module">,
+        // that don't support <script type="module">.
         'last 2 Chrome versions', 'not Chrome < 60',
         'last 2 Safari versions', 'not Safari < 10.1',
         'last 2 iOS versions', 'not iOS < 10.3',

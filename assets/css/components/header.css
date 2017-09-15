@@ -14,7 +14,7 @@
 }
 
 .Header-info {
-  color: var(--light-text-color);
+  color: var(--text-color-dark-bg);
   display: block;
   flex: 1 0 0%;
   text-decoration: none;
@@ -28,10 +28,9 @@
   word-spacing: 0.25em;
 }
 .Header-tagline {
-  color: inherit;
   font-size: .8em;
   margin: .15em 0 0;
-  opacity: .6;
+  opacity: .8;
 }
 
 .Header-drawer {
@@ -43,7 +42,7 @@
 }
 
 .Header-drawerToggle {
-  color: var(--light-text-color);
+  color: var(--text-color-dark-bg);
   cursor: pointer;
   display: flex;
   font-size: 1.5em;

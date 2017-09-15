@@ -1,5 +1,3 @@
-window.WebFontConfig;
-
 // Template-level User Timing code
 window.__perf;
 

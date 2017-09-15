@@ -13,14 +13,14 @@
 }
 
 .ArticlePreview-excerpt {
-  color: #aaa;
+  color: var(--text-color-faded);
   font-size: .9em;
   line-height: 1.4;
   margin: 0;
 }
 
 .ArticlePreview-date {
-  color: #aaa;
+  color: var(--text-color-faded);
   font-size: .8em;
 }
 

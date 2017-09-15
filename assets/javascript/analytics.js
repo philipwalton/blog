@@ -125,7 +125,6 @@ export const init = () => {
   stopPreloadAbandonTracking();
   trackTimeToFirstConsistentlyInteractive();
   sendNavigationTimingMetrics();
-  sendWebfontPerfAndFailures();
 };
 
 
@@ -281,24 +280,6 @@ const trackCustomDimensions = () => {
 
 
 /**
- // TODO(philipwalton): consider re-adding but not before making sure not to
- // send network change hits if the session has expired.
- * Sets the network status as a custom dimension on each tracker and adds
- * event listeners to detect future network changes.
- */
-// const trackNetworkStatusChanges = () => {
-//   const updateNetworkStatus = ({type}) => {
-//     gaTest('set', dimensions.NETWORK_STATUS, type);
-//     gaTest('send', 'event', 'Network', 'change', type, {
-//       nonInteraction: true,
-//     });
-//   };
-//   window.addEventListener('online', updateNetworkStatus);
-//   window.addEventListener('offline', updateNetworkStatus);
-// }
-
-
-/**
  * Requires select autotrack plugins for each tracker.
  */
 const requireAutotrackPlugins = () => {
@@ -394,7 +375,7 @@ const trackTimeToFirstConsistentlyInteractive = async () => {
         [metrics.TTCI]: Math.round(ttci),
       });
     }
-  } catch(err) {
+  } catch (err) {
     trackError(err);
   }
 
@@ -439,62 +420,6 @@ const sendNavigationTimingMetrics = () => {
       [metrics.DOM_LOAD_TIME]: domLoaded,
       [metrics.WINDOW_LOAD_TIME]: windowLoaded,
     });
-  }
-};
-
-
-/**
- * Tracks the point at which the webfonts were active as well as whether an
- * error occurred loading them.
- */
-const sendWebfontPerfAndFailures = () => {
-  new Promise((resolve, reject) => {
-    const loaded = /wf-(in)?active/.exec(document.documentElement.className);
-    const success = loaded && !loaded[1]; // No "in" in the capture group.
-    if (loaded) {
-      success ? resolve() : reject();
-    } else {
-      const originalAciveCallback = window.WebFontConfig.active;
-      window.WebFontConfig.inactive = reject;
-      window.WebFontConfig.active = () => {
-        originalAciveCallback();
-        resolve();
-      };
-      // In case the webfont.js script failed to load.
-      setTimeout(reject, window.WebFontConfig.timeout);
-    }
-  }).then(() => {
-    const fontsActiveTime = measureDuration('fonts:active');
-    if (fontsActiveTime) {
-      // Tracks the amount of time the web fonts take to activate.
-      gaTest('send', 'event', 'Fonts', 'active', {
-        eventLabel: 'google',
-        eventValue: fontsActiveTime,
-        nonInteraction: true,
-        [dimensions.METRIC_VALUE]: String(fontsActiveTime),
-      });
-    }
-  }).catch(() => {
-    gaTest('send', 'event', 'Fonts', 'error', 'google');
-  });
-};
-
-
-/**
- * Measures the time between a PerformanceEntry object and a reference time.
- * @param {string} mark The mark name to measure duration until.
- * @param {string=} reference The timing reference to measure from.
- * @return {number} The duration in milliseconds.
- */
-const measureDuration = (mark, reference = 'responseEnd') => {
-  if (window.__perf) {
-    const name = `${reference}:${mark}`;
-    performance.clearMeasures(name);
-    performance.measure(name, reference, mark);
-    const measure = performance.getEntriesByName(name)[0];
-    return measure ? Math.round(measure.duration) : 0;
-  } else {
-    return 0;
   }
 };
 

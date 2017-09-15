@@ -14,21 +14,18 @@ html, body {
 
 body {
   color: var(--text-color);
-  font: 1em/1.5 var(--font-fallback);
+  font: 1em/1.5 var(--font-family);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-rendering: optimizeLegibility;
-  letter-spacing: -0.02em;
+
   margin: 0;
-}
-.wf-active body {
-  font-family: var(--font);
 }
 
 h1,
 h2,
 h3,
 h4 {
+  font-weight: 500;
   line-height: 1.1;
   margin: 1em 0;
 }

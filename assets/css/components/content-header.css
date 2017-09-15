@@ -6,19 +6,18 @@
 
 .ContentHeader-articleTitle {
   font-size: 1.75em;
-  letter-spacing: -.05em;
   margin: 0;
 }
 
 .ContentHeader-articleDate {
-  color: #999;
+  color: var(--text-color-faded);
   display: block;
   font-size: .875em;
   margin: 1em 0 0;
 }
 
 .ContentHeader-pageTitle {
-  color: #aaa;
+  color: var(--text-color-faded);
   font-size: .8em;
   letter-spacing: .15em;
   margin: 0;

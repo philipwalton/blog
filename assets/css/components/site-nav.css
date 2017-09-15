@@ -7,14 +7,6 @@
 
 }
 
-.SiteNav-toggle {
-  cursor: pointer;
-  display: inline-block;
-  width: 1.5em;
-  height: 1.5em;
-  fill: hsl(0, 0%, 50%);
-}
-
 .SiteNav-items {
   display: flex;
   margin: 0;
@@ -29,7 +21,7 @@
 }
 
 .SiteNav-link {
-  color: hsl(0, 0%, 40%);
+  color: var(--text-color-faded);
   font-size: .9em;
   font-weight: 600;
   text-decoration: none;

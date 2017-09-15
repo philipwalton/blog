@@ -17,8 +17,6 @@ const dimensions = {
 
 const assetUrlParts = [
   new RegExp('^' + location.origin),
-  /^https?:\/\/fonts\.googleapis\.com/,
-  /^https?:\/\/www\.gstatic\.com/,
   /^https?:\/\/www\.google-analytics\.com\/analytics\.js/,
 ];
 

@@ -18,8 +18,13 @@ module.exports = {
       ]}),
     ]).process(css, {
       from: 'assets/css/main.css',
+      to: 'build/static/main.css',
+      map: {
+        inline: false,
+      },
     });
 
     await generateRevisionedAsset('main.css', result.css);
+    await fs.outputFile('build/static/main.css.map', result.map);
   },
 };

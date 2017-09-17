@@ -1,5 +1,5 @@
-// Template-level User Timing code
-window.__perf;
+// Track error logic;
+window.__e
 
 // Track abandon logic
 window.__trackAbandons;

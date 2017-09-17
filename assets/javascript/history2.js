@@ -39,7 +39,7 @@ export default class History2 {
    * - url: The URL for the next page in the history.
    * - title: The title of the next page in the history.
    * - isPopState: true if the entry was added from a popState event.
-   * @return {!Promise} A promise that is resolved once the next entry is the
+   * @return {!Promise} A promise that is resolved once the next entry in the
    *     history is loaded.
    */
   async add({url, title, isPopState}) {

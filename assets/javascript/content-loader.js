@@ -3,7 +3,7 @@ import * as alerts from './alerts';
 import {gaTest, trackError} from './analytics';
 import * as drawer from './drawer';
 import History2 from './history2';
-import {mark, measure, track} from './user-timing';
+import Timer from './timer.js';
 
 
 // Cache the container element to avoid multiple lookups.
@@ -15,34 +15,6 @@ const pageCache = {};
 
 
 /**
- * Marks the beginning of a vitual page fetch.
- */
-const trackPageFetchStart = () => {
-  mark('pagefetch:start');
-}
-
-
-/**
- * Marks the end of a virtual page fetch, measures the duration between
- * the start and end mark, and sends that as an event to Google Analytics.
- * @param {{path: (string), fromCache: (boolean)}} arg1
- *     path: The page path of the fetch
- *     fromCache: True if the content is already cached so no network request
- *         needs to be made.
- */
-const trackPageFetchEnd = ({path, fromCache}) => {
-  mark('pagefetch:end');
-  measure('pagefetch', 'pagefetch:start', 'pagefetch:end');
-  track('pagefetch', {
-    eventCategory: 'Virtual Pageviews',
-    eventAction: 'fetch',
-    eventLabel: fromCache ? 'cache' : 'network',
-    page: path,
-  });
-}
-
-
-/**
  * Gets the title of a page from a link element.
  * @param {!Element} a The `<a>`` element.
  * @return {string} The title of the page the link will load.
@@ -50,7 +22,7 @@ const trackPageFetchEnd = ({path, fromCache}) => {
 const getTitle = (a) => {
   const title = a.title || a.innerText;
   return title ? title + ' \u2014 Philip Walton' : '';
-}
+};
 
 
 /**
@@ -61,7 +33,7 @@ const getTitle = (a) => {
 const getMainContent = (html) => {
   const match = /<main[^>]*>([\s\S]*)<\/main>/.exec(html);
   return match ? match[1] : '';
-}
+};
 
 
 /**
@@ -74,9 +46,20 @@ const getMainContent = (html) => {
  *    page or rejects with the network error.
  */
 const fetchPageContent = async (path) => {
-  trackPageFetchStart();
+  const timer = new Timer().start();
+  const gaEventData = {
+    eventCategory: 'Virtual Pageviews',
+    eventAction: 'fetch',
+    page: path,
+  };
+
   if (pageCache[path]) {
-    trackPageFetchEnd({path, fromCache: true});
+    timer.stop();
+    gaTest('send', 'event', Object.assign(gaEventData, {
+      eventValue: Math.round(timer.duration),
+      eventLabel: 'cache',
+    }));
+
     return pageCache[path];
   } else {
     try {
@@ -94,7 +77,12 @@ const fetchPageContent = async (path) => {
       if (!content) {
         throw new Error(`Could not parse content from response: ${path}`);
       } else {
-        trackPageFetchEnd({path, fromCache: false});
+        timer.stop();
+        gaTest('send', 'event', Object.assign(gaEventData, {
+          eventValue: Math.round(timer.duration),
+          eventLabel: 'network',
+        }));
+
         pageCache[path] = content;
         return content;
       }
@@ -111,7 +99,7 @@ const fetchPageContent = async (path) => {
       throw err;
     }
   }
-}
+};
 
 
 /**
@@ -120,7 +108,7 @@ const fetchPageContent = async (path) => {
  */
 const showPageContent = (content) => {
   container.innerHTML = content;
-}
+};
 
 
 /**
@@ -136,7 +124,7 @@ const setScroll = (hash) => {
   // if the browser has already visited the page and thinks it has a scroll
   // position in mind.
   window.scrollTo(0, scrollPos);
-}
+};
 
 
 /**
@@ -146,7 +134,7 @@ const setScroll = (hash) => {
 const resetImpressionTracking = () => {
   gaTest('impressionTracker:unobserveAllElements');
   gaTest('impressionTracker:observeElements', ['share']);
-}
+};
 
 /**
  * Initializes the dynamic, page-loading code.
@@ -167,7 +155,7 @@ export const init = () => {
       drawer.close();
       setScroll(state.hash);
       resetImpressionTracking();
-    } catch(err) {
+    } catch (err) {
       trackError(/** @type {!Error} */ (err));
     }
   });
@@ -206,4 +194,4 @@ export const init = () => {
       });
     }
   });
-}
+};

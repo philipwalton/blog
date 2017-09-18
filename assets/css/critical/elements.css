@@ -14,10 +14,13 @@ html, body {
 
 body {
   color: var(--text-color);
-  font: 1em/1.5 var(--font-family);
+  font: 1em/1.5 sans-serif;
+
+  /* Declare font-family separately since <=IE11 don't parse it properly */
+  font-family: var(--font-family);
+
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-
   margin: 0;
 }
 

@@ -56,7 +56,6 @@
     "mocha": "^3.5.3",
     "moment-timezone": "^0.5.13",
     "name-all-modules-plugin": "^1.0.1",
-    "normalize.css": "^7.0.0",
     "nunjucks": "^3.0.1",
     "path": "^0.12.7",
     "postcss-cssnext": "^3.0.2",

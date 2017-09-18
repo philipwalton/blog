@@ -15,21 +15,11 @@
   margin: 0 auto;
 }
 
-
 @media (--break-md) {
   .Site-contentContainer {
     padding: calc(var(--vgap-md) * 1.333) var(--hgap-md);
   }
 }
-
-/*
-@media (--break-md) {
-  .Site-contentContainer {
-    padding-top: 3em;
-    padding-bottom: 3em;
-  }
-}
-*/
 
 @media (--break-lg) {
   .Site-contentContainer {

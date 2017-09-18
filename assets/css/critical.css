@@ -1,13 +1,9 @@
-@import "./base/variables.css";
-@import "./base/custom-media.css";
-@import "./base/critical.css";
+@import './shared/variables.css';
+@import './shared/custom-media.css';
 
-@import "./components/header.css";
-@import "./components/site.css";
-@import "./components/site-nav.css";
+@import './critical/elements.css';
 
-/* Components to hide until the rest of the CSS is loaded. */
-.SocialNav,
-.UnstyledButton {
-  display: none;
-}
+@import './critical/components/header.css';
+@import './critical/components/site.css';
+@import './critical/components/site-nav.css';
+@import './critical/components/social-nav.css';

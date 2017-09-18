@@ -152,7 +152,7 @@ const getSwConfig = () => ({
   devtool: '#source-map',
   plugins: [
     new webpack.DefinePlugin({
-      MAIN_CSS_URL: JSON.stringify(getRevisionedAssetUrl('main.css')),
+      LAZY_CSS_URL: JSON.stringify(getRevisionedAssetUrl('lazy.css')),
       MAIN_JS_URL: JSON.stringify(getRevisionedAssetUrl('main.js')),
       MAIN_RUNTIME_URL: JSON.stringify(getRevisionedAssetUrl('runtime.js')),
     }),

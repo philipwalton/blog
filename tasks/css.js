@@ -27,7 +27,7 @@ module.exports = {
   build: () => {
     return Promise.all([
       generateCss('assets/css/critical.css'),
-      generateCss('assets/css/main.css'),
+      generateCss('assets/css/lazy.css'),
     ]);
   },
 };

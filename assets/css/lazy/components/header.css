@@ -1,0 +1,24 @@
+/* Defines .Header styles not needed in critical.css */
+
+.Header--drawerOpen {
+  box-shadow: var(--shadow);
+}
+
+.Header-drawerToggle {
+  color: var(--text-color-dark-bg);
+  cursor: pointer;
+  display: flex;
+  font-size: 1.5em;
+}
+
+@media (--break-lg) {
+  .Header--drawerOpen {
+    box-shadow: none;
+  }
+  .Header-drawerToggle {
+    display: none;
+  }
+  .Header-drawerToggle svg {
+    color: var(--link-color);
+  }
+}

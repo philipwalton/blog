@@ -40,10 +40,11 @@
   </div>
 
   {% include '_javascript-legacy.html' %}
+  {% include '_css.html' %}
 
   <noscript>
     <!-- Track if JavaScript is disabled -->
-    <img src="https://www.google-analytics.com/collect?v=1&t=pageview&tid=UA-21292978-3&cid=noscript&dl={{ site.baseUrl | urlencode}}{{ page.path | urlencode }}">
+    <img src="https://www.google-analytics.com/collect?v=1&t=pageview&tid=UA-21292978-3&cid=noscript&cd7=noscript&dl={{ site.baseUrl | urlencode}}{{ page.path | urlencode }}">
   </noscript>
 
 </body>

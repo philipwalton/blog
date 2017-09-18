@@ -11,7 +11,6 @@
 </title>
 
 {% include '_analytics.html' %}
-{% include '_css.html' %}
 {% include '_javascript.html' %}
 
 <!-- Generated via: realfavicongenerator.net and modified -->
@@ -27,5 +26,7 @@
 <link href="https://feeds.feedburner.com/philipwalton" rel="alternate" title="{{site.title}}" type="application/atom+xml">
 <meta name="description" content="{% if page.excerpt %}{{ page.excerpt }}{% else %}{{ site.description }}{% endif %}">
 <link rel="canonical" href="{{ site.baseUrl }}{{ page.path }}" />
+
+<style>{{ 'critical.css' | revision | inline }}</style>
 
 {% include '_icons.html' %}

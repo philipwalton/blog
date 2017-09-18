@@ -24,6 +24,15 @@ env.addFilter('revision', (filename) => {
   return getRevisionedAssetUrl(filename);
 });
 
+const inlineCache = {};
+env.addFilter('inline', (filepath) => {
+  if (!inlineCache[filepath]) {
+    inlineCache[filepath] = fs.readFileSync(`build/${filepath}`);
+  }
+
+  return inlineCache[filepath];
+});
+
 const minifyHtml = (html) => {
   let opts = {
     removeComments: true,

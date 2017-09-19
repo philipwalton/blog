@@ -246,15 +246,19 @@ function getCapabilities() {
 
   if (isSauceLabs) {
     capabilities = [
-      // {
-      //   browserName: 'chrome',
-      //   platform: 'Windows 10',
-      // },
-      // {
-      //   browserName: 'firefox',
-      //   platform: 'OS X 10.11',
-      //   version: '46', // TODO(philipwalton): 47 has issues, use 46 until fixed.
-      // },
+      {
+        browserName: 'chrome',
+        platform: 'Windows 10',
+      },
+      {
+        browserName: 'firefox',
+        platform: 'Windows 10',
+      },
+      {
+        browserName: 'safari',
+        platform: 'macOS 10.12',
+        version: '10.0',
+      },
       // {
       //   browserName: 'safari',
       //   platform: 'OS X 10.11',
@@ -272,16 +276,16 @@ function getCapabilities() {
       //   browserName: 'MicrosoftEdge',
       //   platform: 'Windows 10',
       // },
-      // {
-      //   browserName: 'internet explorer',
-      //   platform: 'Windows 8.1',
-      //   version: '11',
-      // },
       {
         browserName: 'internet explorer',
-        platform: 'Windows 8',
-        version: '10',
+        platform: 'Windows 8.1',
+        version: '11',
       },
+      // {
+      //   browserName: 'internet explorer',
+      //   platform: 'Windows 8',
+      //   version: '10',
+      // },
     ];
 
     capabilities.forEach(function(cap) {

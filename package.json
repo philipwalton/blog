@@ -72,6 +72,7 @@
     "rollup-plugin-replace": "^2.0.0",
     "rollup-plugin-uglify": "^2.0.1",
     "rollup-plugin-uglify-es": "0.0.1",
+    "sauce-connect-launcher": "^1.2.2",
     "selenium-server-standalone-jar": "^3.5.3",
     "source-map": "^0.5.7",
     "sw-helpers": "philipwalton/sw-helpers",

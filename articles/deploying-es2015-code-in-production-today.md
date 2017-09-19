@@ -29,7 +29,7 @@ If you're already using a module bundler like webpack or rollup to generate your
 
 Next, in addition to your current bundle, you'll generate a second bundle just like the first one; the only difference is you won't transpile all the way down to ES5 and you won't need to include legacy polyfills.
 
-If you're already using [`babel-preset-env`](https://github.com/babel/babel-preset-env) (which you should be), this second step is very easy. All you have to do is change your list of browsers to only those that support `<script type="module">` and babel will automatically not apply transformations it doesn't have to.
+If you're already using [`babel-preset-env`](https://github.com/babel/babel-preset-env) (which you should be), this second step is very easy. All you have to do is change your list of browsers to only those that support `<script type="module">` and Babel will automatically not apply transformations it doesn't have to.
 
 In other words, it will output ES2015+ code instead of ES5.
 
@@ -129,7 +129,7 @@ The next step is to update your HTML to conditionally load the ES2015+ bundle in
 
 <aside class="Info">
 
-**Warning!** The only gotcha here is Safari 10 doesn't support the `nomodule` attribute, but you can solve this by [inlining a JavaScript snippet](https://gist.github.com/samthor/64b114e4a4f539915a95b91ffd340acc) in your HTML prior to using any `<script nomodule>` tags. *(Note: this has been fixed in Safari Tech Preview, and should be released in Safari 11).*
+**Warning!** The only gotcha here is Safari 10 doesn't support the `nomodule` attribute, but you can solve this by [inlining a JavaScript snippet](https://gist.github.com/samthor/64b114e4a4f539915a95b91ffd340acc) in your HTML prior to using any `<script nomodule>` tags. *(Note: this has been fixed in Safari 11).*
 
 </aside>
 
@@ -215,7 +215,7 @@ Now that deploying ES2015+ code is possible, it's time we change this.
 
 I fully understand that this presents a lot of challenges for the immediate future. Most build tools today publish documentation that [recommends configurations](https://github.com/babel/babel-loader/blob/v7.1.2/README.md#usage) which [assume all modules are ES5](https://rollupjs.org/#babel). This means if module authors start publishing ES2015+ source code to npm, they'll probably [break some users' builds](https://github.com/googleanalytics/autotrack/issues/137) and just generally cause confusion.
 
-The problem is most developers that use babel configure it to not transpile anything in `node_modules`, but if modules are published with ES2015+ source code, this is a problem. Luckily the fix is easy. You just have to remove the `node_modules` exclusion from your build config:
+The problem is most developers that use Babel configure it to not transpile anything in `node_modules`, but if modules are published with ES2015+ source code, this is a problem. Luckily the fix is easy. You just have to remove the `node_modules` exclusion from your build config:
 
 ```js
 rules: [
@@ -242,11 +242,11 @@ By publishing ES2015, we give developers a choice, and that ultimately benefits 
 
 While `<script type="module">` was intended to be a mechanism for loading ES modules (and their dependencies) in the browser, it doesn't have to be used *just* for that purpose.
 
-`<script type="module">` will happily load regular JavaScript files, and this gives developers a much-needed means for conditionally loading modern features in browsers that can support it.
+`<script type="module">` will happily load a single JavaScript file, and this gives developers a much-needed means for conditionally loading modern features in browsers that can support it.
 
-This, along with the `nomodule` attribute, finally gives us a way to ship ES2015+ code in production, meaning we don't have to ship unnecessary code to users who don't need it.
+This, along with the `nomodule` attribute, gives us a way to use ES2015+ code in production, and we can finally stop sending so much transpiled code to browsers that don't need it.
 
-Writing ES2015 code is a win for developers, and shipping ES2015 code is a win for users.
+Writing ES2015 code is a win for developers, and deploying ES2015 code is a win for users.
 
 
 ### Further reading

@@ -9,6 +9,10 @@
   transition: border-color .5s var(--quantum-easing),
               box-shadow .5s var(--quantum-easing);
 }
+.Header--drawerOpen {
+  box-shadow: var(--shadow);
+}
+
 .Header-info {
   color: var(--text-color-dark-bg);
   display: block;
@@ -38,7 +42,10 @@
 }
 
 .Header-drawerToggle {
-  display: none;
+  color: var(--text-color-dark-bg);
+  cursor: pointer;
+  display: flex;
+  font-size: 1.5em;
 }
 
 @media (--break-md) {
@@ -55,6 +62,9 @@
 
     padding: var(--vgap-lg) var(--hgap-lg);
   }
+  .Header--drawerOpen {
+    box-shadow: none;
+  }
   .Header-info {
     color: var(--link-color);
   }
@@ -63,6 +73,12 @@
   }
   .Header-title {
     transition: color .25s var(--quantum-easing);
+  }
+  .Header-drawerToggle {
+    display: none;
+  }
+  .Header-drawerToggle svg {
+    color: var(--link-color);
   }
   .Header-drawer {
     flex: 2 0 0%;

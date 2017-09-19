@@ -27,6 +27,5 @@
 <meta name="description" content="{% if page.excerpt %}{{ page.excerpt }}{% else %}{{ site.description }}{% endif %}">
 <link rel="canonical" href="{{ site.baseUrl }}{{ page.path }}" />
 
-<style>{{ 'critical.css' | revision | inline }}</style>
-
+{% include '_css.html' %}
 {% include '_icons.html' %}

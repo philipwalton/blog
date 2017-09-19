@@ -24,10 +24,5 @@ const generateCss = async (filepath) => {
 };
 
 module.exports = {
-  build: () => {
-    return Promise.all([
-      generateCss('assets/css/critical.css'),
-      generateCss('assets/css/lazy.css'),
-    ]);
-  },
+  build: () => generateCss('assets/css/main.css'),
 };

@@ -49,6 +49,14 @@ const generateHighResArticleImages = (filenames) => {
   }));
 };
 
+const optimizeManifestImages = (filenames) => {
+  return Promise.all(filenames.map(async (filename) => {
+    const buffer = await fs.readFile(filename);
+    const minified = await minifyImageBuffer(buffer);
+    return generateRevisionedAsset(path.basename(filename), minified);
+  }));
+};
+
 
 const generateRevisionedAssets = (filenames) => {
   return Promise.all(filenames.map(async (filename) => {
@@ -60,13 +68,17 @@ const generateRevisionedAssets = (filenames) => {
 
 module.exports = {
   build: async () => {
+    // Article images.
     const articlPngFilenames = await glob('assets/images/articles/*.png');
-    const articleSvgFilenames = await glob('assets/images/articles/*.svg');
     await generateLowResArticleImages(articlPngFilenames);
     await generateHighResArticleImages(articlPngFilenames);
-    await generateRevisionedAssets(articleSvgFilenames);
 
-    const manifestFilenames = await glob('assets/images/*.@(png|svg)');
-    await generateRevisionedAssets(manifestFilenames);
+    // Manifest images.
+    const manifestPngFilenames = await glob('assets/images/*.png');
+    await optimizeManifestImages(manifestPngFilenames);
+
+    // SVG assets
+    const svgFilenames = await glob('assets/images/**/*.svg');
+    await generateRevisionedAssets(svgFilenames);
   },
 };

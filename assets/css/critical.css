@@ -1,9 +1,0 @@
-@import './shared/variables.css';
-@import './shared/custom-media.css';
-
-@import './critical/elements.css';
-
-@import './critical/components/header.css';
-@import './critical/components/site.css';
-@import './critical/components/site-nav.css';
-@import './critical/components/social-nav.css';

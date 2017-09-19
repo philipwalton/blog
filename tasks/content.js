@@ -27,7 +27,7 @@ env.addFilter('revision', (filename) => {
 const inlineCache = {};
 env.addFilter('inline', (filepath) => {
   if (!inlineCache[filepath]) {
-    inlineCache[filepath] = fs.readFileSync(`build/${filepath}`);
+    inlineCache[filepath] = fs.readFileSync(`build/${filepath}`, 'utf-8');
   }
 
   return inlineCache[filepath];

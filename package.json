@@ -14,7 +14,8 @@
     "build": "npm run clean && node tasks/build.js",
     "start": "firebase serve",
     "clean": "rm -rf build",
-    "deploy": "npm run build && firebase deploy -P philipwalton-site",
+    "deploy": "NODE_ENV=production npm run build && firebase deploy -P philipwalton-site",
+    "stage": "NODE_ENV=production npm run build && firebase deploy -P philipwalton-staging",
     "test": "wdio"
   },
   "license": "MIT",

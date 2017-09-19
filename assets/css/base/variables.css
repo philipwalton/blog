@@ -1,6 +1,19 @@
 :root {
-  /* system-ui will be expanded by cssnext */
-  --font-family: system-ui, sans-serif;
+  /* https://v4-alpha.getbootstrap.com/content/reboot/#native-font-stack */
+  /* https://www.smashingmagazine.com/2015/11/using-system-ui-fonts-practical-guide/ */
+  --font-family:
+    /* Safari for OS X and iOS (San Francisco) */
+    -apple-system,
+    /* Chrome >= 56 for OS X (San Francisco), Windows, Linux and Android */
+    system-ui,
+    /* Chrome < 56 for OS X (San Francisco) */
+    BlinkMacSystemFont,
+    /* Windows */
+    'Segoe UI',
+    /* Android */
+    'Roboto',
+    /* Basic web fallback */
+    'Helvetica Neue', Arial, sans-serif;
 
   --text-color: hsl(0, 0%, 20%);
   --text-color-faded: hsl(0, 0%, 35%);

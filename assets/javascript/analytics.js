@@ -18,7 +18,7 @@ import {breakpoints} from './breakpoints';
  * implementation. This allows you to create a segment or view filter
  * that isolates only data captured with the most recent tracking changes.
  */
-const TRACKING_VERSION = '31';
+const TRACKING_VERSION = '32';
 
 
 /**
@@ -64,6 +64,7 @@ export const dimensions = {
   HIT_ID: 'dimension14',
   HIT_TIME: 'dimension15',
   TRACKING_VERSION: 'dimension16',
+  DEVICE_MEMORY: 'dimension17',
 };
 
 
@@ -121,6 +122,7 @@ export const init = () => {
   createTrackers();
   trackErrors();
   trackCustomDimensions();
+  trackDeviceMemory();
   requireAutotrackPlugins();
   stopPreloadAbandonTracking();
   trackTimeToFirstConsistentlyInteractive();
@@ -277,6 +279,16 @@ const trackCustomDimensions = () => {
     });
   });
 };
+
+
+/**
+ * Sets the device memory dimension if supported.
+ */
+const trackDeviceMemory = () => {
+  if (navigator.deviceMemory) {
+    gaTest('set', dimensions.DEVICE_MEMORY, navigator.deviceMemory);
+  }
+}
 
 
 /**

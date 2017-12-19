@@ -112,6 +112,24 @@ const showPageContent = (content) => {
 
 
 /**
+ * Executes any scripts added to the container element since they're not
+ * automatically added via `innerHTML`.
+ */
+const executeContainerScripts = () => {
+  const containerScripts = [...container.getElementsByTagName('script')];
+
+  for (const containerScript of containerScripts) {
+    // Remove the unexecuted container script.
+    containerScript.parentNode.removeChild(containerScript);
+
+    const activeScript = document.createElement('script');
+    activeScript.text = containerScript.text;
+    container.appendChild(activeScript);
+  }
+};
+
+
+/**
  * Sets the scroll position of the main document to the top of the page or
  * to the position of an element if a hash fragment is passed.
  * @param {string} hash The hash fragment of a URL to match with an element ID.
@@ -152,6 +170,7 @@ export const init = () => {
       const content = await fetchPageContent(state.pathname);
 
       showPageContent(content);
+      executeContainerScripts();
       drawer.close();
       setScroll(state.hash);
       resetImpressionTracking();

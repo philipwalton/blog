@@ -9,18 +9,18 @@ Anyone who's browsed the web on their phone has, at one point or another, experi
 This is bad enough on its own, but it often doesn't end there. Here's what usually happens next:
 
 <p>
-  <i>You start clicking everywhere just to get *some* feedback that your phone isn't frozen&mdash;then suddenly a bunch of stuff all happens in rapid succession, and now you're on a completely different page and you have no idea how you got there.</i>
+  <i>You start clicking everywhere just to get *some* feedback that your phone isn't broken&mdash;then suddenly a bunch of stuff all happens at the same time, and now you're on a completely different page and you have no idea how you got there.</i>
 </p>
 
 If this sounds familiar, then you've experienced the opposite of interactivity on the web. But what exactly does the term "interactivity" mean?
 
-I think most people reading this article probably know what the word "interactivity" means in general. The problem is, in recent years the word has been given a technical meaning (e.g. in the metric "Time to Interactive" or TTI), and unfortunately the specifics of that meaning are rarely explained.
+I think most people reading this article probably know what the *word* "interactivity" means in general. The problem is, in recent years the word has been given a technical meaning (e.g. in the metric "Time to Interactive" or TTI), and unfortunately the specifics of that meaning are rarely explained.
 
 So in this article I want to dig into the meaning of interactivity on the web. After all, I think it's one of the most important things developers need to care about.
 
 ## Interactivity on the web
 
-For a page to be interactive, it has to be capable of responding quickly to user input. Whether a user is clicking a link, tapping on a custom component, or just scrolling through the content, if the page can respond quickly (in a way that more or less feels "instant" to the user) then the page is interactive.
+For a page to be interactive, it has to be capable of responding quickly to user input. Whether a user is clicking a link, tapping on a custom component, or just scrolling through content, if the page can respond quickly (in a way that more or less feels "instant" to the user) then the page is interactive.
 
 I think most developers generally understand this. What I _don't_ think most developers understand are the reasons _why_ a page might not be interactive, and that's a much bigger issue.
 
@@ -29,17 +29,17 @@ There are essentially just two reasons a page wouldn't be able to respond quickl
 1. The page hasn't finished loading the JavaScript needed to control its DOM.
 2. The browser's main thread is busy doing something else.
 
-The first reason is important, but it's been discussed a lot in the community, and I don't see much point in repeating it (this [5-minute video](https://youtu.be/RAhYnK0v3rk) gives a great summary of the issue if you're curious).
+The first reason is important, but it's been discussed a lot by folks in the community, and I don't see much point in repeating it (this [5-minute video](https://youtu.be/RAhYnK0v3rk) gives a great summary of the issue if you're curious).
 
-The second reason is complex and often overlooked, so that's the primary thing I'm going to focus on here.
+The second reason is complex and often overlooked, so that's the primary thing I want to focus on here.
 
 ### When the browser's main thread is busy
 
 While you often hear people say that browsers are multi-threaded (and this is true to some extent), the reality is a large portion of the tasks a browser will run need to happen on the same thread that handles user input (often called the "main thread" or the "UI thread").
 
-Without getting too deep into the weeds of browser internals (e.g. [tasks](https://html.spec.whatwg.org/#queue-a-task), [task queues](https://html.spec.whatwg.org/#task-queue), and the [event loop](https://html.spec.whatwg.org/#event-loop)<sup>[[1]](#footnote-1)</sup>), the main point to understand is there are many cases where the browser has some code it wants to run (like an event listener after a user clicks something), but it can't because it has to wait for other code to finish first. In this case the main thread is said to be "busy" or "blocked".
+Without getting too deep into the weeds of browser internals (e.g. [tasks](https://html.spec.whatwg.org/#queue-a-task), [task queues](https://html.spec.whatwg.org/#task-queue), and the [event loop](https://html.spec.whatwg.org/#event-loop)<sup>[[1]](#footnote-1)</sup>), the main point to understand is there are many cases where the browser has some code it wants to run (like an event listener in respond to a user's click), but it can't because it has to wait for other code to finish first. In this case the main thread is said to be "busy" or "blocked".
 
-Perhaps the best way to show this is with a demo. Take a look at this code, which runs a continuous `while` loop for 10 seconds.
+Perhaps the best way to show this is with a demo. Take a look at this code, which runs a `while` loop continuously for 10 seconds.
 
 ```js
 function blockMainThreadUntil(time) {
@@ -54,12 +54,12 @@ blockMainThreadUntil(performance.now() + 10000);
 While this code runs, **nothing else can happen on the main thread**. That means a user can't:
 
 * Click a link
-* Select some text
+* Select any text
 * Check a checkbox
 * Watch an animated GIF
 * Type into an `<input>` or `<textarea>`
 
-Before showing this, I want to take a moment to emphasize just how bad this experience is. When the above code is running, it's not just blocking other JavaScript code, it's blocking all other tasks on the main thread, and that includes so-called native interactions you might not expect could be affected by user code.
+Before showing the demo, I want to take a moment to emphasize just how bad this experience is. When the above code is running, it's not just blocking other JavaScript code, it's blocking all other tasks on the main thread, and that includes so-called native interactions you might not expect could be affected by user code.
 
 In fact, even interactions like scrolling (which are usually handled on a separate thread) can sometimes be affected by a busy main thread (e.g. if a `wheel`, `touchstart`, or `touchmove` event listener has been added to the page).<sup>[[2]](#footnote-2)</sup>
 
@@ -126,7 +126,7 @@ Unfortunately the answer is still yes. It's a lot easier for pages to block the 
 
 My colleague Addy Osmani did [a study of 6000+ websites](https://medium.com/reloading/javascript-start-up-performance-69200f43b201) built with popular web frameworks and found that on average they blocked the main thread for 4.4 seconds while just parsing and compiling JavaScript. That's 4.4 seconds where users can't click any links or select any text!
 
-In addition to parsing and compiling, executing JavaScript also blocks the main thread. Every JavaScript function that runs on your page is going to block the main thread for some amount of time. While JavaScript functions tend to be small and typically execute very quickly, the more functions you run at a time, the more likely those small times are to add up to something noticeable by the user.
+In addition to parsing and compiling, executing JavaScript also blocks the main thread. Every JavaScript function that runs on your page is going to block the main thread for some amount of time. While JavaScript functions tend to be small and usually execute very quickly, the more functions you run at a time, the more likely those are to add up to something noticeable by the user.
 
 This is especially true if you use a web framework or virtual DOM library that manages component re-rendering in response to state changes. Many of these libraries define component lifecycle methods that all get run synchronously whenever there's a change. For an app with a lot of components, this can easily be thousands of function calls.
 
@@ -140,17 +140,17 @@ A great example of this strategy is React's recent architectural changes (a.k.a.
 
 Lastly, I'd be remiss if I didn't mention perhaps the biggest cause of non-interactivity on the web: third-party ads and widgets&mdash;which often run way too much code and frequently access properties of the main document, thus adding tasks to its main thread.
 
-Third-party ads and widgets tend to be found on content sites rather than "app" sites, which brings up an important topic…
+Third-party ads and widgets tend to be found on content sites rather than "app" sites, which brings up another important topic…
 
 ### App sites vs. content sites
 
-I hear a lot of people say things like: _I run a content site, not an "app", so I don't really need to care about interactivity._
+I hear a lot of people say things like: _I run a content site, not an app, so I don't really need to care about interactivity._
 
 But this isn't true! As I mentioned above, when you block the main thread you prevent users from clicking links or selecting text, and in the some cases you may even prevent scrolling! These are absolutely things that content sites need to care about.
 
 ## How to tell if you have an interactivity problem
 
-The tricky issue with interactivity is the same page may be interactive for one user (on a fast, desktop machine) but completely unresponsive for another (on a low-end phone). As developers, it's important that we really grok this and actually measure interactivity on devices that reflect the real world.
+The tricky issue with interactivity is the same page may be interactive for one user (on a fast, desktop machine) but completely unresponsive for another (on a low-end phone). As developers, it's important that we really grok this and actually measure interactivity on devices that reflect our users in the real world.
 
 Earlier I said that for a page to be interactive it needs to be able to respond to user input quickly. Most current definitions of interactivity define "quickly" using the [RAIL guidelines](https://developers.google.com/web/fundamentals/performance/rail) for responsiveness, which is within 100ms.
 
@@ -205,14 +205,13 @@ If you want to measure _actual_ input latency (RUM), you can use analytics tools
 ```js
 const menuToggleBtn = document.querySelector('#menu-toggle');
 menuToggleBtn.addEventListener('click', (event) => {
-  // Run menu toggle code here first...
+  // Put your menu-toggle logic here...
 
-  // Then measure when it finished running.
+  // Then measure when it finished executing.
   const latency = performance.now() - event.timeStamp;
 
   // If it took more than 50ms, report it to Google Analytics.
   if (latency > 50) {
-    //
     // Assumes the availability of requestIdleCallback (or a shim).
     requestIdleCallback(() => {
       ga('send', 'event', {
@@ -236,17 +235,17 @@ You can also measure general interactivity via RUM thanks to the new [Long Tasks
 ```js
 // Define a callback that sends Long Task data to Google Analytics.
 function sendLongTaskDataToAnalytics(entryList) {
-  for (const entry of entryList.getEntries()) {
-    // Assumes the availability of requestIdleCallback (or a shim).
-    requestIdleCallback(() => {
+  // Assumes the availability of requestIdleCallback (or a shim).
+  requestIdleCallback(() => {
+    for (const entry of entryList.getEntries()) {
       ga('send', 'event', {
         eventCategory: 'Performance Metrics',
         eventAction: 'longtask',
         eventValue: Math.round(entry.duration),
         eventLabel: JSON.stringify(entry.attribution),
       });
-    });
-  }
+    }
+  });
 }
 
 // Create a PerformanceObserver and start observing Long Tasks.
@@ -279,7 +278,7 @@ I hear a lot of web developers say things like "I want the web to win", but the 
 
 ## What's next
 
-Hopefully you now have a better understanding of what interactivity means and why it matters. Next I strongly encourage you to investigate the interactivity of your own sites on real devices and for real users. In my experience, developers are typically surprised by their results.
+Hopefully you now have a better understanding of what interactivity means and why it matters. Next I strongly encourage you to measure the interactivity of your own sites on real devices and for real users. In my experience, developers are typically surprised by their results.
 
 Finally, if you're looking for ways to improve your interactivity metrics, [Addy Osmani's recommendations for lowering JavaScript startup cost](https://medium.com/reloading/javascript-start-up-performance-69200f43b201#24ef) is a great place to start. I also strongly second [Alex's Russell's recommendation of implementing a performance budget](https://infrequently.org/2017/10/can-you-afford-it-real-world-web-performance-budgets/).
 

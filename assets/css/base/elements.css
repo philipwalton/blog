@@ -135,7 +135,7 @@ figcaption a:hover {
   border-bottom-style: solid;
 }
 
-img {
+figure img {
   border: 1px solid var(--border-color);
   border-radius: var(--border-radius);
   height: auto;
@@ -158,13 +158,35 @@ table th {
 table th,
 table td {
   border: 1px solid var(--border-color);
-  padding: .5em;
+  padding: .75em;
   text-align: left;
   vertical-align: top;
 }
 
 iframe {
   width: 100%;
+}
+
+input[type="text"] {
+  background: #fff;
+  border: 1px solid var(--border-color-input);
+  border-radius: var(--border-radius);
+  font: inherit;
+  font-size: 0.9em;
+  font-weight: 400;
+  padding: 0.5em .75em;
+  width: 100%;
+}
+
+label {
+  color: var(--text-color-faded);
+  display: block;
+  font-size: 0.9em;
+  margin-bottom: 0.5em;
+}
+
+label > input[type="checkbox"] {
+  margin-right: 0.5em;
 }
 
 /* From normalize.css */

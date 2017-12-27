@@ -6,10 +6,22 @@
 
   <header class="ContentHeader">
     <h1 class="ContentHeader-articleTitle entry-title">{{ page.title }}</h1>
-    <time class="ContentHeader-articleDate published"
-        datetime="{{ page.date | format('YYYY-MM-DDTHH:mm:ssZ') }}">
-      {{ page.date | format('MMMM D, YYYY') }}
-    </time>
+    <div class="ContentHeader-meta">
+      <time class="ContentHeader-articleDate published"
+          datetime="{{ page.date | format('YYYY-MM-DDTHH:mm:ssZ') }}">
+        {{ page.date | format('MMMM D, YYYY') }}
+      </time>
+      {%- if page.translations -%}
+        <span class="ContentHeader-articleTranslations">
+          (translations:
+            {% for lang, url in page.translations %}
+              <a href="{{ url }}">{{ lang }}</a>
+              {%- if not loop.last %}, {% endif %}
+            {%- endfor -%}
+          )
+        </span>
+      {% endif %}
+    </div>
   </header>
 
   <div class="entry-content">

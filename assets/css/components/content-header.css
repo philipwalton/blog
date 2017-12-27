@@ -9,11 +9,20 @@
   margin: 0;
 }
 
-.ContentHeader-articleDate {
-  color: var(--text-color-faded);
-  display: block;
+
+.ContentHeader-meta {
   font-size: .875em;
   margin: 1em 0 0;
+}
+
+.ContentHeader-articleDate {
+  margin-right: 0.5em;
+}
+
+
+.ContentHeader-articleTranslations {
+  color: var(--text-color-faded);
+  font-style: italic;
 }
 
 .ContentHeader-pageTitle {

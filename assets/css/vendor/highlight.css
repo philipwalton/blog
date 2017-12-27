@@ -2,7 +2,6 @@
 
 pre {
   background: var(--bg-color);
-  border-radius: var(--border-radius);
   margin: var(--vgap) -var(--hgap);
   overflow: auto;
   padding: var(--vgap) var(--hgap);
@@ -26,6 +25,7 @@ pre mark {
 
 @media (--break-lg) {
   pre {
+    border-radius: var(--border-radius);
     margin: var(--vgap-md) 0;
     padding: var(--vgap-md) var(--hgap-md);
   }

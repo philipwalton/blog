@@ -1,6 +1,5 @@
 .Info {
   background: hsla(120, 100%, 50%, .07);
-  border-radius: var(--border-radius);
   margin: var(--vgap) -var(--hgap);
   padding: var(--vgap) var(--hgap);
 }
@@ -19,6 +18,7 @@
 
 @media (--break-lg) {
   .Info {
+    border-radius: var(--border-radius);
     margin: var(--vgap-md) 0;
     padding: var(--vgap-md) var(--hgap-md);
   }

@@ -1,6 +1,5 @@
 .Callout {
   background: var(--bg-color);
-  border-radius: var(--border-radius);
   margin: var(--vgap) -var(--hgap);
   padding: var(--vgap) var(--hgap);
 }
@@ -19,6 +18,7 @@
 
 @media (--break-lg) {
   .Callout {
+    border-radius: var(--border-radius);
     margin: var(--vgap-md) 0;
     padding: var(--vgap-md) var(--hgap-md);
   }

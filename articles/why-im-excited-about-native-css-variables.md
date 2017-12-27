@@ -397,12 +397,6 @@ Custom properties fill a gap that preprocessor variables simply can't. Despite t
 
 I don't think it has to be an either-or situation. And pitting them against each other as competitors does a disservice to everyone.
 
-<div class="Thanks">
-
-Special thanks to [Addy Osmani](https://twitter.com/addyosmani) and [Matt Gaunt](https://twitter.com/gauntface) for reviewing this article and to [Shane Stephens](https://twitter.com/komradshaneski) for prioritizing and fixing a Chrome bug to get the demos working.
-
-</div>
-
 <aside class="Footnotes">
   <h1 class="Footnotes-title">Footnotes:</h1>
   <ol class="Footnotes-items">

@@ -34,7 +34,7 @@ articles:
   path: /articles/what-no-one-told-you-about-z-index/
   date: 2013-01-15T11:17:39-08:00
   translations:
-    français: http://iamvdo.me/blog/comprendre-z-index-et-les-contextes-dempilement
+    français: https://iamvdo.me/blog/comprendre-z-index-et-les-contextes-dempilement
 - title: "The Future of OOCSS: A Proposal"
   path: /articles/the-future-of-oocss-a-proposal/
   date: 2013-01-17T11:02:16-08:00
@@ -82,40 +82,39 @@ articles:
   path: /articles/measuring-your-sites-responsive-breakpoint-usage/
   date: 2014-12-22T22:38:36-08:00
   translations:
-    Português: http://imasters.com.br/analytics/medindo-o-uso-do-breakpoint-responsivo-de-um-site/
+    Português: https://imasters.com.br/analytics/medindo-o-uso-do-breakpoint-responsivo-de-um-site/
 - title: "Normalizing Cross-browser Flexbox Bugs"
   path: /articles/normalizing-cross-browser-flexbox-bugs/
   date: 2015-01-04T17:44:38-08:00
   excerpt: "Way back in September of 2013, while testing my Solved by Flexbox project, I discovered a bug in Internet Explorer 10 and 11 that was preventing my sticky footer from actually sticking to the bottom of the page. I spent some time trying to work around the issue, but all my attempts failed."
   translations:
-    Português: http://imasters.com.br/front-end/css/normalizando-bugs-no-flexbox-em-diversos-navegadores/
+    Português: https://imasters.com.br/front-end/css/normalizando-bugs-no-flexbox-em-diversos-navegadores/
 - title: "Side Effects in CSS"
   path: /articles/side-effects-in-css/
   date: 2015-03-03T21:25:06-08:00
   translations:
-    Português: http://imasters.com.br/front-end/css/efeitos-colaterais-no-css/
+    Português: https://imasters.com.br/front-end/css/efeitos-colaterais-no-css/
 - title: "Extending Styles"
   path: /articles/extending-styles/
   date: 2015-05-20T12:34:57-07:00
   translations:
-    Português: http://imasters.com.br/front-end/css/estendendo-estilos/
+    Português: https://imasters.com.br/front-end/css/estendendo-estilos/
 - title: "How to Become a Great Front-End Engineer"
   path: /articles/how-to-become-a-great-front-end-engineer/
   date: 2015-08-02T15:39:17-07:00
   translations:
-    한국어: http://hyunseob.github.io/2016/02/21/how-to-become-a-great-frontend-engineer/
+    한국어: https://hyunseob.github.io/2016/02/21/how-to-become-a-great-frontend-engineer/
 - title: "Do We Actually Need Specificity In CSS?"
   path: /articles/do-we-actually-need-specificity-in-css/
   date: 2015-11-01T14:37:42-08:00
   translations:
     日本語: http://postd.cc/do-we-actually-need-specificity-in-css/
-    Português: http://imasters.com.br/desenvolvimento/sera-que-realmente-precisamos-da-especificidade-no-css/
+    Português: https://imasters.com.br/desenvolvimento/sera-que-realmente-precisamos-da-especificidade-no-css/
 - title: "Why I'm Excited About Native CSS Variables"
   path: /articles/why-im-excited-about-native-css-variables/
   date: 2015-12-06T12:43:53-08:00
   translations:
-    français: http://terkel.github.io/why-im-excited-about-native-css-variables/
-    日本語: http://terkel.github.io/why-im-excited-about-native-css-variables/
+    français: https://terkel.github.io/why-im-excited-about-native-css-variables/
 - title: "Houdini: Maybe the Most Exciting Development in CSS You've Never Heard Of"
   path: /articles/houdini-maybe-the-most-exciting-development-in-css-youve-never-heard-of/
   date: 2016-03-24T15:43:07-07:00

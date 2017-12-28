@@ -8,7 +8,6 @@
   margin-bottom: 0;
 }
 
-
 @media (--break-md) {
   .Callout {
     margin: var(--vgap-md) -var(--hgap-md);

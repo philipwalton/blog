@@ -82,7 +82,7 @@ Of course, this code assumes the component containers have the correct classes a
 
 Whether your writing your container query as an explicit length comparison query (the first syntax) or whether you're using named breakpoint classes (the second syntax), your styles are still declarative and functionally the same. As long as you can define your named breakpoints however you want, I don't see a clear benefit to one over the other.
 
-And to clarify the rest of this discussion, let's define our named breakpoint classes with the following mapping, where `min-width` applies to the *container*, not the viewport:
+And to clarify the rest of this article, let me define the named breakpoint classes I'm using with the following mapping (where `min-width` applies to the *container*, not the viewport):
 
 <table>
   <tr>
@@ -235,7 +235,7 @@ self.customElements.define('responsive-container', ResponsiveContainer);
 
 In my initial experimentation with this strategy, I didn't wrap each component with a container element. Instead, I used a single container element per distinct content area (header, sidebar, footer, etc), and in my CSS I used [descendant combinators](https://developer.mozilla.org/en-US/docs/Web/CSS/Descendant_selectors) instead of [child combinators](https://developer.mozilla.org/en-US/docs/Web/CSS/Child_selectors).
 
-This resulted in simpler markup and CSS, but it quickly fell apart when I tried nesting components within other components (which most complex sites will do). The problem is, with the descendant combinator approach, selectors would match multiple containers at the same time.
+This resulted in simpler markup and CSS, but it quickly fell apart when I tried nesting components within other components (which many complex sites do). The problem is, with the descendant combinator approach, selectors would match multiple containers at the same time.
 
 After building a few non-trivial demos, it became clear that a direct child/parent structure for each component and its container was far easier to manage and scale. Note that containers can still host more than one component, as long as every hosted component is a direct descendant.
 
@@ -264,8 +264,8 @@ Note that when using my recommended strategy for additive matching, you can stil
 At the end of the day, you can pick whichever convention makes the most sense for you and works best for your situation.
 
 <aside class="Info">
-  <strong>Node:</strong>
-  the <code>:matches()</code> selector isn't well supported in current browsers. However, you can use tools like <a href="https://www.npmjs.com/package/postcss-selector-matches">postcss-selector-matches</a> to transpile <code>:matches()</code> selectors into cross-browser equivalents.
+  <strong>Note:</strong>
+  the <code>:matches()</code> selector isn't well supported in current browsers. However, you can use tools like <a href="https://www.npmjs.com/package/postcss-selector-matches">postcss-selector-matches</a> to transpile <code>:matches()</code> into something the works cross-browser.
 </aside>
 
 ### Height-based breakpoints

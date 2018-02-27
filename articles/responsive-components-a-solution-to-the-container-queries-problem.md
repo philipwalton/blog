@@ -206,7 +206,7 @@ The code example above only works for container elements that are already in the
 
 For content-based sites this is usually fine, but for more complex sites whose DOM is constantly changing, you'll need to make sure you're observing all newly added container elements.
 
-A one-size-fits-all solution to this problem is to expand the snippet above to include a MutationObserver that keeps track of all added DOM elements. This is [the approach I use](https://github.com/philipwalton/responsive-containers/blob/master/app/templates/_resize-observer.html#L28-L51) in the Responsive Components demo site, and it works well for small and medium-sized sites with limited DOM changes.
+A one-size-fits-all solution to this problem is to expand the snippet above to include a MutationObserver that keeps track of all added DOM elements. This is [the approach I use](https://github.com/philipwalton/responsive-components/blob/cf93cc7/app/templates/_resize-observer.html#L47-L71) in the Responsive Components demo site, and it works well for small and medium-sized sites with limited DOM changes.
 
 For larger sites with frequently-updating DOM, chances are you're already using something like [Custom Elements](https://developer.mozilla.org/en-US/docs/Web/Web_Components/Using_custom_elements) or a web framework with component lifecycle methods that track when elements are added and removed from the DOM. If that's the case, it's probably better to just hook into that mechanism. You probably even want to make a generic, reusable container component.
 
@@ -285,7 +285,7 @@ If you really want to deliver a consistent UI across all browsers, you can load 
 
 Also consider that polyfills tend to run slower on mobile devices, and given that responsive components is primarily only something that matters at larger screen sizes, you probably don't need to load the polyfill if the user is on a device with a small screen size.
 
-The Responsive Components demo site takes [this latter approach](https://github.com/philipwalton/responsive-components/blob/master/app/templates/_resize-observer.html#L63-L71). It loads the polyfill, but only if the user's browser doesn't support `ResizeObserver` _and_ if the user's screen width is at least `48em`.
+The Responsive Components demo site takes [this latter approach](https://github.com/philipwalton/responsive-components/blob/cf93cc7/app/templates/_resize-observer.html#L75-L83). It loads the polyfill, but only if the user's browser doesn't support `ResizeObserver` _and_ if the user's screen width is at least `48em`.
 
 ## Limitations and future improvements
 
@@ -309,7 +309,7 @@ In most cases it's a best practice to load all your JavaScript asynchronously, b
 
 While this isn't the worst experience, it's something you wouldn't have to worry about with a pure-CSS solution. And since this strategy involves coordination with JavaScript, you have to also coordinate when your styles and breakpoints are applied in order to avoid this re-layout.
 
-I've found the best way to handle this is to inline your container query code at the end of your HTML templates, so it runs as soon as possible. You should then add a class or attribute to your container elements once they're initialized, so you know when it's safe to show them (and make sure you consider the case where JavaScript is disabled or errors when run). You can see an example of [how I do this](https://github.com/philipwalton/responsive-components/blob/master/app/templates/_resize-observer.html#L32) in the demo site.
+I've found the best way to handle this is to inline your container query code at the end of your HTML templates, so it runs as soon as possible. You should then add a class or attribute to your container elements once they're initialized and visible, so you know when it's safe to show them (and make sure you consider the case where JavaScript is disabled or errors when run). You can see an example of [how I do this](https://github.com/philipwalton/responsive-components/blob/cf93cc7/app/templates/_resize-observer.html#L22-L26) in the demo site.
 
 ### Units are based in pixels
 

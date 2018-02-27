@@ -74,6 +74,10 @@ const fetchPageContent = async (path) => {
       }
 
       const content = getMainContent(html);
+      // TODO(philipwalton):
+      // const title = getTitle(html);
+      // const canonical = getCanonical(html);
+
       if (!content) {
         throw new Error(`Could not parse content from response: ${path}`);
       } else {

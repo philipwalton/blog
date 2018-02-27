@@ -193,6 +193,11 @@ iframe {
   width: 100%;
 }
 
+video {
+  border: 1px solid var(--border-color);
+  width: 100%;
+}
+
 input[type="text"] {
   background: #fff;
   border: 1px solid var(--border-color-input);

@@ -143,8 +143,12 @@ articles:
   date: 2017-09-13T12:23:12-07:00
   translations:
     中文: https://jdc.jd.com/archives/4911
-- title: Why Web Developers Need to Care about Interactivity
+- title: "Why Web Developers Need to Care about Interactivity"
   path: /articles/why-web-developers-need-to-care-about-interactivity/
   date: 2017-12-19T09:25:23-08:00
   translations:
     français: https://frank.taillandier.me/2017/12/21/pourquoi-les-developpeurs-web-doivent-se-soucier-de-l-interactivite/
+- title: "Responsive Components: a Solution to the Container Queries Problem"
+  path: /articles/responsive-components-a-solution-to-the-container-queries-problem/
+  date: 2018-02-27T00:12:12-08:00
+

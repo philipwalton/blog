@@ -151,4 +151,5 @@ articles:
 - title: "Responsive Components: a Solution to the Container Queries Problem"
   path: /articles/responsive-components-a-solution-to-the-container-queries-problem/
   date: 2018-02-27T00:12:12-08:00
-
+  translations:
+    русский: http://css-live.ru/javascript/otzyvchivye-komponenty-reshenie-problemy-vyrazhenij-ot-kontejnera.html

@@ -321,7 +321,7 @@ In the future, once browsers implement the [CSS Typed OM](https://drafts.css-hou
 
 ## Conclusion
 
-This articles describes a strategy for using modern web technologies to build responsive components: DOM elements that can update their style and layout in response to changes in the size of their container.
+This article describes a strategy for using modern web technologies to build responsive components: DOM elements that can update their style and layout in response to changes in the size of their container.
 
 While previous attempts to build responsive components were valuable in exploring this space, limitations in the platform meant these solutions were always either [too big, too slow, or both](https://philipwalton.com/articles/the-dark-side-of-polyfilling-css/).
 

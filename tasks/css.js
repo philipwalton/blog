@@ -1,28 +1,50 @@
 const cssnano = require('cssnano');
 const fs = require('fs-extra');
+const gulp = require('gulp');
 const path = require('path');
 const postcss = require('postcss');
 const atImport = require('postcss-import');
 const cssnext = require('postcss-cssnext');
-const {generateRevisionedAsset} = require('./static');
+const {generateRevisionedAsset} = require('./utils/assets');
 
+const compileCss = async (srcPath) => {
+  const css = await fs.readFile(srcPath, 'utf-8');
 
-const generateCss = async (filepath) => {
-  const css = await fs.readFile(filepath, 'utf-8');
-  const result = await postcss([
+  const plugins = [
     atImport(),
-    cssnext(),
-    cssnano({preset: [
-      'default',
-      {discardComments: {removeAll: true}},
-    ]}),
-  ]).process(css, {
-    from: filepath,
-  });
+    cssnext({
+      browsers: ['debug', 'production'].includes(process.env.NODE_ENV) ?
+          'defaults' : 'last 2 Chrome versions',
+      features: {
+        customProperties: {
+          warnings: true,
+          preserve: true,
+        },
+      },
+    }),
+  ];
+  if (process.env.NODE_ENV === 'production') {
+    plugins.push(cssnano({preset: [
+      'default', {
+        discardComments: {removeAll: true},
+        // This must be disabled because it breaks postcss-custom-properties:
+        // https://github.com/ben-eb/cssnano/issues/448
+        mergeLonghand: false,
+      }
+    ]}));
+  }
 
-  await generateRevisionedAsset(path.basename(filepath), result.css);
+  const result = await postcss(plugins).process(css, {from: srcPath});
+
+  return result.css;
 };
 
-module.exports = {
-  build: () => generateCss('assets/css/main.css'),
-};
+gulp.task('css', async () => {
+  try {
+    const srcPath = './assets/css/main.css';
+    const css = await compileCss(srcPath);
+    await generateRevisionedAsset(path.basename(srcPath), css);
+  } catch (err) {
+    console.error(err);
+  }
+});

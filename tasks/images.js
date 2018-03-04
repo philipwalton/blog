@@ -1,9 +1,10 @@
 const fs = require('fs-extra');
+const gm = require('gm');
+const gulp = require('gulp');
 const imagemin = require('imagemin');
 const imageminPngquant = require('imagemin-pngquant');
-const gm = require('gm');
 const path = require('path');
-const {generateRevisionedAsset} = require('./static');
+const {generateRevisionedAsset} = require('./utils/assets');
 
 const {promisify} = require('util');
 const glob = promisify(require('glob'));
@@ -65,9 +66,8 @@ const generateRevisionedAssets = (filenames) => {
   }));
 };
 
-
-module.exports = {
-  build: async () => {
+gulp.task('images', async () => {
+  try {
     // Article screenshots.
     const articlPngFilenames = await glob('assets/images/articles/*.png');
     await generateLowResArticleImages(articlPngFilenames);
@@ -80,5 +80,8 @@ module.exports = {
     // GIF and SVG assets
     const svgFilenames = await glob('assets/images/**/*.+(gif|svg)');
     await generateRevisionedAssets(svgFilenames);
-  },
-};
+  } catch (err) {
+    console.error(err);
+  }
+});
+

@@ -1,21 +1,14 @@
-/* eslint-disable no-console */
+const gulp = require('gulp');
 
-const content = require('./content');
-const css = require('./css');
-const images = require('./images');
-const javascript = require('./javascript');
+// Ensure referenced tasks are registered.
+// require('./clean.js');
+require('./content.js');
+require('./css.js');
+require('./images.js');
+require('./javascript.js');
 
-(async () => {
-  try {
-    await Promise.all([
-      css.build(),
-      images.build(),
-    ]);
-
-    await javascript();
-    await content.build();
-  } catch (err) {
-    console.error(err);
-    process.exit(1);
-  }
-})();
+gulp.task('build', gulp.series(
+    // 'clean',
+    gulp.parallel('css', 'images'),
+    'javascript',
+    'content'));

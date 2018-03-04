@@ -288,7 +288,7 @@ const trackDeviceMemory = () => {
   if (navigator.deviceMemory) {
     gaTest('set', dimensions.DEVICE_MEMORY, navigator.deviceMemory);
   }
-}
+};
 
 
 /**

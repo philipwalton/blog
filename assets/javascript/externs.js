@@ -1,5 +1,5 @@
 // Track error logic;
-window.__e
+window.__e;
 
 // Track abandon logic
 window.__trackAbandons;

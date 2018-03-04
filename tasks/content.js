@@ -1,4 +1,5 @@
 const fs = require('fs-extra');
+const gulp = require('gulp');
 const he = require('he');
 const hljs = require('highlight.js');
 const htmlMinifier = require('html-minifier');
@@ -7,12 +8,12 @@ const markdownItAnchor = require('markdown-it-anchor');
 const moment = require('moment-timezone');
 const nunjucks = require('nunjucks');
 const path = require('path');
-const {getRevisionedAssetUrl} = require('./static');
+const {getRevisionedAssetUrl} = require('./utils/assets');
 const book = require('../book');
-
 
 const env = nunjucks.configure('templates', {
   autoescape: false,
+  noCache: true,
   watch: false,
 });
 
@@ -99,6 +100,7 @@ const getOutputPathFromPathname = (pathname) => {
 const renderArticleContent = async () => {
   for (const article of book.articles) {
     const data = {
+      ENV: process.env.NODE_ENV,
       site: book.site,
       page: article,
     };
@@ -112,6 +114,7 @@ const renderArticleContent = async () => {
 const buildArticles = async () => {
   for (const article of book.articles) {
     const data = {
+      ENV: process.env.NODE_ENV,
       site: book.site,
       page: article,
     };
@@ -129,6 +132,7 @@ const buildPages = async () => {
     const pageTemplatePath = getPageTemplateFromPathname(page.path);
 
     const data = {
+      ENV: process.env.NODE_ENV,
       site: book.site,
       articles: book.articles,
       page: page,
@@ -142,11 +146,12 @@ const buildPages = async () => {
   }
 };
 
-const build = async () => {
-  await renderArticleContent();
-  await buildArticles();
-  await buildPages();
-};
-
-
-module.exports = {build};
+gulp.task('content', async () => {
+  try {
+    await renderArticleContent();
+    await buildArticles();
+    await buildPages();
+  } catch (err) {
+    console.error(err);
+  }
+});

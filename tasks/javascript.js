@@ -1,13 +1,14 @@
 /* eslint-disable no-console */
 
+const gulp = require('gulp');
 const md5 = require('md5');
 const NameAllModulesPlugin = require('name-all-modules-plugin');
 const path = require('path');
 const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 const webpack = require('webpack');
 const ManifestPlugin = require('webpack-manifest-plugin');
-const {getManifest, addAsset} = require('./asset-manifest');
-const {getRevisionedAssetUrl} = require('./static');
+const {addAsset, getManifest, getRevisionedAssetUrl} =
+    require('./utils/assets');
 const config = require('../config.json');
 
 const buildCache = {};
@@ -184,13 +185,20 @@ const createCompiler = (config) => {
 };
 
 
-module.exports = async () => {
-  const compileMainBundle = createCompiler(getMainConfig());
-  await compileMainBundle();
+gulp.task('javascript', async () => {
+  try {
+    const compileMainBundle = createCompiler(getMainConfig());
+    await compileMainBundle();
 
-  const compileLegacyBundle = createCompiler(getLegacyConfig());
-  await compileLegacyBundle();
+    const compileSwBundle = createCompiler(getSwConfig());
+    await compileSwBundle();
 
-  const compileSwBundle = createCompiler(getSwConfig());
-  await compileSwBundle();
-};
+    if (['debug', 'production'].includes(process.env.NODE_ENV)) {
+      // Generate the main-legacy bundle.
+      const compileLegacyBundle = createCompiler(getLegacyConfig());
+      await compileLegacyBundle();
+    }
+  } catch (err) {
+    console.error(err);
+  }
+});

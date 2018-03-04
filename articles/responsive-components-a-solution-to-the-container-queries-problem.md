@@ -80,7 +80,7 @@ However, what *does work* today is something like this:
 
 Of course, this code assumes the component containers have the correct classes added to them (in this example, `.MD` and `.LG`). But ignoring that detail for the moment, if you're a CSS developer who wants to build a responsive component, the second syntax probably still makes sense to you.
 
-Whether your writing your container query as an explicit length comparison query (the first syntax) or whether you're using named breakpoint classes (the second syntax), your styles are still declarative and functionally the same. As long as you can define your named breakpoints however you want, I don't see a clear benefit to one over the other.
+Whether you're writing your container query as an explicit length comparison query (the first syntax) or whether you're using named breakpoint classes (the second syntax), your styles are still declarative and functionally the same. As long as you can define your named breakpoints however you want, I don't see a clear benefit to one over the other.
 
 And to clarify the rest of this article, let me define the named breakpoint classes I'm using with the following mapping (where `min-width` applies to the *container*, not the viewport):
 

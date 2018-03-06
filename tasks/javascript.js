@@ -74,16 +74,16 @@ const generateBabelEnvLoader = (browserlist) => {
       options: {
         babelrc: false,
         presets: [
-          ['env', {
+          ['@babel/env', {
             debug: true,
             modules: false,
-            useBuiltIns: true,
+            useBuiltIns: 'usage',
             targets: {
               browsers: browserlist,
             },
           }],
         ],
-        plugins: ['syntax-dynamic-import'],
+        plugins: ['@babel/plugin-syntax-dynamic-import'],
       },
     },
   };
@@ -165,7 +165,8 @@ const getSwConfig = () => ({
         // Browsers that support service worker.
         'last 2 Chrome versions', 'not Chrome < 45',
         'last 2 Firefox versions', 'not Firefox < 44',
-        'last 2 Edge versions', 'not Edge < 15',
+        'last 2 Edge versions', 'not Edge < 17',
+        'last 2 Safari versions', 'not Safari < 11.1',
       ]),
     ],
   },

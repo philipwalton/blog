@@ -19,9 +19,9 @@ const main = async () => {
   analytics.init();
   if ('serviceWorker' in navigator) {
     try {
-      await navigator.serviceWorker.register('/sw.js')
+      await navigator.serviceWorker.register('/sw.js');
     } catch (err) {
-      analytics.trackError(err)
+      analytics.trackError(err);
     }
   }
 };

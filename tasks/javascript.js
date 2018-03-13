@@ -83,7 +83,6 @@ const generateBabelEnvLoader = (browserlist) => {
             },
           }],
         ],
-        plugins: ['syntax-dynamic-import'],
       },
     },
   };

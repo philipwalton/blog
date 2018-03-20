@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends layout %}
 
 {% block content %}
 
@@ -25,7 +25,7 @@
   </header>
 
   <div class="entry-content">
-    {{ super() }}
+    {{ page.markup }}
   </div>
 
   <footer class="entry-unrelated">

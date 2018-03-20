@@ -1,7 +1,10 @@
 {
-  "publicPath": "/",
+  "contentPartialsSuffix": ".content.html",
+  "manifestFileName": "revisioned-asset-manifest.json",
   "publicDir": "build",
-  "publicStaticPath": "/static",
+  "publicPath": "/",
   "publicStaticDir": "build/static",
-  "manifestFileName": "revisioned-asset-manifest.json"
+  "publicStaticPath": "/static",
+  "templatesDir": "templates",
+  "timezone": "America/Los_Angeles"
 }

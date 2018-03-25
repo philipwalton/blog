@@ -13,7 +13,7 @@
           </time>
           <h2 class="ArticlePreview-title">{{ article.title }}</h2>
           <p class="ArticlePreview-excerpt">
-            {% set excerpt = article.excerpt or article.content %}
+            {% set excerpt = article.excerpt or article.markup %}
             {{ excerpt | striptags | truncate(180, false, '') | trim -}}
             &hellip;
           </p>

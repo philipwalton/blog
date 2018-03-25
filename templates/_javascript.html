@@ -1,6 +1,6 @@
 <script type="module" src="{{ 'runtime.mjs' | revision }}"></script>
 {% for module in site.assets.modules %}
-  {%- if r/vendor\./.test(module) -%}
+  {%- if r/npm\./.test(module) -%}
     <script type="module" src="{{ module | revision }}"></script>
   {% endif %}
 {%- endfor -%}

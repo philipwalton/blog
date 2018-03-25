@@ -81,7 +81,9 @@ gulp.task('images', async () => {
     const svgFilenames = await glob('assets/images/**/*.+(gif|svg)');
     await generateRevisionedAssets(svgFilenames);
   } catch (err) {
-    console.error(err);
+    console.log(err);
+    console.log(err.stdout.toString());
+    console.log(err.stderr.toString());
   }
 });
 

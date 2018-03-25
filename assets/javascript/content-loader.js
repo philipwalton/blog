@@ -4,9 +4,6 @@ import * as drawer from './drawer';
 import History2 from './history2';
 import Timer from './timer.js';
 
-// Store the result of page content requests to avoid multiple
-// lookups when navigation to a previously seen page.
-const pageCache = {};
 const CONTENT_SUFFIX = '.content.html';
 
 const getContentPartialPath = (pagePath) => {
@@ -33,47 +30,36 @@ const fetchPageContent = async (path) => {
     page: path,
   };
 
-  if (pageCache[path]) {
+  try {
+    const response = await fetch(getContentPartialPath(path));
+
+    let content;
+    if (response.ok) {
+      content = await response.text();
+    } else {
+      throw new Error(
+          `Response: (${response.status}) ${response.statusText}`);
+    }
+
     timer.stop();
     gaTest('send', 'event', Object.assign(gaEventData, {
       eventValue: Math.round(timer.duration),
-      eventLabel: 'memory',
+      // TODO(philipwalton): track cache storage hits vs network requests.
+      eventLabel: 'network',
     }));
 
-    return pageCache[path];
-  } else {
-    try {
-      const response = await fetch(getContentPartialPath(path));
+    return content;
+  } catch (err) {
+    const message = (err instanceof TypeError) ?
+        `Check your network connection to ensure you're still online.` :
+        err.message;
 
-      let content;
-      if (response.ok) {
-        content = await response.text();
-      } else {
-        throw new Error(
-            `Response: (${response.status}) ${response.statusText}`);
-      }
-
-      timer.stop();
-      gaTest('send', 'event', Object.assign(gaEventData, {
-        eventValue: Math.round(timer.duration),
-        // TODO(philipwalton): track cache storage hits vs network requests.
-        eventLabel: 'network',
-      }));
-
-      pageCache[path] = content;
-      return content;
-    } catch (err) {
-      const message = (err instanceof TypeError) ?
-          `Check your network connection to ensure you're still online.` :
-          err.message;
-
-      alerts.add({
-        title: `Oops, there was an error making your request`,
-        body: message,
-      });
-      // Rethrow to be able to catch it again in an outer scope.
-      throw err;
-    }
+    alerts.add({
+      title: `Oops, there was an error making your request`,
+      body: message,
+    });
+    // Rethrow to be able to catch it again in an outer scope.
+    throw err;
   }
 };
 
@@ -92,7 +78,9 @@ const updatePageContent = (content) => {
  */
 const executeContainerScripts = () => {
   const container = document.getElementById('content');
-  const containerScripts = [...container.getElementsByTagName('script')];
+
+  // TODO: [...] should work once Edge supports iterable HTML collections.
+  const containerScripts = Array.from(container.getElementsByTagName('script'));
 
   for (const containerScript of containerScripts) {
     // Remove the unexecuted container script.

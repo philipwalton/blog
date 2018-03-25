@@ -83,4 +83,4 @@ const initBook = async () => {
   return book;
 };
 
-module.exports = {initBook};
+module.exports = {getOutputFile, initBook};

@@ -17,10 +17,6 @@ pages:
 - title: "Page Not Found"
   path: /404.html
   private: true
-- path: /shell-start.html
-  private: true
-- path: /shell-end.html
-  private: true
 
 resources:
 - title: "RSS Feed"

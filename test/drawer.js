@@ -1,12 +1,27 @@
 const assert = require('assert');
-const book = require('../book');
+const {initBook} = require('../tasks/utils/book');
 
 
-const titleSuffix = ' \u2014 Philip Walton';
-
+let site;
+let pages;
 
 describe('Navigation drawer', () => {
-  beforeEach(() => browser.url('/'));
+  before(async () => {
+    const book = await initBook();
+    site = book.site;
+    pages = book.pages;
+  });
+
+  beforeEach(async () => {
+    browser.url('/');
+
+    // I'm not sure why this is needed, but sometime the above command
+    // doesn't appear to wait until the page is loaded.
+    // (possibly due to service worker???)
+    browser.waitUntil(() => {
+      return browser.getTitle() == pages[0].title + site.titleSuffix;
+    });
+  });
 
   it('should show the menu icon but no nav links on small screens', () => {
     browser
@@ -45,10 +60,10 @@ describe('Navigation drawer', () => {
     browser.setViewportSize({width: 375, height: 627}, false);
     // Waits for the links to be clickable.
     browser.click('#drawer-toggle').pause(200);
-    browser.click(`a[href="${book.pages[2].path}"]`);
+    browser.click(`a[href="${pages[2].path}"]`);
 
     browser.waitUntil(() =>
-        browser.getTitle() == book.pages[2].title + titleSuffix);
+        browser.getTitle() == pages[2].title + site.titleSuffix);
 
     browser.waitUntil(() => !browser.isVisible('#drawer'));
   });

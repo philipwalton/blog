@@ -17,7 +17,7 @@ import {breakpoints} from './breakpoints';
  * implementation. This allows you to create a segment or view filter
  * that isolates only data captured with the most recent tracking changes.
  */
-const TRACKING_VERSION = '33';
+const TRACKING_VERSION = '34';
 
 
 /**
@@ -79,10 +79,10 @@ export const metrics = {
   RESPONSE_END_TIME: 'metric6',
   PAGE_LOADS: 'metric7',
   NT_SAMPLE: 'metric8',
-  FCP: 'metric8',
-  FCP_SAMPLE: 'metric9',
-  FID: 'metric10',
-  FID_SAMPLE: 'metric11',
+  FCP: 'metric9',
+  FCP_SAMPLE: 'metric10',
+  FID: 'metric11',
+  FID_SAMPLE: 'metric12',
 };
 
 

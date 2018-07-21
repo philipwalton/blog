@@ -6,7 +6,6 @@ import 'autotrack/lib/plugins/media-query-tracker';
 import 'autotrack/lib/plugins/outbound-link-tracker';
 import 'autotrack/lib/plugins/page-visibility-tracker';
 import 'autotrack/lib/plugins/url-change-tracker';
-import {getFirstConsistentlyInteractive} from 'tti-polyfill/src';
 import {breakpoints} from './breakpoints';
 
 
@@ -18,7 +17,7 @@ import {breakpoints} from './breakpoints';
  * implementation. This allows you to create a segment or view filter
  * that isolates only data captured with the most recent tracking changes.
  */
-const TRACKING_VERSION = '32';
+const TRACKING_VERSION = '33';
 
 
 /**
@@ -79,7 +78,11 @@ export const metrics = {
   WINDOW_LOAD_TIME: 'metric5',
   RESPONSE_END_TIME: 'metric6',
   PAGE_LOADS: 'metric7',
-  TTCI: 'metric8',
+  NT_SAMPLE: 'metric8',
+  FCP: 'metric8',
+  FCP_SAMPLE: 'metric9',
+  FID: 'metric10',
+  FID_SAMPLE: 'metric11',
 };
 
 
@@ -124,9 +127,9 @@ export const init = () => {
   trackCustomDimensions();
   trackDeviceMemory();
   requireAutotrackPlugins();
-  stopPreloadAbandonTracking();
-  trackTimeToFirstConsistentlyInteractive();
-  sendNavigationTimingMetrics();
+  trackFcp();
+  trackFid();
+  trackNavigationTimingMetrics();
 };
 
 
@@ -357,41 +360,44 @@ const requireAutotrackPlugins = () => {
 };
 
 
-const stopPreloadAbandonTracking = () => {
-  window.removeEventListener('unload', window.__trackAbandons);
+const trackFcp = () => {
+  if (window.PerformancePaintTiming) {
+    const reportFcpIfAvailable = (entriesList) => {
+      const fcpEntry = entriesList.getEntriesByName(
+          'first-contentful-paint', 'paint')[0];
+
+      if (fcpEntry) {
+        gaTest('send', 'event', {
+          eventCategory: 'PW Metrics',
+          eventAction: 'track',
+          eventLabel: 'FCP',
+          nonInteraction: true,
+          [metrics.FCP]: Math.round(fcpEntry.startTime),
+          [metrics.FCP_SAMPLE]: 1,
+        });
+      } else {
+        new PerformanceObserver((list, observer) => {
+          observer.disconnect();
+          reportFcpIfAvailable(list);
+        }).observe({entryTypes: ['paint']});
+      }
+    };
+    reportFcpIfAvailable(window.performance);
+  }
 };
 
 
-const trackTimeToFirstConsistentlyInteractive = async () => {
-  const postLoadAbandonTracking = () => {
-    gaTest('send', 'event', 'Load', 'abandon', {
-      eventCategory: 'Load',
-      eventAction: 'abandon',
-      eventLabel: 'post-load',
-      eventValue: Math.round(performance.now()),
+const trackFid = () => {
+  window.perfMetrics.onFirstInputDelay((delay, evt) => {
+    gaTest('send', 'event', {
+      eventCategory: 'PW Metrics',
+      eventAction: 'track',
+      eventLabel: 'FID',
       nonInteraction: true,
+      [metrics.FID]: Math.round(delay),
+      [metrics.FID_SAMPLE]: 1,
     });
-  };
-  window.addEventListener('unload', postLoadAbandonTracking);
-
-  try {
-    const ttci = await getFirstConsistentlyInteractive();
-
-    if (ttci > 0) {
-      gaTest('send', 'event', {
-        eventCategory: 'PW Metrics',
-        eventAction: 'track',
-        eventLabel: NULL_VALUE,
-        eventValue: 1, // Number of metrics track with event.
-        nonInteraction: true,
-        [metrics.TTCI]: Math.round(ttci),
-      });
-    }
-  } catch (err) {
-    trackError(err);
-  }
-
-  window.removeEventListener('unload', postLoadAbandonTracking);
+  });
 };
 
 
@@ -399,13 +405,13 @@ const trackTimeToFirstConsistentlyInteractive = async () => {
  * Gets the DOM and window load times and sends them as custom metrics to
  * Google Analytics via an event hit.
  */
-const sendNavigationTimingMetrics = () => {
+const trackNavigationTimingMetrics = () => {
   // Only track performance in supporting browsers.
   if (!(window.performance && window.performance.timing)) return;
 
   // If the window hasn't loaded, run this function after the `load` event.
   if (document.readyState != 'complete') {
-    window.addEventListener('load', sendNavigationTimingMetrics);
+    window.addEventListener('load', trackNavigationTimingMetrics);
     return;
   }
 
@@ -428,6 +434,7 @@ const sendNavigationTimingMetrics = () => {
       eventAction: 'track',
       eventLabel: NULL_VALUE,
       nonInteraction: true,
+      [metrics.NT_SAMPLE]: 1,
       [metrics.RESPONSE_END_TIME]: responseEnd,
       [metrics.DOM_LOAD_TIME]: domLoaded,
       [metrics.WINDOW_LOAD_TIME]: windowLoaded,

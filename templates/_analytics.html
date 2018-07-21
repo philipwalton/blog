@@ -2,26 +2,5 @@
 <script async src="https://www.google-analytics.com/analytics.js"></script>
 
 <script>
-!function(){if('PerformanceLongTaskTiming' in window){var g=window.__tti={e:[]};
-g.o=new PerformanceObserver(function(l){g.e=g.e.concat(l.getEntries())});
-g.o.observe({entryTypes:['longtask']})}}();
-</script>
-
-<script>
-window.__trackAbandons = function() {
-  var ANALYTICS_URL = 'https://www.google-analytics.com/collect';
-  var GA_COOKIE = document.cookie.replace(
-    /(?:(?:^|.*;)\s*_ga\s*\=\s*(?:\w+\.\d\.)([^;]*).*$)|^.*$/, '$1');
-  var TRACKING_ID = 'UA-21292978-3';
-  var CLIENT_ID =  GA_COOKIE || (Math.random() * Math.pow(2, 52));
-
-  navigator.sendBeacon && navigator.sendBeacon(ANALYTICS_URL, [
-    'v=1', 't=event', 'ec=Load', 'ea=abandon', 'el=pre-load', 'ni=1',
-    'tid=' + TRACKING_ID,
-    'cid=' + CLIENT_ID,
-    'cd7' + CLIENT_ID, // client ID custom dimension
-    'ev=' + Math.round(performance.now()),
-  ].join('&'));
-};
-window.addEventListener('unload', window.__trackAbandons);
+(function(){function f(a){["click","mousedown","keydown","touchstart","pointerdown"].map(function(b){a(b,m,d)})}function g(){var a;if(c)for(;a=e.pop();)a(h,c)}function n(a,b){function e(){c||(h=a,c=b,f(removeEventListener),g());k()}function l(){k()}function k(){removeEventListener("pointerup",e,d);removeEventListener("pointercancel",l,d)}addEventListener("pointerup",e,d);addEventListener("pointercancel",l,d)}function m(a){if(a.cancelable){var b=a.timeStamp;b=Math.max((1E12<b?+new Date:performance.now())-b,0);"pointerdown"==a.type?n(b,a):c||(h=b,c=a,f(removeEventListener),g())}}var d={passive:!0,capture:!0},h,c,e=[];f(addEventListener);self.perfMetrics=self.perfMetrics||{};self.perfMetrics.onFirstInputDelay=function(a){e.push(a);g()}})();
 </script>

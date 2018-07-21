@@ -63,7 +63,6 @@
     "selenium-server-standalone-jar": "^3.9.1",
     "source-map": "^0.7.2",
     "sw-helpers": "philipwalton/sw-helpers",
-    "tti-polyfill": "0.2.2",
     "uglify-es": "^3.3.10",
     "uglifyjs-webpack-plugin": "^1.2.2",
     "wdio-mocha-framework": "^0.5.12",

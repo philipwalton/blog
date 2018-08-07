@@ -17,7 +17,7 @@ import {breakpoints} from './breakpoints';
  * implementation. This allows you to create a segment or view filter
  * that isolates only data captured with the most recent tracking changes.
  */
-const TRACKING_VERSION = '34';
+const TRACKING_VERSION = '35';
 
 
 /**
@@ -361,6 +361,14 @@ const requireAutotrackPlugins = () => {
 
 
 const trackFcp = () => {
+  let wasEverHidden = document.visibilityState === 'hidden';
+  addEventListener('visibilitychange', function f() {
+    if (document.visibilityState === 'hidden') {
+      wasEverHidden = true;
+      removeEventListener('visibilitychange', f, true);
+    }
+  }, true);
+
   if (window.PerformancePaintTiming) {
     const reportFcpIfAvailable = (entriesList) => {
       const fcpEntry = entriesList.getEntriesByName(
@@ -369,8 +377,8 @@ const trackFcp = () => {
       if (fcpEntry) {
         gaTest('send', 'event', {
           eventCategory: 'PW Metrics',
-          eventAction: 'track',
-          eventLabel: 'FCP',
+          eventAction: 'FCP',
+          eventLabel: wasEverHidden ? 'hidden' : 'visible',
           nonInteraction: true,
           [metrics.FCP]: Math.round(fcpEntry.startTime),
           [metrics.FCP_SAMPLE]: 1,
@@ -391,8 +399,8 @@ const trackFid = () => {
   window.perfMetrics.onFirstInputDelay((delay, evt) => {
     gaTest('send', 'event', {
       eventCategory: 'PW Metrics',
-      eventAction: 'track',
-      eventLabel: 'FID',
+      eventAction: 'FID',
+      eventLabel: evt.type,
       nonInteraction: true,
       [metrics.FID]: Math.round(delay),
       [metrics.FID_SAMPLE]: 1,

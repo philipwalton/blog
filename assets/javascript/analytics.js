@@ -17,7 +17,7 @@ import {breakpoints} from './breakpoints';
  * implementation. This allows you to create a segment or view filter
  * that isolates only data captured with the most recent tracking changes.
  */
-const TRACKING_VERSION = '35';
+const TRACKING_VERSION = '36';
 
 
 /**
@@ -401,6 +401,7 @@ const trackFid = () => {
       eventCategory: 'PW Metrics',
       eventAction: 'FID',
       eventLabel: evt.type,
+      [dimensions.METRIC_VALUE]: evt.timeStamp,
       nonInteraction: true,
       [metrics.FID]: Math.round(delay),
       [metrics.FID_SAMPLE]: 1,

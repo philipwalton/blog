@@ -17,7 +17,7 @@ import {breakpoints} from './breakpoints';
  * implementation. This allows you to create a segment or view filter
  * that isolates only data captured with the most recent tracking changes.
  */
-const TRACKING_VERSION = '36';
+const TRACKING_VERSION = '37';
 
 
 /**
@@ -63,7 +63,9 @@ export const dimensions = {
   HIT_ID: 'dimension14',
   HIT_TIME: 'dimension15',
   TRACKING_VERSION: 'dimension16',
-  DEVICE_MEMORY: 'dimension17',
+  TIME_ORIGIN: 'dimension17',
+  PAGE_TIME: 'dimension18',
+  QUEUE_TIME: 'dimension19',
 };
 
 
@@ -125,7 +127,6 @@ export const init = () => {
   createTrackers();
   trackErrors();
   trackCustomDimensions();
-  trackDeviceMemory();
   requireAutotrackPlugins();
   trackFcp();
   trackFid();
@@ -254,6 +255,10 @@ const trackCustomDimensions = () => {
       [dimensions.WINDOW_ID]: uuid(),
       [dimensions.SERVICE_WORKER_STATUS]: getServiceWorkerStatus(),
     });
+
+    if (window.performance && window.performance.timeOrigin) {
+      tracker.set(dimensions.TIME_ORIGIN, window.performance.timeOrigin);
+    }
   });
 
   // Adds tracking to record each the type, time, uuid, and visibility state
@@ -269,6 +274,14 @@ const trackCustomDimensions = () => {
       const qt = model.get('queueTime') || 0;
       model.set(dimensions.HIT_TIME, String(new Date - qt), true);
 
+      if (qt) {
+        model.set(dimensions.QUEUE_TIME, qt, true);
+      }
+
+      if (window.performance && window.performance.now) {
+        model.set(dimensions.PAGE_TIME, window.performance.now(), true);
+      }
+
       const networkStatus = navigator.onLine ? 'online' : 'offline';
       model.set(dimensions.NETWORK_STATUS, networkStatus, true);
 
@@ -281,16 +294,6 @@ const trackCustomDimensions = () => {
       originalBuildHitTask(model);
     });
   });
-};
-
-
-/**
- * Sets the device memory dimension if supported.
- */
-const trackDeviceMemory = () => {
-  if (navigator.deviceMemory) {
-    gaTest('set', dimensions.DEVICE_MEMORY, navigator.deviceMemory);
-  }
 };
 
 

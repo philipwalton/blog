@@ -33,16 +33,14 @@ If you're already using [`babel-preset-env`](https://github.com/babel/babel-pres
 
 In other words, it will output ES2015+ code instead of ES5.
 
-For example, if you're using webpack and your main script entry point is `./path/to/main.js`, then the config for your current, ES5 version might look like this (note, I'm calling this bundle `main-legacy` since it's ES5):
+For example, if you're using webpack and your main script entry point is `./path/to/main.mjs`, then the config for your current, ES5 version might look like this (note, I'm calling this bundle `main.es5.js` since it's ES5):
 
 
 ```js
 module.exports = {
-  entry: {
-    **'main-legacy'**: './path/to/main.js',
-  },
+  entry: './path/to/main.mjs',
   output: {
-    filename: '[name].js',
+    filename: **'main.es5.js'**,
     path: path.resolve(__dirname, 'public'),
   },
   module: {
@@ -71,15 +69,13 @@ module.exports = {
 };
 ```
 
-To make a modern, ES2015+ version, all you have to do is make second config and set your target environment to only include browsers that support `<script type="module">`. It might look like this:
+To make a modern, ES2015+ version, all you have to do is make second config and set your target environment to only include browsers that support `<script type="module">`. It might look like this (note, here's I'm using the `.mjs` extension since it's a module):
 
 ```js
 module.exports = {
-  entry: {
-    **'main'**: './path/to/main.js',
-  },
+  entry: './path/to/main.mjs',
   output: {
-    filename: '[name].js',
+    filename: **'main.mjs'**,
     path: path.resolve(__dirname, 'public'),
   },
   module: {
@@ -112,19 +108,19 @@ module.exports = {
 
 When run, these two configs will output two, production-ready JavaScript files:
 
-* `main.js` (the syntax will be ES2015+)
-* `main-legacy.js` (the syntax will be ES5)
+* `main.mjs` (the syntax will be ES2015+)
+* `main.es5.js` (the syntax will be ES5)
 
 The next step is to update your HTML to conditionally load the ES2015+ bundle in browsers that support modules. You can do this with a combination of `<script type="module">` and `<script nomodule>`:
 
 
 ```html
 <!-- Browsers with ES module support load this file. -->
-<script type="module" src="main.js"></script>
+<script type="module" src="main.mjs"></script>
 
 <!-- Older browsers load this file (and module-supporting -->
 <!-- browsers know *not* to load this file). -->
-<script nomodule src="main-legacy.js"></script>
+<script nomodule src="main.es5.js"></script>
 ```
 
 <aside class="Info">
@@ -166,12 +162,12 @@ In my opinion, definitely! The savings can be substantial. For example, here's a
    <th><strong>Size (minified + gzipped)</strong></th>
   </tr>
   <tr>
-   <td>ES2015+ (main.js)</td>
+   <td>ES2015+ (main.mjs)</td>
    <td>80K</td>
    <td><strong>21K</strong></td>
   </tr>
   <tr>
-   <td>ES5 (main-legacy.js)</td>
+   <td>ES5 (main.es5.js)</td>
    <td>175K</td>
    <td><strong>43K</strong></td>
   </tr>
@@ -188,12 +184,12 @@ Larger files take longer to download, but they also take longer to parse and eva
    <th><strong>Parse/eval time (avg)</strong></th>
   </tr>
   <tr>
-   <td>ES2015+ (main.js)</td>
+   <td>ES2015+ (main.mjs)</td>
    <td>184ms, 164ms, 166ms</td>
    <td><strong>172ms</strong></td>
   </tr>
   <tr>
-   <td>ES5 (main-legacy.js)</td>
+   <td>ES5 (main.es5.js)</td>
    <td>389ms, 351ms, 360ms</td>
    <td><strong>367ms</strong></td>
   </tr>

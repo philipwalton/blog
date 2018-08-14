@@ -69,7 +69,7 @@ module.exports = {
 };
 ```
 
-To make a modern, ES2015+ version, all you have to do is make second config and set your target environment to only include browsers that support `<script type="module">`. It might look like this (note, here's I'm using the `.mjs` extension since it's a module):
+To make a modern, ES2015+ version, all you have to do is make second config and set your target environment to only include browsers that support `<script type="module">`. It might look like this (note, here I'm using the `.mjs` extension since it's a module):
 
 ```js
 module.exports = {

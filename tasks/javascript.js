@@ -2,68 +2,63 @@
 
 const gulp = require('gulp');
 const md5 = require('md5');
-const NameAllModulesPlugin = require('name-all-modules-plugin');
+// const NameAllModulesPlugin = require('name-all-modules-plugin');
 const path = require('path');
-const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
+const TerserPlugin = require('terser-webpack-plugin');
 const webpack = require('webpack');
 const ManifestPlugin = require('webpack-manifest-plugin');
 const {addAsset, getManifest, getRevisionedAssetUrl} =
     require('./utils/assets');
 const config = require('../config.json');
 
+
 const buildCache = {};
 
-const assetCachingPlugins = ({defines, runtimeName}) => {
-  const plugins = [
-    new webpack.DefinePlugin(Object.assign({
-      'process.env.NODE_ENV':
-          JSON.stringify(process.env.NODE_ENV || 'development'),
-    }, defines)),
-
+const initPlugins = () => {
+  return [
     // Give modules a deterministic name for better long-term caching:
     // https://github.com/webpack/webpack.js.org/issues/652#issuecomment-273023082
-    new webpack.NamedModulesPlugin(),
+    // TODO(philipwalton): determine if needed anymore.
+    // new webpack.NamedModulesPlugin(),
 
     // Give dynamically `import()`-ed scripts a deterministic name for better
     // long-term caching. Solution adapted from:
     // https://medium.com/webpack/predictable-long-term-caching-with-webpack-d3eee1d3fa31
-    new webpack.NamedChunksPlugin((chunk) => chunk.name ? chunk.name :
-        md5(chunk.mapModules((m) => m.identifier()).join()).slice(0, 10)),
-
-    // Extract runtime code so updates don't affect app-code caching:
-    // https://webpack.js.org/guides/caching/
-    new webpack.optimize.CommonsChunkPlugin({
-      name: runtimeName || 'runtime',
+    new webpack.NamedChunksPlugin((chunk) => {
+      const hashChunk = () => {
+        return md5(Array.from(chunk.modulesIterable, (m) => {
+          return m.identifier();
+        }).join()).slice(0, 10);
+      }
+      return chunk.name ? chunk.name : hashChunk()
     }),
 
     // Give deterministic names to all webpacks non-"normal" modules
     // https://medium.com/webpack/predictable-long-term-caching-with-webpack-d3eee1d3fa31
-    new NameAllModulesPlugin(),
+    // TODO(philipwalton): determine if needed anymore.
+    // new NameAllModulesPlugin(),
 
     new ManifestPlugin({
       seed: getManifest(),
       fileName: config.manifestFileName,
-      reduce: (oldManifest, {name, path}) => {
-        addAsset(name, path);
-        return getManifest();
+      generate: (seed, files) => {
+        return files.reduce((manifest, opts) => {
+          // Needed until this issue is resolved:
+          // https://github.com/danethurber/webpack-manifest-plugin/issues/159
+          const unhashedName = path.basename(opts.path)
+              .replace(/[_\.\-][0-9a-f]{10}/, '')
+
+          addAsset(unhashedName, opts.path);
+          return getManifest();
+        }, seed);
       },
     }),
+
+    new webpack.DefinePlugin({
+      'process.env.NODE_ENV':
+          JSON.stringify(process.env.NODE_ENV || 'development'),
+    }),
   ];
-
-  if (process.env.NODE_ENV == 'production') {
-    plugins.push(new UglifyJSPlugin({
-      sourceMap: true,
-      uglifyOptions: {
-        mangle: {
-          // Solves this Safari 10 issue:
-          // https://github.com/mishoo/UglifyJS2/issues/1753
-          safari10: true,
-        },
-      },
-    }));
-  }
-
-  return plugins;
 };
 
 const generateBabelEnvLoader = (browserlist) => {
@@ -88,20 +83,34 @@ const generateBabelEnvLoader = (browserlist) => {
   };
 };
 
-const getMainConfig = () => ({
-  entry: {
-    'main': './assets/javascript/main.js',
-  },
+const baseConfig = () => ({
+  mode: process.env.NODE_ENV || 'development',
   output: {
     path: path.resolve(__dirname, '..', config.publicStaticDir),
     publicPath: '/',
     filename: '[name]-[chunkhash:10].js',
   },
-  cache: buildCache,
+  optimization: {
+    runtimeChunk: 'single',
+    minimizer: [new TerserPlugin({
+      sourceMap: true,
+      terserOptions: {
+        mangle: {
+          properties: /(^_|_$)/,
+        },
+        safari10: true,
+      },
+    })],
+  },
+  plugins: initPlugins(),
   devtool: '#source-map',
-  plugins: assetCachingPlugins({
-    runtimeName: 'runtime',
-  }),
+  cache: buildCache,
+});
+
+const getMainConfig = () => Object.assign(baseConfig(), {
+  entry: {
+    'main': './assets/javascript/main.js',
+  },
   module: {
     rules: [
       generateBabelEnvLoader([
@@ -117,20 +126,10 @@ const getMainConfig = () => ({
   },
 });
 
-const getLegacyConfig = () => ({
+const getLegacyConfig = () => Object.assign(baseConfig(), {
   entry: {
     'main-legacy': './assets/javascript/main-legacy.js',
   },
-  output: {
-    path: path.resolve(__dirname, '..', config.publicStaticDir),
-    publicPath: '/',
-    filename: '[name]-[chunkhash:10].js',
-  },
-  cache: buildCache,
-  devtool: '#source-map',
-  plugins: assetCachingPlugins({
-    runtimeName: 'runtime-legacy',
-  }),
   module: {
     rules: [
       generateBabelEnvLoader([
@@ -141,6 +140,7 @@ const getLegacyConfig = () => ({
 });
 
 const getSwConfig = () => ({
+  mode: process.env.NODE_ENV || 'development',
   entry: {
     'sw': './assets/sw.js',
   },
@@ -156,7 +156,6 @@ const getSwConfig = () => ({
       MAIN_JS_URL: JSON.stringify(getRevisionedAssetUrl('main.js')),
       MAIN_RUNTIME_URL: JSON.stringify(getRevisionedAssetUrl('runtime.js')),
     }),
-    new UglifyJSPlugin({sourceMap: true}),
   ],
   module: {
     rules: [
@@ -168,6 +167,18 @@ const getSwConfig = () => ({
         'last 2 Safari versions', 'not Safari < 11.1',
       ]),
     ],
+  },
+  optimization: {
+    runtimeChunk: 'single',
+    minimizer: [new TerserPlugin({
+      sourceMap: true,
+      terserOptions: {
+        mangle: {
+          properties: /(^_|_$)/,
+        },
+        safari10: true,
+      },
+    })],
   },
 });
 
@@ -183,7 +194,6 @@ const createCompiler = (config) => {
     });
   };
 };
-
 
 gulp.task('javascript', async () => {
   try {

@@ -7,7 +7,7 @@ const selenium = require('./utils/selenium');
 require('./build.js');
 
 gulp.task('test', gulp.series(
-    gulp.parallel('build', () => {
+    gulp.series('build', () => {
       return Promise.all([
         server.start({verbose: false}),
         selenium.start({verbose: false}),

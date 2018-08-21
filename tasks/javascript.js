@@ -70,7 +70,7 @@ const generateBabelEnvLoader = (browserlist) => {
         babelrc: false,
         presets: [
           ['env', {
-            debug: true,
+            // debug: true,
             modules: false,
             useBuiltIns: true,
             targets: {
@@ -85,18 +85,16 @@ const generateBabelEnvLoader = (browserlist) => {
 
 const baseConfig = () => ({
   mode: process.env.NODE_ENV || 'development',
-  output: {
-    path: path.resolve(__dirname, '..', config.publicStaticDir),
-    publicPath: '/',
-    filename: '[name]-[chunkhash:10].js',
-  },
   optimization: {
     runtimeChunk: 'single',
     minimizer: [new TerserPlugin({
+      test: /\.m?js$/,
       sourceMap: true,
       terserOptions: {
         mangle: {
-          properties: /(^_|_$)/,
+          properties: {
+            regex: /(^_|_$)/,
+          }
         },
         safari10: true,
       },
@@ -110,6 +108,11 @@ const baseConfig = () => ({
 const getMainConfig = () => Object.assign(baseConfig(), {
   entry: {
     'main': './assets/javascript/main.js',
+  },
+  output: {
+    path: path.resolve(__dirname, '..', config.publicStaticDir),
+    publicPath: '/',
+    filename: '[name]-[chunkhash:10].js',
   },
   module: {
     rules: [
@@ -128,7 +131,12 @@ const getMainConfig = () => Object.assign(baseConfig(), {
 
 const getLegacyConfig = () => Object.assign(baseConfig(), {
   entry: {
-    'main-legacy': './assets/javascript/main-legacy.js',
+    'main': './assets/javascript/main-legacy.js',
+  },
+  output: {
+    path: path.resolve(__dirname, '..', config.publicStaticDir),
+    publicPath: '/',
+    filename: '[name]-[chunkhash:10].es5.js',
   },
   module: {
     rules: [
@@ -169,14 +177,14 @@ const getSwConfig = () => ({
     ],
   },
   optimization: {
-    runtimeChunk: 'single',
     minimizer: [new TerserPlugin({
       sourceMap: true,
       terserOptions: {
         mangle: {
-          properties: /(^_|_$)/,
+          properties: {
+            regex: /(^_|_$)/,
+          }
         },
-        safari10: true,
       },
     })],
   },

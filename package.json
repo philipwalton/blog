@@ -11,11 +11,11 @@
   },
   "scripts": {
     "lint": "eslint --fix assets/**/*.js tasks/**/*.js test/**/*.js",
-    "build": "gulp build",
+    "build": "rm -rf build && gulp build",
     "start": "gulp watch",
     "deploy": "NODE_ENV=production gulp build && firebase deploy -P philipwalton-site",
     "stage": "NODE_ENV=production gulp build && firebase deploy -P philipwalton-staging",
-    "test": "gulp test"
+    "test": "rm -rf build && gulp test"
   },
   "license": "MIT",
   "bugs": {
@@ -23,7 +23,7 @@
   },
   "devDependencies": {
     "async-waituntil-polyfill": "^1.0.2",
-    "autotrack": "github:googleanalytics/autotrack#394e01ea224cca0a8c8b61cd2f8649d5d8c7a302",
+    "autotrack": "github:googleanalytics/autotrack#2f18a38",
     "babel-core": "^6.26.3",
     "babel-eslint": "^8.2.6",
     "babel-loader": "^7.1.5",
@@ -68,7 +68,7 @@
     "wdio-mocha-framework": "^0.6.2",
     "wdio-sauce-service": "^0.4.10",
     "webdriverio": "^4.13.2",
-    "webpack": "^4.16.5",
+    "webpack": "^4.17.0",
     "webpack-manifest-plugin": "^2.0.3",
     "whatwg-fetch": "^2.0.4"
   }

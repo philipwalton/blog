@@ -32,7 +32,7 @@ const getAsset = (filename) => {
   getManifest();
 
   if (!revisionedAssetManifest[filename]) {
-    throw new Error(`Revisioned file for '${filename}' doesn't exist`);
+    console.error(`Revisioned file for '${filename}' doesn't exist`);
   }
 
   return revisionedAssetManifest[filename];

@@ -1,5 +1,5 @@
 {% if ENV == 'production' or ENV == 'debug' %}
   {% include '_nomodule-shim.html' %}
-  <script defer nomodule src="{{ 'runtime-legacy.js' | revision }}"></script>
-  <script defer nomodule src="{{ 'main-legacy.js' | revision }}"></script>
+  <script defer nomodule src="{{ 'runtime.es5.js' | revision }}"></script>
+  <script defer nomodule src="{{ 'main.es5.js' | revision }}"></script>
 {% endif %}

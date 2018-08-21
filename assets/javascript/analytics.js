@@ -1,3 +1,5 @@
+import TrackerQueue from 'autotrack/lib/tracker-queue';
+import {rIC} from 'autotrack/lib/utilities';
 import 'autotrack/lib/plugins/clean-url-tracker';
 import 'autotrack/lib/plugins/event-tracker';
 import 'autotrack/lib/plugins/impression-tracker';
@@ -17,7 +19,7 @@ import {breakpoints} from './breakpoints';
  * implementation. This allows you to create a segment or view filter
  * that isolates only data captured with the most recent tracking changes.
  */
-const TRACKING_VERSION = '37';
+const TRACKING_VERSION = '38';
 
 
 /**
@@ -88,6 +90,18 @@ export const metrics = {
 };
 
 
+const whenWindowLoaded = new Promise((resolve) => {
+  if (document.readyState === 'complete') {
+    resolve();
+  } else {
+    addEventListener('load', function f() {
+      resolve();
+      removeEventListener('load', f);
+    });
+  }
+});
+
+
 /**
  * Creates a ga() proxy function that calls commands on all passed trackers.
  * @param {!Array} trackers an array or objects containing the `name` and
@@ -96,14 +110,21 @@ export const metrics = {
  */
 const createGaProxy = (trackers) => {
   return (command, ...args) => {
-    for (let {name} of trackers) {
-      if (typeof command == 'function') {
-        ga(() => {
-          command(ga.getByName(name));
-        });
-      } else {
-        ga(`${name}.${command}`, ...args);
-      }
+    for (let {name, trackingId} of trackers) {
+      TrackerQueue.getOrCreate(trackingId).add(() => {
+        if (typeof command == 'function') {
+          ga(() => {
+            command(ga.getByName(name));
+          });
+        } else {
+          if (command == 'create') {
+            Object.assign(args[args.length - 1], {name, trackingId});
+            ga('create', ...args);
+          } else {
+            ga(`${name}.${command}`, ...args);
+          }
+        }
+      });
     }
   };
 };
@@ -121,16 +142,18 @@ export const gaTest = createGaProxy(TEST_TRACKERS);
  * values on the trackers.
  */
 export const init = () => {
-  // Initialize the command queue in case analytics.js hasn't loaded yet.
-  window.ga = window.ga || ((...args) => (ga.q = ga.q || []).push(args));
+  rIC(async () => {
+    // Initialize the command queue in case analytics.js hasn't loaded yet.
+    window.ga = window.ga || ((...args) => (ga.q = ga.q || []).push(args));
 
-  createTrackers();
-  trackErrors();
-  trackCustomDimensions();
-  requireAutotrackPlugins();
-  trackFcp();
-  trackFid();
-  trackNavigationTimingMetrics();
+    createTrackers();
+    trackErrors();
+    trackCustomDimensions();
+    requireAutotrackPlugins();
+    trackFcp();
+    trackFid();
+    trackNavigationTimingMetrics();
+  });
 };
 
 
@@ -139,11 +162,7 @@ export const init = () => {
  * version fields. In non-production environments it also logs hits.
  */
 const createTrackers = () => {
-  for (let tracker of ALL_TRACKERS) {
-    ga('create', tracker.trackingId, 'auto', tracker.name, {
-      siteSpeedSampleRate: 10,
-    });
-  }
+  gaAll('create', {cookieDomain: 'auto', siteSpeedSampleRate: 10});
 
   // Ensures all hits are sent via `navigator.sendBeacon()`.
   gaAll('set', 'transport', 'beacon');
@@ -315,7 +334,6 @@ const requireAutotrackPlugins = () => {
     },
   });
   gaAll('require', 'maxScrollTracker', {
-    sessionTimeout: 30,
     timeZone: 'America/Los_Angeles',
     maxScrollMetricIndex: getDefinitionIndex(metrics.MAX_SCROLL_PERCENTAGE),
   });
@@ -400,14 +418,17 @@ const trackFcp = () => {
 
 const trackFid = () => {
   window.perfMetrics.onFirstInputDelay((delay, evt) => {
+    const delayInMs = Math.round(delay);
+
     gaTest('send', 'event', {
       eventCategory: 'PW Metrics',
       eventAction: 'FID',
       eventLabel: evt.type,
-      [dimensions.METRIC_VALUE]: evt.timeStamp,
+      eventValue: delayInMs,
       nonInteraction: true,
-      [metrics.FID]: Math.round(delay),
+      [metrics.FID]: delayInMs,
       [metrics.FID_SAMPLE]: 1,
+      [dimensions.METRIC_VALUE]: evt.timeStamp,
     });
   });
 };
@@ -417,15 +438,11 @@ const trackFid = () => {
  * Gets the DOM and window load times and sends them as custom metrics to
  * Google Analytics via an event hit.
  */
-const trackNavigationTimingMetrics = () => {
+const trackNavigationTimingMetrics = async () => {
   // Only track performance in supporting browsers.
   if (!(window.performance && window.performance.timing)) return;
 
-  // If the window hasn't loaded, run this function after the `load` event.
-  if (document.readyState != 'complete') {
-    window.addEventListener('load', trackNavigationTimingMetrics);
-    return;
-  }
+  await whenWindowLoaded;
 
   const nt = performance.timing;
   const navStart = nt.navigationStart;

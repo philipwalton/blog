@@ -51,13 +51,14 @@ export default class History2 {
 
     await this._onChange(nextState);
 
+    if (title) {
+      document.title = title;
+    }
+
     // Popstate triggered navigation is already handled by the browser,
     // so we only add to the history in non-popstate cases.
     if (!isPopState) {
       history.pushState(nextState, title, url);
-    }
-    if (title) {
-      document.title = title;
     }
   }
 }

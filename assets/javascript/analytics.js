@@ -19,7 +19,7 @@ import {breakpoints} from './breakpoints';
  * implementation. This allows you to create a segment or view filter
  * that isolates only data captured with the most recent tracking changes.
  */
-const TRACKING_VERSION = '38';
+const TRACKING_VERSION = '39';
 
 
 /**
@@ -170,12 +170,12 @@ const createTrackers = () => {
   // Log hits in non-production environments.
   if (process.env.NODE_ENV != 'production') {
     gaAll('set', 'sendHitTask', function(model) {
-      let paramsToIgnore = ['v', 'did', 't', 'tid', 'ec', 'ea', 'el', 'ev',
+      const paramsToIgnore = ['v', 'did', 't', 'tid', 'ec', 'ea', 'el', 'ev',
           'a', 'z', 'ul', 'de', 'sd', 'sr', 'vp', 'je', 'fl', 'jid'];
 
-      let hitType = model.get('&t');
-      let hitPayload = model.get('hitPayload');
-      let hit = hitPayload
+      const hitType = model.get('&t');
+      const hitPayload = model.get('hitPayload');
+      const hit = hitPayload
           .split('&')
           .map(decodeURIComponent)
           .filter((item) => {
@@ -184,15 +184,12 @@ const createTrackers = () => {
                 paramsToIgnore.indexOf(param) > -1);
           });
 
-      let parts = [model.get('&tid'), hitType];
+      const parts = [model.get('&tid'), hitType];
       if (hitType == 'event') {
-        parts = [
-          ...parts,
-          model.get('&ec'),
-          model.get('&ea'),
-          model.get('&el'),
-        ];
-        if (model.get('&ev')) parts.push(model.get('&ev'));
+        parts.push(model.get('&ec'), model.get('&ea'), model.get('&el'));
+        if (model.get('&ev')) {
+          parts.push(model.get('&ev'));
+        }
       }
 
       // eslint-disable-next-line no-console

@@ -180,11 +180,14 @@ const getSwConfig = () => ({
     minimizer: [new TerserPlugin({
       sourceMap: true,
       terserOptions: {
-        mangle: {
-          properties: {
-            regex: /(^_|_$)/,
-          }
-        },
+        // TODO(philipwalton): mangling properties in the service worker
+        // breaks dependencies for somme reason.
+        // mangle: {
+        //   properties: {
+        //     regex: /(^_|_$)/,
+        //   }
+        // },
+        mangle: true,
       },
     })],
   },

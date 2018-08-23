@@ -7,6 +7,9 @@ node_modules
 # Static site output
 build
 
+# Firebase files
+.firebase
+
 # Log files
 *.log
 

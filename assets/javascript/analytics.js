@@ -19,7 +19,7 @@ import {breakpoints} from './breakpoints';
  * implementation. This allows you to create a segment or view filter
  * that isolates only data captured with the most recent tracking changes.
  */
-const TRACKING_VERSION = '40';
+const TRACKING_VERSION = '41';
 
 
 /**
@@ -281,11 +281,16 @@ const trackCustomDimensions = () => {
   // of each hit immediately before it's sent.
   gaTest((tracker) => {
     const originalBuildHitTask = tracker.get('buildHitTask');
+    const queue = TrackerQueue.getOrCreate(tracker.get('trackingId'));
+
     tracker.set('buildHitTask', (model) => {
       const hitType = model.get('hitType');
       model.set(dimensions.HIT_ID, uuid(), true);
       model.set(dimensions.HIT_TYPE, hitType, true);
-      model.set(dimensions.VISIBILITY_STATE, document.visibilityState, true);
+
+      // Use the visibilityState at task queue time if available.
+      const visibilityState = (queue.getState() || document).visibilityState;
+      model.set(dimensions.VISIBILITY_STATE, visibilityState, true);
 
       const qt = model.get('queueTime') || 0;
       model.set(dimensions.HIT_TIME, String(new Date - qt), true);

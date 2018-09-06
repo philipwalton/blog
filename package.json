@@ -23,7 +23,7 @@
   },
   "devDependencies": {
     "async-waituntil-polyfill": "^1.0.2",
-    "autotrack": "github:googleanalytics/autotrack#e738bcc",
+    "autotrack": "github:googleanalytics/autotrack#863acbb",
     "babel-core": "^6.26.3",
     "babel-eslint": "^8.2.6",
     "babel-loader": "^7.1.5",

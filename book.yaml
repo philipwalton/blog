@@ -138,6 +138,8 @@ articles:
 - title: "How We Track Pageviews Is All Wrong"
   path: /articles/how-we-track-pageviews-is-all-wrong/
   date: 2017-04-11T10:46:25-07:00
+  translations:
+    русский: http://softdroid.net/kak-my-otslezhivaem-prosmotry-stranic
 - title: "Deploying ES2015+ Code in Production Today"
   path: /articles/deploying-es2015-code-in-production-today/
   date: 2017-09-13T12:23:12-07:00

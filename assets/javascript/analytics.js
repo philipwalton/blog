@@ -1,5 +1,5 @@
 import TrackerQueue from 'autotrack/lib/tracker-queue';
-import {rIC} from 'autotrack/lib/utilities';
+import {rIC} from 'idlize/idle-callback-polyfills.mjs';
 import 'autotrack/lib/plugins/clean-url-tracker';
 import 'autotrack/lib/plugins/event-tracker';
 import 'autotrack/lib/plugins/impression-tracker';
@@ -111,7 +111,7 @@ const whenWindowLoaded = new Promise((resolve) => {
 const createGaProxy = (trackers) => {
   return (command, ...args) => {
     for (let {name, trackingId} of trackers) {
-      TrackerQueue.getOrCreate(trackingId).add(() => {
+      TrackerQueue.getOrCreate(trackingId).pushTask(() => {
         if (typeof command == 'function') {
           ga(() => {
             command(ga.getByName(name));

@@ -23,7 +23,7 @@
   },
   "devDependencies": {
     "async-waituntil-polyfill": "^1.0.2",
-    "autotrack": "github:googleanalytics/autotrack#863acbb",
+    "autotrack": "github:googleanalytics/autotrack#703ee09",
     "babel-core": "^6.26.3",
     "babel-eslint": "^8.2.6",
     "babel-loader": "^7.1.5",
@@ -41,6 +41,7 @@
     "he": "~1.1.1",
     "highlight.js": "^9.12.0",
     "html-minifier": "^3.5.20",
+    "idlize": "^0.1.0",
     "imagemin": "^6.0.0",
     "imagemin-pngquant": "^6.0.0",
     "js-yaml": "^3.12.0",

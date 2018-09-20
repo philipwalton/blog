@@ -72,6 +72,10 @@ article sup a {
   text-decoration: none;
 }
 
+article strong a {
+  color: inherit;
+}
+
 code {
   background: var(--code-bg-color);
   border-radius: 2px;

@@ -156,3 +156,6 @@ articles:
   translations:
     русский: http://css-live.ru/javascript/otzyvchivye-komponenty-reshenie-problemy-vyrazhenij-ot-kontejnera.html
     Português: http://desenvolvimentoparaweb.com/css/responsive-components-container-queries/
+- title: "Idle Until Urgent"
+  path: /articles/idle-until-urgent/
+  date: 2018-09-20T00:25:36-07:00

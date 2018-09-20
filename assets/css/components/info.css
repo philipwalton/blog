@@ -1,5 +1,5 @@
 .Info {
-  background: hsla(120, 100%, 50%, .07);
+  background: hsla(120, 100%, 50%, .1);
   margin: var(--vgap) -var(--hgap);
   padding: var(--vgap) var(--hgap);
 }
@@ -22,4 +22,8 @@
     margin: var(--vgap-md) 0;
     padding: var(--vgap-md) var(--hgap-md);
   }
+}
+
+.Info--warning {
+  background: hsla(20, 100%, 50%, .15)
 }

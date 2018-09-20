@@ -357,7 +357,7 @@ queue.pushTask(() => {
 
 <aside class="Info">
 
-**Note:** breaking up your synchronous JavaScript code into separate tasks that can run asynchronously as part of a task queue is different from [code slitting](https://developers.google.com/web/fundamentals/performance/optimizing-javascript/code-splitting/), which is about breaking up large JavaScript bundles into smaller files (and is also important for improving performance).
+**Note:** breaking up your synchronous JavaScript code into separate tasks that can run asynchronously as part of a task queue is different from [code splitting](https://developers.google.com/web/fundamentals/performance/optimizing-javascript/code-splitting/), which is about breaking up large JavaScript bundles into smaller files (and is also important for improving performance).
 
 </aside>
 

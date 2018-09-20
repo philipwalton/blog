@@ -507,7 +507,7 @@ queue.pushTask(() => ga('create', 'UA-XXXXX-Y', 'auto'));
 queue.pushTask(() => ga('send', 'pageview'));
 ```
 
-(You could also just create a wrapper around the `ga()` function that automatically queues commands, which is what I did).
+(You could also just create a wrapper around the `ga()` function that automatically queues commands, which is [what I did](https://github.com/philipwalton/blog/blob/0670d46/assets/javascript/analytics.js#L114-L127)).
 
 ## Browser support for requestIdleCallback
 

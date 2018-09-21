@@ -63,7 +63,7 @@ const initPlugins = () => {
 
 const generateBabelEnvLoader = (browserlist) => {
   return {
-    test: /\.js$/,
+    test: /\.m?js$/,
     use: {
       loader: 'babel-loader',
       options: {
@@ -85,21 +85,6 @@ const generateBabelEnvLoader = (browserlist) => {
 
 const baseConfig = () => ({
   mode: process.env.NODE_ENV || 'development',
-  optimization: {
-    runtimeChunk: 'single',
-    minimizer: [new TerserPlugin({
-      test: /\.m?js$/,
-      sourceMap: true,
-      terserOptions: {
-        mangle: {
-          properties: {
-            regex: /(^_|_$)/,
-          }
-        },
-        safari10: true,
-      },
-    })],
-  },
   plugins: initPlugins(),
   devtool: '#source-map',
   cache: buildCache,
@@ -127,6 +112,21 @@ const getMainConfig = () => Object.assign(baseConfig(), {
       ]),
     ],
   },
+  optimization: {
+    runtimeChunk: 'single',
+    minimizer: [new TerserPlugin({
+      test: /\.m?js$/,
+      sourceMap: true,
+      terserOptions: {
+        mangle: {
+          properties: {
+            regex: /(^_|_$)/,
+          }
+        },
+        safari10: true,
+      },
+    })],
+  },
 });
 
 const getLegacyConfig = () => Object.assign(baseConfig(), {
@@ -144,6 +144,19 @@ const getLegacyConfig = () => Object.assign(baseConfig(), {
         'last 2 versions',
       ]),
     ],
+  },
+  optimization: {
+    runtimeChunk: 'single',
+    minimizer: [new TerserPlugin({
+      test: /\.m?js$/,
+      sourceMap: true,
+      terserOptions: {
+        // Don't mangle properties in legacy config
+        // because it breaks polyfills.
+        mangle: true,
+        safari10: true,
+      },
+    })],
   },
 });
 
@@ -181,7 +194,7 @@ const getSwConfig = () => ({
       sourceMap: true,
       terserOptions: {
         // TODO(philipwalton): mangling properties in the service worker
-        // breaks dependencies for somme reason.
+        // breaks dependencies for some reason.
         // mangle: {
         //   properties: {
         //     regex: /(^_|_$)/,

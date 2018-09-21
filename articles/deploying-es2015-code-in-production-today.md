@@ -121,9 +121,9 @@ The next step is to update your HTML to conditionally load the ES2015+ bundle in
 <script nomodule src="main.es5.js"></script>
 ```
 
-<aside class="Info">
+<aside class="Info" id="mjs-warnings">
 
-**Note:** I've updated the examples in this post to use the `.mjs` file extension for any file I load as a module. Since [this practice](https://developers.google.com/web/fundamentals/primers/modules#mjs) is relatively new, I'd be remiss if I didn't point out a few gotcha you might encounter when using it:
+**Note:** I've updated the examples in this article to use the `.mjs` file extension for any file I load as a module. Since [this practice](https://developers.google.com/web/fundamentals/primers/modules#mjs) is relatively new, I'd be remiss if I didn't point out a few gotcha you might encounter when using it:
 
 * Your web server needs to be configured to serve `.mjs` files with the `Content-Type` header `text/javascript`. If your browser is failing to load your `.mjs` files, that may be why.
 * If you're using Webpack and [babel-loader](https://github.com/babel/babel-loader) to bundle your JavaScript, you've likely copy/pasted [some configuration code](https://github.com/babel/babel-loader/blob/8f240b498bb24ef89f7b306f5ac806e84b813b0d/README.md#usage) that only transpiles `.js` files. Changing the regular expression in your config from `/\.js$/` to `/\.m?js$/` should fix your issue.

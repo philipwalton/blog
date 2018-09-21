@@ -69,8 +69,8 @@
     "wdio-mocha-framework": "^0.6.2",
     "wdio-sauce-service": "^0.4.10",
     "webdriverio": "^4.13.2",
-    "webpack": "^4.17.0",
-    "webpack-manifest-plugin": "^2.0.3",
+    "webpack": "^4.19.1",
+    "webpack-manifest-plugin": "^2.0.4",
     "whatwg-fetch": "^2.0.4"
   }
 }

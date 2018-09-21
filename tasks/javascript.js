@@ -2,7 +2,6 @@
 
 const gulp = require('gulp');
 const md5 = require('md5');
-// const NameAllModulesPlugin = require('name-all-modules-plugin');
 const path = require('path');
 const TerserPlugin = require('terser-webpack-plugin');
 const webpack = require('webpack');
@@ -16,28 +15,10 @@ const buildCache = {};
 
 const initPlugins = () => {
   return [
-    // Give modules a deterministic name for better long-term caching:
-    // https://github.com/webpack/webpack.js.org/issues/652#issuecomment-273023082
-    // TODO(philipwalton): determine if needed anymore.
-    // new webpack.NamedModulesPlugin(),
+    // Identify each module by a hash, so caching is more predictable.
+    new webpack.HashedModuleIdsPlugin(),
 
-    // Give dynamically `import()`-ed scripts a deterministic name for better
-    // long-term caching. Solution adapted from:
-    // https://medium.com/webpack/predictable-long-term-caching-with-webpack-d3eee1d3fa31
-    new webpack.NamedChunksPlugin((chunk) => {
-      const hashChunk = () => {
-        return md5(Array.from(chunk.modulesIterable, (m) => {
-          return m.identifier();
-        }).join()).slice(0, 10);
-      }
-      return chunk.name ? chunk.name : hashChunk()
-    }),
-
-    // Give deterministic names to all webpacks non-"normal" modules
-    // https://medium.com/webpack/predictable-long-term-caching-with-webpack-d3eee1d3fa31
-    // TODO(philipwalton): determine if needed anymore.
-    // new NameAllModulesPlugin(),
-
+    // Create manifest of the original filenames to their hashed filenames.
     new ManifestPlugin({
       seed: getManifest(),
       fileName: config.manifestFileName,
@@ -54,6 +35,7 @@ const initPlugins = () => {
       },
     }),
 
+    // Allows minifiers to removed dev-only code.
     new webpack.DefinePlugin({
       'process.env.NODE_ENV':
           JSON.stringify(process.env.NODE_ENV || 'development'),
@@ -97,7 +79,7 @@ const getMainConfig = () => Object.assign(baseConfig(), {
   output: {
     path: path.resolve(__dirname, '..', config.publicStaticDir),
     publicPath: '/',
-    filename: '[name]-[chunkhash:10].js',
+    filename: '[name]-[chunkhash:10].mjs',
   },
   module: {
     rules: [
@@ -174,8 +156,8 @@ const getSwConfig = () => ({
   plugins: [
     new webpack.DefinePlugin({
       MAIN_CSS_URL: JSON.stringify(getRevisionedAssetUrl('main.css')),
-      MAIN_JS_URL: JSON.stringify(getRevisionedAssetUrl('main.js')),
-      MAIN_RUNTIME_URL: JSON.stringify(getRevisionedAssetUrl('runtime.js')),
+      MAIN_JS_URL: JSON.stringify(getRevisionedAssetUrl('main.mjs')),
+      MAIN_RUNTIME_URL: JSON.stringify(getRevisionedAssetUrl('runtime.mjs')),
     }),
   ],
   module: {

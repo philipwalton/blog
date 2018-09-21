@@ -22,7 +22,6 @@ The only thing left to do is provide a fallback for browsers that don't support 
 
 The rest of this article explains how to implement this technique and discusses how the ability to ship ES2015+ code will change how we author modules going forward.
 
-
 ## Implementation
 
 If you're already using a module bundler like webpack or rollup to generate your JavaScript today, you should continue to do that.
@@ -35,7 +34,6 @@ In other words, it will output ES2015+ code instead of ES5.
 
 For example, if you're using webpack and your main script entry point is `./path/to/main.mjs`, then the config for your current, ES5 version might look like this (note, I'm calling this bundle `main.es5.js` since it's ES5):
 
-
 ```js
 module.exports = {
   entry: './path/to/main.mjs',
@@ -45,7 +43,7 @@ module.exports = {
   },
   module: {
     rules: [{
-      test: /\.js$/,
+      test: /\.m?js$/,
       use: {
         loader: 'babel-loader',
         options: {
@@ -80,7 +78,7 @@ module.exports = {
   },
   module: {
     rules: [{
-      test: /\.js$/,
+      test: /\.m?js$/,
       use: {
         loader: 'babel-loader',
         options: {
@@ -125,7 +123,11 @@ The next step is to update your HTML to conditionally load the ES2015+ bundle in
 
 <aside class="Info">
 
-**Warning!** The only gotcha here is Safari 10 doesn't support the `nomodule` attribute, but you can solve this by [inlining a JavaScript snippet](https://gist.github.com/samthor/64b114e4a4f539915a95b91ffd340acc) in your HTML prior to using any `<script nomodule>` tags. *(Note: this has been fixed in Safari 11).*
+**Note:** I've updated the examples in this post to use the `.mjs` file extension for any file I load as a module. Since [this practice](https://developers.google.com/web/fundamentals/primers/modules#mjs) is relatively new, I'd be remiss if I didn't point out a few gotcha you might encounter when using it:
+
+* Your web server needs to be configured to serve `.mjs` files with the `Content-Type` header `text/javascript`. If your browser is failing to load your `.mjs` files, that may be why.
+* If you're using Webpack and [babel-loader](https://github.com/babel/babel-loader) to bundle your JavaScript, you've likely copy/pasted [some configuration code](https://github.com/babel/babel-loader/blob/8f240b498bb24ef89f7b306f5ac806e84b813b0d/README.md#usage) that only transpiles `.js` files. Changing the regular expression in your config from `/\.js$/` to `/\.m?js$/` should fix your issue.
+* Older webpack versions [don't create a sourcemap](https://github.com/webpack/webpack/issues/7927) for `.mjs` files, but [since webpack 4.19.1](https://github.com/webpack/webpack/releases/tag/v4.19.1) this has been fixed.
 
 </aside>
 
@@ -136,6 +138,12 @@ For the most part, this technique "just works", but there are a few details abou
 1. Modules are loaded like [`<script defer>`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script#attr-defer), which means they aren't executed until after the document has been parsed. If some of your code needs to run before that, it's best to split that code out and load it separately.
 2. Modules always run code in [strict mode](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Strict_mode), so if for whatever reason any of your code needs to be run outside of strict mode, it'll have to be loaded separately.
 3. Modules treat top-level `var` and `function` declarations differently from scripts. For example, in a script `var foo = 'bar'` and `function foo() {…}` can be accessed from `window.foo`, but in a module this is not the case. Make sure you're not depending on this behavior in your code.
+
+<aside class="Info Info--warning">
+
+**Warning!** Safari 10 doesn't support the `nomodule` attribute, but you can solve this by [inlining a JavaScript snippet](https://gist.github.com/samthor/64b114e4a4f539915a95b91ffd340acc) in your HTML prior to using any `<script nomodule>` tags. *(Note: this has been fixed in Safari 11).*
+
+</aside>
 
 ## A working example
 
@@ -216,7 +224,7 @@ The problem is most developers that use Babel configure it to not transpile anyt
 ```js
 rules: [
   {
-    test: /\.js$/,
+    test: /\.m?js$/,
     **exclude: /node_modules/, // Remove this line**
     use: {
       loader: 'babel-loader',

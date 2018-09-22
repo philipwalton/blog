@@ -38,6 +38,11 @@ const cacheInitialAssets = async () => {
       MAIN_CSS_URL,
       MAIN_JS_URL,
       MAIN_RUNTIME_URL,
+
+      // Hard code here until switching to workbox.
+      VENDOR_AUTOTRACK_URL,
+      VENDOR_IDLIZE_URL,
+      VENDOR_DOM_UTILS_URL,
     ]),
   ]);
 };

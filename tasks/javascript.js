@@ -171,6 +171,14 @@ const getSwConfig = () => ({
       MAIN_CSS_URL: JSON.stringify(getRevisionedAssetUrl('main.css')),
       MAIN_JS_URL: JSON.stringify(getRevisionedAssetUrl('main.mjs')),
       MAIN_RUNTIME_URL: JSON.stringify(getRevisionedAssetUrl('runtime.mjs')),
+
+      // Hard code here until switching to workbox.
+      VENDOR_AUTOTRACK_URL: JSON.stringify(
+          getRevisionedAssetUrl('vendor.autotrack.mjs')),
+      VENDOR_IDLIZE_URL: JSON.stringify(
+          getRevisionedAssetUrl('vendor.idlize.mjs')),
+      VENDOR_DOM_UTILS_URL: JSON.stringify(
+          getRevisionedAssetUrl('vendor.dom-utils.mjs')),
     }),
   ],
   module: {

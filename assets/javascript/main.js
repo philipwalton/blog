@@ -1,5 +1,3 @@
-import 'babel-polyfill';
-
 import * as alerts from './alerts';
 import * as analytics from './analytics';
 import * as breakpoints from './breakpoints';

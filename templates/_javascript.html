@@ -1,2 +1,7 @@
-<script defer type="module" src="{{ 'runtime.mjs' | revision }}"></script>
-<script defer type="module" src="{{ 'main.mjs' | revision }}"></script>
+<script type="module" src="{{ 'runtime.mjs' | revision }}"></script>
+{% for module in site.assets.modules %}
+  {%- if r/vendor\./.test(module) -%}
+    <script type="module" src="{{ module | revision }}"></script>
+  {% endif %}
+{%- endfor -%}
+<script type="module" src="{{ 'main.mjs' | revision }}"></script>

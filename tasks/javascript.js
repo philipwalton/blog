@@ -43,7 +43,7 @@ const initPlugins = () => {
   ];
 };
 
-const generateBabelEnvLoader = (browserlist) => {
+const generateBabelEnvLoader = (targets) => {
   return {
     test: /\.m?js$/,
     use: {
@@ -51,13 +51,11 @@ const generateBabelEnvLoader = (browserlist) => {
       options: {
         babelrc: false,
         presets: [
-          ['env', {
+          ['@babel/env', {
             // debug: true,
             modules: false,
-            useBuiltIns: true,
-            targets: {
-              browsers: browserlist,
-            },
+            useBuiltIns: 'entry',
+            targets,
           }],
         ],
       },
@@ -81,21 +79,39 @@ const getMainConfig = () => Object.assign(baseConfig(), {
     publicPath: '/',
     filename: '[name]-[chunkhash:10].mjs',
   },
-  module: {
-    rules: [
-      generateBabelEnvLoader([
-        // The last two versions of each browser, excluding versions
-        // that don't support <script type="module">.
-        'last 2 Chrome versions', 'not Chrome < 60',
-        'last 2 Safari versions', 'not Safari < 10.1',
-        'last 2 iOS versions', 'not iOS < 10.3',
-        'last 2 Firefox versions', 'not Firefox < 54',
-        'last 2 Edge versions', 'not Edge < 15',
-      ]),
-    ],
-  },
+  // TODO: removing this for now, as it adds to many unnecessary
+  // polyfills, even with preset-env's `usage` options.
+  // module: {
+  //   rules: [
+  //     generateBabelEnvLoader({
+  //       browsers: [
+  //         // The last two versions of each browser, excluding versions
+  //         // that don't support <script type="module">.
+  //         'last 2 Chrome versions', 'not Chrome < 60',
+  //         'last 2 Safari versions', 'not Safari < 10.1',
+  //         'last 2 iOS versions', 'not iOS < 10.3',
+  //         'last 2 Firefox versions', 'not Firefox < 60',
+  //         'last 2 Edge versions', 'not Edge < 15',
+  //       ]
+  //     }),
+  //   ],
+  // },
   optimization: {
     runtimeChunk: 'single',
+    splitChunks: {
+      chunks: 'all',
+      maxInitialRequests: Infinity,
+      minSize: 0,
+      cacheGroups: {
+        vendor: {
+          test: /node_modules/,
+          name: (mod) => {
+            const pkgName = mod.context.match(/node_modules\/([^\/]+)/)[1];
+            return `vendor.${pkgName}`;
+          },
+        },
+      },
+    },
     minimizer: [new TerserPlugin({
       test: /\.m?js$/,
       sourceMap: true,
@@ -122,13 +138,10 @@ const getLegacyConfig = () => Object.assign(baseConfig(), {
   },
   module: {
     rules: [
-      generateBabelEnvLoader([
-        'last 2 versions',
-      ]),
+      generateBabelEnvLoader({browsers: ['last 2 versions']}),
     ],
   },
   optimization: {
-    runtimeChunk: 'single',
     minimizer: [new TerserPlugin({
       test: /\.m?js$/,
       sourceMap: true,
@@ -162,13 +175,15 @@ const getSwConfig = () => ({
   ],
   module: {
     rules: [
-      generateBabelEnvLoader([
-        // Browsers that support service worker.
-        'last 2 Chrome versions', 'not Chrome < 45',
-        'last 2 Firefox versions', 'not Firefox < 44',
-        'last 2 Edge versions', 'not Edge < 17',
-        'last 2 Safari versions', 'not Safari < 11.1',
-      ]),
+      generateBabelEnvLoader({
+        browsers: [
+          // Browsers that support service worker.
+          'last 2 Chrome versions', 'not Chrome < 45',
+          'last 2 Firefox versions', 'not Firefox < 44',
+          'last 2 Edge versions', 'not Edge < 17',
+          'last 2 Safari versions', 'not Safari < 11.1',
+        ],
+      }),
     ],
   },
   optimization: {
@@ -194,7 +209,11 @@ const createCompiler = (config) => {
     return new Promise((resolve, reject) => {
       compiler.run((err, stats) => {
         if (err) return reject(err);
-        console.log(stats.toString({colors: true}) + '\n');
+        console.log(stats.toString({
+          colors: true,
+          // Uncomment to see all bundled modules.
+          // maxModules: Infinity,
+        }));
         resolve();
       });
     });

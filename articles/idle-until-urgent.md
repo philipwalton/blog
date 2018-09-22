@@ -447,7 +447,7 @@ While using a debounce technique is definitely better than nothing, it's not a p
 It's much better to schedule the localStorage write for an idle time. You can convert the above code from a debounce strategy to an _idle-until-urgent_ strategy as follows:
 
 ```js
-const queue = new IdleQueue();
+const queue = new IdleQueue({ensureTasksRun: true});
 
 // Persist state changes when the browser is idle, and
 // only persist the most recent changes to avoid extra work.
@@ -471,7 +471,7 @@ And note that this strategy is definitely better than using debounce because it 
 Another perfect use case for _idle-until-urgent_ is analytics code. Here's an example of how you can use the `IdleQueue` class to schedule sending your analytics data in a way that ensures it _will be sent_ even if the user closes the tab or navigates away before the next idle period.
 
 ```js
-const queue = new IdleQueue();
+const queue = new IdleQueue({ensureTasksRun: true});
 
 const signupBtn = document.getElementById('signup');
 signupBtn.addEventListener('click', () => {
@@ -501,7 +501,7 @@ ga('send', 'pageview');
 Into this:
 
 ```js
-const queue = new IdleQueue();
+const queue = new IdleQueue({ensureTasksRun: true});
 
 queue.pushTask(() => ga('create', 'UA-XXXXX-Y', 'auto'));
 queue.pushTask(() => ga('send', 'pageview'));

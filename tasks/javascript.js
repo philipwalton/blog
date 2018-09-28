@@ -116,11 +116,7 @@ const getMainConfig = () => Object.assign(baseConfig(), {
       test: /\.m?js$/,
       sourceMap: true,
       terserOptions: {
-        mangle: {
-          properties: {
-            regex: /(^_|_$)/,
-          }
-        },
+        mangle: true,
         safari10: true,
       },
     })],

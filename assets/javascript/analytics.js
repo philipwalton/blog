@@ -19,7 +19,7 @@ import {breakpoints} from './breakpoints';
  * implementation. This allows you to create a segment or view filter
  * that isolates only data captured with the most recent tracking changes.
  */
-const TRACKING_VERSION = '41';
+const TRACKING_VERSION = '42';
 
 
 /**
@@ -110,7 +110,7 @@ const whenWindowLoaded = new Promise((resolve) => {
  */
 const createGaProxy = (trackers) => {
   return (command, ...args) => {
-    for (let {name, trackingId} of trackers) {
+    trackers.forEach(({name, trackingId}) => {
       TrackerQueue.getOrCreate(trackingId).pushTask(() => {
         if (typeof command == 'function') {
           ga(() => {
@@ -118,14 +118,14 @@ const createGaProxy = (trackers) => {
           });
         } else {
           if (command == 'create') {
-            Object.assign(args[args.length - 1], {name, trackingId});
-            ga('create', ...args);
+            ga('create', Object.assign(
+                {}, args[args.length - 1], {name, trackingId}));
           } else {
             ga(`${name}.${command}`, ...args);
           }
         }
       });
-    }
+    });
   };
 };
 
@@ -144,7 +144,9 @@ export const gaTest = createGaProxy(TEST_TRACKERS);
 export const init = () => {
   rIC(async () => {
     // Initialize the command queue in case analytics.js hasn't loaded yet.
-    window.ga = window.ga || ((...args) => (ga.q = ga.q || []).push(args));
+    // https://developers.google.com/analytics/devguides/collection/analyticsjs/
+    // eslint-disable-next-line
+    window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
 
     createTrackers();
     trackErrors();
@@ -259,9 +261,11 @@ const trackCustomDimensions = () => {
   // that every dimension in every hit has *some* value. This is necessary
   // because Google Analytics will drop rows with empty dimension values
   // in your reports.
+  const dimensionsObj = {};
   Object.keys(dimensions).forEach((key) => {
-    gaAll('set', dimensions[key], NULL_VALUE);
+    dimensionsObj[dimensions[key]] = NULL_VALUE;
   });
+  gaAll('set', dimensionsObj);
 
   // Adds tracking of dimensions known at page load time.
   gaTest((tracker) => {

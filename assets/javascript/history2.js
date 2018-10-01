@@ -1,4 +1,4 @@
-import {parseUrl} from 'dom-utils';
+import {delegate, parseUrl} from 'dom-utils';
 
 /**
  * A class than wraps a lot of the complexity around adding items to the
@@ -25,35 +25,65 @@ export default class History2 {
       const url = location.href;
       const title = event.state && event.state.title;
 
-      this.add({url, title, isPopState: true});
+      this.update({url, title, isPopState: true});
+    });
+
+    delegate(document, 'click', 'a[href]', (event, delegateTarget) => {
+      // Don't load content if the user is doing anything other than a normal
+      // left click to open a page in the same window.
+      if (// On mac, command clicking will open a link in a new tab. Control
+          // clicking does this on windows.
+          event.metaKey || event.ctrlKey ||
+          // Shift clicking in Chrome/Firefox opens the link in a new window
+          // In Safari it adds the URL to a favorites list.
+          event.shiftKey ||
+          // On Mac, clicking with the option key is used to download a resouce.
+          event.altKey ||
+          // Middle mouse button clicks (which == 2) are used to open a link
+          // in a new tab, and right clicks (which == 3) on Firefox trigger
+          // a click event.
+          event.which > 1) return;
+
+      const page = parseUrl(location.href);
+      const link = parseUrl(delegateTarget.href);
+
+      if (/\.(png|svg)$/.test(link.href)) return;
+
+      // Don't do anything when clicking on links to the current URL.
+      if (link.href == page.href) event.preventDefault();
+
+      // If the clicked link is on the same site but has a different path,
+      // prevent the browser from navigating there and load the page via ajax.
+      if ((link.origin == page.origin) && (link.pathname != page.pathname)) {
+        event.preventDefault();
+        this.update({
+          url: link.href,
+        });
+      }
     });
   }
 
   /**
-   * Adds a new entry to the history.
+   * Pushes a new entry into the history.
    * @param {{
    *   url: (string),
-   *   title: (string),
+   *   title: (string|undefined),
    *   isPopState: (boolean|undefined),
    * }} arg1
    * - url: The URL for the next page in the history.
    * - title: The title of the next page in the history.
    * - isPopState: true if the entry was added from a popState event.
    */
-  async add({url, title, isPopState}) {
+  async update({url, title, isPopState}) {
     const prevState = this.state;
     const nextState = getState(url, title);
-
-    this.state = nextState;
 
     // Entries that point to the same resource should be ignored.
     if (prevState.pathname == nextState.pathname) return;
 
     await this._onChange(nextState);
 
-    if (title) {
-      document.title = title;
-    }
+    this.state = nextState;
 
     // Popstate triggered navigation is already handled by the browser,
     // so we only add to the history in non-popstate cases.

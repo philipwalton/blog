@@ -8,8 +8,9 @@ let revisionedAssetManifest;
 
 const getManifest = () => {
   if (!revisionedAssetManifest) {
-    revisionedAssetManifest = fs.readJsonSync(path.join(
-    config.publicStaticDir, config.manifestFileName), {throws: false}) || {};
+    revisionedAssetManifest = fs.readJsonSync(
+        path.join(config.publicStaticDir, config.manifestFileName),
+        {throws: false}) || {};
   }
 
   return revisionedAssetManifest;

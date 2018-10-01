@@ -19,7 +19,7 @@ import {breakpoints} from './breakpoints';
  * implementation. This allows you to create a segment or view filter
  * that isolates only data captured with the most recent tracking changes.
  */
-const TRACKING_VERSION = '42';
+const TRACKING_VERSION = '43';
 
 
 /**
@@ -169,33 +169,39 @@ const createTrackers = () => {
   // Ensures all hits are sent via `navigator.sendBeacon()`.
   gaAll('set', 'transport', 'beacon');
 
-  // Log hits in non-production environments.
-  if (process.env.NODE_ENV != 'production') {
-    gaAll('set', 'sendHitTask', function(model) {
-      const paramsToIgnore = ['v', 'did', 't', 'tid', 'ec', 'ea', 'el', 'ev',
-          'a', 'z', 'ul', 'de', 'sd', 'sr', 'vp', 'je', 'fl', 'jid'];
 
-      const hitType = model.get('&t');
-      const hitPayload = model.get('hitPayload');
-      const hit = hitPayload
-          .split('&')
-          .map(decodeURIComponent)
-          .filter((item) => {
-            const [param] = item.split('=');
-            return !(param.charAt(0) === '_' ||
-                paramsToIgnore.indexOf(param) > -1);
-          });
+  // Log hits in development.
+  if (process.env.NODE_ENV === 'development') {
+    gaAll((tracker) => {
+      const originalSendHitTask = tracker.get('sendHitTask');
+      tracker.set('sendHitTask', (model) => {
+        originalSendHitTask(model);
 
-      const parts = [model.get('&tid'), hitType];
-      if (hitType == 'event') {
-        parts.push(model.get('&ec'), model.get('&ea'), model.get('&el'));
-        if (model.get('&ev')) {
-          parts.push(model.get('&ev'));
+        const paramsToIgnore = ['v', 'did', 't', 'tid', 'ec', 'ea', 'el', 'ev',
+            'a', 'z', 'ul', 'de', 'sd', 'sr', 'vp', 'je', 'fl', 'jid'];
+
+        const hitType = model.get('&t');
+        const hitPayload = model.get('hitPayload');
+        const hit = hitPayload
+            .split('&')
+            .map(decodeURIComponent)
+            .filter((item) => {
+              const [param] = item.split('=');
+              return !(param.charAt(0) === '_' ||
+                  paramsToIgnore.indexOf(param) > -1);
+            });
+
+        const parts = [model.get('&tid'), hitType];
+        if (hitType == 'event') {
+          parts.push(model.get('&ec'), model.get('&ea'), model.get('&el'));
+          if (model.get('&ev')) {
+            parts.push(model.get('&ev'));
+          }
         }
-      }
 
-      // eslint-disable-next-line no-console
-      console.log(...parts, hit);
+        // eslint-disable-next-line no-console
+        console.log(...parts, hit);
+      });
     });
   }
 };

@@ -65,8 +65,8 @@ export function init() {
   delegate(alertContainer, 'click', '.Alert-close', remove);
   document.body.addEventListener('click', (e) => {
     const insideAlertContainer = !!closest(
-            /** @type {!Element} */ (e.target),
-            '.AlertContainer');
+        /** @type {!Element} */ (e.target),
+        '.AlertContainer');
     if (!insideAlertContainer) remove();
   });
 

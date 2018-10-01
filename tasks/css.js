@@ -30,7 +30,7 @@ const compileCss = async (srcPath) => {
         // This must be disabled because it breaks postcss-custom-properties:
         // https://github.com/ben-eb/cssnano/issues/448
         mergeLonghand: false,
-      }
+      },
     ]}));
   }
 

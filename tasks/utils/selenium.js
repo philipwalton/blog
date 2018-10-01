@@ -15,6 +15,7 @@ const start = async ({verbose = true} = {}) => {
 
     if (verbose) {
       subprocess.stdout.pipe(process.stdout);
+      subprocess.stderr.pipe(process.stderr);
     }
 
     subprocess.on('error', (err) => reject(err));

@@ -4,7 +4,7 @@
 
 <title>
   {% if page.title %}
-    {{ page.title }}{{ site.titleSuffix }}
+      {{ page.title }}{{ site.titleSuffix | htmlescape }}
   {% else %}
     {{ site.title }}
   {% endif %}
@@ -24,8 +24,12 @@
 <meta name="theme-color" content="{{ site.themeColor }}">
 
 <link href="https://feeds.feedburner.com/philipwalton" rel="alternate" title="{{site.title}}" type="application/atom+xml">
+
 <meta name="description" content="{% if page.excerpt %}{{ page.excerpt }}{% else %}{{ site.description }}{% endif %}">
-<link rel="canonical" href="{{ site.baseUrl }}{{ page.path }}" />
+
+{% if not page.private %}
+  <link rel="canonical" href="{{ site.baseUrl }}{{ page.path }}" />
+{% endif %}
 
 {% include '_css.html' %}
 {% include '_icons.html' %}

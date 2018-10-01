@@ -13,8 +13,5 @@ build
 # Log files
 *.log
 
-# Photoshop assets
-*.psd
-
-# Sauce Labs test script
-sauce.sh
+# Shell scripts
+*.sh

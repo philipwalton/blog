@@ -1,17 +1,26 @@
 /* eslint-disable no-console */
 
 const gulp = require('gulp');
-const md5 = require('md5');
 const path = require('path');
-const TerserPlugin = require('terser-webpack-plugin');
+const {rollup} = require('rollup');
+const babel = require('rollup-plugin-babel');
+const replace = require('rollup-plugin-replace');
+const resolve = require('rollup-plugin-node-resolve');
+const terserRollupPlugin = require('rollup-plugin-terser').terser;
+const TerserWebpackPlugin = require('terser-webpack-plugin');
 const webpack = require('webpack');
 const ManifestPlugin = require('webpack-manifest-plugin');
-const {addAsset, getManifest, getRevisionedAssetUrl} =
-    require('./utils/assets');
+const {addAsset, getManifest} = require('./utils/assets');
+const {checkModuleDuplicates} = require('./utils/check-module-duplicates.js');
 const config = require('../config.json');
 
 
-const buildCache = {};
+const minifyNameCache = {};
+const webpackBuildCache = {};
+
+const getEnv = () => {
+  return process.env.NODE_ENV || 'development';
+};
 
 const initPlugins = () => {
   return [
@@ -27,7 +36,7 @@ const initPlugins = () => {
           // Needed until this issue is resolved:
           // https://github.com/danethurber/webpack-manifest-plugin/issues/159
           const unhashedName = path.basename(opts.path)
-              .replace(/[_\.\-][0-9a-f]{10}/, '')
+              .replace(/[_.-][0-9a-f]{10}/, '');
 
           addAsset(unhashedName, opts.path);
           return getManifest();
@@ -37,8 +46,7 @@ const initPlugins = () => {
 
     // Allows minifiers to removed dev-only code.
     new webpack.DefinePlugin({
-      'process.env.NODE_ENV':
-          JSON.stringify(process.env.NODE_ENV || 'development'),
+      'process.env.NODE_ENV': JSON.stringify(getEnv()),
     }),
   ];
 };
@@ -64,10 +72,10 @@ const generateBabelEnvLoader = (targets) => {
 };
 
 const baseConfig = () => ({
-  mode: process.env.NODE_ENV || 'development',
+  mode: getEnv() === 'development' ? 'development' : 'production',
   plugins: initPlugins(),
   devtool: '#source-map',
-  cache: buildCache,
+  cache: webpackBuildCache,
 });
 
 const getMainConfig = () => Object.assign(baseConfig(), {
@@ -79,23 +87,21 @@ const getMainConfig = () => Object.assign(baseConfig(), {
     publicPath: '/',
     filename: '[name]-[chunkhash:10].mjs',
   },
-  // TODO: removing this for now, as it adds to many unnecessary
-  // polyfills, even with preset-env's `usage` options.
-  // module: {
-  //   rules: [
-  //     generateBabelEnvLoader({
-  //       browsers: [
-  //         // The last two versions of each browser, excluding versions
-  //         // that don't support <script type="module">.
-  //         'last 2 Chrome versions', 'not Chrome < 60',
-  //         'last 2 Safari versions', 'not Safari < 10.1',
-  //         'last 2 iOS versions', 'not iOS < 10.3',
-  //         'last 2 Firefox versions', 'not Firefox < 60',
-  //         'last 2 Edge versions', 'not Edge < 15',
-  //       ]
-  //     }),
-  //   ],
-  // },
+  module: {
+    rules: [
+      generateBabelEnvLoader({
+        browsers: [
+          // The last two versions of each browser, excluding versions
+          // that don't support <script type="module">.
+          'last 2 Chrome versions', 'not Chrome < 60',
+          'last 2 Safari versions', 'not Safari < 10.1',
+          'last 2 iOS versions', 'not iOS < 10.3',
+          'last 2 Firefox versions', 'not Firefox < 60',
+          'last 2 Edge versions', 'not Edge < 16',
+        ]
+      }),
+    ],
+  },
   optimization: {
     runtimeChunk: 'single',
     splitChunks: {
@@ -103,20 +109,27 @@ const getMainConfig = () => Object.assign(baseConfig(), {
       maxInitialRequests: Infinity,
       minSize: 0,
       cacheGroups: {
-        vendor: {
+        npm: {
           test: /node_modules/,
           name: (mod) => {
-            const pkgName = mod.context.match(/node_modules\/([^\/]+)/)[1];
-            return `vendor.${pkgName}`;
+            const pkgName = mod.context.match(/node_modules\/([^/]+)/)[1];
+            return `npm.${pkgName}`;
           },
         },
       },
     },
-    minimizer: [new TerserPlugin({
+    minimizer: [new TerserWebpackPlugin({
       test: /\.m?js$/,
+      parallel: false, // Needed for cross-file prop mangling.
       sourceMap: true,
       terserOptions: {
-        mangle: true,
+        mangle: {
+          properties: {
+            reserved: ['__e', '__esModule'],
+            regex: /(^_|_$)/,
+          },
+        },
+        nameCache: minifyNameCache, // Needed for cross-file prop mangling.
         safari10: true,
       },
     })],
@@ -138,7 +151,7 @@ const getLegacyConfig = () => Object.assign(baseConfig(), {
     ],
   },
   optimization: {
-    minimizer: [new TerserPlugin({
+    minimizer: [new TerserWebpackPlugin({
       test: /\.m?js$/,
       sourceMap: true,
       terserOptions: {
@@ -146,62 +159,6 @@ const getLegacyConfig = () => Object.assign(baseConfig(), {
         // because it breaks polyfills.
         mangle: true,
         safari10: true,
-      },
-    })],
-  },
-});
-
-const getSwConfig = () => ({
-  mode: process.env.NODE_ENV || 'development',
-  entry: {
-    'sw': './assets/sw.js',
-  },
-  output: {
-    path: path.resolve(__dirname, '..', config.publicDir),
-    filename: '[name].js',
-  },
-  cache: buildCache,
-  devtool: '#source-map',
-  plugins: [
-    new webpack.DefinePlugin({
-      MAIN_CSS_URL: JSON.stringify(getRevisionedAssetUrl('main.css')),
-      MAIN_JS_URL: JSON.stringify(getRevisionedAssetUrl('main.mjs')),
-      MAIN_RUNTIME_URL: JSON.stringify(getRevisionedAssetUrl('runtime.mjs')),
-
-      // Hard code here until switching to workbox.
-      VENDOR_AUTOTRACK_URL: JSON.stringify(
-          getRevisionedAssetUrl('vendor.autotrack.mjs')),
-      VENDOR_IDLIZE_URL: JSON.stringify(
-          getRevisionedAssetUrl('vendor.idlize.mjs')),
-      VENDOR_DOM_UTILS_URL: JSON.stringify(
-          getRevisionedAssetUrl('vendor.dom-utils.mjs')),
-    }),
-  ],
-  module: {
-    rules: [
-      generateBabelEnvLoader({
-        browsers: [
-          // Browsers that support service worker.
-          'last 2 Chrome versions', 'not Chrome < 45',
-          'last 2 Firefox versions', 'not Firefox < 44',
-          'last 2 Edge versions', 'not Edge < 17',
-          'last 2 Safari versions', 'not Safari < 11.1',
-        ],
-      }),
-    ],
-  },
-  optimization: {
-    minimizer: [new TerserPlugin({
-      sourceMap: true,
-      terserOptions: {
-        // TODO(philipwalton): mangling properties in the service worker
-        // breaks dependencies for some reason.
-        // mangle: {
-        //   properties: {
-        //     regex: /(^_|_$)/,
-        //   }
-        // },
-        mangle: true,
       },
     })],
   },
@@ -224,15 +181,14 @@ const createCompiler = (config) => {
   };
 };
 
-gulp.task('javascript', async () => {
+gulp.task('javascript:main', async () => {
   try {
     const compileMainBundle = createCompiler(getMainConfig());
     await compileMainBundle();
 
-    const compileSwBundle = createCompiler(getSwConfig());
-    await compileSwBundle();
+    console.log(minifyNameCache);
 
-    if (['debug', 'production'].includes(process.env.NODE_ENV)) {
+    if (getEnv() !== 'development') {
       // Generate the main-legacy bundle.
       const compileLegacyBundle = createCompiler(getLegacyConfig());
       await compileLegacyBundle();
@@ -241,3 +197,55 @@ gulp.task('javascript', async () => {
     console.error(err);
   }
 });
+
+gulp.task('javascript:sw', async () => {
+  try {
+    const plugins = [
+      resolve(),
+      replace({
+        'process.env.NODE_ENV': JSON.stringify(getEnv()),
+      }),
+      babel({
+        presets: [['@babel/env', {
+          // debug: true,
+          modules: false,
+          // useBuiltIns: true,
+          targets: {
+            browsers: [
+              'last 2 Chrome versions', 'not Chrome < 45',
+              'last 2 Firefox versions', 'not Firefox < 44',
+              'last 2 Edge versions', 'not Edge < 17',
+              'last 2 Safari versions', 'not Safari < 11.1',
+            ],
+          },
+        }]],
+      }),
+    ];
+    if (getEnv() !== 'development') {
+      plugins.push(terserRollupPlugin({
+        mangle: {
+          properties: {
+            regex: /(^_|_$)/,
+          },
+        },
+      }));
+    }
+
+    const bundle = await rollup({
+      input: 'assets/sw/sw.js',
+      plugins,
+    });
+
+    checkModuleDuplicates(bundle.modules.map((m) => m.id));
+
+    await bundle.write({
+      file: 'build/sw.js',
+      sourcemap: true,
+      format: 'es',
+    });
+  } catch (err) {
+    console.error(err);
+  }
+});
+
+gulp.task('javascript', gulp.series('javascript:main', 'javascript:sw'));

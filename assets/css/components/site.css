@@ -13,6 +13,9 @@
 
 .Site-content {
   margin: 0 auto;
+
+  /* Needed for IE11 since this is a <main> element. */
+  display: block;
 }
 
 

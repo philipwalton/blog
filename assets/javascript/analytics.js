@@ -19,7 +19,7 @@ import {breakpoints} from './breakpoints';
  * implementation. This allows you to create a segment or view filter
  * that isolates only data captured with the most recent tracking changes.
  */
-const TRACKING_VERSION = '43';
+const TRACKING_VERSION = '44';
 
 
 /**
@@ -68,6 +68,7 @@ export const dimensions = {
   TIME_ORIGIN: 'dimension17',
   PAGE_TIME: 'dimension18',
   QUEUE_TIME: 'dimension19',
+  FIRST_INPUT_EVENT: 'dimension20',
 };
 
 
@@ -87,6 +88,9 @@ export const metrics = {
   FCP_SAMPLE: 'metric10',
   FID: 'metric11',
   FID_SAMPLE: 'metric12',
+  FID_OT: 'metric13',
+  FID_SAMPLE_OT: 'metric14',
+  FIL_OT: 'metric15',
 };
 
 
@@ -428,21 +432,41 @@ const trackFcp = () => {
 };
 
 
-const trackFid = () => {
-  window.perfMetrics.onFirstInputDelay((delay, evt) => {
-    const delayInMs = Math.round(delay);
-
-    gaTest('send', 'event', {
-      eventCategory: 'PW Metrics',
-      eventAction: 'FID',
-      eventLabel: evt.type,
-      eventValue: delayInMs,
-      nonInteraction: true,
-      [metrics.FID]: delayInMs,
-      [metrics.FID_SAMPLE]: 1,
-      [dimensions.METRIC_VALUE]: evt.timeStamp,
+const trackFid = async () => {
+  const fidOriginTrial = window.__fidOccurred || Promise.resolve({});
+  const fidPolyfill = new Promise((resolve) =>  {
+    window.perfMetrics.onFirstInputDelay((delay, event) => {
+      resolve({delay, event});
     });
   });
+
+  const [otResult, polyfillResult] =
+      await Promise.all([fidOriginTrial, fidPolyfill]);
+
+  const polyfillFid = Math.round(polyfillResult.delay);
+
+  const fieldsObj = {
+    eventCategory: 'PW Metrics',
+    eventAction: 'FID',
+    eventLabel: polyfillResult.event.type,
+    eventValue: polyfillFid,
+    nonInteraction: true,
+    [metrics.FID]: polyfillFid,
+    [metrics.FID_SAMPLE]: 1,
+    [dimensions.METRIC_VALUE]: polyfillResult.event.timeStamp,
+  };
+
+  if (otResult.startTime) {
+    const otFid = Math.round(otResult.processingStart - otResult.startTime);
+    const otFil = Math.round(otResult.processingEnd - otResult.processingStart);
+
+    fieldsObj[metrics.FID_OT] = otFid;
+    fieldsObj[metrics.FIL_OT] = otFil;
+    fieldsObj[metrics.FID_SAMPLE_OT] = 1;
+    fieldsObj[dimensions.FIRST_INPUT_EVENT] = otResult.name;
+  }
+
+  gaTest('send', 'event', fieldsObj);
 };
 
 

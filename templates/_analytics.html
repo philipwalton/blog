@@ -20,3 +20,29 @@
 (function(){function g(a,b){d||(d=b,c=a,h=new Date,k(removeEventListener),l())}function l(){0<=c&&c<h-m&&(e.forEach(function(a){a(c,d)}),e=[])}function n(a,b){function c(){g(a,b);e()}function d(){e()}function e(){removeEventListener("pointerup",c,f);removeEventListener("pointercancel",d,f)}addEventListener("pointerup",c,f);addEventListener("pointercancel",d,f)}function p(a){if(a.cancelable){var b=(1E12<a.timeStamp?new Date:performance.now())-a.timeStamp;"pointerdown"==a.type?n(b,a):g(b,a)}}function k(a){["click",
 "mousedown","keydown","touchstart","pointerdown"].forEach(function(b){a(b,p,f)})}var d,c,h,e=[],f={passive:!0,capture:!0},m=new Date;k(addEventListener);self.perfMetrics=self.perfMetrics||{};self.perfMetrics.onFirstInputDelay=function(a){e.push(a);l()}})();
 </script>
+
+{% if ENV == 'production' %}
+<!-- Origin Trial Token, feature = Event Timing, origin = https://philipwalton.com, expires = 2018-11-30 -->
+<meta http-equiv="origin-trial" data-feature="Event Timing" data-expires="2018-11-30" content="AnUbzvTcy+lP0MQiwKw31SUyRswAI1PJifgYjz9OqNdbisUMUGZchjWnmifhJUMB/q66F2YeqLhINf8vp9FOSAsAAABVeyJvcmlnaW4iOiJodHRwczovL3BoaWxpcHdhbHRvbi5jb206NDQzIiwiZmVhdHVyZSI6IkV2ZW50VGltaW5nIiwiZXhwaXJ5IjoxNTQzNTQ1ODQyfQ==">
+{% else %}
+<!-- Origin Trial Token, feature = Event Timing, origin = http://localhost:5000, expires = 2018-11-30 -->
+<meta http-equiv="origin-trial" data-feature="Event Timing" data-expires="2018-11-30" content="AibOiSCs+/N3yMNW7x3KYcaCAvSG5MNWvuWK//I5jJc8PqPGxm9QQ409tdsePAEmC4oubHx1csLRhg+buYe6vQIAAABOeyJvcmlnaW4iOiJodHRwOi8vbG9jYWxob3N0OjUwMDAiLCJmZWF0dXJlIjoiRXZlbnRUaW1pbmciLCJleHBpcnkiOjE1NDM1NDk0Mjd9">
+{% endif %}
+
+<script>
+// Track FID with the Event Timing API origin trial enabled.
+if ('PerformanceEventTiming' in window) {
+  window.__fidOccurred = new Promise(function(resolve) {
+    var po = new PerformanceObserver(function(entryList) {
+      entryList.getEntries().forEach(function(entry) {
+        if (entry.entryType === 'firstInput') {
+          po.disconnect();
+          resolve(entry);
+        }
+      });
+    });
+    po.observe({entryTypes:['event', 'firstInput']});
+  });
+}
+</script>
+

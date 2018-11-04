@@ -238,7 +238,7 @@ rules: [
 
 The downside is that if tools like Babel have to start transpiling dependencies in `node_modules` in addition to local dependencies, builds will be slower. Fortunately this is a problem that can somewhat be addressed [at the tooling level with persistent, local caching](https://github.com/babel/babel-loader/blob/v7.1.2/README.md#babel-loader-is-slow).
 
-Regardless of the bumps we'll likely face on the road to ES2015+ being the new module publishing standard, I think it's a fight worth having. If we, as module authors, only publish ES5 versions of our code to npm, we force bloated and slower code upon on users.
+Regardless of the bumps we'll likely face on the road to ES2015+ being the new module publishing standard, I think it's a fight worth having. If we, as module authors, only publish ES5 versions of our code to npm, we force bloated and slower code upon our users.
 
 By publishing ES2015, we give developers a choice, and that ultimately benefits everyone.
 

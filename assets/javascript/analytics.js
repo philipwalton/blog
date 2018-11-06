@@ -19,7 +19,7 @@ import {breakpoints} from './breakpoints';
  * implementation. This allows you to create a segment or view filter
  * that isolates only data captured with the most recent tracking changes.
  */
-const TRACKING_VERSION = '46';
+const TRACKING_VERSION = '47';
 
 
 /**
@@ -91,8 +91,9 @@ export const metrics = {
   FID_OT: 'metric13',
   FID_SAMPLE_OT: 'metric14',
   FIL_OT: 'metric15',
-  SW_STARTUP: 'metric16',
+  SW_START_TIME: 'metric16',
   RESPONSE_START_TIME: 'metric17',
+  REQUEST_START_TIME: 'metric18',
 };
 
 
@@ -490,6 +491,8 @@ const trackNavigationTimingMetrics = async () => {
       const pt = performance.timing;
       const startTime = pt.navigationStart
       nt = {
+        workerStart: 0,
+        requestStart: pt.requestStart - startTime,
         responseStart: pt.responseStart - startTime,
         responseEnd: pt.responseEnd - startTime,
         domContentLoadedEventStart: pt.domContentLoadedEventStart - startTime,
@@ -498,6 +501,8 @@ const trackNavigationTimingMetrics = async () => {
     }
 
     if (nt) {
+      const swStartTime = Math.round(nt.workerStart || 0);
+      const requestStart = Math.round(nt.requestStart);
       const responseStart = Math.round(nt.responseStart);
       const responseEnd = Math.round(nt.responseEnd);
       const domLoaded = Math.round(nt.domContentLoadedEventStart);
@@ -510,20 +515,21 @@ const trackNavigationTimingMetrics = async () => {
       };
 
       if (allValuesAreValid(
-          responseStart, responseEnd, domLoaded, windowLoaded)) {
+          requestStart, responseStart, responseEnd, domLoaded, windowLoaded)) {
         const fieldsObj = {
           eventCategory: 'Navigation Timing',
           eventAction: 'track',
           eventLabel: NULL_VALUE,
           nonInteraction: true,
           [metrics.NT_SAMPLE]: 1,
+          [metrics.REQUEST_START_TIME]: requestStart,
           [metrics.RESPONSE_START_TIME]: responseStart,
           [metrics.RESPONSE_END_TIME]: responseEnd,
           [metrics.DOM_LOAD_TIME]: domLoaded,
           [metrics.WINDOW_LOAD_TIME]: windowLoaded,
         };
-        if (nt.workerStart) {
-          fieldsObj[metrics.SW_STARTUP] = Math.round(nt.workerStart);
+        if (nt.workerStart && getServiceWorkerStatus() === 'controlled') {
+          fieldsObj[metrics.SW_START_TIME] = Math.round(nt.workerStart);
         }
         gaTest('send', 'event', fieldsObj);
       }

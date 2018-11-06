@@ -1,14 +1,16 @@
 {% if ENV != 'production' %}
   <script>
   (function() {
-    window.__beacons = [];
-    const originalSendBeacon = navigator.sendBeacon;
-    Object.defineProperty(navigator, 'sendBeacon', {
-      value: function() {
-        window.__beacons.push(arguments);
-        return originalSendBeacon.apply(navigator, arguments);;
-      },
-    });
+    if (navigator.sendBeacon) {
+      window.__beacons = [];
+      const originalSendBeacon = navigator.sendBeacon;
+      Object.defineProperty(navigator, 'sendBeacon', {
+        value: function() {
+          window.__beacons.push(arguments);
+          return originalSendBeacon.apply(navigator, arguments);;
+        },
+      });
+    }
   }());
   </script>
 {% endif %}

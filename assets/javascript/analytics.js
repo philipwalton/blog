@@ -19,7 +19,7 @@ import {breakpoints} from './breakpoints';
  * implementation. This allows you to create a segment or view filter
  * that isolates only data captured with the most recent tracking changes.
  */
-const TRACKING_VERSION = '45';
+const TRACKING_VERSION = '46';
 
 
 /**
@@ -91,6 +91,8 @@ export const metrics = {
   FID_OT: 'metric13',
   FID_SAMPLE_OT: 'metric14',
   FIL_OT: 'metric15',
+  SW_STARTUP: 'metric16',
+  RESPONSE_START_TIME: 'metric17',
 };
 
 
@@ -173,9 +175,8 @@ const createTrackers = () => {
   // Ensures all hits are sent via `navigator.sendBeacon()`.
   gaAll('set', 'transport', 'beacon');
 
-
   // Log hits in development.
-  if (process.env.NODE_ENV === 'development') {
+  if (process.env.NODE_ENV !== 'production') {
     gaAll((tracker) => {
       const originalSendHitTask = tracker.get('sendHitTask');
       tracker.set('sendHitTask', (model) => {
@@ -476,34 +477,57 @@ const trackFid = async () => {
  */
 const trackNavigationTimingMetrics = async () => {
   // Only track performance in supporting browsers.
-  if (!(window.performance && window.performance.timing)) return;
+  if (window.performance &&
+      window.performance.timing &&
+      window.performance.getEntriesByType) {
+    await whenWindowLoaded;
 
-  await whenWindowLoaded;
+    let nt = performance.getEntriesByType('navigation')[0];
 
-  const nt = performance.timing;
-  const navStart = nt.navigationStart;
+    // Fall back to the performance timeline in browsers that don't
+    // support Navigation Timing Level 2.
+    if (!nt) {
+      const pt = performance.timing;
+      const startTime = pt.navigationStart
+      nt = {
+        responseStart: pt.responseStart - startTime,
+        responseEnd: pt.responseEnd - startTime,
+        domContentLoadedEventStart: pt.domContentLoadedEventStart - startTime,
+        loadEventStart: pt.loadEventStart - startTime,
+      }
+    }
 
-  const responseEnd = Math.round(nt.responseEnd - navStart);
-  const domLoaded = Math.round(nt.domContentLoadedEventStart - navStart);
-  const windowLoaded = Math.round(nt.loadEventStart - navStart);
+    if (nt) {
+      const responseStart = Math.round(nt.responseStart);
+      const responseEnd = Math.round(nt.responseEnd);
+      const domLoaded = Math.round(nt.domContentLoadedEventStart);
+      const windowLoaded = Math.round(nt.loadEventStart);
 
-  // In some edge cases browsers return very obviously incorrect NT values,
-  // e.g. 0, negative, or future times. This validates values before sending.
-  const allValuesAreValid = (...values) => {
-    return values.every((value) => value > 0 && value < 6e6);
-  };
+      // In some edge cases browsers return very obviously incorrect NT values,
+      // e.g. 0, negative, or future times. This validates values before sending.
+      const allValuesAreValid = (...values) => {
+        return values.every((value) => value > 0 && value < 6e6);
+      };
 
-  if (allValuesAreValid(responseEnd, domLoaded, windowLoaded)) {
-    gaTest('send', 'event', {
-      eventCategory: 'Navigation Timing',
-      eventAction: 'track',
-      eventLabel: NULL_VALUE,
-      nonInteraction: true,
-      [metrics.NT_SAMPLE]: 1,
-      [metrics.RESPONSE_END_TIME]: responseEnd,
-      [metrics.DOM_LOAD_TIME]: domLoaded,
-      [metrics.WINDOW_LOAD_TIME]: windowLoaded,
-    });
+      if (allValuesAreValid(
+          responseStart, responseEnd, domLoaded, windowLoaded)) {
+        const fieldsObj = {
+          eventCategory: 'Navigation Timing',
+          eventAction: 'track',
+          eventLabel: NULL_VALUE,
+          nonInteraction: true,
+          [metrics.NT_SAMPLE]: 1,
+          [metrics.RESPONSE_START_TIME]: responseStart,
+          [metrics.RESPONSE_END_TIME]: responseEnd,
+          [metrics.DOM_LOAD_TIME]: domLoaded,
+          [metrics.WINDOW_LOAD_TIME]: windowLoaded,
+        };
+        if (nt.workerStart) {
+          fieldsObj[metrics.SW_STARTUP] = Math.round(nt.workerStart);
+        }
+        gaTest('send', 'event', fieldsObj);
+      }
+    }
   }
 };
 

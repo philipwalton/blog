@@ -20,7 +20,7 @@ const listenForBroadcastCacheUpdates = () => {
         // TODO: handle cases where the analytics.js library isn't loaded yet.
         sendUpdateEvent('notify', updatedUrl);
         messages.add({
-          body: 'A newer version of this page exsits.',
+          body: 'A newer version of this page exists.',
           action: 'Reload',
           onAction: () => {
             sendUpdateEvent('reload', updatedUrl);

@@ -1,6 +1,5 @@
 import {Route} from 'workbox-routing/Route.mjs';
-import {StaleWhileRevalidate}
-    from 'workbox-strategies/StaleWhileRevalidate.mjs';
+import {StaleWhileRevalidate} from 'workbox-strategies/StaleWhileRevalidate.mjs';
 import {cacheNames} from '../caches.js';
 
 const thirdPartyAssetsMatcher = ({url}) => {

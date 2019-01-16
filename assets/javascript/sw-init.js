@@ -1,7 +1,15 @@
 import {parseUrl} from 'dom-utils';
-import {onNewSwActive, messageSw} from './sw-utils.js';
+import {Workbox} from 'workbox-window';
 import {gaTest} from './analytics';
 import * as messages from './messages';
+
+
+// We don't want to show a message that there's newer content more than once.
+// per page load. This is especially important in the case where we receive
+// multiple content partial cache updated messages with large time gaps
+// between them.
+let updateMessageShownThisPageload = false;
+
 
 const sendUpdateEvent = (eventAction, eventLabel) => {
   gaTest('send', 'event', {
@@ -11,58 +19,56 @@ const sendUpdateEvent = (eventAction, eventLabel) => {
   });
 };
 
-const listenForBroadcastCacheUpdates = () => {
-  navigator.serviceWorker.addEventListener('message', async ({data}) => {
-    if (data.type === 'CACHE_UPDATED') {
-      const updatedUrl = parseUrl(data.payload.updatedUrl).pathname;
+export const init = async () => {
+  const wb = new Workbox('/sw.js');
+  wb.register();
 
-      if (!messages.isShowing()) {
-        // TODO: handle cases where the analytics.js library isn't loaded yet.
-        sendUpdateEvent('notify', updatedUrl);
+  // When a new SW is activated, tell it to cache the URLs of all loaded
+  // resource, plus the current URL.
+  wb.addEventListener('activated', () => {
+    const urlsToCache = [
+      location.href,
+      ...performance.getEntriesByType('resource').map((resource) => {
+        const url = resource.name;
+
+        // The analytics.js script must be loaded with `no-cors` mode.
+        if (url.includes('google-analytics.com/analytics.js')) {
+          return {url, mode: 'no-cors'};
+        } else {
+          return url;
+        }
+      }),
+    ];
+    wb.messageSW({
+      type: 'CACHE_URLS',
+      meta: 'workbox-window',
+      payload: {urlsToCache},
+    });
+  });
+
+  // Listen for cache update messages and show a notice to the user.
+  wb.addEventListener('message', (data) => {
+    if (data.type === 'CACHE_UPDATED') {
+      const updatedURL = parseUrl(data.payload.updatedURL).pathname;
+
+      if (!updateMessageShownThisPageload) {
+        sendUpdateEvent('notify', updatedURL);
         messages.add({
           body: 'A newer version of this page exists.',
           action: 'Reload',
           onAction: () => {
-            sendUpdateEvent('reload', updatedUrl);
+            sendUpdateEvent('reload', updatedURL);
             location.reload();
           },
           onDismiss: () => {
-            sendUpdateEvent('dismiss', updatedUrl);
+            sendUpdateEvent('dismiss', updatedURL);
           },
         });
+
+        updateMessageShownThisPageload = true;
       } else {
-        sendUpdateEvent('receive', updatedUrl);
+        sendUpdateEvent('receive', updatedURL);
       }
     }
   });
-};
-
-const notifyReady = (registration) => {
-  if (registration.active) {
-    messageSw(registration.active, {
-      type: 'WINDOW_READY',
-      meta: 'philipwalton',
-    });
-  }
-};
-
-const sendLoadedResources = (sw) => {
-  const urls = [
-    location.href,
-    ...performance.getEntriesByType('resource').map(({name}) => name),
-  ];
-  messageSw(sw, {
-    type: 'LOADED_RESOURCES',
-    meta: 'philipwalton',
-    payload: {urls},
-  });
-};
-
-
-export const init = async () => {
-  const registration = await navigator.serviceWorker.register('/sw.js');
-
-  listenForBroadcastCacheUpdates();
-  notifyReady(registration);
-  onNewSwActive(registration, sendLoadedResources);
 };

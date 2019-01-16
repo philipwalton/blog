@@ -436,7 +436,7 @@ const trackFcp = () => {
 
 const trackFid = async () => {
   const fidOriginTrial = window.__fidOccurred || Promise.resolve({});
-  const fidPolyfill = new Promise((resolve) =>  {
+  const fidPolyfill = new Promise((resolve) => {
     window.perfMetrics.onFirstInputDelay((delay, event) => {
       resolve({delay, event});
     });
@@ -489,7 +489,7 @@ const trackNavigationTimingMetrics = async () => {
     // support Navigation Timing Level 2.
     if (!nt) {
       const pt = performance.timing;
-      const startTime = pt.navigationStart
+      const startTime = pt.navigationStart;
       nt = {
         workerStart: 0,
         requestStart: pt.requestStart - startTime,
@@ -497,7 +497,7 @@ const trackNavigationTimingMetrics = async () => {
         responseEnd: pt.responseEnd - startTime,
         domContentLoadedEventStart: pt.domContentLoadedEventStart - startTime,
         loadEventStart: pt.loadEventStart - startTime,
-      }
+      };
     }
 
     if (nt) {
@@ -509,7 +509,8 @@ const trackNavigationTimingMetrics = async () => {
       const windowLoaded = Math.round(nt.loadEventStart);
 
       // In some edge cases browsers return very obviously incorrect NT values,
-      // e.g. 0, negative, or future times. This validates values before sending.
+      // e.g. 0, negative, or future times. This validates values before
+      // sending.
       const allValuesAreValid = (...values) => {
         return values.every((value) => value > 0 && value < 6e6);
       };
@@ -529,7 +530,7 @@ const trackNavigationTimingMetrics = async () => {
           [metrics.WINDOW_LOAD_TIME]: windowLoaded,
         };
         if (nt.workerStart && getServiceWorkerStatus() === 'controlled') {
-          fieldsObj[metrics.SW_START_TIME] = Math.round(nt.workerStart);
+          fieldsObj[metrics.SW_START_TIME] = swStartTime;
         }
         gaTest('send', 'event', fieldsObj);
       }

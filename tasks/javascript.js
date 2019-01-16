@@ -98,7 +98,7 @@ const getMainConfig = () => Object.assign(baseConfig(), {
           'last 2 iOS versions', 'not iOS < 10.3',
           'last 2 Firefox versions', 'not Firefox < 60',
           'last 2 Edge versions', 'not Edge < 16',
-        ]
+        ],
       }),
     ],
   },

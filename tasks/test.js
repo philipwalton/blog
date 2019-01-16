@@ -1,4 +1,3 @@
-const {spawn} = require('child_process');
 const gulp = require('gulp');
 const server = require('./utils/server');
 const selenium = require('./utils/selenium');
@@ -15,7 +14,7 @@ require('./tunnel.js');
 const startServices = () => {
   const promises = [
     server.start({verbose: false}),
-  ]
+  ];
 
   if (process.env.CI) {
     promises.push(tunnel.start({verbose: false}));
@@ -23,7 +22,7 @@ const startServices = () => {
     promises.push(selenium.start({verbose: false}));
   }
   return Promise.all(promises);
-}
+};
 
 const stopServices = () => {
   server.stop();

@@ -1,28 +1,13 @@
 .Drawer {
   box-shadow: var(--shadow);
-  transform: translate3d(0, 0, 0);
-  transition: transform .25s var(--quantum-easing),
-              opacity .25s var(--quantum-easing);
-}
-
-.Drawer--closed {
-  visibility: hidden;
-}
-.Drawer--open {
-  opacity: 1;
-  transform: translate3d(0, 100%, 0);
-}
-
-.Drawer--opening,
-.Drawer--closing {
-  visibility: visible;
-}
-
-.Drawer--closing {
   opacity: 0;
   transform: translate3d(0, 0, 0);
 }
-.Drawer--opening {
+.Drawer--isTransitioning {
+  transition: transform .25s var(--quantum-easing),
+              opacity .25s var(--quantum-easing);
+}
+.Drawer--isOpen {
   opacity: 1;
   transform: translate3d(0, 100%, 0);
 }

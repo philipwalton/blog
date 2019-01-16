@@ -6,12 +6,15 @@
   letter-spacing: 0.025em;
   padding: var(--vgap) var(--hgap);
   position: relative;
+}
+.Header--isTransitioning {
   transition: border-color .5s var(--quantum-easing),
               box-shadow .5s var(--quantum-easing);
 }
-.Header--drawerOpen {
+.Header--isDrawerOpen {
   box-shadow: var(--shadow);
 }
+
 
 .Header-info {
   color: var(--text-color-dark-bg);
@@ -57,14 +60,16 @@
 @media (--break-lg) {
   .Header {
     background: var(--bg-color);
-    transition: transform .25s var(--quantum-easing),
-                  opacity .25s var(--quantum-easing);
-
     padding: var(--vgap-lg) var(--hgap-lg);
   }
-  .Header--drawerOpen {
+  .Header--isTransitioning {
+    transition: transform .25s var(--quantum-easing),
+                opacity .25s var(--quantum-easing);
+  }
+  .Header--isDrawerOpen {
     box-shadow: none;
   }
+
   .Header-info {
     color: var(--link-color);
   }

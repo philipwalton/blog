@@ -1,5 +1,7 @@
 import {closest, delegate} from 'dom-utils';
+import {transition} from './transition.js';
 
+const ALERT_TRANSITION_TIME = 200;
 
 let alertContainer = null;
 let alertShowing = false;
@@ -8,17 +10,20 @@ let alertShowing = false;
 /**
  * Removes all shown alerts.
  */
-function remove() {
+const remove = async () => {
   if (!alertShowing) return;
 
-  const alert = alertContainer.firstChild;
-  alert.classList.remove('Alert--active');
   alertShowing = false;
 
-  alert.addEventListener('transitionend', ({target}) => {
-    target.parentElement.removeChild(target);
+  const alert = alertContainer.firstChild;
+  await transition(alert, ALERT_TRANSITION_TIME, {
+    from: 'Alert--isActive',
+    using: 'Alert--isTransitioning',
+    useTransitions: true,
   });
-}
+
+  alertContainer.removeChild(alert);
+};
 
 
 /**
@@ -28,7 +33,7 @@ function remove() {
  *     body: The alert body text.
  * @return {!Element} The alert DOM element.
  */
-function createAlert({title, body}) {
+const createAlert = ({title, body}) => {
   const alert = document.createElement('div');
   alert.className = 'Alert';
   alert.innerHTML = `
@@ -39,7 +44,7 @@ function createAlert({title, body}) {
     </div>
     <button class="Alert-close">${renderIcon('close')}</button>`;
   return alert;
-}
+};
 
 
 /**
@@ -47,31 +52,30 @@ function createAlert({title, body}) {
  * @param {string} id The icon id from the main icons file.
  * @return {string} The icon markup.
  */
-function renderIcon(id) {
+const renderIcon = (id) => {
   return `<svg class="Icon" viewBox="0 0 24 24">
     <use xmlns:xlink="http://www.w3.org/1999/xlink"
          xlink:href="#icon-${id}"></use></svg>`;
-}
+};
 
 
 /**
  * Initializes the alert DOM containers and event handlers to remove
  * added alerts.
  */
-export function init() {
+export const init = () => {
   alertContainer = document.createElement('div');
   alertContainer.className = 'AlertContainer';
 
   delegate(alertContainer, 'click', '.Alert-close', remove);
   document.body.addEventListener('click', (e) => {
     const insideAlertContainer = !!closest(
-        /** @type {!Element} */ (e.target),
-        '.AlertContainer');
+        /** @type {!Element} */ (e.target), '.AlertContainer');
     if (!insideAlertContainer) remove();
   });
 
   document.body.appendChild(alertContainer);
-}
+};
 
 /**
  * Adds an alert with the passed title and body.
@@ -79,13 +83,16 @@ export function init() {
  *     title: The alert title text.
  *     body: The alert body text.
  */
-export function add({title, body}) {
+export const add = async ({title, body}) => {
   if (alertShowing) remove();
 
   const alert = createAlert({title, body});
   alertContainer.appendChild(alert);
   alertShowing = true;
 
-  // Use a timeout so the CSS transition is triggered.
-  setTimeout(() => alert.classList.add('Alert--active'), 0);
-}
+  await transition(alert, ALERT_TRANSITION_TIME, {
+    to: 'Alert--isActive',
+    using: 'Alert--isTransitioning',
+    useTransitions: true,
+  });
+};

@@ -10,10 +10,14 @@
   right: 0;
   top: 0;
   transform: translate3d(0, -100%, 0);
+
+}
+
+.Alert--isTransitioning {
   transition: transform .2s var(--quantum-easing);
 }
 
-.Alert--active {
+.Alert--isActive {
   transform: translate3d(0, 0%, 0);
 }
 
@@ -24,6 +28,7 @@
 .Alert-close {
   background: none;
   border: 0;
+  cursor: pointer;
   font-size: 2em;
   opacity: .4;
   padding: .25em;

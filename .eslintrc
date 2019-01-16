@@ -12,7 +12,8 @@
   "globals": {
     "browser": false,
     "clients": false,
-    "FetchEvent": false
+    "FetchEvent": false,
+    "skipWaiting": false
   },
   "extends": [
     "eslint:recommended", "google"
@@ -20,6 +21,10 @@
   "rules": {
     // Enough cases fail with this that we have to disable it.
     "indent": 0,
+    "max-len": [2, {
+      "ignorePattern": "^\\s*import",
+      "ignoreUrls": true
+    }]
   },
   "overrides": [{
     "files": ["tasks/**/*.{js,mjs}"],

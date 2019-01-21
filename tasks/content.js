@@ -1,11 +1,12 @@
 const fs = require('fs-extra');
 const gulp = require('gulp');
 const nunjucks = require('nunjucks');
-
-const {getOutputFile, initBook} = require('./utils/book');
+const {generateRevisionedAsset} = require('./utils/assets');
+const {initBook} = require('./utils/book');
 const {processHtml} = require('./utils/html');
 const {renderMarkdown} = require('./utils/markdown');
 const {initTemplates} = require('./utils/templates');
+
 
 let book;
 
@@ -117,8 +118,8 @@ const buildShell = async () => {
 
   const [shellStart, shellEnd] = processedHtml.split(SHELL_SPLIT_POINT);
 
-  await fs.outputFile(getOutputFile('/shell-start.html'), shellStart);
-  await fs.outputFile(getOutputFile('/shell-end.html'), shellEnd);
+  await generateRevisionedAsset('shell-start.html', shellStart);
+  await generateRevisionedAsset('shell-end.html', shellEnd);
 };
 
 

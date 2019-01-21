@@ -24,7 +24,7 @@ let isOpen = false;
 const handleDrawerToggleClick = (event) => {
   event.preventDefault();
   isOpen ? close() : open();
-}
+};
 
 
 /**
@@ -38,7 +38,7 @@ const handleClickOutsideDrawerContainer = (event) => {
   if (isOpen && drawerIsUsable() && !closest(target, '#header', true)) {
     close();
   }
-}
+};
 
 
 /**
@@ -47,7 +47,7 @@ const handleClickOutsideDrawerContainer = (event) => {
  */
 const drawerIsUsable = () => {
   return getActiveBreakpoint().name != 'lg';
-}
+};
 
 
 /**
@@ -59,7 +59,7 @@ export const init = () => {
 
   document.addEventListener('click', handleClickOutsideDrawerContainer);
   document.addEventListener('touchend', handleClickOutsideDrawerContainer);
-}
+};
 
 
 /**
@@ -82,7 +82,7 @@ export const open = async () => {
       }),
     ]);
   }
-}
+};
 
 
 /**
@@ -105,4 +105,4 @@ export const close = async () => {
       }),
     ]);
   }
-}
+};

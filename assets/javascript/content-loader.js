@@ -10,7 +10,10 @@ const getContentPartialPath = (pagePath) => {
   if (pagePath.endsWith('/')) {
     pagePath += 'index.html';
   }
-  return pagePath.replace(/\.html$/, CONTENT_SUFFIX);
+  if (!pagePath.includes(CONTENT_SUFFIX)) {
+    pagePath = pagePath.replace(/\.html$/, CONTENT_SUFFIX);
+  }
+  return pagePath;
 };
 
 /**
@@ -118,6 +121,16 @@ const resetImpressionTracking = () => {
   gaTest('impressionTracker:observeElements', ['share']);
 };
 
+
+/**
+ * Loads a page partial for the passed pathname and updates the content.
+ * @param {string} pathname
+ */
+export const loadPage = async (pathname) => {
+  updatePageContent(await fetchPageContent(pathname));
+  executeContainerScripts();
+};
+
 /**
  * Initializes the dynamic, page-loading code.
  */
@@ -127,8 +140,7 @@ export const init = () => {
 
   new History2(async (state) => {
     try {
-      updatePageContent(await fetchPageContent(state.pathname));
-      executeContainerScripts();
+      await loadPage(state.pathname);
       drawer.close();
       setScroll(state.hash);
       resetImpressionTracking();

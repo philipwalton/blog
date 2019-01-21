@@ -2,16 +2,10 @@
 
 const gulp = require('gulp');
 const path = require('path');
-const {rollup} = require('rollup');
-const babel = require('rollup-plugin-babel');
-const replace = require('rollup-plugin-replace');
-const resolve = require('rollup-plugin-node-resolve');
-const terserRollupPlugin = require('rollup-plugin-terser').terser;
 const TerserWebpackPlugin = require('terser-webpack-plugin');
 const webpack = require('webpack');
 const ManifestPlugin = require('webpack-manifest-plugin');
 const {addAsset, getManifest} = require('./utils/assets');
-const {checkModuleDuplicates} = require('./utils/check-module-duplicates.js');
 const config = require('../config.json');
 
 
@@ -35,10 +29,10 @@ const initPlugins = () => {
         return files.reduce((manifest, opts) => {
           // Needed until this issue is resolved:
           // https://github.com/danethurber/webpack-manifest-plugin/issues/159
-          const unhashedName = path.basename(opts.path)
-              .replace(/[_.-][0-9a-f]{10}/, '');
+          const name = path.basename(opts.path);
+          const unhashedName = name.replace(/[_.-][0-9a-f]{10}/, '');
 
-          addAsset(unhashedName, opts.path);
+          addAsset(unhashedName, name);
           return getManifest();
         }, seed);
       },
@@ -181,12 +175,10 @@ const createCompiler = (config) => {
   };
 };
 
-gulp.task('javascript:main', async () => {
+gulp.task('javascript', async () => {
   try {
     const compileMainBundle = createCompiler(getMainConfig());
     await compileMainBundle();
-
-    console.log(minifyNameCache);
 
     if (getEnv() !== 'development') {
       // Generate the main-legacy bundle.
@@ -194,58 +186,7 @@ gulp.task('javascript:main', async () => {
       await compileLegacyBundle();
     }
   } catch (err) {
+    // Log but don't throw so watching still works.
     console.error(err);
   }
 });
-
-gulp.task('javascript:sw', async () => {
-  try {
-    const plugins = [
-      resolve(),
-      replace({
-        'process.env.NODE_ENV': JSON.stringify(getEnv()),
-      }),
-      babel({
-        presets: [['@babel/env', {
-          // debug: true,
-          modules: false,
-          // useBuiltIns: true,
-          targets: {
-            browsers: [
-              'last 2 Chrome versions', 'not Chrome < 45',
-              'last 2 Firefox versions', 'not Firefox < 44',
-              'last 2 Edge versions', 'not Edge < 17',
-              'last 2 Safari versions', 'not Safari < 11.1',
-            ],
-          },
-        }]],
-      }),
-    ];
-    if (getEnv() !== 'development') {
-      plugins.push(terserRollupPlugin({
-        mangle: {
-          properties: {
-            regex: /(^_|_$)/,
-          },
-        },
-      }));
-    }
-
-    const bundle = await rollup({
-      input: 'assets/sw/sw.js',
-      plugins,
-    });
-
-    checkModuleDuplicates(bundle.modules.map((m) => m.id));
-
-    await bundle.write({
-      file: 'build/sw.js',
-      sourcemap: true,
-      format: 'es',
-    });
-  } catch (err) {
-    console.error(err);
-  }
-});
-
-gulp.task('javascript', gulp.series('javascript:main', 'javascript:sw'));

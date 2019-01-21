@@ -1,19 +1,14 @@
-import {Plugin as BroadcastCacheUpdatePlugin} from 'workbox-broadcast-cache-update/Plugin.mjs';
 import {Route} from 'workbox-routing/Route.mjs';
-import {StaleWhileRevalidate} from 'workbox-strategies/StaleWhileRevalidate.mjs';
+import {CacheFirst} from 'workbox-strategies/CacheFirst.mjs';
 import {cacheNames} from '../caches.js';
 
 const shellMatcher = ({url}) => {
-  return url.hostname === location.hostname &&
-      url.pathname.match(/shell-(start|end)\.html/);
+  return url.pathname.startsWith('/static/shell-') ||
+      url.pathname.endsWith('.mjs') || url.pathname.endsWith('.css');
 };
 
-export const shellStrategy = new StaleWhileRevalidate({
+export const shellStrategy = new CacheFirst({
   cacheName: cacheNames.SHELL,
-  plugins: [new BroadcastCacheUpdatePlugin({
-    deferNoticationTimeout: navigator.connection &&
-        navigator.connection.effectiveType === '4g' ? 3000 : 6000,
-  })],
 });
 
 export const createShellRoute = () => {

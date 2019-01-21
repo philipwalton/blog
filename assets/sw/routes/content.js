@@ -11,6 +11,7 @@ const contentMatcher = ({url}) => {
 export const contentStrategy = new StaleWhileRevalidate({
   cacheName: cacheNames.CONTENT,
   plugins: [new BroadcastCacheUpdatePlugin({
+    headersToCheck: ['etag'],
     deferNoticationTimeout: navigator.connection &&
         navigator.connection.effectiveType === '4g' ? 3000 : 6000,
   })],

@@ -1,4 +1,5 @@
 export const cacheNames = {
+  META: 'meta:v1',
   SHELL: 'shell:v1',
   CONTENT: 'content:v1',
   STATIC_ASSETS: 'static-assets:v1',

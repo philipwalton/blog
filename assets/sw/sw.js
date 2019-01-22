@@ -1,56 +1,54 @@
-import {initialize as initOfflineGA} from 'workbox-google-analytics/initialize.mjs';
-import {PrecacheController} from 'workbox-precaching/PrecacheController.mjs';
-import {cacheNames, deleteUnusedCaches} from './caches.js';
-import {initRouter} from './router.js';
+import {deleteUnusedCaches} from './caches.js';
+import {messageWindows} from './messenger.js';
+import {getMetadata, updateStoredMetadata} from './metadata.js';
+
+import * as precache from './precache.js';
+import * as offlineAnalytics from './offline-analytics.js';
+import * as router from './router.js';
 
 
-/* global __PRECACHE_MANIFEST__ */
+router.init();
+precache.init();
+offlineAnalytics.init();
 
-const SERVICE_WORKER_REPLAY_GA_DIMENSION = 'cd8';
-
-const precache = new PrecacheController(cacheNames.SHELL);
-precache.addToCacheList(__PRECACHE_MANIFEST__);
-
-initRouter();
-
-initOfflineGA({
-  cacheName: cacheNames.THIRD_PARTY_ASSETS,
-  parameterOverrides: {[SERVICE_WORKER_REPLAY_GA_DIMENSION]: 'replay'},
-});
 
 addEventListener('install', (event) => {
   const installComplete = async () => {
-    const {updatedURLs} = await precache.install();
-    if (updatedURLs.length > 0) {
-      // This `includeUncontrolled` flag is needed because we're in the
-      // install event, which means this SW is not yet controlling the page.
-      const wins = await clients.matchAll({
-        type: 'window',
-        includeUncontrolled: true,
-      });
-      for (const win of wins) {
-        win.postMessage({
-          type: 'UPDATE_AVAILABLE',
-          payload: {
-            updatedURLs,
-            // TODO(philipwalton): send the version of this SW to the window
-            // as well so it can compare and conditionally notify the user
-            // of the update.
-            // swVersion: __VERSION__,
-          },
-        });
-      }
-    }
-    skipWaiting();
+    await precache.install();
+
+    const {oldMetadata, newMetadata} = await getMetadata();
+
+    // IMPORTANT!
+    // When sending data to the window in an update event, remember that the
+    // code that gets served to the page may be an incompatible version.
+    // Take care when updating the format of the data being sent.
+    await messageWindows({
+      type: 'UPDATE_AVAILABLE',
+      payload: {
+        oldMetadata,
+        newMetadata,
+      },
+    });
+
+    // TODO(philipwalton): in the future consider not calling `skipWaiting()`
+    // for a major version bump. Instead, wait for confirmation from the
+    // window before calling it.
+    await skipWaiting();
   };
   event.waitUntil(installComplete());
 });
 
 addEventListener('activate', (event) => {
   const activateComplete = async () => {
+    // Run these in parallel so any one of them erroring won't prevent the
+    // other ones from finishing.
+    await Promise.all([
+      updateStoredMetadata(),
+      deleteUnusedCaches(),
+      precache.activate(),
+    ]);
+
     clients.claim();
-    await precache.activate();
-    await deleteUnusedCaches();
   };
   event.waitUntil(activateComplete());
 });

@@ -1,5 +1,5 @@
 import {Workbox} from 'workbox-window';
-import {gaTest} from './analytics';
+import {gaTest, trackError, NULL_VALUE} from './analytics';
 import {loadPage} from './content-loader';
 import * as messages from './messages';
 
@@ -8,35 +8,66 @@ import * as messages from './messages';
 // here in the top-level scope.
 const wb = new Workbox('/sw.js');
 
+const isFirstSWInstall = !navigator.serviceWorker.controller;
 
-export const init = async () => {
-  await wb.register();
 
-  // If this is the very first SW install, send installing SW a list of
-  // URLs to cache from the Resource Timing API.
-  if (!navigator.serviceWorker.controller) {
-    // When a new SW is activated, tell it to cache the URLs of all loaded
-    // resource, plus the current URL.
-    const urlsToCache = [
-      location.href,
-      ...performance.getEntriesByType('resource').map((resource) => {
-        const url = resource.name;
+/**
+ * Accepts a payload of data from the SW, processes the data, and returns
+ * the bits relevant for the code from this version of the site.
+ * Note that the data we get from the SW *might* be from a future version of
+ * the site, so we can't make too many assumptions about the format, which
+ * is why we wrap everything in a try/catch block, and simply return the error
+ * if one occurs.
+ * @param {Object} payload
+ * @return {Object}
+ */
+const processMetadata = (payload = {}) => {
+  try {
+    const {oldMetadata, newMetadata} = payload;
 
-        // The analytics.js script must be loaded with `no-cors` mode.
-        if (url.includes('google-analytics.com/analytics.js')) {
-          return {url, mode: 'no-cors'};
-        } else {
-          return url;
-        }
-      }),
-    ];
-    wb.messageSW({
-      type: 'CACHE_URLS',
-      meta: 'workbox-window',
-      payload: {urlsToCache},
-    });
+    const oldVersion = oldMetadata.version || '';
+    const newVersion = newMetadata.version || '';
+    const oldMajorVersion = Number(oldVersion.split('.')[0]);
+    const newMajorVersion = Number(newVersion.split('.')[0]);
+
+    const {buildTime} = newMetadata;
+    const timeSinceNewVersionDeployed = Date.now() - buildTime;
+
+    return {
+      oldVersion,
+      oldMajorVersion,
+      newVersion,
+      newMajorVersion,
+      timeSinceNewVersionDeployed,
+    };
+  } catch (error) {
+    return {error};
   }
+};
 
+const cacheResources = () => {
+  const urlsToCache = [
+    location.href,
+    ...performance.getEntriesByType('resource').map((resource) => {
+      const url = resource.name;
+
+      // The analytics.js script must be loaded with `no-cors` mode.
+      if (url.includes('google-analytics.com/analytics.js')) {
+        return {url, mode: 'no-cors'};
+      } else {
+        return url;
+      }
+    }),
+  ];
+  wb.messageSW({
+    type: 'CACHE_URLS',
+    meta: 'workbox-window',
+    payload: {urlsToCache},
+  });
+};
+
+
+const addCacheUpdateListener = () => {
   // Listen for cache update messages and swap out the content.
   // TODO(philipwalton): consider whether this is the best UX.
   wb.addEventListener('message', (data) => {
@@ -59,41 +90,77 @@ export const init = async () => {
         eventValue: resourceAge,
       });
     }
+  });
+};
 
+
+const addSWUpdateListener = () => {
+  wb.addEventListener('message', (data) => {
     if (data.type === 'UPDATE_AVAILABLE') {
-      const {updatedURLs} = data.payload;
+      let shouldNotifyUser;
+      const {
+        oldVersion,
+        oldMajorVersion,
+        newVersion,
+        newMajorVersion,
+        timeSinceNewVersionDeployed,
+        error,
+      } = processMetadata(data.payload);
 
-      // TODO(philipwalton): add logic to compare page version to SW version
-      // in the future, so that not all SW updates will generate a
-      // notification to the user. Also, to ensure version data doesn't
-      // interfere with caching, set the version in a file that you precache.
-      // const {swVersion, updatedURLs} = data.payload;
-      // const swMajorVersion = swVersion && Number(swVersion.split('.')[0]);
-      // const pageVersion = VERSION;
-      // const pageMajorVersion = Number(VERSION.split('.')[0]);
-
-      const sendEvent = (eventAction) => {
+      const sendUpdateEvent = (eventAction) => {
         gaTest('send', 'event', {
           eventCategory: 'SW Update',
           eventAction,
-          eventLabel: `(not set)`,
-          // eventLabel: `${pageVersion} => ${swVersion}`,
-          eventValue: updatedURLs.length,
+          eventValue: timeSinceNewVersionDeployed || 0,
+          eventLabel: newVersion ?
+              `${oldVersion || NULL_VALUE} => ${newVersion}` : NULL_VALUE,
         });
       };
-      sendEvent('receive');
 
-      messages.add({
-        body: 'A newer version of this page exists.',
-        action: 'Reload',
-        onAction: async () => {
-          sendEvent('reload');
-          setTimeout(() => location.reload(), 4);
-        },
-        onDismiss: () => {
-          sendEvent('dismiss');
-        },
-      });
+      if (error) {
+        trackError(error, {
+          eventCategory: 'SW Update',
+          eventAction: 'error',
+        });
+        shouldNotifyUser = true;
+      }
+
+      // If this is an update from a brand new SW installation, or if there
+      // wasn't a major version change, log that it happened but don't notify
+      // the user.
+      if (!isFirstSWInstall && newMajorVersion > oldMajorVersion) {
+        shouldNotifyUser = true;
+      }
+
+      if (shouldNotifyUser) {
+        sendUpdateEvent('notify');
+        messages.add({
+          body: 'A newer version of this site is available.',
+          action: 'Reload',
+          onAction: async () => {
+            sendUpdateEvent('reload');
+            setTimeout(() => location.reload(), 0);
+          },
+          onDismiss: () => {
+            sendUpdateEvent('dismiss');
+          },
+        });
+      } else {
+        sendUpdateEvent('receive');
+      }
     }
   });
+};
+
+export const init = async () => {
+  await wb.register();
+
+  addCacheUpdateListener();
+  addSWUpdateListener();
+
+  // If this is the very first SW install, send the installing SW a list of
+  // URLs to cache from the Resource Timing API.
+  if (isFirstSWInstall) {
+    cacheResources();
+  }
 };

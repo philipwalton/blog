@@ -15,6 +15,6 @@ gulp.task('watch', gulp.series('build', 'server', () => {
       gulp.series('content', 'sw'));
   gulp.watch('assets/sw/**/*.js',
       gulp.series('sw'));
-  gulp.watch('config.json',
-      gulp.series('javascript', 'content', 'sw'));
+  gulp.watch('package.json',
+      gulp.series('sw'));
 }));

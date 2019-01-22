@@ -1,5 +1,6 @@
 /* eslint-disable no-console */
 
+const fse = require('fs-extra');
 const gulp = require('gulp');
 const {rollup} = require('rollup');
 const babel = require('rollup-plugin-babel');
@@ -16,6 +17,9 @@ const getEnv = () => {
 
 gulp.task('sw', async () => {
   try {
+    const version = fse.readJSONSync('package.json').version;
+    const buildTime = new Date();
+
     const shellStartPath = getRevisionedAssetUrl('shell-start.html');
     const shellEndPath = getRevisionedAssetUrl('shell-end.html');
     const criticalAssets = [
@@ -32,6 +36,8 @@ gulp.task('sw', async () => {
       resolve(),
       replace({
         'process.env.NODE_ENV': JSON.stringify(getEnv()),
+        '__VERSION__': JSON.stringify(version),
+        '__BUILD_TIME__': JSON.stringify(buildTime),
         '__PRECACHE_MANIFEST__': JSON.stringify(criticalAssets),
         '__SHELL_START_PATH__': JSON.stringify(shellStartPath),
         '__SHELL_END_PATH__': JSON.stringify(shellEndPath),

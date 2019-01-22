@@ -19,7 +19,7 @@ import {breakpoints} from './breakpoints';
  * implementation. This allows you to create a segment or view filter
  * that isolates only data captured with the most recent tracking changes.
  */
-const TRACKING_VERSION = '47';
+const TRACKING_VERSION = '48';
 
 
 /**
@@ -42,7 +42,7 @@ const TEST_TRACKERS = ALL_TRACKERS.filter(({name}) => /test/.test(name));
  * something. This is needed since Google Analytics will drop empty dimension
  * values in reports.
  */
-const NULL_VALUE = '(not set)';
+export const NULL_VALUE = '(not set)';
 
 
 /**

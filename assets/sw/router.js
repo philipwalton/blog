@@ -13,7 +13,7 @@ const routes = {
   createThirdPartyAssetsRoute,
 };
 
-export const initRouter = () => {
+export const init = () => {
   const router = new Router();
   router.addFetchListener();
 

@@ -97,7 +97,11 @@ const addCacheUpdateListener = () => {
 const addSWUpdateListener = () => {
   wb.addEventListener('message', (data) => {
     if (data.type === 'UPDATE_AVAILABLE') {
-      let shouldNotifyUser;
+      // Default to showing an update message. This is helpful in the event
+      // a future version causes an error parsing the message data, the
+      // default will be to still show an update notification.
+      let shouldNotifyUser = true;
+
       const {
         oldVersion,
         oldMajorVersion,
@@ -117,23 +121,20 @@ const addSWUpdateListener = () => {
         });
       };
 
-      if (error) {
-        trackError(error, {
-          eventCategory: 'SW Update',
-          eventAction: 'error',
-        });
-        shouldNotifyUser = true;
-      }
-
       // If this is an update from a brand new SW installation, or if there
       // wasn't a major version change, log that it happened but don't notify
       // the user.
-      if (!isFirstSWInstall && newMajorVersion > oldMajorVersion) {
-        shouldNotifyUser = true;
+      if (newMajorVersion && newMajorVersion <= oldMajorVersion) {
+        shouldNotifyUser = false;
+      }
+
+      // Never show update notifications if this is the first SW version
+      // the user is installing for your
+      if (isFirstSWInstall) {
+        shouldNotifyUser = false;
       }
 
       if (shouldNotifyUser) {
-        sendUpdateEvent('notify');
         messages.add({
           body: 'A newer version of this site is available.',
           action: 'Reload',
@@ -145,8 +146,16 @@ const addSWUpdateListener = () => {
             sendUpdateEvent('dismiss');
           },
         });
+      }
+
+      // Track what happened with the udpate
+      if (error) {
+        trackError(error, {
+          eventCategory: 'SW Update',
+          eventAction: 'error',
+        });
       } else {
-        sendUpdateEvent('receive');
+        sendUpdateEvent(shouldNotifyUser ? 'notify' : 'receive');
       }
     }
   });

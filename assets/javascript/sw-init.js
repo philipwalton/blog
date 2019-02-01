@@ -70,7 +70,7 @@ const cacheResources = () => {
 const addCacheUpdateListener = () => {
   // Listen for cache update messages and swap out the content.
   // TODO(philipwalton): consider whether this is the best UX.
-  wb.addEventListener('message', (data) => {
+  wb.addEventListener('message', ({data}) => {
     if (data.type === 'CACHE_UPDATED') {
       const {updatedURL, _lastCached} = data.payload;
 
@@ -95,7 +95,7 @@ const addCacheUpdateListener = () => {
 
 
 const addSWUpdateListener = () => {
-  wb.addEventListener('message', (data) => {
+  wb.addEventListener('message', ({data}) => {
     if (data.type === 'UPDATE_AVAILABLE') {
       // Default to showing an update message. This is helpful in the event
       // a future version causes an error parsing the message data, the

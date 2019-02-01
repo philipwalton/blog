@@ -79,13 +79,13 @@
     "webpack": "^4.20.2",
     "webpack-manifest-plugin": "^2.0.4",
     "whatwg-fetch": "^3.0.0",
-    "workbox-broadcast-cache-update": "^4.0.0-beta.1",
-    "workbox-cache-expiration": "^4.0.0-beta.1",
-    "workbox-google-analytics": "^4.0.0-beta.1",
-    "workbox-precaching": "^4.0.0-beta.1",
-    "workbox-routing": "^4.0.0-beta.1",
-    "workbox-strategies": "^4.0.0-beta.1",
-    "workbox-streams": "^4.0.0-beta.1",
-    "workbox-window": "^4.0.0-beta.1"
+    "workbox-broadcast-cache-update": "../../GoogleChrome/workbox/packages/workbox-broadcast-cache-update",
+    "workbox-cache-expiration": "../../GoogleChrome/workbox/packages/workbox-cache-expiration",
+    "workbox-google-analytics": "../../GoogleChrome/workbox/packages/workbox-google-analytics",
+    "workbox-precaching": "../../GoogleChrome/workbox/packages/workbox-precaching",
+    "workbox-routing": "../../GoogleChrome/workbox/packages/workbox-routing",
+    "workbox-strategies": "../../GoogleChrome/workbox/packages/workbox-strategies",
+    "workbox-streams": "../../GoogleChrome/workbox/packages/workbox-streams",
+    "workbox-window": "../../GoogleChrome/workbox/packages/workbox-window"
   }
 }

@@ -22,7 +22,7 @@ addEventListener('install', (event) => {
     // When sending data to the window in an update event, remember that the
     // code that gets served to the page may be an incompatible version.
     // Take care when updating the format of the data being sent.
-    await messageWindows({
+    messageWindows({
       type: 'UPDATE_AVAILABLE',
       payload: {
         oldMetadata,
@@ -33,7 +33,7 @@ addEventListener('install', (event) => {
     // TODO(philipwalton): in the future consider not calling `skipWaiting()`
     // for a major version bump. Instead, wait for confirmation from the
     // window before calling it.
-    await skipWaiting();
+    skipWaiting();
   };
   event.waitUntil(installComplete());
 });

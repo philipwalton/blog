@@ -96,6 +96,10 @@ const getMainConfig = () => Object.assign(baseConfig(), {
       }),
     ],
   },
+  resolve: {
+    // Needed when using `npm link` or file paths.
+    symlinks: false,
+  },
   optimization: {
     runtimeChunk: 'single',
     splitChunks: {

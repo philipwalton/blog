@@ -1,4 +1,4 @@
-import {Plugin as BroadcastCacheUpdatePlugin} from 'workbox-broadcast-cache-update/Plugin.mjs';
+import {Plugin as BroadcastCacheUpdatePlugin} from 'workbox-broadcast-update/Plugin.mjs';
 import {Route} from 'workbox-routing/Route.mjs';
 import {StaleWhileRevalidate} from 'workbox-strategies/StaleWhileRevalidate.mjs';
 import {cacheNames} from '../caches.js';

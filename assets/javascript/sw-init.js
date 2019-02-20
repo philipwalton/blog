@@ -1,4 +1,4 @@
-import {Workbox} from 'workbox-window';
+import {Workbox} from 'workbox-window/Workbox.mjs';
 import {gaTest, trackError, NULL_VALUE} from './analytics';
 import {loadPage} from './content-loader';
 import * as messages from './messages';

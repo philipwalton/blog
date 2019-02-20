@@ -1,4 +1,4 @@
-import {Plugin as ExpirationPlugin} from 'workbox-cache-expiration/Plugin.mjs';
+import {Plugin as ExpirationPlugin} from 'workbox-expiration/Plugin.mjs';
 import {Route} from 'workbox-routing/Route.mjs';
 import {CacheFirst} from 'workbox-strategies/CacheFirst.mjs';
 import {cacheNames} from '../caches.js';

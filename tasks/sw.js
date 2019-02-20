@@ -73,7 +73,7 @@ gulp.task('sw', async () => {
       plugins,
     });
 
-    checkModuleDuplicates(bundle.modules.map((m) => m.id));
+    checkModuleDuplicates(bundle.cache.modules.map((m) => m.id));
 
     await bundle.write({
       file: 'build/sw.js',

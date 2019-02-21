@@ -10,6 +10,7 @@
     "sourceType": "module"
   },
   "globals": {
+    "$": false,
     "browser": false,
     "clients": false,
     "FetchEvent": false,
@@ -22,7 +23,7 @@
     // Enough cases fail with this that we have to disable it.
     "indent": 0,
     "max-len": [2, {
-      "ignorePattern": "^\\s*import",
+      "ignorePattern": "^\\s*import|^\\s*it\\(|^\\s*describe\\(",
       "ignoreUrls": true
     }]
   },

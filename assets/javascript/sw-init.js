@@ -45,24 +45,28 @@ const processMetadata = (payload = {}) => {
   }
 };
 
-const cacheResources = () => {
-  const urlsToCache = [
-    location.href,
-    ...performance.getEntriesByType('resource').map((resource) => {
-      const url = resource.name;
+const addFirstInstalledListener = () => {
+  wb.addEventListener('installed', (event) => {
+    // `isUpdate` means this is not the first install.
+    if (!event.isUpdate) {
+      const urlsToCache = [
+        location.href,
+        ...performance.getEntriesByType('resource').map((resource) => {
+          const url = resource.name;
 
-      // The analytics.js script must be loaded with `no-cors` mode.
-      if (url.includes('google-analytics.com/analytics.js')) {
-        return {url, mode: 'no-cors'};
-      } else {
-        return url;
-      }
-    }),
-  ];
-  wb.messageSW({
-    type: 'CACHE_URLS',
-    meta: 'workbox-window',
-    payload: {urlsToCache},
+          // The analytics.js script must be loaded with `no-cors` mode.
+          if (url.includes('google-analytics.com/analytics.js')) {
+            return [url, {mode: 'no-cors'}];
+          } else {
+            return url;
+          }
+        }),
+      ];
+      wb.messageSW({
+        type: 'CACHE_URLS',
+        payload: {urlsToCache},
+      });
+    }
   });
 };
 
@@ -128,8 +132,7 @@ const addSWUpdateListener = () => {
         shouldNotifyUser = false;
       }
 
-      // Never show update notifications if this is the first SW version
-      // the user is installing for your
+      // Never show update notifications if this is the first SW install.
       if (isFirstSWInstall) {
         shouldNotifyUser = false;
       }
@@ -162,14 +165,9 @@ const addSWUpdateListener = () => {
 };
 
 export const init = async () => {
-  await wb.register();
-
+  addFirstInstalledListener();
   addCacheUpdateListener();
   addSWUpdateListener();
 
-  // If this is the very first SW install, send the installing SW a list of
-  // URLs to cache from the Resource Timing API.
-  if (isFirstSWInstall) {
-    cacheResources();
-  }
+  await wb.register();
 };

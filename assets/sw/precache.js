@@ -10,6 +10,5 @@ export const init = () => {
   pc.addToCacheList(__PRECACHE_MANIFEST__);
 };
 
-export const install = () => pc.install();
-
-export const activate = () => pc.activate();
+export const install = (opts) => pc.install(opts);
+export const activate = (opts) => pc.activate(opts);

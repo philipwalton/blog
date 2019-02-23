@@ -4,6 +4,7 @@ const superstatic = require('superstatic');
 
 
 const PORT = 5000;
+let server;
 
 const app = express()
     // Any request matching this pattern will return a test fixture.
@@ -16,7 +17,7 @@ const app = express()
 
 const start = async ({verbose = true} = {}) => {
   await new Promise((resolve, reject) => {
-    app.listen(PORT, (err) => {
+    server = app.listen(PORT, (err) => {
       if (err) {
         reject(err);
       } else {
@@ -27,7 +28,7 @@ const start = async ({verbose = true} = {}) => {
 };
 
 const stop = () => {
-  app.close();
+  server.close();
 };
 
 module.exports = {start, stop};

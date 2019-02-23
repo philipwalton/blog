@@ -14,7 +14,7 @@ describe('Service Worker', () => {
 
   it(`should not show an update notice after the very first registration`, () => {
     browser.url('/');
-    waitUntilResourcesCached();
+    waitUntilControlling();
 
     assert(!$('.Message').isExisting());
   });
@@ -22,11 +22,11 @@ describe('Service Worker', () => {
   it(`should show an update notice if the major version in the SW changes`, () => {
     updateSWVersion('1.0.0');
 
-    browser.url('/');
-    waitUntilResourcesCached();
+    browser.url('/?v=1');
+    waitUntilControlling();
 
     updateSWVersion('2.0.0');
-    browser.url('/');
+    browser.url('/?v=2');
 
     $('.Message').waitForExist(5000);
   });
@@ -35,7 +35,7 @@ describe('Service Worker', () => {
     updateSWVersion('1.0.0');
 
     browser.url('/');
-    waitUntilResourcesCached();
+    waitUntilControlling();
 
     updateSWVersion('1.9.9');
     browser.url('/');
@@ -84,11 +84,13 @@ const restoreSWVersion = () => {
   fse.outputFileSync('./build/sw.js', originalSWContents);
 };
 
-const waitUntilResourcesCached = () => {
+const waitUntilControlling = () => {
   browser.waitUntil(() => {
-    return browser.executeAsync(async (done) => {
-      const cacheKeys = await caches.keys();
-      done(cacheKeys.length === 5);
+    const {value} = browser.executeAsync(async (done) => {
+      const reg = await navigator.serviceWorker.getRegistration();
+      done(reg && reg.active &&
+          reg.active === navigator.serviceWorker.controller);
     });
+    return value === true;
   });
 };

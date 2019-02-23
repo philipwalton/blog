@@ -9,5 +9,7 @@
   for (const cachesKey of cachesKeys) {
     await caches.delete(cachesKey);
   }
+
+  localStorage.clear();
 })();
 </script>

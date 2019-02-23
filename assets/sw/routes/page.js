@@ -15,14 +15,29 @@ const pageMatcher = ({url}) => {
       url.pathname.match(/^\/(?:about|articles)\/([\w-]+\/)?$/));
 };
 
-const pageHandler = streamsStrategy([
-  ({event}) => shellStrategy
-      .makeRequest({request: shellStartPath, event}),
-  ({event, url}) => contentStrategy
-      .makeRequest({request: `${url.pathname}index.content.html`, event}),
-  ({event}) => shellStrategy
-      .makeRequest({request: shellEndPath, event}),
+const contentHandler = ({event, url}) => {
+  return contentStrategy.makeRequest({
+    request: `${url.pathname}index.content.html`,
+    event,
+  });
+};
+
+const streamHandler = streamsStrategy([
+  ({event}) => shellStrategy.makeRequest({request: shellStartPath, event}),
+  contentHandler,
+  ({event}) => shellStrategy.makeRequest({request: shellEndPath, event}),
 ]);
+
+const pageHandler = (opts) => {
+  // If the request is a navigation request, assume it's going to be consumed
+  // by a browser and return the full stream. If the request is from a
+  // CACHE_URLS message, only the content partial needs to be cached.
+  if (opts.request && opts.request.mode === 'navigate') {
+    return streamHandler(opts);
+  } else {
+    return contentHandler(opts);
+  }
+};
 
 export const createPageRoute = () => {
   return new Route(pageMatcher, pageHandler);

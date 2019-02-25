@@ -76,22 +76,17 @@ const addCacheUpdateListener = () => {
   // TODO(philipwalton): consider whether this is the best UX.
   wb.addEventListener('message', ({data}) => {
     if (data.type === 'CACHE_UPDATED') {
-      const {updatedURL, _lastCached} = data.payload;
+      const {updatedURL} = data.payload;
 
       // Perform an in-place update with the next content. In most cases this
       // shouldn't be very noticeable to the user, but we'll track how often
       // it occurs to get a bit more insight into any UX concerns.
       loadPage(updatedURL);
 
-      let resourceAge = 0;
-      if (_lastCached) {
-        resourceAge = Math.round((new Date() - new Date(_lastCached)) / 1000);
-      }
       gaTest('send', 'event', {
         eventCategory: 'Cache Update',
         eventAction: 'receive',
         eventLabel: updatedURL,
-        eventValue: resourceAge,
       });
     }
   });

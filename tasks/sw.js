@@ -3,7 +3,6 @@
 const fse = require('fs-extra');
 const gulp = require('gulp');
 const {rollup} = require('rollup');
-const babel = require('rollup-plugin-babel');
 const replace = require('rollup-plugin-replace');
 const resolve = require('rollup-plugin-node-resolve');
 const terserRollupPlugin = require('rollup-plugin-terser').terser;
@@ -42,25 +41,11 @@ gulp.task('sw', async () => {
         '__SHELL_START_PATH__': JSON.stringify(shellStartPath),
         '__SHELL_END_PATH__': JSON.stringify(shellEndPath),
       }),
-      babel({
-        presets: [['@babel/env', {
-          // debug: true,
-          modules: false,
-          // useBuiltIns: true,
-          targets: {
-            browsers: [
-              'last 2 Chrome versions', 'not Chrome < 45',
-              'last 2 Firefox versions', 'not Firefox < 44',
-              'last 2 Edge versions', 'not Edge < 17',
-              'last 2 Safari versions', 'not Safari < 11.1',
-            ],
-          },
-        }]],
-      }),
     ];
     if (getEnv() !== 'development') {
       plugins.push(terserRollupPlugin({
         mangle: {
+          toplevel: true,
           properties: {
             regex: /(^_|_$)/,
           },

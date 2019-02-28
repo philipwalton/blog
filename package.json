@@ -15,12 +15,16 @@
     "url": "https://github.com/philipwalton/blog/issues"
   },
   "scripts": {
-    "lint": "eslint \"assets/**/*.js\" \"tasks/**/*.js\" \"test/**/*.js\"",
     "build": "gulp build",
+    "deploy": "firebase deploy -P philipwalton-site",
+    "lint": "eslint \"assets/**/*.js\" \"tasks/**/*.js\" \"test/**/*.js\"",
+    "release:major": "npm version major -m 'Release v%s' && npm run deploy && git push && git push --tags",
+    "release:minor": "npm version minor -m 'Release v%s' && npm run deploy && git push && git push --tags",
+    "release:patch": "npm version patch -m 'Release v%s' && npm run deploy && git push && git push --tags",
+    "stage": "firebase deploy -P philipwalton-staging",
     "start": "gulp watch",
-    "deploy": "NODE_ENV=production gulp build && firebase deploy -P philipwalton-site",
-    "stage": "NODE_ENV=production gulp build && firebase deploy -P philipwalton-staging",
-    "test": "gulp test"
+    "test": "gulp test",
+    "version": "NODE_ENV=production gulp build"
   },
   "husky": {
     "hooks": {

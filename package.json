@@ -18,13 +18,14 @@
     "build": "gulp build",
     "deploy": "git push --follow-tags && firebase deploy -P philipwalton-site",
     "lint": "eslint \"assets/**/*.js\" \"tasks/**/*.js\" \"test/**/*.js\"",
-    "release:major": "npm version major -m 'Release v%s' && npm run deploy",
-    "release:minor": "npm version minor -m 'Release v%s' && npm run deploy",
-    "release:patch": "npm version patch -m 'Release v%s' && npm run deploy",
+    "release:major": "npm version major -m 'Release v%s'",
+    "release:minor": "npm version minor -m 'Release v%s'",
+    "release:patch": "npm version patch -m 'Release v%s'",
     "stage": "firebase deploy -P philipwalton-staging",
     "start": "gulp watch",
     "test": "gulp test",
-    "version": "NODE_ENV=production gulp build"
+    "version": "NODE_ENV=production gulp build",
+    "postversion": "npm run deploy"
   },
   "husky": {
     "hooks": {

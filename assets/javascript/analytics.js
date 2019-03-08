@@ -256,7 +256,7 @@ const trackErrors = () => {
   };
 
   // Replay any stored load error events.
-  for (let event of loadErrorEvents) {
+  for (const event of loadErrorEvents) {
     trackErrorEvent(event);
   }
 

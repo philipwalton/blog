@@ -1,7 +1,7 @@
 const htmlMinifier = require('html-minifier');
 
 const minifyHtml = (html) => {
-  let opts = {
+  const opts = {
     removeComments: true,
     collapseWhitespace: true,
     collapseBooleanAttributes: true,

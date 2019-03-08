@@ -60,7 +60,7 @@ describe('Service Worker', () => {
 
 
 const originalSWContents = fse.readFileSync('./build/sw.js', 'utf-8');
-let originalSWVersion =
+const originalSWVersion =
     JSON.stringify(fse.readJSONSync('./package.json').version);
 
 const updateSWVersion = (newVersion) => {

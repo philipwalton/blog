@@ -15,7 +15,7 @@ let activeBreakpoint = breakpoints[0];
  * media query and stores that on the `activeBreakpoint` variable.
  */
 function handleChanges() {
-  for (let breakpoint of breakpoints) {
+  for (const breakpoint of breakpoints) {
     if (breakpoint.mql.matches) {
       activeBreakpoint = breakpoint;
     }
@@ -28,7 +28,7 @@ function handleChanges() {
  * current active breakpoint.
  */
 export function init() {
-  for (let breakpoint of breakpoints) {
+  for (const breakpoint of breakpoints) {
     breakpoint.mql = window.matchMedia(breakpoint.media);
     breakpoint.mql.addListener(handleChanges);
     if (breakpoint.mql.matches) {

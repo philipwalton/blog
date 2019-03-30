@@ -123,7 +123,7 @@ const getMainConfig = () => Object.assign(baseConfig(), {
       terserOptions: {
         mangle: {
           properties: {
-            reserved: ['__e', '__esModule', '__fidOccurred'],
+            reserved: ['__e', '__esModule'],
             regex: /(^_|_$)/,
           },
         },

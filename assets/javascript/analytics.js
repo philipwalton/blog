@@ -9,6 +9,7 @@ import 'autotrack/lib/plugins/outbound-link-tracker';
 import 'autotrack/lib/plugins/page-visibility-tracker';
 import 'autotrack/lib/plugins/url-change-tracker';
 import {breakpoints} from './breakpoints';
+import {fireperf, logTrace} from './fireperf';
 
 
 /* global ga */
@@ -88,9 +89,9 @@ export const metrics = {
   FCP_SAMPLE: 'metric10',
   FID: 'metric11',
   FID_SAMPLE: 'metric12',
-  FID_OT: 'metric13',
-  FID_SAMPLE_OT: 'metric14',
-  FIL_OT: 'metric15',
+  // FID_OT: 'metric13',
+  // FID_SAMPLE_OT: 'metric14',
+  // FIL_OT: 'metric15',
   SW_START_TIME: 'metric16',
   RESPONSE_START_TIME: 'metric17',
   REQUEST_START_TIME: 'metric18',
@@ -433,42 +434,27 @@ const trackFcp = () => {
   }
 };
 
+const trackFid = () => {
+  window.perfMetrics.onFirstInputDelay((delay, event) => {
+    const delayInMs = Math.round(delay);
 
-const trackFid = async () => {
-  const fidOriginTrial = window.__fidOccurred || Promise.resolve({});
-  const fidPolyfill = new Promise((resolve) => {
-    window.perfMetrics.onFirstInputDelay((delay, event) => {
-      resolve({delay, event});
+    gaTest('send', 'event', {
+      eventCategory: 'PW Metrics',
+      eventAction: 'FID',
+      eventLabel: event.type,
+      eventValue: delayInMs,
+      nonInteraction: true,
+      [metrics.FID]: delayInMs,
+      [metrics.FID_SAMPLE]: 1,
+      [dimensions.METRIC_VALUE]: event.timeStamp,
     });
+
+    // All FirePerf times need to be in microseconds.
+    const trace = fireperf.newTrace('First Input Delay');
+    trace.setStartTime(Math.round(event.timeStamp * 1000));
+    trace.setDuration(Math.round(delay * 1000));
+    logTrace(trace);
   });
-
-  const [otResult, polyfillResult] =
-      await Promise.all([fidOriginTrial, fidPolyfill]);
-
-  const polyfillFid = Math.round(polyfillResult.delay);
-
-  const fieldsObj = {
-    eventCategory: 'PW Metrics',
-    eventAction: 'FID',
-    eventLabel: polyfillResult.event.type,
-    eventValue: polyfillFid,
-    nonInteraction: true,
-    [metrics.FID]: polyfillFid,
-    [metrics.FID_SAMPLE]: 1,
-    [dimensions.METRIC_VALUE]: polyfillResult.event.timeStamp,
-  };
-
-  if (otResult.startTime) {
-    const otFid = Math.round(otResult.processingStart - otResult.startTime);
-    const otFil = Math.round(otResult.processingEnd - otResult.processingStart);
-
-    fieldsObj[metrics.FID_OT] = otFid;
-    fieldsObj[metrics.FIL_OT] = otFil;
-    fieldsObj[metrics.FID_SAMPLE_OT] = 1;
-    fieldsObj[dimensions.FIRST_INPUT_EVENT] = otResult.name;
-  }
-
-  gaTest('send', 'event', fieldsObj);
 };
 
 

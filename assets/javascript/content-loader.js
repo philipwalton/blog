@@ -1,8 +1,10 @@
 import * as alerts from './alerts';
 import {gaTest, trackError} from './analytics';
 import * as drawer from './drawer';
+import {fireperf} from './fireperf';
 import History2 from './history2';
-import Timer from './timer.js';
+import Timer from './timer';
+
 
 const CONTENT_SUFFIX = '.content.html';
 
@@ -27,6 +29,10 @@ const getContentPartialPath = (pagePath) => {
  */
 const fetchPageContent = async (path) => {
   const timer = new Timer().start();
+  const trace = fireperf.newTrace('SPA Load');
+  trace.start();
+  trace.putAttribute('page', path);
+
   const gaEventData = {
     eventCategory: 'Virtual Pageviews',
     eventAction: 'fetch',
@@ -45,6 +51,8 @@ const fetchPageContent = async (path) => {
     }
 
     timer.stop();
+    trace.stop();
+
     gaTest('send', 'event', Object.assign(gaEventData, {
       eventValue: Math.round(timer.duration),
       // TODO(philipwalton): track cache storage hits vs network requests.

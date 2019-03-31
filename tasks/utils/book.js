@@ -80,6 +80,12 @@ const initBook = async () => {
         .filter((entry) => entry.match(/\.mjs$/)),
   };
 
+  // TODO(philipwalton): sometimes the build don't contain modules. I'm not
+  // sure why, but it should fail if that ever happens.
+  if (!(book.site.assets.modules && book.site.assets.modules.length > 0)) {
+    throw new Error('No modules added to book.');
+  }
+
   return book;
 };
 

@@ -3,7 +3,6 @@ import * as analytics from './analytics';
 import * as breakpoints from './breakpoints';
 import * as contentLoader from './content-loader';
 import * as drawer from './drawer';
-import * as firePerf from './fireperf';
 import * as messages from './messages';
 import * as sw from './sw-init.js';
 
@@ -19,7 +18,6 @@ const main = async () => {
   alerts.init();
 
   analytics.init();
-  firePerf.init();
 
   if ('serviceWorker' in navigator) {
     try {

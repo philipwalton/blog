@@ -10,6 +10,7 @@ import 'autotrack/lib/plugins/page-visibility-tracker';
 import 'autotrack/lib/plugins/url-change-tracker';
 import {breakpoints} from './breakpoints';
 import {fireperf} from './fireperf';
+import {wb} from './sw-init';
 
 
 /* global ga */
@@ -54,12 +55,12 @@ export const dimensions = {
   PIXEL_DENSITY: 'dimension2',
   ORIENTATION: 'dimension3',
   HIT_SOURCE: 'dimension4',
-  URL_QUERY_PARAMS: 'dimension5',
+  EFFECTIVE_CONNECTION_TYPE: 'dimension5',
   METRIC_VALUE: 'dimension6',
   CLIENT_ID: 'dimension7',
   SERVICE_WORKER_REPLAY: 'dimension8',
   SERVICE_WORKER_STATUS: 'dimension9',
-  EFFECTIVE_CONNECTION_TYPE: 'dimension10',
+  CACHE_HIT: 'dimension10',
   WINDOW_ID: 'dimension11',
   VISIBILITY_STATE: 'dimension12',
   HIT_TYPE: 'dimension13',
@@ -107,6 +108,22 @@ const whenWindowLoaded = new Promise((resolve) => {
       removeEventListener('load', f);
     });
   }
+});
+
+
+const navigationReportReadyOrTimeout = new Promise((resolve, reject) => {
+  // Uncontrolled pages can never be fully cache-first.
+  if (!navigator.serviceWorker.controller) {
+    resolve({cacheHit: false});
+  }
+
+  wb.addEventListener('message', ({data}) => {
+    if (data.type === 'NAVIGATION_REPORT') {
+      resolve(data.payload);
+    }
+  });
+
+  setTimeout(() => resolve({cacheHit: NULL_VALUE}), 3000);
 });
 
 
@@ -160,6 +177,12 @@ export const init = () => {
     trackErrors();
     trackCustomDimensions();
     requireAutotrackPlugins();
+
+    // Before sending any perf data, determine whether the page was served
+    // entirely cache-first.
+    const {cacheHit} = await navigationReportReadyOrTimeout;
+    gaAll('set', dimensions.CACHE_HIT, String(cacheHit));
+
     trackFcp();
     trackFid();
     trackNavigationTimingMetrics();
@@ -339,7 +362,6 @@ const trackCustomDimensions = () => {
 const requireAutotrackPlugins = () => {
   gaAll('require', 'cleanUrlTracker', {
     stripQuery: true,
-    queryDimensionIndex: getDefinitionIndex(dimensions.URL_QUERY_PARAMS),
     indexFilename: 'index.html',
     trailingSlash: 'add',
   });

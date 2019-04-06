@@ -6,7 +6,7 @@ import * as messages from './messages';
 
 // Defining a Workbox instance has no side effects, so it's OK to do
 // here in the top-level scope.
-const wb = new Workbox('/sw.js');
+export const wb = new Workbox('/sw.js');
 
 const isFirstSWInstall = !navigator.serviceWorker.controller;
 

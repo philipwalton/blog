@@ -53,7 +53,7 @@ export const NULL_VALUE = '(not set)';
 export const dimensions = {
   BREAKPOINT: 'dimension1',
   PIXEL_DENSITY: 'dimension2',
-  ORIENTATION: 'dimension3',
+  SITE_VERSION: 'dimension3',
   HIT_SOURCE: 'dimension4',
   EFFECTIVE_CONNECTION_TYPE: 'dimension5',
   METRIC_VALUE: 'dimension6',
@@ -111,7 +111,7 @@ const whenWindowLoaded = new Promise((resolve) => {
 });
 
 
-const navigationReportReadyOrTimeout = new Promise((resolve, reject) => {
+const navigationReportReadyOrTimeout = new Promise((resolve) => {
   // Uncontrolled pages can never be fully cache-first.
   if (!navigator.serviceWorker.controller) {
     resolve({cacheHit: false});
@@ -124,6 +124,18 @@ const navigationReportReadyOrTimeout = new Promise((resolve, reject) => {
   });
 
   setTimeout(() => resolve({cacheHit: NULL_VALUE}), 3000);
+});
+
+
+const getSiteVersionOrTimeout = new Promise((resolve) => {
+  // Uncontrolled pages won't have a version.
+  if (!navigator.serviceWorker.controller) {
+    resolve({version: NULL_VALUE});
+  }
+
+  wb.messageSW({type: 'GET_METADATA'}).then(resolve);
+
+  setTimeout(() => resolve({version: NULL_VALUE}), 3000);
 });
 
 
@@ -176,6 +188,11 @@ export const init = () => {
     createTrackers();
     trackErrors();
     trackCustomDimensions();
+
+    // Set the site version, if available.
+    const {version} = await getSiteVersionOrTimeout;
+    gaAll('set', dimensions.SITE_VERSION, version);
+
     requireAutotrackPlugins();
 
     // Before sending any perf data, determine whether the page was served
@@ -392,14 +409,6 @@ const requireAutotrackPlugins = () => {
                                 '(min-resolution: 144dpi)'},
           {name: '2x', media: '(-webkit-min-device-pixel-ratio: 2), ' +
                               '(min-resolution: 192dpi)'},
-        ],
-      },
-      {
-        name: 'Orientation',
-        dimensionIndex: getDefinitionIndex(dimensions.ORIENTATION),
-        items: [
-          {name: 'landscape', media: '(orientation: landscape)'},
-          {name: 'portrait', media: '(orientation: portrait)'},
         ],
       },
     ],

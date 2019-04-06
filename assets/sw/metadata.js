@@ -11,7 +11,7 @@ const metadata = {
   buildTime: __BUILD_TIME__,
 };
 
-const getStoredMetadata = async () => {
+export const getStoredMetadata = async () => {
   const cache = await caches.open(cacheNames.META);
   const response = await cache.match(META_PATH);
   return response ? await response.json() : {

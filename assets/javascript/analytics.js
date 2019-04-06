@@ -9,7 +9,7 @@ import 'autotrack/lib/plugins/outbound-link-tracker';
 import 'autotrack/lib/plugins/page-visibility-tracker';
 import 'autotrack/lib/plugins/url-change-tracker';
 import {breakpoints} from './breakpoints';
-import {fireperf, logTrace} from './fireperf';
+import {fireperf} from './fireperf';
 
 
 /* global ga */
@@ -447,11 +447,11 @@ const trackFid = () => {
       [dimensions.METRIC_VALUE]: event.timeStamp,
     });
 
-    // All FirePerf times need to be in microseconds.
     const trace = fireperf.newTrace('First Input Delay');
-    trace.setStartTime(Math.round(event.timeStamp * 1000));
-    trace.setDuration(Math.round(delay * 1000));
-    logTrace(trace);
+    trace.start();
+    // Using setTimeout here is a hack due to the fact that FirePerf doesn't
+    // currently let you programmatically set startTime and duration.
+    setTimeout(() => trace.stop(), delayInMs);
   });
 };
 

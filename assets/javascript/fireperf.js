@@ -1,4 +1,4 @@
-import {initializeApp, logTrace} from 'firebase/lite/dist/index.esm.js';
+import {initializeApp} from 'firebase/lite/dist/index.esm.js';
 
 
 const appId = '1:48175167448:web:45863557eb40ee1a';
@@ -10,4 +10,4 @@ if (location.hostname !== 'philipwalton.com') {
   fireperf.isInstrumentationEnabled = false;
 }
 
-export {fireperf, logTrace};
+export {fireperf};

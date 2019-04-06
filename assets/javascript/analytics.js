@@ -20,7 +20,7 @@ import {fireperf, logTrace} from './fireperf';
  * implementation. This allows you to create a segment or view filter
  * that isolates only data captured with the most recent tracking changes.
  */
-const TRACKING_VERSION = '49';
+const TRACKING_VERSION = '50';
 
 
 /**
@@ -47,7 +47,7 @@ export const NULL_VALUE = '(not set)';
 
 
 /**
- * A maping between custom dimension names and their indexes.
+ * A mapping between custom dimension names and their indexes.
  */
 export const dimensions = {
   BREAKPOINT: 'dimension1',
@@ -59,7 +59,7 @@ export const dimensions = {
   CLIENT_ID: 'dimension7',
   SERVICE_WORKER_REPLAY: 'dimension8',
   SERVICE_WORKER_STATUS: 'dimension9',
-  NETWORK_STATUS: 'dimension10',
+  EFFECTIVE_CONNECTION_TYPE: 'dimension10',
   WINDOW_ID: 'dimension11',
   VISIBILITY_STATE: 'dimension12',
   HIT_TYPE: 'dimension13',
@@ -74,7 +74,7 @@ export const dimensions = {
 
 
 /**
- * A maping between custom dimension names and their indexes.
+ * A mapping between custom dimension names and their indexes.
  */
 export const metrics = {
   PAGE_VISIBLE: 'metric1',
@@ -235,7 +235,7 @@ export const trackError = (err = {}, fieldsObj = {}) => {
 
 
 /**
- * Tracks any errors that may have occured on the page prior to analytics being
+ * Tracks any errors that may have occurred on the page prior to analytics being
  * initialized, then adds an event handler to track future errors.
  */
 const trackErrors = () => {
@@ -287,6 +287,7 @@ const trackCustomDimensions = () => {
       [dimensions.CLIENT_ID]: tracker.get('clientId'),
       [dimensions.WINDOW_ID]: uuid(),
       [dimensions.SERVICE_WORKER_STATUS]: getServiceWorkerStatus(),
+      [dimensions.EFFECTIVE_CONNECTION_TYPE]: getEffectiveConnectionType(),
     });
 
     if (window.performance && window.performance.timeOrigin) {
@@ -319,9 +320,6 @@ const trackCustomDimensions = () => {
       if (window.performance && window.performance.now) {
         model.set(dimensions.PAGE_TIME, window.performance.now(), true);
       }
-
-      const networkStatus = navigator.onLine ? 'online' : 'offline';
-      model.set(dimensions.NETWORK_STATUS, networkStatus, true);
 
       // TODO(philipwalton): temporary fix to address an analytics.js bug where
       // custom metrics on the initial pageview are added to timing hits.
@@ -531,9 +529,19 @@ const trackNavigationTimingMetrics = async () => {
  * @return {string} The service worker status.
  */
 const getServiceWorkerStatus = () => {
-  return 'serviceWorker' in navigator
-    ? (navigator.serviceWorker.controller ? 'controlled' : 'supported')
-    : 'unsupported';
+  return 'serviceWorker' in navigator ?
+      (navigator.serviceWorker.controller ? 'controlled' : 'supported') :
+      'unsupported';
+};
+
+
+/**
+ * Gets the effective connection type information if available.
+ * @return {string}
+ */
+const getEffectiveConnectionType = () => {
+  return navigator.connection &&
+      navigator.connection.effectiveType || NULL_VALUE;
 };
 
 

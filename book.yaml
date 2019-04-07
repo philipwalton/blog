@@ -157,6 +157,17 @@ articles:
   translations:
     русский: http://css-live.ru/javascript/otzyvchivye-komponenty-reshenie-problemy-vyrazhenij-ot-kontejnera.html
     Português: http://desenvolvimentoparaweb.com/css/responsive-components-container-queries/
+- title: "First Input Delay"
+  path: /articles/first-input-delay/
+  date: 2018-05-10T12:15:30-07:00
+- title: "Page Lifecycle API"
+  path: /articles/page-lifecycle-api/
+  date: 2018-07-24T11:41:57-07:00
 - title: "Idle Until Urgent"
   path: /articles/idle-until-urgent/
   date: 2018-09-20T00:25:36-07:00
+- title: "KV Storage: the Web's First Built-in Module"
+  path: /articles/kv-storage-the-webs-first-built-in-module/
+  date: 2019-03-11T22:27:02-07:00
+
+

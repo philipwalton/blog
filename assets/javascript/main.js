@@ -28,4 +28,5 @@ const main = async () => {
   }
 };
 
-main();
+// Initialize all code in a separate task.
+setTimeout(main, 0);

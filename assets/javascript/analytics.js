@@ -1,5 +1,4 @@
 import TrackerQueue from 'autotrack/lib/tracker-queue';
-import {rIC} from 'idlize/idle-callback-polyfills.mjs';
 import 'autotrack/lib/plugins/clean-url-tracker';
 import 'autotrack/lib/plugins/event-tracker';
 import 'autotrack/lib/plugins/impression-tracker';
@@ -178,32 +177,30 @@ export const gaTest = createGaProxy(TEST_TRACKERS);
  * Initializes all the analytics setup. Creates trackers and sets initial
  * values on the trackers.
  */
-export const init = () => {
-  rIC(async () => {
-    // Initialize the command queue in case analytics.js hasn't loaded yet.
-    // https://developers.google.com/analytics/devguides/collection/analyticsjs/
-    // eslint-disable-next-line
-    window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+export const init = async () => {
+  // Initialize the command queue in case analytics.js hasn't loaded yet.
+  // https://developers.google.com/analytics/devguides/collection/analyticsjs/
+  // eslint-disable-next-line
+  window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
 
-    createTrackers();
-    trackErrors();
-    trackCustomDimensions();
+  createTrackers();
+  trackErrors();
+  trackCustomDimensions();
 
-    // Set the site version, if available.
-    const {version} = await getSiteVersionOrTimeout;
-    gaAll('set', dimensions.SITE_VERSION, version);
+  // Set the site version, if available.
+  const {version} = await getSiteVersionOrTimeout;
+  gaAll('set', dimensions.SITE_VERSION, version);
 
-    requireAutotrackPlugins();
+  requireAutotrackPlugins();
 
-    // Before sending any perf data, determine whether the page was served
-    // entirely cache-first.
-    const {cacheHit} = await navigationReportReadyOrTimeout;
-    gaAll('set', dimensions.CACHE_HIT, String(cacheHit));
+  // Before sending any perf data, determine whether the page was served
+  // entirely cache-first.
+  const {cacheHit} = await navigationReportReadyOrTimeout;
+  gaAll('set', dimensions.CACHE_HIT, String(cacheHit));
 
-    trackFcp();
-    trackFid();
-    trackNavigationTimingMetrics();
-  });
+  trackFcp();
+  trackFid();
+  trackNavigationTimingMetrics();
 };
 
 

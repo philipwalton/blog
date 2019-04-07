@@ -15,10 +15,29 @@ export class StaleWhileRevalidate2 extends StaleWhileRevalidate {
       // Keep track of when cached responses were used vs. having to
       // fall back to the network.
       cachedResponseWillBeUsed: async ({cachedResponse, event}) => {
-        if (event && event.request && event.request.mode === 'navigate') {
-          requestToCachedResponseMap.set(event.request, cachedResponse);
+        if (cachedResponse) {
+          if (event && event.request && event.request.mode === 'navigate') {
+            requestToCachedResponseMap.set(event.request, cachedResponse);
+          } else {
+            // Add a custom header to the response indicating
+            const newHeaders = new Headers(cachedResponse.headers);
+            newHeaders.append('X-Cache-Hit', '1');
+
+            // Not all browsers support the Response.body stream, so fall back
+            // to reading the entire body into memory as a blob.
+            const body = cachedResponse.body ?
+                cachedResponse.body : await cachedResponse.blob();
+
+            const newResponse = new Response(body, {
+              status: cachedResponse.status,
+              statusText: cachedResponse.statusText,
+              headers: newHeaders,
+            });
+
+            cachedResponse = newResponse;
+          }
+          return cachedResponse;
         }
-        return cachedResponse;
       },
     });
   }

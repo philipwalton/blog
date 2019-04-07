@@ -55,8 +55,7 @@ const fetchPageContent = async (path) => {
 
     gaTest('send', 'event', Object.assign(gaEventData, {
       eventValue: Math.round(timer.duration),
-      // TODO(philipwalton): track cache storage hits vs network requests.
-      eventLabel: 'network',
+      eventLabel: response.headers.get('X-Cache-Hit') ? 'cache' : 'network',
     }));
 
     return content;

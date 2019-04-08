@@ -1,4 +1,5 @@
 import {StaleWhileRevalidate} from 'workbox-strategies/StaleWhileRevalidate.mjs';
+import {isSupported as streamsAreSupported} from 'workbox-streams/isSupported.mjs';
 import {messageWindows, windowReadyOrTimeout} from './messenger.js';
 
 
@@ -24,8 +25,11 @@ export class StaleWhileRevalidate2 extends StaleWhileRevalidate {
             newHeaders.append('X-Cache-Hit', '1');
 
             // Not all browsers support the Response.body stream, so fall back
-            // to reading the entire body into memory as a blob.
-            const body = cachedResponse.body ?
+            // to reading the entire body into memory as text.
+            // NOTE: Edge 18 claims supports for the Response.body steam, but
+            // it fails when trying to create a new response from that stream,
+            // so we instead check the `workbox-streams` support method.
+            const body = streamsAreSupported() ?
                 cachedResponse.body : await cachedResponse.blob();
 
             const newResponse = new Response(body, {

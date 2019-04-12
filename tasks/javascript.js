@@ -122,10 +122,12 @@ const getMainConfig = () => Object.assign(baseConfig(), {
       sourceMap: true,
       terserOptions: {
         mangle: {
-          properties: {
-            reserved: ['__e', '__esModule'],
-            regex: /(^_|_$)/,
-          },
+          // TODO(philipwalton): property mangling doesn't work with FirePerf.
+          // Figure out why, or what a realistic workaround could be.
+          // properties: {
+          //   reserved: ['__e', '__esModule'],
+          //   regex: /(^_|_$)/,
+          // },
         },
         nameCache: minifyNameCache, // Needed for cross-file prop mangling.
         safari10: true,

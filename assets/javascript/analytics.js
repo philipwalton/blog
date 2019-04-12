@@ -9,7 +9,7 @@ import 'autotrack/lib/plugins/page-visibility-tracker';
 import 'autotrack/lib/plugins/url-change-tracker';
 import {breakpoints} from './breakpoints';
 import {fireperf} from './fireperf';
-import {wb} from './sw-init';
+import {wb, getInitialSWStatus} from './sw-init';
 
 
 /* global ga */
@@ -323,7 +323,7 @@ const trackCustomDimensions = () => {
       [dimensions.TRACKING_VERSION]: TRACKING_VERSION,
       [dimensions.CLIENT_ID]: tracker.get('clientId'),
       [dimensions.WINDOW_ID]: uuid(),
-      [dimensions.SERVICE_WORKER_STATUS]: getServiceWorkerStatus(),
+      [dimensions.SERVICE_WORKER_STATUS]: getInitialSWStatus(),
       [dimensions.EFFECTIVE_CONNECTION_TYPE]: getEffectiveConnectionType(),
     });
 
@@ -513,7 +513,6 @@ const trackNavigationTimingMetrics = async () => {
     }
 
     if (nt) {
-      const swStartTime = Math.round(nt.workerStart || 0);
       const requestStart = Math.round(nt.requestStart);
       const responseStart = Math.round(nt.responseStart);
       const responseEnd = Math.round(nt.responseEnd);
@@ -521,10 +520,9 @@ const trackNavigationTimingMetrics = async () => {
       const windowLoaded = Math.round(nt.loadEventStart);
 
       // In some edge cases browsers return very obviously incorrect NT values,
-      // e.g. 0, negative, or future times. This validates values before
-      // sending.
+      // e.g. negative or future times. This validates values before sending.
       const allValuesAreValid = (...values) => {
-        return values.every((value) => value > 0 && value < 6e6);
+        return values.every((value) => value >= 0 && value < 6e6);
       };
 
       if (allValuesAreValid(
@@ -541,25 +539,13 @@ const trackNavigationTimingMetrics = async () => {
           [metrics.DOM_LOAD_TIME]: domLoaded,
           [metrics.WINDOW_LOAD_TIME]: windowLoaded,
         };
-        if (nt.workerStart && getServiceWorkerStatus() === 'controlled') {
-          fieldsObj[metrics.SW_START_TIME] = swStartTime;
+        if (getInitialSWStatus() === 'controlled' && 'workerStart' in nt) {
+          fieldsObj[metrics.SW_START_TIME] = Math.round(nt.workerStart);
         }
         gaTest('send', 'event', fieldsObj);
       }
     }
   }
-};
-
-
-/**
- * Gets the service worker status. It will be either: 'supported',
- * 'unsupported', or 'controlled'.
- * @return {string} The service worker status.
- */
-const getServiceWorkerStatus = () => {
-  return 'serviceWorker' in navigator ?
-      (navigator.serviceWorker.controller ? 'controlled' : 'supported') :
-      'unsupported';
 };
 
 

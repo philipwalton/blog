@@ -166,3 +166,19 @@ export const init = async () => {
 
   await wb.register();
 };
+
+
+/**
+ * Gets the service worker status at page laod time. It will be either:
+ * 'controlled', 'supported', or 'unsupported'.
+ * @return {string} The service worker status.
+ */
+export const getInitialSWStatus = () => {
+  if ('serviceWorker' in navigator) {
+    if (navigator.serviceWorker.controller && !isFirstSWInstall) {
+      return 'controlled';
+    }
+    return 'supported';
+  }
+  return 'unsupported';
+};

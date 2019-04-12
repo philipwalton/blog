@@ -29,7 +29,7 @@ const getContentPartialPath = (pagePath) => {
  */
 const fetchPageContent = async (path) => {
   const timer = new Timer().start();
-  const trace = fireperf.newTrace('SPA Load');
+  const trace = fireperf.trace('SPA Load');
   trace.start();
   trace.putAttribute('page', path);
 

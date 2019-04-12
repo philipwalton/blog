@@ -9,6 +9,7 @@ build
 
 # Firebase files
 .firebase
+fireperf.js
 
 # Log files
 *.log

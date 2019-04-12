@@ -98,6 +98,10 @@ export const metrics = {
 };
 
 
+const timeOrigin =
+    performance.timeOrigin || performance.timing.navigationStart;
+
+
 const whenWindowLoaded = new Promise((resolve) => {
   if (document.readyState === 'complete') {
     resolve();
@@ -475,11 +479,15 @@ const trackFid = () => {
       [dimensions.METRIC_VALUE]: event.timeStamp,
     });
 
-    const trace = fireperf.newTrace('First Input Delay');
-    trace.start();
-    // Using setTimeout here is a hack due to the fact that FirePerf doesn't
-    // currently let you programmatically set startTime and duration.
-    setTimeout(() => trace.stop(), delayInMs);
+    const trace = fireperf.trace('FID2');
+
+    // Some browsers report event timestamps in epoch time.
+    const startTime = event.timeStamp > 1e12 ?
+        event.timeStamp : event.timeStamp + timeOrigin;
+
+    trace.record(startTime, delay, {
+      attributes: {eventType: event.type},
+    });
   });
 };
 

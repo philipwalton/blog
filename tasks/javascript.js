@@ -110,7 +110,14 @@ const getMainConfig = () => Object.assign(baseConfig(), {
         npm: {
           test: /node_modules/,
           name: (mod) => {
-            const pkgName = mod.context.match(/node_modules\/([^/]+)/)[1];
+            // Since node modules can be nested, don't just match but get the
+            // last directory name after `/node_modules/`.
+            const lastMatch = mod.context.split('node_modules/').slice(-1);
+            const pkgName = /^(?:[^@/]+)|^@(?:[^/]+)\/(?:[^/]+)/
+                .exec(lastMatch)[0]
+                .replace('@', '')
+                .replace('/', ':');
+
             return `npm.${pkgName}`;
           },
         },

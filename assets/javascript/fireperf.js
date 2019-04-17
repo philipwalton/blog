@@ -1,4 +1,4 @@
-import {initializeApp} from '../../fireperf.js';
+import {initializeApp} from 'fireperf';
 
 
 const firebaseConfig = {

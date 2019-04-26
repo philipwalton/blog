@@ -9,6 +9,7 @@ import 'autotrack/lib/plugins/page-visibility-tracker';
 import 'autotrack/lib/plugins/url-change-tracker';
 import {breakpoints} from './breakpoints';
 import {fireperf} from './fireperf';
+import {now, timeOrigin} from './performance';
 import {wb, getInitialSWStatus} from './sw-init';
 
 
@@ -20,7 +21,7 @@ import {wb, getInitialSWStatus} from './sw-init';
  * implementation. This allows you to create a segment or view filter
  * that isolates only data captured with the most recent tracking changes.
  */
-const TRACKING_VERSION = '51';
+const TRACKING_VERSION = '52';
 
 
 /**
@@ -96,10 +97,6 @@ export const metrics = {
   RESPONSE_START_TIME: 'metric17',
   REQUEST_START_TIME: 'metric18',
 };
-
-
-const timeOrigin =
-    performance.timeOrigin || performance.timing.navigationStart;
 
 
 const whenWindowLoaded = new Promise((resolve) => {
@@ -329,11 +326,8 @@ const trackCustomDimensions = () => {
       [dimensions.WINDOW_ID]: uuid(),
       [dimensions.SERVICE_WORKER_STATUS]: getInitialSWStatus(),
       [dimensions.EFFECTIVE_CONNECTION_TYPE]: getEffectiveConnectionType(),
+      [dimensions.TIME_ORIGIN]: timeOrigin,
     });
-
-    if (window.performance && window.performance.timeOrigin) {
-      tracker.set(dimensions.TIME_ORIGIN, window.performance.timeOrigin);
-    }
   });
 
   // Adds tracking to record each the type, time, uuid, and visibility state
@@ -346,6 +340,7 @@ const trackCustomDimensions = () => {
       const hitType = model.get('hitType');
       model.set(dimensions.HIT_ID, uuid(), true);
       model.set(dimensions.HIT_TYPE, hitType, true);
+      model.set(dimensions.PAGE_TIME, now(), true);
 
       // Use the visibilityState at task queue time if available.
       const visibilityState = (queue.getState() || document).visibilityState;
@@ -356,10 +351,6 @@ const trackCustomDimensions = () => {
 
       if (qt) {
         model.set(dimensions.QUEUE_TIME, qt, true);
-      }
-
-      if (window.performance && window.performance.now) {
-        model.set(dimensions.PAGE_TIME, window.performance.now(), true);
       }
 
       // TODO(philipwalton): temporary fix to address an analytics.js bug where
@@ -440,7 +431,7 @@ const trackFcp = () => {
   }, true);
 
   if (window.PerformancePaintTiming) {
-    const reportFcpIfAvailable = (entriesList) => {
+    const reportFcpIfAvailable = async (entriesList) => {
       const fcpEntry = entriesList.getEntriesByName(
           'first-contentful-paint', 'paint')[0];
 
@@ -453,6 +444,15 @@ const trackFcp = () => {
           [metrics.FCP]: Math.round(fcpEntry.startTime),
           [metrics.FCP_SAMPLE]: 1,
         });
+
+        const {cacheHit} = await navigationReportReadyOrTimeout;
+        const attributes = {
+          'Cache Hit': String(cacheHit),
+          'visibilityState': wasEverHidden ? 'hidden' : 'visible',
+        };
+
+        const fcp2 = fireperf.trace('FCP2');
+        fcp2.record(timeOrigin, fcpEntry.startTime, {attributes});
       } else {
         new PerformanceObserver((list, observer) => {
           observer.disconnect();
@@ -509,14 +509,13 @@ const trackNavigationTimingMetrics = async () => {
     // support Navigation Timing Level 2.
     if (!nt) {
       const pt = performance.timing;
-      const startTime = pt.navigationStart;
       nt = {
         workerStart: 0,
-        requestStart: pt.requestStart - startTime,
-        responseStart: pt.responseStart - startTime,
-        responseEnd: pt.responseEnd - startTime,
-        domContentLoadedEventStart: pt.domContentLoadedEventStart - startTime,
-        loadEventStart: pt.loadEventStart - startTime,
+        requestStart: pt.requestStart - timeOrigin,
+        responseStart: pt.responseStart - timeOrigin,
+        responseEnd: pt.responseEnd - timeOrigin,
+        domContentLoadedEventStart: pt.domContentLoadedEventStart - timeOrigin,
+        loadEventStart: pt.loadEventStart - timeOrigin,
       };
     }
 
@@ -551,6 +550,15 @@ const trackNavigationTimingMetrics = async () => {
           fieldsObj[metrics.SW_START_TIME] = Math.round(nt.workerStart);
         }
         gaTest('send', 'event', fieldsObj);
+
+        const {cacheHit} = await navigationReportReadyOrTimeout;
+        const attributes = {'Cache Hit': String(cacheHit)};
+
+        const ttfb = fireperf.trace('Time to First Byte');
+        ttfb.record(timeOrigin, responseStart, {attributes});
+
+        const ttlb = fireperf.trace('Response End');
+        ttlb.record(timeOrigin, responseEnd, {attributes});
       }
     }
   }

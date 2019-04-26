@@ -3,7 +3,7 @@ import {gaTest, trackError} from './analytics';
 import * as drawer from './drawer';
 import {fireperf} from './fireperf';
 import History2 from './history2';
-import Timer from './timer';
+import {now} from './performance';
 
 
 const CONTENT_SUFFIX = '.content.html';
@@ -28,18 +28,8 @@ const getContentPartialPath = (pagePath) => {
  *    page or rejects with the network error.
  */
 const fetchPageContent = async (path) => {
-  const timer = new Timer().start();
-  const trace = fireperf.trace('SPA Load');
-  trace.start();
-  trace.putAttribute('page', path);
-
-  const gaEventData = {
-    eventCategory: 'Virtual Pageviews',
-    eventAction: 'fetch',
-    page: path,
-  };
-
   try {
+    const responseStartTime = now();
     const response = await fetch(getContentPartialPath(path));
 
     let content;
@@ -49,14 +39,24 @@ const fetchPageContent = async (path) => {
       throw new Error(
           `Response: (${response.status}) ${response.statusText}`);
     }
+    const responseDuration = now() - responseStartTime;
+    const responseSource =
+        response.headers.get('X-Cache-Hit') ? 'cache' : 'network';
 
-    timer.stop();
-    trace.stop();
+    gaTest('send', 'event', {
+      page: path,
+      eventCategory: 'Virtual Pageviews',
+      eventAction: 'fetch',
+      eventLabel: responseSource,
+      eventValue: Math.round(responseDuration),
+    });
 
-    gaTest('send', 'event', Object.assign(gaEventData, {
-      eventValue: Math.round(timer.duration),
-      eventLabel: response.headers.get('X-Cache-Hit') ? 'cache' : 'network',
-    }));
+    const spaLoad = fireperf.trace('SPA Load');
+    const attributes = {
+      'page': path,
+      'Cache Hit': String(responseSource === 'cache'),
+    };
+    spaLoad.record(responseStartTime, responseDuration, {attributes});
 
     return content;
   } catch (err) {

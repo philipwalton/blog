@@ -13,10 +13,4 @@ const firebaseConfig = {
 
 const fireperf = initializeApp(firebaseConfig).performance();
 
-// Don't send data when not in production.
-if (location.hostname !== 'philipwalton.com') {
-  fireperf.isDataCollectionEnabled = false;
-  fireperf.isInstrumentationEnabled = false;
-}
-
 export {fireperf};

@@ -53,8 +53,8 @@ const fetchPageContent = async (path) => {
 
     const spaLoad = fireperf.trace('SPA Load');
     const attributes = {
-      'page': path,
-      'cacheHit': String(responseSource === 'cache'),
+      page: path,
+      cacheHit: String(responseSource === 'cache'),
     };
     spaLoad.record(responseStartTime, responseDuration, {attributes});
 

@@ -447,8 +447,8 @@ const trackFcp = () => {
 
         const {cacheHit} = await navigationReportReadyOrTimeout;
         const attributes = {
-          'cacheHit': String(cacheHit),
-          'visibilityState': wasEverHidden ? 'hidden' : 'visible',
+          cacheHit: String(cacheHit),
+          wasEverHidden: String(wasEverHidden),
         };
 
         const fcp2 = fireperf.trace('FCP2');
@@ -552,7 +552,7 @@ const trackNavigationTimingMetrics = async () => {
         gaTest('send', 'event', fieldsObj);
 
         const {cacheHit} = await navigationReportReadyOrTimeout;
-        const attributes = {'cacheHit': String(cacheHit)};
+        const attributes = {cacheHit: String(cacheHit)};
 
         const ttfb = fireperf.trace('Time to First Byte');
         ttfb.record(timeOrigin, responseStart, {attributes});

@@ -18,8 +18,7 @@ const minifyHtml = (html) => {
 
 
 const processHtml = (html) => {
-  return process.env.NODE_ENV == 'production' ?
-      minifyHtml(html) : html;
+  return process.env.NODE_ENV === 'development' ? html : minifyHtml(html);
 };
 
 module.exports = {processHtml};

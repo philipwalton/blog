@@ -17,7 +17,7 @@ const getManifest = () => {
 };
 
 const saveManifest = () => {
-  fs.outputJson(
+  fs.outputJsonSync(
       path.join(config.publicStaticDir, config.manifestFileName),
       revisionedAssetManifest, {spaces: 2});
 };
@@ -40,7 +40,7 @@ const getAsset = (filename) => {
 };
 
 
-const addAsset = async (filename, revisionedFilename) => {
+const addAsset = (filename, revisionedFilename) => {
   getManifest();
 
   revisionedAssetManifest[filename] = revisionedFilename;
@@ -50,18 +50,18 @@ const addAsset = async (filename, revisionedFilename) => {
 
 
 const getRevisionedAssetUrl = (filename) => {
-  return path.join(config.publicStaticPath, getAsset(filename));
+  return path.join(config.publicStaticPath, getAsset(filename) || filename);
 };
 
 
-const generateRevisionedAsset = async (filename, content) => {
+const generateRevisionedAsset = (filename, content) => {
   const hash = revHash(content);
   const revisionedFilename = revPath(filename, hash);
 
   // Updates the internal revision map so it can be referenced later.
   addAsset(filename, revisionedFilename);
 
-  await fs.outputFile(
+  fs.outputFileSync(
       path.join(config.publicStaticDir, revisionedFilename), content);
 };
 

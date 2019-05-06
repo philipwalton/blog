@@ -113,7 +113,7 @@ const whenWindowLoaded = new Promise((resolve) => {
 
 const navigationReportReadyOrTimeout = new Promise((resolve) => {
   // Uncontrolled pages can never be fully cache-first.
-  if (!navigator.serviceWorker.controller) {
+  if (!(navigator.serviceWorker && navigator.serviceWorker.controller)) {
     resolve({cacheHit: false});
   }
 
@@ -129,7 +129,7 @@ const navigationReportReadyOrTimeout = new Promise((resolve) => {
 
 const getSiteVersionOrTimeout = new Promise((resolve) => {
   // Uncontrolled pages won't have a version.
-  if (!navigator.serviceWorker.controller) {
+  if (!(navigator.serviceWorker && navigator.serviceWorker.controller)) {
     resolve({version: NULL_VALUE});
   }
 
@@ -172,6 +172,12 @@ const createGaProxy = (trackers) => {
  */
 export const gaAll = createGaProxy(ALL_TRACKERS);
 export const gaTest = createGaProxy(TEST_TRACKERS);
+
+
+export const addDependency = () => {
+  // TODO(philipwalton): implement a way for other modules to delay sending
+  // of analytics data.
+};
 
 
 /**

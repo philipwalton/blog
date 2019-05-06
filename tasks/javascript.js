@@ -1,205 +1,138 @@
-/* eslint-disable no-console */
-
 const gulp = require('gulp');
-const path = require('path');
-const TerserWebpackPlugin = require('terser-webpack-plugin');
-const webpack = require('webpack');
-const ManifestPlugin = require('webpack-manifest-plugin');
-const {addAsset, getManifest} = require('./utils/assets');
+const {rollup} = require('rollup');
+const babel = require('rollup-plugin-babel');
+const commonjs = require('rollup-plugin-commonjs');
+const resolve = require('rollup-plugin-node-resolve');
+const replace = require('rollup-plugin-replace');
+const terserRollupPlugin = require('rollup-plugin-terser').terser;
+const {addAsset} = require('./utils/assets');
+const {checkModuleDuplicates} = require('./utils/check-module-duplicates');
 const config = require('../config.json');
 
-
-const minifyNameCache = {};
-const webpackBuildCache = {};
 
 const getEnv = () => {
   return process.env.NODE_ENV || 'development';
 };
 
-const initPlugins = () => {
-  return [
-    // Identify each module by a hash, so caching is more predictable.
-    new webpack.HashedModuleIdsPlugin(),
+const getPackageNameFromFilePath = (filePath) => {
+  // Since node modules can be nested, don't just match but get the
+  // last directory name after `/node_modules/`.
+  const pathParts = filePath.split('node_modules/').slice(-1);
+  const lastPart = pathParts[pathParts.length - 1];
 
-    // Create manifest of the original filenames to their hashed filenames.
-    new ManifestPlugin({
-      seed: getManifest(),
-      fileName: config.manifestFileName,
-      generate: (seed, files) => {
-        return files.reduce((manifest, opts) => {
-          // Needed until this issue is resolved:
-          // https://github.com/danethurber/webpack-manifest-plugin/issues/159
-          const name = path.basename(opts.path);
-          const unhashedName = name.replace(/[_.-][0-9a-f]{10}/, '');
+  return /^(?:[^@/]+)|^@(?:[^/]+)\/(?:[^/]+)/.exec(lastPart)[0];
+};
 
-          addAsset(unhashedName, name);
-          return getManifest();
-        }, seed);
-      },
-    }),
+const manualChunks = (id) => {
+  if (id.includes('node_modules')) {
+    return `npm.${getPackageNameFromFilePath(id)}`;
+  }
+};
 
-    // Allows minifiers to removed dev-only code.
-    new webpack.DefinePlugin({
+const assetManifestPlugin = {
+  generateBundle(options, bundle) {
+    const ext = options.entryFileNames.slice(
+        options.entryFileNames.indexOf('.'));
+
+    for (const [name, assetInfo] of Object.entries(bundle)) {
+      addAsset(`${assetInfo.name}${ext}`, name);
+    }
+  },
+};
+
+const terserConfig = {
+  mangle: {
+    toplevel: true,
+    // properties: {
+    //   regex: /(^_|_$)/,
+    // },
+    safari10: true,
+  },
+};
+
+let moduleBundleCache;
+
+const compileModuleBundle = async () => {
+  const plugins = [
+    resolve(),
+    commonjs(),
+    replace({
       'process.env.NODE_ENV': JSON.stringify(getEnv()),
     }),
+    assetManifestPlugin,
   ];
+  if (getEnv() !== 'development') {
+    plugins.push(terserRollupPlugin(terserConfig));
+  }
+
+  const bundle = await rollup({
+    input: 'assets/javascript/main.js',
+    cache: moduleBundleCache,
+    plugins,
+    manualChunks,
+    preserveSymlinks: true, // Needed for `file:` entries in package.json.
+  });
+
+  moduleBundleCache = bundle.cache;
+
+  checkModuleDuplicates(bundle.cache.modules.map((m) => m.id));
+
+  await bundle.write({
+    dir: config.publicStaticDir,
+    format: 'esm',
+    chunkFileNames: '[name]-[hash].mjs',
+    entryFileNames: '[name]-[hash].mjs',
+  });
 };
 
-const generateBabelEnvLoader = (targets) => {
-  return {
-    test: /\.m?js$/,
-    use: {
-      loader: 'babel-loader',
-      options: {
-        babelrc: false,
-        presets: [
-          ['@babel/env', {
-            // debug: true,
-            modules: false,
-            useBuiltIns: 'entry',
-            targets,
-          }],
-        ],
-      },
-    },
-  };
-};
+let nomoduleBundleCache;
 
-const baseConfig = () => ({
-  mode: getEnv() === 'development' ? 'development' : 'production',
-  plugins: initPlugins(),
-  devtool: '#source-map',
-  cache: webpackBuildCache,
-});
+const compileClassicBundle = async () => {
+  const plugins = [
+    resolve(),
+    commonjs(),
+    replace({
+      'process.env.NODE_ENV': JSON.stringify(getEnv()),
+    }),
+    babel({
+      exclude: [
+        /core-js/,
+        /regenerator-runtime/,
+      ],
+      presets: [['@babel/preset-env', {
+        targets: {browsers: ['ie 11']},
+        useBuiltIns: 'usage',
+        // debug: true,
+        loose: true,
+        corejs: 3,
+      }]],
+    }),
+    assetManifestPlugin,
+  ];
+  if (getEnv() !== 'development') {
+    plugins.push(terserRollupPlugin(terserConfig));
+  }
 
-const getMainConfig = () => Object.assign(baseConfig(), {
-  entry: {
-    'main': './assets/javascript/main.js',
-  },
-  output: {
-    path: path.resolve(__dirname, '..', config.publicStaticDir),
-    publicPath: '/',
-    filename: '[name]-[chunkhash:10].mjs',
-  },
-  module: {
-    rules: [
-      generateBabelEnvLoader({
-        browsers: [
-          // The last two versions of each browser, excluding versions
-          // that don't support <script type="module">.
-          'last 2 Chrome versions', 'not Chrome < 60',
-          'last 2 Safari versions', 'not Safari < 10.1',
-          'last 2 iOS versions', 'not iOS < 10.3',
-          'last 2 Firefox versions', 'not Firefox < 60',
-          'last 2 Edge versions', 'not Edge < 16',
-        ],
-      }),
-    ],
-  },
-  resolve: {
-    // Needed when using `npm link` or file paths.
-    symlinks: false,
-  },
-  optimization: {
-    runtimeChunk: 'single',
-    splitChunks: {
-      chunks: 'all',
-      maxInitialRequests: Infinity,
-      minSize: 0,
-      cacheGroups: {
-        npm: {
-          test: /node_modules/,
-          name: (mod) => {
-            // Since node modules can be nested, don't just match but get the
-            // last directory name after `/node_modules/`.
-            const lastMatch = mod.context.split('node_modules/').slice(-1);
-            const pkgName = /^(?:[^@/]+)|^@(?:[^/]+)\/(?:[^/]+)/
-                .exec(lastMatch)[0]
-                .replace('@', '')
-                .replace('/', ':');
+  const bundle = await rollup({
+    input: 'assets/javascript/nomodule.js',
+    cache: nomoduleBundleCache,
+    plugins,
+    preserveSymlinks: true, // Needed for `file:` entries in package.json.
+  });
 
-            return `npm.${pkgName}`;
-          },
-        },
-      },
-    },
-    minimizer: [new TerserWebpackPlugin({
-      test: /\.m?js$/,
-      parallel: false, // Needed for cross-file prop mangling.
-      sourceMap: true,
-      terserOptions: {
-        mangle: {
-          // TODO(philipwalton): property mangling doesn't work with FirePerf.
-          // Figure out why, or what a realistic workaround could be.
-          // properties: {
-          //   reserved: ['__e', '__esModule'],
-          //   regex: /(^_|_$)/,
-          // },
-        },
-        nameCache: minifyNameCache, // Needed for cross-file prop mangling.
-        safari10: true,
-      },
-    })],
-  },
-});
+  nomoduleBundleCache = bundle.cache;
 
-const getLegacyConfig = () => Object.assign(baseConfig(), {
-  entry: {
-    'main': './assets/javascript/main-legacy.js',
-  },
-  output: {
-    path: path.resolve(__dirname, '..', config.publicStaticDir),
-    publicPath: '/',
-    filename: '[name]-[chunkhash:10].es5.js',
-  },
-  module: {
-    rules: [
-      generateBabelEnvLoader({browsers: ['last 2 versions']}),
-    ],
-  },
-  optimization: {
-    minimizer: [new TerserWebpackPlugin({
-      test: /\.m?js$/,
-      sourceMap: true,
-      terserOptions: {
-        // Don't mangle properties in legacy config
-        // because it breaks polyfills.
-        mangle: true,
-        safari10: true,
-      },
-    })],
-  },
-});
-
-const createCompiler = (config) => {
-  const compiler = webpack(config);
-  return () => {
-    return new Promise((resolve, reject) => {
-      compiler.run((err, stats) => {
-        if (err) return reject(err);
-        console.log(stats.toString({
-          colors: true,
-          // Uncomment to see all bundled modules.
-          // maxModules: Infinity,
-        }));
-        resolve();
-      });
-    });
-  };
+  await bundle.write({
+    dir: config.publicStaticDir,
+    format: 'iife',
+    entryFileNames: '[name]-[hash].js',
+  });
 };
 
 gulp.task('javascript', async () => {
-  try {
-    const compileMainBundle = createCompiler(getMainConfig());
-    await compileMainBundle();
+  await compileModuleBundle();
 
-    if (getEnv() !== 'development') {
-      // Generate the main-legacy bundle.
-      const compileLegacyBundle = createCompiler(getLegacyConfig());
-      await compileLegacyBundle();
-    }
-  } catch (err) {
-    // Log but don't throw so watching still works.
-    console.error(err);
+  if (getEnv() !== 'development') {
+    await compileClassicBundle();
   }
 });

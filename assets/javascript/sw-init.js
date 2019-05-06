@@ -8,7 +8,8 @@ import * as messages from './messages';
 // here in the top-level scope.
 export const wb = new Workbox('/sw.js');
 
-const isFirstSWInstall = !navigator.serviceWorker.controller;
+const isFirstSWInstall = navigator.serviceWorker &&
+    !navigator.serviceWorker.controller;
 
 
 /**

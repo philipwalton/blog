@@ -1,4 +1,4 @@
-import {initializeApp} from 'fireperf';
+import fireperf from 'fireperf';
 
 
 const firebaseConfig = {
@@ -11,6 +11,6 @@ const firebaseConfig = {
   appId: '1:48175167448:web:45863557eb40ee1a',
 };
 
-const fireperf = initializeApp(firebaseConfig).performance();
+const performance = fireperf.initializeApp(firebaseConfig).performance();
 
-export {fireperf};
+export {performance as fireperf};

@@ -1,15 +1,50 @@
 import {Workbox} from 'workbox-window/Workbox.mjs';
-import {gaTest, trackError, NULL_VALUE} from './analytics';
+import {gaTest, dimensions, addPreSendDependency, trackError, NULL_VALUE} from './analytics';
 import {loadPage} from './content-loader';
 import * as messages from './messages';
+import {initialSWState} from './sw-state';
 
 
-// Defining a Workbox instance has no side effects, so it's OK to do
+// Defining a Workbox instance has no side effects, so it's OK to do it
 // here in the top-level scope.
 export const wb = new Workbox('/sw.js');
 
-const isFirstSWInstall = navigator.serviceWorker &&
-    !navigator.serviceWorker.controller;
+const setSiteVersionOrTimeout = async () => {
+  // Set the site version, if available.
+  const {version} = await new Promise((resolve) => {
+    // Uncontrolled pages won't have a version.
+    if (initialSWState !== 'controlled') {
+      resolve({version: NULL_VALUE});
+    }
+
+    wb.messageSW({type: 'GET_METADATA'}).then(resolve);
+
+    setTimeout(() => resolve({version: NULL_VALUE}), 3000);
+  });
+
+  gaTest('set', dimensions.SITE_VERSION, version);
+};
+
+const setNavigationCacheOrTimeout = async () => {
+  // Before sending any perf data, determine whether the page was served
+  // entirely cache-first.
+  const {cacheHit} = await new Promise((resolve) => {
+    // Uncontrolled pages can never be fully cache-first.
+    if (initialSWState !== 'controlled') {
+      resolve({cacheHit: false});
+    }
+
+    wb.addEventListener('message', ({data}) => {
+      if (data.type === 'NAVIGATION_REPORT') {
+        resolve(data.payload);
+      }
+    });
+
+    setTimeout(() => resolve({cacheHit: NULL_VALUE}), 3000);
+  });
+
+  gaTest('set', dimensions.CACHE_HIT, String(cacheHit));
+};
 
 
 /**
@@ -129,7 +164,7 @@ const addSWUpdateListener = () => {
       }
 
       // Never show update notifications if this is the first SW install.
-      if (isFirstSWInstall) {
+      if (initialSWState !== 'controlled') {
         shouldNotifyUser = false;
       }
 
@@ -166,20 +201,7 @@ export const init = async () => {
   addSWUpdateListener();
 
   await wb.register();
-};
 
-
-/**
- * Gets the service worker status at page laod time. It will be either:
- * 'controlled', 'supported', or 'unsupported'.
- * @return {string} The service worker status.
- */
-export const getInitialSWStatus = () => {
-  if ('serviceWorker' in navigator) {
-    if (navigator.serviceWorker.controller && !isFirstSWInstall) {
-      return 'controlled';
-    }
-    return 'supported';
-  }
-  return 'unsupported';
+  addPreSendDependency(setSiteVersionOrTimeout());
+  addPreSendDependency(setNavigationCacheOrTimeout());
 };

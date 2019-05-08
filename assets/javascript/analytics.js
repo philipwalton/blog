@@ -10,7 +10,7 @@ import 'autotrack/lib/plugins/url-change-tracker';
 import {breakpoints} from './breakpoints';
 import {fireperf} from './fireperf';
 import {now, timeOrigin} from './performance';
-import {wb, getInitialSWStatus} from './sw-init';
+import {initialSWState} from './sw-state';
 
 
 /* global ga */
@@ -59,7 +59,7 @@ export const dimensions = {
   METRIC_VALUE: 'dimension6',
   CLIENT_ID: 'dimension7',
   SERVICE_WORKER_REPLAY: 'dimension8',
-  SERVICE_WORKER_STATUS: 'dimension9',
+  SERVICE_WORKER_STATE: 'dimension9',
   CACHE_HIT: 'dimension10',
   WINDOW_ID: 'dimension11',
   VISIBILITY_STATE: 'dimension12',
@@ -111,32 +111,13 @@ const whenWindowLoaded = new Promise((resolve) => {
 });
 
 
-const navigationReportReadyOrTimeout = new Promise((resolve) => {
-  // Uncontrolled pages can never be fully cache-first.
-  if (!(navigator.serviceWorker && navigator.serviceWorker.controller)) {
-    resolve({cacheHit: false});
+let wasEverHidden = document.visibilityState === 'hidden';
+addEventListener('visibilitychange', function f() {
+  if (document.visibilityState === 'hidden') {
+    wasEverHidden = true;
+    removeEventListener('visibilitychange', f, true);
   }
-
-  wb.addEventListener('message', ({data}) => {
-    if (data.type === 'NAVIGATION_REPORT') {
-      resolve(data.payload);
-    }
-  });
-
-  setTimeout(() => resolve({cacheHit: NULL_VALUE}), 3000);
-});
-
-
-const getSiteVersionOrTimeout = new Promise((resolve) => {
-  // Uncontrolled pages won't have a version.
-  if (!(navigator.serviceWorker && navigator.serviceWorker.controller)) {
-    resolve({version: NULL_VALUE});
-  }
-
-  wb.messageSW({type: 'GET_METADATA'}).then(resolve);
-
-  setTimeout(() => resolve({version: NULL_VALUE}), 3000);
-});
+}, true);
 
 
 /**
@@ -174,9 +155,9 @@ export const gaAll = createGaProxy(ALL_TRACKERS);
 export const gaTest = createGaProxy(TEST_TRACKERS);
 
 
-export const addDependency = () => {
-  // TODO(philipwalton): implement a way for other modules to delay sending
-  // of analytics data.
+const preSendDependencies = [];
+export const addPreSendDependency = (dependency) => {
+  preSendDependencies.push(dependency);
 };
 
 
@@ -194,17 +175,10 @@ export const init = async () => {
   trackErrors();
   trackCustomDimensions();
 
-  // Set the site version, if available.
-  const {version} = await getSiteVersionOrTimeout;
-  gaAll('set', dimensions.SITE_VERSION, version);
+  // presend dependencies
+  await Promise.all(preSendDependencies);
 
   requireAutotrackPlugins();
-
-  // Before sending any perf data, determine whether the page was served
-  // entirely cache-first.
-  const {cacheHit} = await navigationReportReadyOrTimeout;
-  gaAll('set', dimensions.CACHE_HIT, String(cacheHit));
-
   trackFcp();
   trackFid();
   trackNavigationTimingMetrics();
@@ -330,7 +304,7 @@ const trackCustomDimensions = () => {
       [dimensions.TRACKING_VERSION]: TRACKING_VERSION,
       [dimensions.CLIENT_ID]: tracker.get('clientId'),
       [dimensions.WINDOW_ID]: uuid(),
-      [dimensions.SERVICE_WORKER_STATUS]: getInitialSWStatus(),
+      [dimensions.SERVICE_WORKER_STATE]: initialSWState,
       [dimensions.EFFECTIVE_CONNECTION_TYPE]: getEffectiveConnectionType(),
       [dimensions.TIME_ORIGIN]: timeOrigin,
     });
@@ -428,14 +402,6 @@ const requireAutotrackPlugins = () => {
 
 
 const trackFcp = () => {
-  let wasEverHidden = document.visibilityState === 'hidden';
-  addEventListener('visibilitychange', function f() {
-    if (document.visibilityState === 'hidden') {
-      wasEverHidden = true;
-      removeEventListener('visibilitychange', f, true);
-    }
-  }, true);
-
   if (window.PerformancePaintTiming) {
     const reportFcpIfAvailable = async (entriesList) => {
       const fcpEntry = entriesList.getEntriesByName(
@@ -451,14 +417,15 @@ const trackFcp = () => {
           [metrics.FCP_SAMPLE]: 1,
         });
 
-        const {cacheHit} = await navigationReportReadyOrTimeout;
-        const attributes = {
-          cacheHit: String(cacheHit),
-          wasEverHidden: String(wasEverHidden),
-        };
+        gaTest((tracker) => {
+          const attributes = {
+            cacheHit: tracker.get(dimensions.CACHE_HIT),
+            wasEverHidden: String(wasEverHidden),
+          };
 
-        const fcp2 = fireperf.trace('FCP2');
-        fcp2.record(timeOrigin, fcpEntry.startTime, {attributes});
+          const fcp2 = fireperf.trace('FCP2');
+          fcp2.record(timeOrigin, fcpEntry.startTime, {attributes});
+        });
       } else {
         new PerformanceObserver((list, observer) => {
           observer.disconnect();
@@ -552,19 +519,20 @@ const trackNavigationTimingMetrics = async () => {
           [metrics.DOM_LOAD_TIME]: domLoaded,
           [metrics.WINDOW_LOAD_TIME]: windowLoaded,
         };
-        if (getInitialSWStatus() === 'controlled' && 'workerStart' in nt) {
+        if (initialSWState === 'controlled' && 'workerStart' in nt) {
           fieldsObj[metrics.SW_START_TIME] = Math.round(nt.workerStart);
         }
         gaTest('send', 'event', fieldsObj);
 
-        const {cacheHit} = await navigationReportReadyOrTimeout;
-        const attributes = {cacheHit: String(cacheHit)};
+        gaTest((tracker) => {
+          const attributes = {cacheHit: dimensions.CACHE_HIT};
 
-        const ttfb = fireperf.trace('Time to First Byte');
-        ttfb.record(timeOrigin, responseStart, {attributes});
+          const ttfb = fireperf.trace('Time to First Byte');
+          ttfb.record(timeOrigin, responseStart, {attributes});
 
-        const ttlb = fireperf.trace('Response End');
-        ttlb.record(timeOrigin, responseEnd, {attributes});
+          const ttlb = fireperf.trace('Response End');
+          ttlb.record(timeOrigin, responseEnd, {attributes});
+        });
       }
     }
   }

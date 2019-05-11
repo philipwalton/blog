@@ -1,7 +1,6 @@
 import * as alerts from './alerts';
 import {gaTest, trackError} from './analytics';
 import * as drawer from './drawer';
-import {fireperf} from './fireperf';
 import History2 from './history2';
 import {now} from './performance';
 
@@ -50,13 +49,6 @@ const fetchPageContent = async (path) => {
       eventLabel: responseSource,
       eventValue: Math.round(responseDuration),
     });
-
-    const spaLoad = fireperf.trace('SPA Load');
-    const attributes = {
-      page: path,
-      cacheHit: String(responseSource === 'cache'),
-    };
-    spaLoad.record(responseStartTime, responseDuration, {attributes});
 
     return content;
   } catch (err) {

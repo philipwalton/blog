@@ -8,7 +8,6 @@ import 'autotrack/lib/plugins/outbound-link-tracker';
 import 'autotrack/lib/plugins/page-visibility-tracker';
 import 'autotrack/lib/plugins/url-change-tracker';
 import {breakpoints} from './breakpoints';
-import {fireperf} from './fireperf';
 import {now, timeOrigin} from './performance';
 import {initialSWState} from './sw-state';
 
@@ -416,16 +415,6 @@ const trackFcp = () => {
           [metrics.FCP]: Math.round(fcpEntry.startTime),
           [metrics.FCP_SAMPLE]: 1,
         });
-
-        gaTest((tracker) => {
-          const attributes = {
-            cacheHit: tracker.get(dimensions.CACHE_HIT),
-            wasEverHidden: String(wasEverHidden),
-          };
-
-          const fcp2 = fireperf.trace('FCP2');
-          fcp2.record(timeOrigin, fcpEntry.startTime, {attributes});
-        });
       } else {
         new PerformanceObserver((list, observer) => {
           observer.disconnect();
@@ -450,16 +439,6 @@ const trackFid = () => {
       [metrics.FID]: delayInMs,
       [metrics.FID_SAMPLE]: 1,
       [dimensions.METRIC_VALUE]: event.timeStamp,
-    });
-
-    const trace = fireperf.trace('FID2');
-
-    // Some browsers report event timestamps in epoch time.
-    const startTime = event.timeStamp > 1e12 ?
-        event.timeStamp : event.timeStamp + timeOrigin;
-
-    trace.record(startTime, delay, {
-      attributes: {eventType: event.type},
     });
   });
 };
@@ -523,16 +502,6 @@ const trackNavigationTimingMetrics = async () => {
           fieldsObj[metrics.SW_START_TIME] = Math.round(nt.workerStart);
         }
         gaTest('send', 'event', fieldsObj);
-
-        gaTest((tracker) => {
-          const attributes = {cacheHit: dimensions.CACHE_HIT};
-
-          const ttfb = fireperf.trace('Time to First Byte');
-          ttfb.record(timeOrigin, responseStart, {attributes});
-
-          const ttlb = fireperf.trace('Response End');
-          ttlb.record(timeOrigin, responseEnd, {attributes});
-        });
       }
     }
   }

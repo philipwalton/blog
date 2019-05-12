@@ -1,5 +1,5 @@
 import {Workbox} from 'workbox-window/Workbox.mjs';
-import {ga, dimensions, addPreSendDependency, trackError, NULL_VALUE} from './analytics';
+import {ga, dimensions, addPreSendDependency, NULL_VALUE} from './analytics';
 import {loadPage} from './content-loader';
 import * as messages from './messages';
 import {initialSWState} from './sw-state';
@@ -120,8 +120,8 @@ const addCacheUpdateListener = () => {
       loadPage(updatedURL);
 
       ga('send', 'event', {
-        eventCategory: 'Cache Update',
-        eventAction: 'receive',
+        eventCategory: 'Service Worker',
+        eventAction: 'cache-update',
         eventLabel: updatedURL,
       });
     }
@@ -143,18 +143,19 @@ const addSWUpdateListener = () => {
         newVersion,
         newMajorVersion,
         timeSinceNewVersionDeployed,
-        error,
       } = processMetadata(data.payload);
 
-      const sendUpdateEvent = (eventAction) => {
+      const sendEvent = (eventCategory, eventAction) => {
         ga('send', 'event', {
-          eventCategory: 'SW Update',
+          eventCategory,
           eventAction,
           eventValue: timeSinceNewVersionDeployed || 0,
           eventLabel: newVersion ?
               `${oldVersion || NULL_VALUE} => ${newVersion}` : NULL_VALUE,
         });
       };
+
+      sendEvent('Service Worker', 'sw-update');
 
       // If this is an update from a brand new SW installation, or if there
       // wasn't a major version change, log that it happened but don't notify
@@ -173,23 +174,14 @@ const addSWUpdateListener = () => {
           body: 'A newer version of this site is available.',
           action: 'Reload',
           onAction: async () => {
-            sendUpdateEvent('reload');
+            sendEvent('Messages', 'sw-update-reload');
             setTimeout(() => location.reload(), 0);
           },
           onDismiss: () => {
-            sendUpdateEvent('dismiss');
+            sendEvent('Messages', 'sw-update-dismiss');
           },
         });
-      }
-
-      // Track what happened with the udpate
-      if (error) {
-        trackError(error, {
-          eventCategory: 'SW Update',
-          eventAction: 'error',
-        });
-      } else {
-        sendUpdateEvent(shouldNotifyUser ? 'notify' : 'receive');
+        sendEvent('Messages', 'sw-update-notify');
       }
     }
   });

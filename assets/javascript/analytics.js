@@ -102,15 +102,6 @@ const whenWindowLoaded = new Promise((resolve) => {
 });
 
 
-let wasEverHidden = document.visibilityState === 'hidden';
-addEventListener('visibilitychange', function f() {
-  if (document.visibilityState === 'hidden') {
-    wasEverHidden = true;
-    removeEventListener('visibilitychange', f, true);
-  }
-}, true);
-
-
 const preSendDependencies = [];
 export const addPreSendDependency = (dependency) => {
   preSendDependencies.push(dependency);
@@ -130,9 +121,12 @@ export const init = async () => {
   await Promise.all(preSendDependencies);
 
   ga('send', 'pageview', {[dimensions.HIT_SOURCE]: 'navigation'});
-  trackFcp();
-  trackFid();
-  trackNavigationTimingMetrics();
+
+  if (window.__wasAlwaysVisible) {
+    trackFcp();
+    trackFid();
+    trackNavigationTimingMetrics();
+  }
 };
 
 
@@ -294,9 +288,9 @@ const trackFcp = () => {
 
       if (fcpEntry) {
         ga('send', 'event', {
-          eventCategory: 'PW Metrics',
-          eventAction: 'FCP',
-          eventLabel: wasEverHidden ? 'hidden' : 'visible',
+          eventCategory: 'Performance',
+          eventAction: 'first-contentful-paint',
+          eventLabel: NULL_VALUE,
           nonInteraction: true,
           [metrics.FCP]: Math.round(fcpEntry.startTime),
           [metrics.FCP_SAMPLE]: 1,
@@ -317,8 +311,8 @@ const trackFid = () => {
     const delayInMs = Math.round(delay);
 
     ga('send', 'event', {
-      eventCategory: 'PW Metrics',
-      eventAction: 'FID',
+      eventCategory: 'Performance',
+      eventAction: 'first-input-delay',
       eventLabel: event.type,
       eventValue: delayInMs,
       nonInteraction: true,
@@ -373,8 +367,8 @@ const trackNavigationTimingMetrics = async () => {
       if (allValuesAreValid(
           requestStart, responseStart, responseEnd, domLoaded, windowLoaded)) {
         const fieldsObj = {
-          eventCategory: 'Navigation Timing',
-          eventAction: 'track',
+          eventCategory: 'Performance',
+          eventAction: 'navigation',
           eventLabel: NULL_VALUE,
           nonInteraction: true,
           [metrics.NT_SAMPLE]: 1,

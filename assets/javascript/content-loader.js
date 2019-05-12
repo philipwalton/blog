@@ -44,7 +44,7 @@ const fetchPageContent = async (path) => {
 
     ga('send', 'event', {
       page: path,
-      eventCategory: 'Virtual Pageviews',
+      eventCategory: 'SPA',
       eventAction: 'fetch',
       eventLabel: responseSource,
       eventValue: Math.round(responseDuration),

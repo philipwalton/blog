@@ -63,7 +63,7 @@ const renderIcon = (id) => {
  * Initializes the alert DOM containers and event handlers to remove
  * added alerts.
  */
-export const init = () => {
+const init = () => {
   alertContainer = document.createElement('div');
   alertContainer.className = 'AlertContainer';
 
@@ -84,6 +84,7 @@ export const init = () => {
  *     body: The alert body text.
  */
 export const add = async ({title, body}) => {
+  if (!alertContainer) init();
   if (alertShowing) remove();
 
   const alert = createAlert({title, body});

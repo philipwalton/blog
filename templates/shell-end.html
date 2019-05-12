@@ -1,12 +1,6 @@
     </main>
   </div>
 
-  {% include '_javascript-legacy.html' %}
-
-  <noscript>
-    <!-- Track if JavaScript is disabled -->
-    <img src="https://www.google-analytics.com/collect?v=1&t=pageview&tid=UA-21292978-3&cid=noscript&cd7=noscript&dl={{ site.baseUrl | urlencode}}{{ page.path | urlencode }}">
-  </noscript>
-
+  {% include '_javascript.html' %}
 </body>
 </html>

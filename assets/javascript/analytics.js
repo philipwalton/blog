@@ -25,12 +25,6 @@ const queue = new IdleQueue({
 });
 
 
-// Initialize the command queue in case analytics.js hasn't loaded yet.
-// https://developers.google.com/analytics/devguides/collection/analyticsjs/
-// eslint-disable-next-line
-window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};
-
-
 /**
  * A wrapper function for the global `ga()` provided by analytics.js that
  * runs all commands via an IdleQueue.
@@ -113,6 +107,11 @@ export const addPreSendDependency = (dependency) => {
  * values on the trackers.
  */
 export const init = async () => {
+  // Initialize the command queue in case analytics.js hasn't loaded yet.
+  // https://developers.google.com/analytics/devguides/collection/analyticsjs/
+  // eslint-disable-next-line
+  window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};
+
   createTracker();
   trackErrors();
   trackCustomDimensions();

@@ -1,4 +1,3 @@
-
 export const transition = ($el, timeout,
     {to, using, from, useTransitions = true} = {}) => {
   return new Promise(async (resolve) => {

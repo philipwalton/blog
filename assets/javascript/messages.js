@@ -77,7 +77,7 @@ const renderIcon = (id) => {
  * Initializes the message DOM containers and event handlers to remove
  * added messages.
  */
-export const init = () => {
+const init = () => {
   messageContainer = document.createElement('div');
   messageContainer.className = 'MessageContainer';
 
@@ -99,6 +99,8 @@ export const init = () => {
  *     action: The message action text.
  */
 export const add = async ({body, action, onAction, onDismiss}) => {
+  if (!messageContainer) init();
+
   const message = createMessage({body, action});
 
   // Map the DOM element to the passed onAction.

@@ -1,5 +1,3 @@
-import * as alerts from './alerts';
-import {ga, dimensions, trackError} from './analytics';
 import * as drawer from './drawer';
 import History2 from './history2';
 import {now} from './performance';
@@ -42,6 +40,7 @@ const fetchPageContent = async (path) => {
     const responseSource =
         response.headers.get('X-Cache-Hit') ? 'cache' : 'network';
 
+    const {ga} = await import('./analytics');
     ga('send', 'event', {
       page: path,
       eventCategory: 'SPA',
@@ -56,10 +55,12 @@ const fetchPageContent = async (path) => {
         `Check your network connection to ensure you're still online.` :
         err.message;
 
+    const alerts = await import('./alerts');
     alerts.add({
       title: `Oops, there was an error making your request`,
       body: message,
     });
+
     // Rethrow to be able to catch it again in an outer scope.
     throw err;
   }
@@ -116,6 +117,8 @@ const setScroll = (hash) => {
  * @param {string} pathname
  */
 const trackPageview = async (pathname) => {
+  const {ga, dimensions} = await import('./analytics');
+
   ga('set', 'page', pathname);
   ga('send', 'pageview', {[dimensions.HIT_SOURCE]: 'SPA'});
 };
@@ -144,6 +147,8 @@ export const init = () => {
       setScroll(state.hash);
       trackPageview(state.pathname);
     } catch (err) {
+      const {trackError} = await import('./analytics');
+
       trackError(/** @type {!Error} */ (err));
       throw err;
     }

@@ -34,8 +34,13 @@ const assetManifestPlugin = {
     const ext = options.entryFileNames.slice(
         options.entryFileNames.indexOf('.'));
 
-    for (const [name, assetInfo] of Object.entries(bundle)) {
-      addAsset(`${assetInfo.name}${ext}`, name);
+    let chunks = 0;
+    for (const [filename, assetInfo] of Object.entries(bundle)) {
+      let moduleName = assetInfo.name;
+      if (moduleName === 'chunk') {
+        moduleName += chunks++;
+      }
+      addAsset(`${moduleName}${ext}`, filename);
     }
   },
 };
@@ -66,11 +71,14 @@ const compileModuleBundle = async () => {
   }
 
   const bundle = await rollup({
-    input: 'assets/javascript/main.js',
+    input: 'assets/javascript/main-module.js',
     cache: moduleBundleCache,
     plugins,
     manualChunks,
     preserveSymlinks: true, // Needed for `file:` entries in package.json.
+    treeshake: {
+      pureExternalModules: true,
+    },
   });
 
   moduleBundleCache = bundle.cache;
@@ -82,6 +90,9 @@ const compileModuleBundle = async () => {
     format: 'esm',
     chunkFileNames: '[name]-[hash].mjs',
     entryFileNames: '[name]-[hash].mjs',
+    // Don't rewrite dynamic import when developing (for easier debugging).
+    dynamicImportFunction: getEnv() === 'development' ?
+        undefined : '__import__',
   });
 };
 
@@ -106,6 +117,7 @@ const compileClassicBundle = async () => {
         loose: true,
         corejs: 3,
       }]],
+      plugins: ['@babel/plugin-syntax-dynamic-import'],
     }),
     assetManifestPlugin,
   ];
@@ -114,9 +126,10 @@ const compileClassicBundle = async () => {
   }
 
   const bundle = await rollup({
-    input: 'assets/javascript/nomodule.js',
+    input: 'assets/javascript/main-nomodule.js',
     cache: nomoduleBundleCache,
     plugins,
+    inlineDynamicImports: true, // Need for a single output bundle.
     preserveSymlinks: true, // Needed for `file:` entries in package.json.
   });
 

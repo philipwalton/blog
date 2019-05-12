@@ -25,9 +25,9 @@ gulp.task('sw', async () => {
       shellStartPath,
       shellEndPath,
     ];
-    for (const [key, value] of Object.entries(getManifest())) {
-      if (key.match(/\.(css|mjs)$/)) {
-        criticalAssets.push(`/static/${value}`);
+    for (const filename of Object.values(getManifest())) {
+      if (filename.match(/\.(css|mjs)$/)) {
+        criticalAssets.push(`/static/${filename}`);
       }
     }
 

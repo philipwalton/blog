@@ -1,5 +1,5 @@
 import * as alerts from './alerts';
-import {gaTest, trackError} from './analytics';
+import {ga, dimensions, trackError} from './analytics';
 import * as drawer from './drawer';
 import History2 from './history2';
 import {now} from './performance';
@@ -42,7 +42,7 @@ const fetchPageContent = async (path) => {
     const responseSource =
         response.headers.get('X-Cache-Hit') ? 'cache' : 'network';
 
-    gaTest('send', 'event', {
+    ga('send', 'event', {
       page: path,
       eventCategory: 'Virtual Pageviews',
       eventAction: 'fetch',
@@ -112,12 +112,12 @@ const setScroll = (hash) => {
 
 
 /**
- * Removes and re-adds impression observation on the #share call to action
- * since a new page has loaded and thus a new impression should be possible.
+ * Updates analytics to reflect the current page.
+ * @param {string} pathname
  */
-const resetImpressionTracking = () => {
-  gaTest('impressionTracker:unobserveAllElements');
-  gaTest('impressionTracker:observeElements', ['share']);
+const trackPageview = async (pathname) => {
+  ga('set', 'page', pathname);
+  ga('send', 'pageview', {[dimensions.HIT_SOURCE]: 'SPA'});
 };
 
 
@@ -142,7 +142,7 @@ export const init = () => {
       await loadPage(state.pathname);
       drawer.close();
       setScroll(state.hash);
-      resetImpressionTracking();
+      trackPageview(state.pathname);
     } catch (err) {
       trackError(/** @type {!Error} */ (err));
       throw err;

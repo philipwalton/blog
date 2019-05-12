@@ -5,9 +5,7 @@ const {initBook} = require('../tasks/utils/book');
 let articles;
 let pages;
 
-const prodTid = 'UA-21292978-1';
-const testTid = 'UA-21292978-3';
-
+const TRACKING_ID = 'UA-21292978-1';
 
 describe('analytics', function() {
   const browserName = browser.desiredCapabilities.browserName;
@@ -28,35 +26,24 @@ describe('analytics', function() {
   beforeEach(() => {
     browser.url('/');
 
-    // In development and test mode, this script is inserted into the head of
-    // the page so it runs before anything else. In production mode, we can't
-    // test that, so we only test the hits after the initial pageviews.
-    if (process.env.NODE_ENV === 'production') {
-      browser.execute(function() {
-        window.__beacons = [];
-        const originalSendBeacon = navigator.sendBeacon;
-        Object.defineProperty(navigator, 'sendBeacon', {
-          value: function() {
-            /* eslint-disable */
-            window.__beacons.push(arguments);
-            return originalSendBeacon.apply(navigator, arguments);
-            /* eslint-enable */
-          },
-        });
+    browser.execute(function() {
+      window.__beacons = [];
+      const originalSendBeacon = navigator.sendBeacon;
+      Object.defineProperty(navigator, 'sendBeacon', {
+        value: function() {
+          /* eslint-disable */
+          window.__beacons.push(arguments);
+          return originalSendBeacon.apply(navigator, arguments);
+          /* eslint-enable */
+        },
       });
-    }
+    });
   });
 
   it('should send pageview hits on pageload', () => {
     if (process.env.NODE_ENV !== 'production') {
       browser.waitUntil(() => beaconsContain({
-        tid: prodTid,
-        t: 'pageview',
-        dp: '/',
-      }));
-
-      browser.waitUntil(() => beaconsContain({
-        tid: testTid,
+        tid: TRACKING_ID,
         t: 'pageview',
         dp: '/',
       }));
@@ -66,13 +53,7 @@ describe('analytics', function() {
   it('should send pageview hits on SPA pageloads', () => {
     if (process.env.NODE_ENV !== 'production') {
       browser.waitUntil(() => beaconsContain({
-        tid: prodTid,
-        t: 'pageview',
-        dp: '/',
-      }));
-
-      browser.waitUntil(() => beaconsContain({
-        tid: testTid,
+        tid: TRACKING_ID,
         t: 'pageview',
         dp: '/',
       }));
@@ -82,13 +63,7 @@ describe('analytics', function() {
     browser.waitUntil(() => getUrlPath() == articles[0].path);
 
     browser.waitUntil(() => beaconsContain({
-      tid: prodTid,
-      t: 'pageview',
-      dp: articles[0].path,
-    }));
-
-    browser.waitUntil(() => beaconsContain({
-      tid: testTid,
+      tid: TRACKING_ID,
       t: 'pageview',
       dp: articles[0].path,
     }));
@@ -97,13 +72,7 @@ describe('analytics', function() {
   it('should send pageview hits on back/forward navigations', () => {
     if (process.env.NODE_ENV !== 'production') {
       browser.waitUntil(() => beaconsContain({
-        tid: prodTid,
-        t: 'pageview',
-        dp: '/',
-      }));
-
-      browser.waitUntil(() => beaconsContain({
-        tid: testTid,
+        tid: TRACKING_ID,
         t: 'pageview',
         dp: '/',
       }));
@@ -115,13 +84,7 @@ describe('analytics', function() {
     browser.waitUntil(() => getUrlPath() == pages[1].path);
 
     browser.waitUntil(() => beaconsContain({
-      tid: prodTid,
-      t: 'pageview',
-      dp: pages[1].path,
-    }));
-
-    browser.waitUntil(() => beaconsContain({
-      tid: testTid,
+      tid: TRACKING_ID,
       t: 'pageview',
       dp: pages[1].path,
     }));
@@ -133,13 +96,7 @@ describe('analytics', function() {
     browser.waitUntil(() => getUrlPath() == pages[0].path);
 
     browser.waitUntil(() => beaconsContain({
-      tid: prodTid,
-      t: 'pageview',
-      dp: pages[0].path,
-    }));
-
-    browser.waitUntil(() => beaconsContain({
-      tid: testTid,
+      tid: TRACKING_ID,
       t: 'pageview',
       dp: pages[0].path,
     }));
@@ -151,13 +108,7 @@ describe('analytics', function() {
     browser.waitUntil(() => getUrlPath() == pages[1].path);
 
     browser.waitUntil(() => beaconsContain({
-      tid: prodTid,
-      t: 'pageview',
-      dp: pages[1].path,
-    }));
-
-    browser.waitUntil(() => beaconsContain({
-      tid: testTid,
+      tid: TRACKING_ID,
       t: 'pageview',
       dp: pages[1].path,
     }));

@@ -1,18 +1,7 @@
-import TrackerQueue from 'autotrack/lib/tracker-queue';
-import 'autotrack/lib/plugins/clean-url-tracker';
-import 'autotrack/lib/plugins/event-tracker';
-import 'autotrack/lib/plugins/impression-tracker';
-import 'autotrack/lib/plugins/max-scroll-tracker';
-import 'autotrack/lib/plugins/media-query-tracker';
-import 'autotrack/lib/plugins/outbound-link-tracker';
-import 'autotrack/lib/plugins/page-visibility-tracker';
-import 'autotrack/lib/plugins/url-change-tracker';
-import {breakpoints} from './breakpoints';
+import {IdleQueue} from 'idlize/IdleQueue.mjs';
+import {getActiveBreakpoint} from './breakpoints';
 import {now, timeOrigin} from './performance';
 import {initialSWState} from './sw-state';
-
-
-/* global ga */
 
 
 /**
@@ -20,22 +9,36 @@ import {initialSWState} from './sw-state';
  * implementation. This allows you to create a segment or view filter
  * that isolates only data captured with the most recent tracking changes.
  */
-const TRACKING_VERSION = '52';
+const TRACKING_VERSION = '53';
 
 
 /**
- * A global list of tracker object.
+ * The property ID for philipwalton.com
  */
-const ALL_TRACKERS = [
-  {name: 'prod', trackingId: 'UA-21292978-1'},
-  {name: 'test', trackingId: 'UA-21292978-3'},
-];
+const TRACKING_ID = 'UA-21292978-1';
+
+
+// A queue to ensure all analytics tasks to run when idle.
+const queue = new IdleQueue({
+  defaultMinTaskTime: 40, // Only run if there's lots of time left.
+  ensureTasksRun: true,
+});
+
+
+// Initialize the command queue in case analytics.js hasn't loaded yet.
+// https://developers.google.com/analytics/devguides/collection/analyticsjs/
+// eslint-disable-next-line
+window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};
 
 
 /**
- * Just the trackers with a name matching `test`.
+ * A wrapper function for the global `ga()` provided by analytics.js that
+ * runs all commands via an IdleQueue.
+ * @param {...*} args
  */
-const TEST_TRACKERS = ALL_TRACKERS.filter(({name}) => /test/.test(name));
+export const ga = (...args) => {
+  queue.pushTask(() => window.ga(...args));
+};
 
 
 /**
@@ -119,41 +122,6 @@ addEventListener('visibilitychange', function f() {
 }, true);
 
 
-/**
- * Creates a ga() proxy function that calls commands on all passed trackers.
- * @param {!Array} trackers an array or objects containing the `name` and
- *     `trackingId` fields.
- * @return {!Function} The proxied ga() function.
- */
-const createGaProxy = (trackers) => {
-  return (command, ...args) => {
-    trackers.forEach(({name, trackingId}) => {
-      TrackerQueue.getOrCreate(trackingId).pushTask(() => {
-        if (typeof command == 'function') {
-          ga(() => {
-            command(ga.getByName(name));
-          });
-        } else {
-          if (command == 'create') {
-            ga('create', Object.assign(
-                {}, args[args.length - 1], {name, trackingId}));
-          } else {
-            ga(`${name}.${command}`, ...args);
-          }
-        }
-      });
-    });
-  };
-};
-
-
-/**
- * Command queue proxies.
- */
-export const gaAll = createGaProxy(ALL_TRACKERS);
-export const gaTest = createGaProxy(TEST_TRACKERS);
-
-
 const preSendDependencies = [];
 export const addPreSendDependency = (dependency) => {
   preSendDependencies.push(dependency);
@@ -165,19 +133,14 @@ export const addPreSendDependency = (dependency) => {
  * values on the trackers.
  */
 export const init = async () => {
-  // Initialize the command queue in case analytics.js hasn't loaded yet.
-  // https://developers.google.com/analytics/devguides/collection/analyticsjs/
-  // eslint-disable-next-line
-  window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
-
-  createTrackers();
+  createTracker();
   trackErrors();
   trackCustomDimensions();
 
   // presend dependencies
   await Promise.all(preSendDependencies);
 
-  requireAutotrackPlugins();
+  ga('send', 'pageview', {[dimensions.HIT_SOURCE]: 'navigation'});
   trackFcp();
   trackFid();
   trackNavigationTimingMetrics();
@@ -188,15 +151,18 @@ export const init = async () => {
  * Creates the trackers and sets the default transport and tracking
  * version fields. In non-production environments it also logs hits.
  */
-const createTrackers = () => {
-  gaAll('create', {cookieDomain: 'auto', siteSpeedSampleRate: 10});
+const createTracker = () => {
+  ga('create', TRACKING_ID, 'auto', {siteSpeedSampleRate: 0});
 
   // Ensures all hits are sent via `navigator.sendBeacon()`.
-  gaAll('set', 'transport', 'beacon');
+  ga('set', 'transport', 'beacon');
+
+  // Set the page field and ignore any search params.
+  ga('set', 'page', location.pathname);
 
   // Log hits in development.
   if (process.env.NODE_ENV !== 'production') {
-    gaAll((tracker) => {
+    ga((tracker) => {
       const originalSendHitTask = tracker.get('sendHitTask');
       tracker.set('sendHitTask', (model) => {
         originalSendHitTask(model);
@@ -215,7 +181,7 @@ const createTrackers = () => {
                   paramsToIgnore.indexOf(param) > -1);
             });
 
-        const parts = [model.get('&tid'), hitType];
+        const parts = [hitType];
         if (hitType == 'event') {
           parts.push(model.get('&ec'), model.get('&ea'), model.get('&el'));
           if (model.get('&ev')) {
@@ -242,7 +208,7 @@ const createTrackers = () => {
  * @param {FieldsObj=} fieldsObj
  */
 export const trackError = (err = {}, fieldsObj = {}) => {
-  gaAll('send', 'event', Object.assign({
+  ga('send', 'event', Object.assign({
     eventCategory: 'Error',
     eventAction: err.name || '(no error name)',
     eventLabel: `${err.message}\n${err.stack || '(no stack trace)'}`,
@@ -287,7 +253,7 @@ const trackErrors = () => {
  * Sets a default dimension value for all custom dimensions on all trackers.
  */
 const trackCustomDimensions = () => {
-  // Sets a default dimension value for all custom dimensions to ensure
+  // Set a default dimension value for all custom dimensions to ensure
   // that every dimension in every hit has *some* value. This is necessary
   // because Google Analytics will drop rows with empty dimension values
   // in your reports.
@@ -295,107 +261,40 @@ const trackCustomDimensions = () => {
   Object.keys(dimensions).forEach((key) => {
     dimensionsObj[dimensions[key]] = NULL_VALUE;
   });
-  gaAll('set', dimensionsObj);
+  ga('set', dimensionsObj);
 
-  // Adds tracking of dimensions known at page load time.
-  gaTest((tracker) => {
+  // Add tracking of dimensions known at page load time.
+  ga((tracker) => {
     tracker.set({
+      [dimensions.BREAKPOINT]: getActiveBreakpoint().name,
+      [dimensions.PIXEL_DENSITY]: getPixelDensity(),
       [dimensions.TRACKING_VERSION]: TRACKING_VERSION,
       [dimensions.CLIENT_ID]: tracker.get('clientId'),
       [dimensions.WINDOW_ID]: uuid(),
       [dimensions.SERVICE_WORKER_STATE]: initialSWState,
       [dimensions.EFFECTIVE_CONNECTION_TYPE]: getEffectiveConnectionType(),
-      [dimensions.TIME_ORIGIN]: timeOrigin,
+      [dimensions.TIME_ORIGIN]: `${timeOrigin}`,
     });
   });
 
-  // Adds tracking to record each the type, time, uuid, and visibility state
+  // Add tracking to record each the type, time, uuid, and visibility state
   // of each hit immediately before it's sent.
-  gaTest((tracker) => {
+  ga((tracker) => {
     const originalBuildHitTask = tracker.get('buildHitTask');
-    const queue = TrackerQueue.getOrCreate(tracker.get('trackingId'));
 
     tracker.set('buildHitTask', (model) => {
       const hitType = model.get('hitType');
       model.set(dimensions.HIT_ID, uuid(), true);
       model.set(dimensions.HIT_TYPE, hitType, true);
-      model.set(dimensions.PAGE_TIME, now(), true);
+      model.set(dimensions.PAGE_TIME, `${now()}`, true);
 
       // Use the visibilityState at task queue time if available.
       const visibilityState = (queue.getState() || document).visibilityState;
       model.set(dimensions.VISIBILITY_STATE, visibilityState, true);
-
-      const qt = model.get('queueTime') || 0;
-      model.set(dimensions.HIT_TIME, String(new Date - qt), true);
-
-      if (qt) {
-        model.set(dimensions.QUEUE_TIME, qt, true);
-      }
-
-      // TODO(philipwalton): temporary fix to address an analytics.js bug where
-      // custom metrics on the initial pageview are added to timing hits.
-      if (hitType == 'timing') {
-        model.set(metrics.PAGE_LOADS, undefined, true);
-      }
+      model.set(dimensions.HIT_TIME, `${+new Date}`, true);
 
       originalBuildHitTask(model);
     });
-  });
-};
-
-
-/**
- * Requires select autotrack plugins for each tracker.
- */
-const requireAutotrackPlugins = () => {
-  gaAll('require', 'cleanUrlTracker', {
-    stripQuery: true,
-    indexFilename: 'index.html',
-    trailingSlash: 'add',
-  });
-  gaAll('require', 'eventTracker');
-  gaAll('require', 'impressionTracker', {
-    elements: ['share'],
-    hitFilter: (model) => {
-      model.set(metrics.SHARE_IMPRESSIONS, 1, true);
-    },
-  });
-  gaAll('require', 'maxScrollTracker', {
-    timeZone: 'America/Los_Angeles',
-    maxScrollMetricIndex: getDefinitionIndex(metrics.MAX_SCROLL_PERCENTAGE),
-  });
-  gaAll('require', 'mediaQueryTracker', {
-    definitions: [
-      {
-        name: 'Breakpoint',
-        dimensionIndex: getDefinitionIndex(dimensions.BREAKPOINT),
-        items: breakpoints,
-      },
-      {
-        name: 'Pixel Density',
-        dimensionIndex: getDefinitionIndex(dimensions.PIXEL_DENSITY),
-        items: [
-          {name: '1x', media: 'all'},
-          {name: '1.5x', media: '(-webkit-min-device-pixel-ratio: 1.5), ' +
-                                '(min-resolution: 144dpi)'},
-          {name: '2x', media: '(-webkit-min-device-pixel-ratio: 2), ' +
-                              '(min-resolution: 192dpi)'},
-        ],
-      },
-    ],
-  });
-  gaAll('require', 'outboundLinkTracker', {
-    events: ['click', 'auxclick', 'contextmenu'],
-  });
-  gaAll('require', 'pageVisibilityTracker', {
-    sendInitialPageview: true,
-    pageLoadsMetricIndex: getDefinitionIndex(metrics.PAGE_LOADS),
-    visibleMetricIndex: getDefinitionIndex(metrics.PAGE_VISIBLE),
-    timeZone: 'America/Los_Angeles',
-    fieldsObj: {[dimensions.HIT_SOURCE]: 'pageVisibilityTracker'},
-  });
-  gaAll('require', 'urlChangeTracker', {
-    fieldsObj: {[dimensions.HIT_SOURCE]: 'urlChangeTracker'},
   });
 };
 
@@ -407,7 +306,7 @@ const trackFcp = () => {
           'first-contentful-paint', 'paint')[0];
 
       if (fcpEntry) {
-        gaTest('send', 'event', {
+        ga('send', 'event', {
           eventCategory: 'PW Metrics',
           eventAction: 'FCP',
           eventLabel: wasEverHidden ? 'hidden' : 'visible',
@@ -430,7 +329,7 @@ const trackFid = () => {
   window.perfMetrics.onFirstInputDelay((delay, event) => {
     const delayInMs = Math.round(delay);
 
-    gaTest('send', 'event', {
+    ga('send', 'event', {
       eventCategory: 'PW Metrics',
       eventAction: 'FID',
       eventLabel: event.type,
@@ -501,38 +400,45 @@ const trackNavigationTimingMetrics = async () => {
         if (initialSWState === 'controlled' && 'workerStart' in nt) {
           fieldsObj[metrics.SW_START_TIME] = Math.round(nt.workerStart);
         }
-        gaTest('send', 'event', fieldsObj);
+        ga('send', 'event', fieldsObj);
       }
     }
   }
 };
 
-
 /**
  * Gets the effective connection type information if available.
  * @return {string}
  */
-const getEffectiveConnectionType = () => {
-  return navigator.connection &&
-      navigator.connection.effectiveType || NULL_VALUE;
+const getEffectiveConnectionType = () => navigator.connection &&
+    navigator.connection.effectiveType || NULL_VALUE;
+
+
+const getPixelDensity = () => {
+  const densities = [
+    {name: '1x', media: 'all'},
+    {name: '1.5x', media:
+        '(-webkit-min-device-pixel-ratio: 1.5), ' +
+        '(min-resolution: 144dpi)'},
+    {name: '2x', media:
+        '(-webkit-min-device-pixel-ratio: 2), ' +
+        '(min-resolution: 192dpi)'},
+  ];
+  let activeDensity;
+  for (const density of densities) {
+    if (window.matchMedia(density.media).matches) {
+      activeDensity = density;
+    }
+  }
+  return activeDensity.name;
 };
 
 
 /**
- * Accepts a custom dimension or metric and returns it's numerical index.
- * @param {string} definition The definition string (e.g. 'dimension1').
- * @return {number} The definition index.
- */
-const getDefinitionIndex = (definition) => +/\d+$/.exec(definition)[0];
-
-
-/**
- * Generates a UUID.
- * https://gist.github.com/jed/982883
- * @param {string|undefined=} a
+ * Performantly generate a unique, 27-char string by combining the current
+ * timestamp with a 13-digit random number.
  * @return {string}
  */
-const uuid = function b(a) {
-  return a ? (a ^ Math.random() * 16 >> a / 4).toString(16) :
-      ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, b);
+const uuid = () => {
+  return `${Date.now()}-${Math.floor(Math.random() * (9e12 - 1)) + 1e12}`;
 };

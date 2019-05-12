@@ -1,20 +1,3 @@
-{% if ENV != 'production' %}
-  <script>
-  (function() {
-    if (navigator.sendBeacon) {
-      window.__beacons = [];
-      const originalSendBeacon = navigator.sendBeacon;
-      Object.defineProperty(navigator, 'sendBeacon', {
-        value: function() {
-          window.__beacons.push(arguments);
-          return originalSendBeacon.apply(navigator, arguments);;
-        },
-      });
-    }
-  }());
-  </script>
-{% endif %}
-
 <script>addEventListener('error', window.__e=function f(e){f.q=f.q||[];f.q.push(e)});</script>
 <script async src="https://www.google-analytics.com/analytics.js"></script>
 

@@ -1,5 +1,5 @@
 import {Workbox} from 'workbox-window/Workbox.mjs';
-import {gaTest, dimensions, addPreSendDependency, trackError, NULL_VALUE} from './analytics';
+import {ga, dimensions, addPreSendDependency, trackError, NULL_VALUE} from './analytics';
 import {loadPage} from './content-loader';
 import * as messages from './messages';
 import {initialSWState} from './sw-state';
@@ -22,7 +22,7 @@ const setSiteVersionOrTimeout = async () => {
     setTimeout(() => resolve({version: NULL_VALUE}), 3000);
   });
 
-  gaTest('set', dimensions.SITE_VERSION, version);
+  ga('set', dimensions.SITE_VERSION, version);
 };
 
 const setNavigationCacheOrTimeout = async () => {
@@ -43,7 +43,7 @@ const setNavigationCacheOrTimeout = async () => {
     setTimeout(() => resolve({cacheHit: NULL_VALUE}), 3000);
   });
 
-  gaTest('set', dimensions.CACHE_HIT, String(cacheHit));
+  ga('set', dimensions.CACHE_HIT, String(cacheHit));
 };
 
 
@@ -119,7 +119,7 @@ const addCacheUpdateListener = () => {
       // it occurs to get a bit more insight into any UX concerns.
       loadPage(updatedURL);
 
-      gaTest('send', 'event', {
+      ga('send', 'event', {
         eventCategory: 'Cache Update',
         eventAction: 'receive',
         eventLabel: updatedURL,
@@ -147,7 +147,7 @@ const addSWUpdateListener = () => {
       } = processMetadata(data.payload);
 
       const sendUpdateEvent = (eventAction) => {
-        gaTest('send', 'event', {
+        ga('send', 'event', {
           eventCategory: 'SW Update',
           eventAction,
           eventValue: timeSinceNewVersionDeployed || 0,

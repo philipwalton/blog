@@ -1,6 +1,6 @@
 import {IdleQueue} from 'idlize/IdleQueue.mjs';
 import {getActiveBreakpoint} from './breakpoints';
-import {now, timeOrigin} from './performance';
+import {timeOrigin} from './performance';
 import {initialSWState} from './sw-state';
 
 
@@ -69,10 +69,6 @@ export const dimensions = {
   HIT_ID: 'dimension14',
   HIT_TIME: 'dimension15',
   TRACKING_VERSION: 'dimension16',
-  TIME_ORIGIN: 'dimension17',
-  PAGE_TIME: 'dimension18',
-  QUEUE_TIME: 'dimension19',
-  FIRST_INPUT_EVENT: 'dimension20',
 };
 
 
@@ -80,24 +76,17 @@ export const dimensions = {
  * A mapping between custom dimension names and their indexes.
  */
 export const metrics = {
-  PAGE_VISIBLE: 'metric1',
-  MAX_SCROLL_PERCENTAGE: 'metric2',
-  SHARE_IMPRESSIONS: 'metric3',
+  FCP: 'metric1',
+  FCP_SAMPLE: 'metric2',
+  NT_SAMPLE: 'metric3',
   DOM_LOAD_TIME: 'metric4',
   WINDOW_LOAD_TIME: 'metric5',
-  RESPONSE_END_TIME: 'metric6',
-  PAGE_LOADS: 'metric7',
-  NT_SAMPLE: 'metric8',
-  FCP: 'metric9',
-  FCP_SAMPLE: 'metric10',
-  FID: 'metric11',
-  FID_SAMPLE: 'metric12',
-  // FID_OT: 'metric13',
-  // FID_SAMPLE_OT: 'metric14',
-  // FIL_OT: 'metric15',
-  SW_START_TIME: 'metric16',
-  RESPONSE_START_TIME: 'metric17',
-  REQUEST_START_TIME: 'metric18',
+  REQUEST_START_TIME: 'metric6',
+  RESPONSE_END_TIME: 'metric7',
+  RESPONSE_START_TIME: 'metric8',
+  WORKER_START_TIME: 'metric9',
+  FID: 'metric10',
+  FID_SAMPLE: 'metric11',
 };
 
 
@@ -273,7 +262,6 @@ const trackCustomDimensions = () => {
       [dimensions.WINDOW_ID]: uuid(),
       [dimensions.SERVICE_WORKER_STATE]: initialSWState,
       [dimensions.EFFECTIVE_CONNECTION_TYPE]: getEffectiveConnectionType(),
-      [dimensions.TIME_ORIGIN]: `${timeOrigin}`,
     });
   });
 
@@ -286,7 +274,6 @@ const trackCustomDimensions = () => {
       const hitType = model.get('hitType');
       model.set(dimensions.HIT_ID, uuid(), true);
       model.set(dimensions.HIT_TYPE, hitType, true);
-      model.set(dimensions.PAGE_TIME, `${now()}`, true);
 
       // Use the visibilityState at task queue time if available.
       const visibilityState = (queue.getState() || document).visibilityState;
@@ -398,7 +385,7 @@ const trackNavigationTimingMetrics = async () => {
           [metrics.WINDOW_LOAD_TIME]: windowLoaded,
         };
         if (initialSWState === 'controlled' && 'workerStart' in nt) {
-          fieldsObj[metrics.SW_START_TIME] = Math.round(nt.workerStart);
+          fieldsObj[metrics.WORKER_START_TIME] = Math.round(nt.workerStart);
         }
         ga('send', 'event', fieldsObj);
       }
@@ -416,21 +403,17 @@ const getEffectiveConnectionType = () => navigator.connection &&
 
 const getPixelDensity = () => {
   const densities = [
-    {name: '1x', media: 'all'},
-    {name: '1.5x', media:
-        '(-webkit-min-device-pixel-ratio: 1.5), ' +
-        '(min-resolution: 144dpi)'},
-    {name: '2x', media:
-        '(-webkit-min-device-pixel-ratio: 2), ' +
-        '(min-resolution: 192dpi)'},
+    ['1x', 'all'],
+    ['1.5x', '(-webkit-min-device-pixel-ratio: 1.5),(min-resolution: 144dpi)'],
+    ['2x', '(-webkit-min-device-pixel-ratio: 2),(min-resolution: 192dpi)'],
   ];
   let activeDensity;
-  for (const density of densities) {
-    if (window.matchMedia(density.media).matches) {
+  for (const [density, query] of densities) {
+    if (window.matchMedia(query).matches) {
       activeDensity = density;
     }
   }
-  return activeDensity.name;
+  return activeDensity;
 };
 
 

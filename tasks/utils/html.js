@@ -1,4 +1,6 @@
 const htmlMinifier = require('html-minifier');
+const {ENV} = require('./env');
+
 
 const minifyHtml = (html) => {
   const opts = {
@@ -18,7 +20,7 @@ const minifyHtml = (html) => {
 
 
 const processHtml = (html) => {
-  return process.env.NODE_ENV === 'development' ? html : minifyHtml(html);
+  return ENV === 'development' ? html : minifyHtml(html);
 };
 
 module.exports = {processHtml};

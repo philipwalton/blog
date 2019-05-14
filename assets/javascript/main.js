@@ -36,4 +36,4 @@ const main = async () => {
 };
 
 // Initialize all code in a separate task.
-setTimeout(main, 1);
+setTimeout(main, 0);

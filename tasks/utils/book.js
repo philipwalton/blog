@@ -2,7 +2,7 @@ const fs = require('fs-extra');
 const path = require('path');
 const yaml = require('js-yaml');
 const config = require('../../config.json');
-const {getManifest} = require('./assets');
+const {getModulePreloadList} = require('./assets');
 
 
 const getTemplate = (pathname) => {
@@ -70,19 +70,10 @@ const initBook = async () => {
     article.partialOutput = getPartialOutputFile(article.output);
   }
 
-  const assetManifest = getManifest();
-
   book.site.buildTime = new Date();
   book.site.assets = {
-    modules: Object.keys(assetManifest)
-        .filter((entry) => entry.match(/\.mjs$/)),
+    modulepreload: getModulePreloadList(),
   };
-
-  // TODO(philipwalton): sometimes the build doesn't contain modules. I'm not
-  // sure why, but it should fail if that ever happens.
-  if (!(book.site.assets.modules && book.site.assets.modules.length > 0)) {
-    throw new Error('No modules added to book.');
-  }
 
   return book;
 };

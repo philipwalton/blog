@@ -3,6 +3,7 @@ const gulp = require('gulp');
 const nunjucks = require('nunjucks');
 const {generateRevisionedAsset} = require('./utils/assets');
 const {initBook} = require('./utils/book');
+const {ENV} = require('./utils/env');
 const {processHtml} = require('./utils/html');
 const {renderMarkdown} = require('./utils/markdown');
 const {initTemplates} = require('./utils/templates');
@@ -10,14 +11,10 @@ const {initTemplates} = require('./utils/templates');
 
 let book;
 
-const getEnv = () => {
-  return process.env.NODE_ENV || 'development';
-};
-
 const renderArticleContentPartials = async () => {
   for (const article of book.articles) {
     const data = {
-      ENV: getEnv(),
+      ENV,
       site: book.site,
       page: article,
       layout: 'partial.html',
@@ -28,7 +25,6 @@ const renderArticleContentPartials = async () => {
 
     article.markup = renderMarkdown(nunjucks.renderString(markdown, data));
     article.content = nunjucks.render(article.template, data);
-    // article.hash = hash(article.content);
   }
 };
 
@@ -37,7 +33,7 @@ const buildArticles = async () => {
     await fs.outputFile(article.partialOutput, processHtml(article.content));
 
     const data = {
-      ENV: getEnv(),
+      ENV,
       site: book.site,
       page: article,
       layout: 'shell.html',
@@ -59,7 +55,6 @@ const renderPageContentPartials = async () => {
       };
 
       page.content = nunjucks.render(page.template, data);
-      // page.hash = hash(page.content);
     }
   }
 };
@@ -73,7 +68,7 @@ const buildPages = async () => {
     }
 
     const data = {
-      ENV: getEnv(),
+      ENV,
       site: book.site,
       articles: book.articles,
       page: page,
@@ -102,7 +97,7 @@ const buildShell = async () => {
   const SHELL_SPLIT_POINT = 'SHELL_SPLIT_POINT';
 
   const data = {
-    ENV: getEnv(),
+    ENV,
     site: book.site,
     articles: book.articles,
     page: {

@@ -4,48 +4,80 @@ const revHash = require('rev-hash');
 const revPath = require('rev-path');
 const config = require('../../config');
 
-let revisionedAssetManifest;
+
+let manifest;
+
+
+const getInitialManifestStructure = () => {
+  return {
+    assetMap: {},
+    modulepreload: [],
+  };
+};
+
+
+const ensureManifest = () => {
+  if (!manifest) {
+    manifest = fs.readJsonSync(
+        path.join(config.publicStaticDir, config.manifestFileName),
+        {throws: false}) || getInitialManifestStructure();
+  }
+};
+
 
 const getManifest = () => {
-  if (!revisionedAssetManifest) {
-    revisionedAssetManifest = fs.readJsonSync(
-        path.join(config.publicStaticDir, config.manifestFileName),
-        {throws: false}) || {};
-  }
-
-  return revisionedAssetManifest;
+  ensureManifest();
+  return manifest.assetMap;
 };
+
 
 const saveManifest = () => {
   fs.outputJsonSync(
       path.join(config.publicStaticDir, config.manifestFileName),
-      revisionedAssetManifest, {spaces: 2});
+      manifest, {spaces: 2});
 };
 
 
 const resetManifest = () => {
-  revisionedAssetManifest = {};
+  manifest = getInitialManifestStructure();
   saveManifest();
 };
 
 
 const getAsset = (filename) => {
-  getManifest();
+  ensureManifest();
 
-  if (!revisionedAssetManifest[filename]) {
+  if (!manifest.assetMap[filename]) {
     console.error(`Revisioned file for '${filename}' doesn't exist`);
   }
 
-  return revisionedAssetManifest[filename];
+  return manifest.assetMap[filename];
 };
 
 
 const addAsset = (filename, revisionedFilename) => {
-  getManifest();
+  ensureManifest();
 
-  revisionedAssetManifest[filename] = revisionedFilename;
+  manifest.assetMap[filename] = revisionedFilename;
 
   saveManifest();
+};
+
+
+const addModulePreload = (module) => {
+  ensureManifest();
+
+  if (!manifest.modulepreload.includes(module)) {
+    manifest.modulepreload.push(module);
+  }
+  saveManifest();
+};
+
+
+const getModulePreloadList = () => {
+  ensureManifest();
+
+  return manifest.modulepreload;
 };
 
 
@@ -73,4 +105,6 @@ module.exports = {
   addAsset,
   getRevisionedAssetUrl,
   generateRevisionedAsset,
+  getModulePreloadList,
+  addModulePreload,
 };

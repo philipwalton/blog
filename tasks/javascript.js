@@ -5,14 +5,11 @@ const commonjs = require('rollup-plugin-commonjs');
 const resolve = require('rollup-plugin-node-resolve');
 const replace = require('rollup-plugin-replace');
 const terserRollupPlugin = require('rollup-plugin-terser').terser;
-const {addAsset} = require('./utils/assets');
+const {addAsset, addModulePreload} = require('./utils/assets');
 const {checkModuleDuplicates} = require('./utils/check-module-duplicates');
+const {ENV} = require('./utils/env');
 const config = require('../config.json');
 
-
-const getEnv = () => {
-  return process.env.NODE_ENV || 'development';
-};
 
 const getPackageNameFromFilePath = (filePath) => {
   // Since node modules can be nested, don't just match but get the
@@ -34,13 +31,34 @@ const assetManifestPlugin = {
     const ext = options.entryFileNames.slice(
         options.entryFileNames.indexOf('.'));
 
-    let chunks = 0;
+    // Create a list of static module dependencies to preload.
+    const staticModules = new Set();
+
+    if (ext === '.mjs') {
+      for (const [filename, assetInfo] of Object.entries(bundle)) {
+        // Add any import in the top-level module graph (non-dynamic)
+        if (assetInfo.isEntry || staticModules.has(filename)) {
+          staticModules.add(filename);
+          for (const i of assetInfo.imports) {
+            staticModules.add(i);
+          }
+        }
+      }
+    }
+
     for (const [filename, assetInfo] of Object.entries(bundle)) {
       let moduleName = assetInfo.name;
+
+      // Chunks get dynamically generated names, but that's OK since they're
+      // never referenced from the markup via their original name.
       if (moduleName === 'chunk') {
-        moduleName += chunks++;
+        moduleName = filename;
       }
       addAsset(`${moduleName}${ext}`, filename);
+
+      if (staticModules.has(filename)) {
+        addModulePreload(`${moduleName}${ext}`);
+      }
     }
   },
 };
@@ -62,11 +80,11 @@ const compileModuleBundle = async () => {
     resolve(),
     commonjs(),
     replace({
-      'process.env.NODE_ENV': JSON.stringify(getEnv()),
+      'process.env.NODE_ENV': JSON.stringify(ENV),
     }),
     assetManifestPlugin,
   ];
-  if (getEnv() !== 'development') {
+  if (ENV !== 'development') {
     plugins.push(terserRollupPlugin(terserConfig));
   }
 
@@ -91,8 +109,7 @@ const compileModuleBundle = async () => {
     chunkFileNames: '[name]-[hash].mjs',
     entryFileNames: '[name]-[hash].mjs',
     // Don't rewrite dynamic import when developing (for easier debugging).
-    dynamicImportFunction: getEnv() === 'development' ?
-        undefined : '__import__',
+    dynamicImportFunction: ENV === 'development' ? undefined : '__import__',
   });
 };
 
@@ -103,7 +120,7 @@ const compileClassicBundle = async () => {
     resolve(),
     commonjs(),
     replace({
-      'process.env.NODE_ENV': JSON.stringify(getEnv()),
+      'process.env.NODE_ENV': JSON.stringify(ENV),
     }),
     babel({
       exclude: [
@@ -121,7 +138,7 @@ const compileClassicBundle = async () => {
     }),
     assetManifestPlugin,
   ];
-  if (getEnv() !== 'development') {
+  if (ENV !== 'development') {
     plugins.push(terserRollupPlugin(terserConfig));
   }
 
@@ -145,7 +162,7 @@ const compileClassicBundle = async () => {
 gulp.task('javascript', async () => {
   await compileModuleBundle();
 
-  if (getEnv() !== 'development') {
+  if (ENV !== 'development') {
     await compileClassicBundle();
   }
 });

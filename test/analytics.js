@@ -41,23 +41,19 @@ describe('analytics', function() {
   });
 
   it('should send pageview hits on pageload', () => {
-    if (process.env.NODE_ENV !== 'production') {
-      browser.waitUntil(() => beaconsContain({
-        tid: TRACKING_ID,
-        t: 'pageview',
-        dp: '/',
-      }));
-    }
+    browser.waitUntil(() => beaconsContain({
+      tid: TRACKING_ID,
+      t: 'pageview',
+      dp: '/',
+    }));
   });
 
   it('should send pageview hits on SPA pageloads', () => {
-    if (process.env.NODE_ENV !== 'production') {
-      browser.waitUntil(() => beaconsContain({
-        tid: TRACKING_ID,
-        t: 'pageview',
-        dp: '/',
-      }));
-    }
+    browser.waitUntil(() => beaconsContain({
+      tid: TRACKING_ID,
+      t: 'pageview',
+      dp: '/',
+    }));
 
     browser.click(`a[href="${articles[0].path}"]`);
     browser.waitUntil(() => getUrlPath() == articles[0].path);
@@ -70,13 +66,11 @@ describe('analytics', function() {
   });
 
   it('should send pageview hits on back/forward navigations', () => {
-    if (process.env.NODE_ENV !== 'production') {
-      browser.waitUntil(() => beaconsContain({
-        tid: TRACKING_ID,
-        t: 'pageview',
-        dp: '/',
-      }));
-    }
+    browser.waitUntil(() => beaconsContain({
+      tid: TRACKING_ID,
+      t: 'pageview',
+      dp: '/',
+    }));
 
     // Load articles page.
 

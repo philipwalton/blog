@@ -8,11 +8,8 @@ const resolve = require('rollup-plugin-node-resolve');
 const terserRollupPlugin = require('rollup-plugin-terser').terser;
 const {getManifest, getRevisionedAssetUrl} = require('./utils/assets');
 const {checkModuleDuplicates} = require('./utils/check-module-duplicates');
+const {ENV} = require('./utils/env');
 
-
-const getEnv = () => {
-  return process.env.NODE_ENV || 'development';
-};
 
 gulp.task('sw', async () => {
   try {
@@ -34,7 +31,7 @@ gulp.task('sw', async () => {
     const plugins = [
       resolve(),
       replace({
-        'process.env.NODE_ENV': JSON.stringify(getEnv()),
+        'process.env.NODE_ENV': JSON.stringify(ENV),
         '__VERSION__': JSON.stringify(version),
         '__BUILD_TIME__': JSON.stringify(buildTime),
         '__PRECACHE_MANIFEST__': JSON.stringify(criticalAssets),
@@ -42,7 +39,7 @@ gulp.task('sw', async () => {
         '__SHELL_END_PATH__': JSON.stringify(shellEndPath),
       }),
     ];
-    if (getEnv() !== 'development') {
+    if (ENV !== 'development') {
       plugins.push(terserRollupPlugin({
         mangle: {
           toplevel: true,

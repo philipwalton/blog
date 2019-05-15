@@ -8,6 +8,9 @@ import {initialSWState} from './sw-state';
 export const wb = new Workbox('/sw.js');
 
 
+const MESSAGE_TIMEOUT = 5000;
+
+
 const setSiteVersionOrTimeout = async () => {
   const {ga, dimensions, NULL_VALUE} = await import('./analytics');
 
@@ -20,7 +23,7 @@ const setSiteVersionOrTimeout = async () => {
 
     wb.messageSW({type: 'GET_METADATA'}).then(resolve);
 
-    setTimeout(() => resolve({version: NULL_VALUE}), 3000);
+    setTimeout(() => resolve({version: NULL_VALUE}), MESSAGE_TIMEOUT);
   });
 
   ga('set', dimensions.SITE_VERSION, version);
@@ -44,7 +47,7 @@ const setNavigationCacheOrTimeout = async () => {
       }
     });
 
-    setTimeout(() => resolve({cacheHit: NULL_VALUE}), 3000);
+    setTimeout(() => resolve({cacheHit: NULL_VALUE}), MESSAGE_TIMEOUT);
   });
 
   ga('set', dimensions.CACHE_HIT, String(cacheHit));
@@ -201,9 +204,10 @@ export const init = async () => {
   addCacheUpdateListener();
   addSWUpdateListener();
 
-  await wb.register();
-
   const {addPreSendDependency} = await import('./analytics');
   addPreSendDependency(setSiteVersionOrTimeout());
   addPreSendDependency(setNavigationCacheOrTimeout());
+
+  // Calling register must happen after all presendDependencies get added.
+  await wb.register();
 };

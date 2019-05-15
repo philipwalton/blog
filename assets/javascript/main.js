@@ -31,8 +31,10 @@ const main = async () => {
   breakpoints.init();
 
   // Everything after this includes dynamic imports.
-  initServiceWorker();
-  initAnalytics();
+  // NOTE: make sure `initServiceWorker()` finishes before running
+  // `initAnalytics()` because it needs to add pre-send dependencies.
+  await initServiceWorker();
+  await initAnalytics();
 };
 
 // Initialize all code in a separate task.

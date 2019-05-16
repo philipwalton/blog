@@ -11,8 +11,9 @@
 </title>
 
 {% for module in site.assets.modulepreload %}
-  <script type="module" src="{{ module | revision }}"></script>
-{%- endfor -%}
+  <link rel="modulepreload" href="{{ module | revision }}"></script>
+{%- endfor %}
+<script type="module" src="{{ 'main-module.mjs' | revision }}"></script>
 
 {% include '_analytics.html' %}
 

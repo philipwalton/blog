@@ -33,19 +33,18 @@ const fetchPageContent = async (path) => {
     if (response.ok) {
       content = await response.text();
     } else {
-      throw new Error(
-          `Response: (${response.status}) ${response.statusText}`);
+      throw new Error(`Response: (${response.status}) ${response.statusText}`);
     }
     const responseDuration = now() - responseStartTime;
-    const responseSource =
-        response.headers.get('X-Cache-Hit') ? 'cache' : 'network';
+    const cacheHit = Boolean(response.headers.get('X-Cache-Hit'));
 
-    const {ga} = await import('./analytics');
+    const {ga, dimensions} = await import('./analytics');
+    ga('set', dimensions.CACHE_HIT, String(cacheHit));
     ga('send', 'event', {
       page: path,
       eventCategory: 'SPA',
       eventAction: 'fetch',
-      eventLabel: responseSource,
+      eventLabel: cacheHit ? 'cache' : 'network',
       eventValue: Math.round(responseDuration),
     });
 

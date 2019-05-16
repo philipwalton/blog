@@ -11,6 +11,11 @@ const {ENV} = require('./utils/env');
 const config = require('../config.json');
 
 
+const path = require('path');
+const chalk = require('chalk');
+const gzipSize = require('gzip-size');
+
+
 const getPackageNameFromFilePath = (filePath) => {
   // Since node modules can be nested, don't just match but get the
   // last directory name after `/node_modules/`.
@@ -25,6 +30,30 @@ const manualChunks = (id) => {
     return `npm.${getPackageNameFromFilePath(id)}`;
   }
 };
+
+
+const bundleSizePlugin = () => {
+  let entryFile;
+  return {
+    buildStart: (inputOptions) => {
+      entryFile = inputOptions.input;
+    },
+    generateBundle: (options, bundle) => {
+      let bundleSize = 0;
+      for (const [filename, assetInfo] of Object.entries(bundle)) {
+        const chunkSize = gzipSize.sync(assetInfo.code);
+        bundleSize += chunkSize;
+        console.log(
+            chalk.magenta(String(chunkSize).padStart(6)),
+            chalk.gray(filename));
+      }
+      console.log(
+          chalk.yellow(String(bundleSize).padStart(6)),
+          chalk.white(`(total '${path.basename(entryFile)}' bundle size)`));
+    },
+  };
+};
+
 
 const assetManifestPlugin = {
   generateBundle(options, bundle) {
@@ -82,6 +111,7 @@ const compileModuleBundle = async () => {
     replace({
       'process.env.NODE_ENV': JSON.stringify(ENV),
     }),
+    bundleSizePlugin(),
     assetManifestPlugin,
   ];
   if (ENV !== 'development') {
@@ -136,6 +166,7 @@ const compileClassicBundle = async () => {
       }]],
       plugins: ['@babel/plugin-syntax-dynamic-import'],
     }),
+    bundleSizePlugin(),
     assetManifestPlugin,
   ];
   if (ENV !== 'development') {

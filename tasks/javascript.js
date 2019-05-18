@@ -25,6 +25,19 @@ const getPackageNameFromFilePath = (filePath) => {
   return /^(?:[^@/]+)|^@(?:[^/]+)\/(?:[^/]+)/.exec(lastPart)[0];
 };
 
+
+/**
+ * Takes a `chunkInfo` object and returns the unversioned name for chunks
+ * with a corresponding module, or the versioned name for dynamically
+ * generated chunks (since their unversioned name is just "chunk").
+ * @param {Object} chunkInfo
+ * @return {string}
+ */
+const getChunkName = (chunkInfo) => {
+  return chunkInfo.name === 'chunk' ? chunkInfo.fileName :
+      chunkInfo.name + path.extname(chunkInfo.fileName);
+};
+
 const manualChunks = (id) => {
   if (id.includes('node_modules')) {
     return `npm.${getPackageNameFromFilePath(id)}`;
@@ -40,8 +53,8 @@ const bundleSizePlugin = () => {
     },
     generateBundle: (options, bundle) => {
       let bundleSize = 0;
-      for (const [filename, assetInfo] of Object.entries(bundle)) {
-        const chunkSize = gzipSize.sync(assetInfo.code);
+      for (const [filename, chunkInfo] of Object.entries(bundle)) {
+        const chunkSize = gzipSize.sync(chunkInfo.code);
         bundleSize += chunkSize;
         console.log(
             chalk.magenta(String(chunkSize).padStart(6)),
@@ -55,41 +68,50 @@ const bundleSizePlugin = () => {
 };
 
 
-const assetManifestPlugin = {
-  generateBundle(options, bundle) {
-    const ext = options.entryFileNames.slice(
-        options.entryFileNames.indexOf('.'));
+const modulePreloadPlugin = (callback) => {
+  return {
+    generateBundle(options, bundle) {
+      // Create a list of static module dependencies to preload.
+      const staticChunks = new Map();
 
-    // Create a list of static module dependencies to preload.
-    const staticModules = new Set();
+      const chunksToCheck = Object.keys(bundle);
+      const recheckedChunks = new Set();
 
-    if (ext === '.mjs') {
-      for (const [filename, assetInfo] of Object.entries(bundle)) {
+      let filename;
+      while (filename = chunksToCheck.shift()) {
+        const chunkInfo = bundle[filename];
+
         // Add any import in the top-level module graph (non-dynamic)
-        if (assetInfo.isEntry || staticModules.has(filename)) {
-          staticModules.add(filename);
-          for (const i of assetInfo.imports) {
-            staticModules.add(i);
+        if (chunkInfo.isEntry || staticChunks.has(filename)) {
+          staticChunks.set(filename, chunkInfo);
+
+          for (const i of chunkInfo.imports) {
+            staticChunks.set(i, bundle[i]);
+
+            // Imports need to be checked again since they may have been
+            // originally checked before all entry chunks were discovered.
+            // But don't recheck a chunk more than once.
+            if (!recheckedChunks.has(i)) {
+              chunksToCheck.push(i);
+              recheckedChunks.add(i);
+            }
           }
         }
       }
-    }
+      callback(staticChunks);
+    },
+  };
+};
 
-    for (const [filename, assetInfo] of Object.entries(bundle)) {
-      let moduleName = assetInfo.name;
 
-      // Chunks get dynamically generated names, but that's OK since they're
-      // never referenced from the markup via their original name.
-      if (moduleName === 'chunk') {
-        moduleName = filename;
+const assetManifestPlugin = () => {
+  return {
+    generateBundle(options, bundle) {
+      for (const [filename, chunkInfo] of Object.entries(bundle)) {
+        addAsset(getChunkName(chunkInfo), filename);
       }
-      addAsset(`${moduleName}${ext}`, filename);
-
-      if (staticModules.has(filename)) {
-        addModulePreload(`${moduleName}${ext}`);
-      }
-    }
-  },
+    },
+  };
 };
 
 const terserConfig = {
@@ -111,8 +133,17 @@ const compileModuleBundle = async () => {
     replace({
       'process.env.NODE_ENV': JSON.stringify(ENV),
     }),
+    modulePreloadPlugin((staticChunks) => {
+      for (const chunkInfo of staticChunks.values()) {
+        addModulePreload(getChunkName(chunkInfo));
+        if (chunkInfo.isDynamicEntry) {
+          throw new Error(
+              `Dynamic chunk '${chunkInfo.name}' found in the static graph`);
+        }
+      }
+    }),
     bundleSizePlugin(),
-    assetManifestPlugin,
+    assetManifestPlugin(),
   ];
   if (ENV !== 'development') {
     plugins.push(terserRollupPlugin(terserConfig));
@@ -167,7 +198,7 @@ const compileClassicBundle = async () => {
       plugins: ['@babel/plugin-syntax-dynamic-import'],
     }),
     bundleSizePlugin(),
-    assetManifestPlugin,
+    assetManifestPlugin(),
   ];
   if (ENV !== 'development') {
     plugins.push(terserRollupPlugin(terserConfig));

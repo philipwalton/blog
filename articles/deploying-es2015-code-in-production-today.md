@@ -211,6 +211,18 @@ A quick [query of the HTTPArchive dataset](https://bigquery.cloud.google.com/sav
 
 The reality is transpiling and including polyfills is quickly becoming the new norm. What's unfortunate is this means billions of users are getting trillions of bytes sent over the wire unnecessarily to browsers that would have been perfectly capable of running the untranspiled code natively.
 
+<aside class="Info" id="double-download-issue">
+
+**Note:** a few developers have commented that, when using this technique, [some desktop browsers will download both the module and `nomodule` versions of the script](https://github.com/philipwalton/webpack-esnext-boilerplate/issues/1#issuecomment-445280691). As a result they prefer not to use it until browsers fix these bugs.
+
+I strongly disagree with this. Here's why:
+
+The [cost of shipping lots of unneeded JavaScript to low-end mobile browsers](https://v8.dev/blog/cost-of-javascript-2019) can be significant! We (on the Chrome team) have seen numerous occurrences of polyfill bloat adding **seconds** to the total startup time of websites on low-end mobile devices. On the other hand, a user on desktop IE or Edge having to download something twice is likely to have **zero effect** on startup time since the incorrectly downloaded bundle isn't executed and is only downloaded optimistically and off the main thread (by the preload scanner).
+
+In addition to performance cost, there's also a literal monetary cost. Most users affected by the double-download bug are on WiFi with an unlimited data plan. Downloading an extra file doesn't cost them anything&mdash;this is often not the case for mobile web users.
+
+</aside>
+
 ## It's time we start publishing our modules as ES2015
 
 The main gotcha for this technique currently is most module authors don't publish ES2015+ versions of their source code, they publish transpiled, ES5 versions.

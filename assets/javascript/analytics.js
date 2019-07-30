@@ -4,6 +4,12 @@ import {timeOrigin} from './performance';
 import {initialSWState} from './sw-state';
 
 
+// Initialize the command queue in case analytics.js hasn't loaded yet.
+// https://developers.google.com/analytics/devguides/collection/analyticsjs/
+// eslint-disable-next-line
+window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};
+
+
 /**
  * Bump this when making backwards incompatible changes to the tracking
  * implementation. This allows you to create a segment or view filter
@@ -107,11 +113,6 @@ export const addPreSendDependency = (dependency) => {
  * values on the trackers.
  */
 export const init = async () => {
-  // Initialize the command queue in case analytics.js hasn't loaded yet.
-  // https://developers.google.com/analytics/devguides/collection/analyticsjs/
-  // eslint-disable-next-line
-  window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};
-
   createTracker();
   trackErrors();
   trackCustomDimensions();

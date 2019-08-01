@@ -25,7 +25,8 @@
     "max-len": [2, {
       "ignorePattern": "^\\s*import|^\\s*it\\(|^\\s*describe\\(",
       "ignoreUrls": true
-    }]
+    }],
+    "require-atomic-updates": 0
   },
   "overrides": [{
     "files": ["tasks/**/*.{js,mjs}"],

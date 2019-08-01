@@ -1,6 +1,6 @@
 export const transition = ($el, timeout,
     {to, using, from, useTransitions = true} = {}) => {
-  return new Promise(async (resolve) => {
+  return new Promise((resolve) => {
     const change = () => new Promise((resolve) => {
       requestAnimationFrame(() => {
         if (to) {
@@ -24,8 +24,7 @@ export const transition = ($el, timeout,
         }, timeout);
       });
     } else {
-      await change();
-      resolve();
+      change().then(resolve);
     }
   });
 };

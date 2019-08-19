@@ -1,13 +1,11 @@
 import {StaleWhileRevalidate} from 'workbox-strategies/StaleWhileRevalidate.mjs';
 import {isSupported as streamsAreSupported} from 'workbox-streams/isSupported.mjs';
-import {messageWindows, windowReadyOrTimeout} from './messenger.js';
+import {messageWindows} from './messenger.js';
 
 
 /* eslint require-jsdoc: 0 */
 
-
 const requestToCachedResponseMap = new Map();
-
 
 export class StaleWhileRevalidate2 extends StaleWhileRevalidate {
   constructor(...args) {
@@ -46,8 +44,8 @@ export class StaleWhileRevalidate2 extends StaleWhileRevalidate {
     });
   }
 
-  async makeRequest(options) {
-    const finalResponse = await super.makeRequest(options);
+  async handle(options) {
+    const finalResponse = await super.handle(options);
 
     const {event} = options;
     if (event && event.request && event.request.mode === 'navigate') {
@@ -55,7 +53,6 @@ export class StaleWhileRevalidate2 extends StaleWhileRevalidate {
       const cacheHit = cachedResponse === finalResponse;
 
       const sendUpdate = async () => {
-        await windowReadyOrTimeout(event);
         await messageWindows({
           type: 'NAVIGATION_REPORT',
           payload: {

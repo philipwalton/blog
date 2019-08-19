@@ -16,16 +16,22 @@ const pageMatcher = ({url}) => {
 };
 
 const contentHandler = ({event, url}) => {
-  return contentStrategy.makeRequest({
-    request: `${url.pathname}index.content.html`,
+  return contentStrategy.handle({
+    request: new Request(`${url.pathname}index.content.html`),
     event,
   });
 };
 
 const streamHandler = streamsStrategy([
-  ({event}) => shellStrategy.makeRequest({request: shellStartPath, event}),
+  ({event}) => shellStrategy.handle({
+    request: new Request(shellStartPath),
+    event,
+  }),
   contentHandler,
-  ({event}) => shellStrategy.makeRequest({request: shellEndPath, event}),
+  ({event}) => shellStrategy.handle({
+    request: new Request(shellEndPath),
+    event,
+  }),
 ]);
 
 const pageHandler = (opts) => {

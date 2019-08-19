@@ -2,7 +2,6 @@ const fs = require('fs-extra');
 const path = require('path');
 const yaml = require('js-yaml');
 const config = require('../../config.json');
-const {getModulePreloadList} = require('./assets');
 
 
 const getTemplate = (pathname) => {
@@ -71,9 +70,6 @@ const initBook = async () => {
   }
 
   book.site.buildTime = new Date();
-  book.site.assets = {
-    modulepreload: getModulePreloadList(),
-  };
 
   return book;
 };

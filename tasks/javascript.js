@@ -1,55 +1,96 @@
+const chalk = require('chalk');
+const fs = require('fs-extra');
 const gulp = require('gulp');
+const gzipSize = require('gzip-size');
+const path = require('path');
 const {rollup} = require('rollup');
 const babel = require('rollup-plugin-babel');
 const commonjs = require('rollup-plugin-commonjs');
 const resolve = require('rollup-plugin-node-resolve');
 const replace = require('rollup-plugin-replace');
 const terserRollupPlugin = require('rollup-plugin-terser').terser;
-const {addAsset, addModulePreload} = require('./utils/assets');
+const {addAsset} = require('./utils/assets');
 const {checkModuleDuplicates} = require('./utils/check-module-duplicates');
 const {ENV} = require('./utils/env');
 const config = require('../config.json');
 
 
-const path = require('path');
-const chalk = require('chalk');
-const gzipSize = require('gzip-size');
+/**
+ * A Rollup plugin to generate a list of import dependencies for each entry
+ * point in the module graph. This is then used by the template to generate
+ * the necessary `<link rel="modulepreload">` tags.
+ * @return {Object}
+ */
+const modulepreloadPlugin = () => {
+  return {
+    name: 'modulepreload',
+    generateBundle(options, bundle) {
+      // A mapping of entry chunk names to their full dependency list.
+      const modulepreloadMap = {};
 
+      // Loop through all the chunks to detect entries.
+      for (const [fileName, chunkInfo] of Object.entries(bundle)) {
+        if (chunkInfo.isEntry || chunkInfo.isDynamicEntry) {
+          modulepreloadMap[chunkInfo.name] = [fileName, ...chunkInfo.imports];
+        }
+      }
 
-const getPackageNameFromFilePath = (filePath) => {
-  // Since node modules can be nested, don't just match but get the
-  // last directory name after `/node_modules/`.
-  const pathParts = filePath.split('node_modules/').slice(-1);
-  const lastPart = pathParts[pathParts.length - 1];
-
-  return /^(?:[^@/]+)|^@(?:[^/]+)\/(?:[^/]+)/.exec(lastPart)[0];
+      fs.outputJsonSync(
+          path.join(config.publicDir, 'modulepreload.json'),
+          modulepreloadMap, {spaces: 2});
+    },
+  };
 };
-
 
 /**
- * Takes a `chunkInfo` object and returns the unversioned name for chunks
- * with a corresponding module, or the versioned name for dynamically
- * generated chunks (since their unversioned name is just "chunk").
- * @param {Object} chunkInfo
- * @return {string}
+ * A Rollup plugin that will fail the build it two chunks are detected with
+ * the same name. This is to avoid the issue described here (and need to be
+ * used until it's resolved):
+ * https://github.com/rollup/rollup/issues/3060#issuecomment-522719783
+ * @return {Object}
  */
-const getChunkName = (chunkInfo) => {
-  return chunkInfo.name === 'chunk' ? chunkInfo.fileName :
-      chunkInfo.name + path.extname(chunkInfo.fileName);
-};
-
-const manualChunks = (id) => {
-  if (id.includes('node_modules')) {
-    return `npm.${getPackageNameFromFilePath(id)}`;
-  }
-};
-
-
-const bundleSizePlugin = () => {
-  let entryFile;
+const checkDuplicateChunksPlugin = () => {
   return {
+    name: 'manifest',
+    generateBundle(options, bundle) {
+      const chunkNames = new Set();
+
+      for (const chunkInfo of Object.values(bundle)) {
+        const name = chunkInfo.name;
+
+        if (chunkNames.has(name)) {
+          throw new Error(`Duplicate chunk name '${name}' detected`);
+        }
+        chunkNames.add(name);
+      }
+    },
+  };
+};
+
+/**
+ * A Rollup plugin that adds each chunk to the asset manifest, keyed by
+ * the chunk name and the output extension, mapping to the file name.
+ * @return {Object}
+ */
+const manifestPlugin = () => {
+  return {
+    name: 'manifest',
+    generateBundle(options, bundle) {
+      const ext = path.extname(options.entryFileNames);
+
+      for (const [fileName, chunkInfo] of Object.entries(bundle)) {
+        addAsset(chunkInfo.name + ext, fileName);
+      }
+    },
+  };
+};
+
+const reportBundleSizePlugin = () => {
+  let entryNames;
+  return {
+    name: 'bundle-size-plugin',
     buildStart: (inputOptions) => {
-      entryFile = inputOptions.input;
+      entryNames = Object.keys(inputOptions.input);
     },
     generateBundle: (options, bundle) => {
       let bundleSize = 0;
@@ -62,54 +103,7 @@ const bundleSizePlugin = () => {
       }
       console.log(
           chalk.yellow(String(bundleSize).padStart(6)),
-          chalk.white(`(total '${path.basename(entryFile)}' bundle size)`));
-    },
-  };
-};
-
-
-const modulePreloadPlugin = (callback) => {
-  return {
-    generateBundle(options, bundle) {
-      // Create a list of static module dependencies to preload.
-      const staticChunks = new Map();
-
-      const chunksToCheck = Object.keys(bundle);
-      const recheckedChunks = new Set();
-
-      let filename;
-      while (filename = chunksToCheck.shift()) {
-        const chunkInfo = bundle[filename];
-
-        // Add any import in the top-level module graph (non-dynamic)
-        if (chunkInfo.isEntry || staticChunks.has(filename)) {
-          staticChunks.set(filename, chunkInfo);
-
-          for (const i of chunkInfo.imports) {
-            staticChunks.set(i, bundle[i]);
-
-            // Imports need to be checked again since they may have been
-            // originally checked before all entry chunks were discovered.
-            // But don't recheck a chunk more than once.
-            if (!recheckedChunks.has(i)) {
-              chunksToCheck.push(i);
-              recheckedChunks.add(i);
-            }
-          }
-        }
-      }
-      callback(staticChunks);
-    },
-  };
-};
-
-
-const assetManifestPlugin = () => {
-  return {
-    generateBundle(options, bundle) {
-      for (const [filename, chunkInfo] of Object.entries(bundle)) {
-        addAsset(getChunkName(chunkInfo), filename);
-      }
+          chalk.white(`(total '${entryNames.join('/')}' bundle size)`));
     },
   };
 };
@@ -124,6 +118,15 @@ const terserConfig = {
   },
 };
 
+const manualChunks = (id) => {
+  if (id.includes('node_modules')) {
+    // The directory name following the last `node_modules`.
+    // Usually this is the package, but it could also be the scope.
+    const directories = id.split(path.sep);
+    return directories[directories.lastIndexOf('node_modules') + 1];
+  }
+};
+
 let moduleBundleCache;
 
 const compileModuleBundle = async () => {
@@ -133,24 +136,19 @@ const compileModuleBundle = async () => {
     replace({
       'process.env.NODE_ENV': JSON.stringify(ENV),
     }),
-    modulePreloadPlugin((staticChunks) => {
-      for (const chunkInfo of staticChunks.values()) {
-        addModulePreload(getChunkName(chunkInfo));
-        if (chunkInfo.isDynamicEntry) {
-          throw new Error(
-              `Dynamic chunk '${chunkInfo.name}' found in the static graph`);
-        }
-      }
-    }),
-    bundleSizePlugin(),
-    assetManifestPlugin(),
+    checkDuplicateChunksPlugin(),
+    modulepreloadPlugin(),
+    reportBundleSizePlugin(),
+    manifestPlugin(),
   ];
   if (ENV !== 'development') {
     plugins.push(terserRollupPlugin(terserConfig));
   }
 
   const bundle = await rollup({
-    input: 'assets/javascript/main-module.js',
+    input: {
+      'main-module': 'assets/javascript/main-module.js',
+    },
     cache: moduleBundleCache,
     plugins,
     manualChunks,
@@ -169,6 +167,7 @@ const compileModuleBundle = async () => {
     format: 'esm',
     chunkFileNames: '[name]-[hash].mjs',
     entryFileNames: '[name]-[hash].mjs',
+
     // Don't rewrite dynamic import when developing (for easier debugging).
     dynamicImportFunction: ENV === 'development' ? undefined : '__import__',
   });
@@ -197,15 +196,17 @@ const compileClassicBundle = async () => {
       }]],
       plugins: ['@babel/plugin-syntax-dynamic-import'],
     }),
-    bundleSizePlugin(),
-    assetManifestPlugin(),
+    reportBundleSizePlugin(),
+    manifestPlugin(),
   ];
   if (ENV !== 'development') {
     plugins.push(terserRollupPlugin(terserConfig));
   }
 
   const bundle = await rollup({
-    input: 'assets/javascript/main-nomodule.js',
+    input: {
+      'main-nomodule': 'assets/javascript/main-nomodule.js',
+    },
     cache: nomoduleBundleCache,
     plugins,
     inlineDynamicImports: true, // Need for a single output bundle.

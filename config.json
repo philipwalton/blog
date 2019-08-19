@@ -1,6 +1,6 @@
 {
   "contentPartialsSuffix": ".content.html",
-  "manifestFileName": "revisioned-asset-manifest.json",
+  "manifestFileName": "asset-map.json",
   "publicDir": "build",
   "publicPath": "/",
   "publicStaticDir": "build/static",

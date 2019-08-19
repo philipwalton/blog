@@ -8,38 +8,30 @@ const config = require('../../config');
 let manifest;
 
 
-const getInitialManifestStructure = () => {
-  return {
-    assetMap: {},
-    modulepreload: [],
-  };
-};
-
-
 const ensureManifest = () => {
   if (!manifest) {
     manifest = fs.readJsonSync(
-        path.join(config.publicStaticDir, config.manifestFileName),
-        {throws: false}) || getInitialManifestStructure();
+        path.join(config.publicDir, config.manifestFileName),
+        {throws: false}) || {};
   }
 };
 
 
 const getManifest = () => {
   ensureManifest();
-  return manifest.assetMap;
+  return manifest;
 };
 
 
 const saveManifest = () => {
   fs.outputJsonSync(
-      path.join(config.publicStaticDir, config.manifestFileName),
+      path.join(config.publicDir, config.manifestFileName),
       manifest, {spaces: 2});
 };
 
 
 const resetManifest = () => {
-  manifest = getInitialManifestStructure();
+  manifest = {};
   saveManifest();
 };
 
@@ -47,37 +39,20 @@ const resetManifest = () => {
 const getAsset = (filename) => {
   ensureManifest();
 
-  if (!manifest.assetMap[filename]) {
+  if (!manifest[filename]) {
     console.error(`Revisioned file for '${filename}' doesn't exist`);
   }
 
-  return manifest.assetMap[filename];
+  return manifest[filename];
 };
 
 
 const addAsset = (filename, revisionedFilename) => {
   ensureManifest();
 
-  manifest.assetMap[filename] = revisionedFilename;
+  manifest[filename] = revisionedFilename;
 
   saveManifest();
-};
-
-
-const addModulePreload = (module) => {
-  ensureManifest();
-
-  if (!manifest.modulepreload.includes(module)) {
-    manifest.modulepreload.push(module);
-  }
-  saveManifest();
-};
-
-
-const getModulePreloadList = () => {
-  ensureManifest();
-
-  return manifest.modulepreload;
 };
 
 
@@ -105,6 +80,4 @@ module.exports = {
   addAsset,
   getRevisionedAssetUrl,
   generateRevisionedAsset,
-  getModulePreloadList,
-  addModulePreload,
 };

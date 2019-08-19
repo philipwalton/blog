@@ -3,6 +3,7 @@ const he = require('he');
 const jsesc = require('jsesc');
 const moment = require('moment-timezone');
 const nunjucks = require('nunjucks');
+const path = require('path');
 const {getRevisionedAssetUrl} = require('./assets');
 const config = require('../../config.json');
 
@@ -26,6 +27,9 @@ const catchAndLogErrors = (fn) => {
 
 
 const initTemplates = () => {
+  const modulepreload = fs.readJsonSync(
+      path.join(config.publicDir, 'modulepreload.json'));
+
   const env = nunjucks.configure('templates', {
     autoescape: false,
     noCache: true,
@@ -49,12 +53,19 @@ const initTemplates = () => {
     return getRevisionedAssetUrl(filename);
   }));
 
+  env.addFilter('modulepreload', catchAndLogErrors((entryModule) => {
+    return modulepreload[entryModule].map((importedModule) => {
+      return path.join(config.publicStaticPath, importedModule);
+    });
+  }));
+
   const inlineCache = {};
-  env.addFilter('inline', catchAndLogErrors((filepath) => {
-    if (!inlineCache[filepath]) {
-      inlineCache[filepath] = fs.readFileSync(`build/${filepath}`, 'utf-8');
+  env.addFilter('inline', catchAndLogErrors((fileURL) => {
+    if (!inlineCache[fileURL]) {
+      const assetPath = path.join(config.publicDir, fileURL.slice(1));
+      inlineCache[fileURL] = fs.readFileSync(assetPath, 'utf-8');
     }
-    return inlineCache[filepath];
+    return inlineCache[fileURL];
   }));
 };
 

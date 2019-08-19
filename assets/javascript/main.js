@@ -25,7 +25,7 @@ const initAnalytics = async () => {
  * The main script entry point for the site. Initalizes all the sub modules
  * analytics tracking, and the service worker.
  */
-const main = async () => {
+export const main = async () => {
   contentLoader.init();
   drawer.init();
   breakpoints.init();
@@ -36,6 +36,3 @@ const main = async () => {
   await initServiceWorker();
   await initAnalytics();
 };
-
-// Initialize all code in a separate task.
-setTimeout(main, 0);

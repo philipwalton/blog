@@ -1,5 +1,9 @@
-// FF 66 and Edge 18 do not support dynamic import.
-import './dynamic-import';
+import {initialize as initializeDynamicImport} from 'dynamic-import-polyfill/initialize.mjs';
+import {main} from './main';
 
-// Import main.js after dynamic import support is loaded.
-import './main';
+// This needs to be done before any dynamic imports are used.
+// If your modules are hosted in a sub-directory, it must be specified here.
+initializeDynamicImport({modulePath: '/static/'});
+
+// Start the app.
+main();

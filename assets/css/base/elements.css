@@ -55,8 +55,13 @@ h2,
 h3,
 h4 {
   font-weight: 500;
-  line-height: 1.1;
+  line-height: 1.2;
   margin: 1em 0;
+}
+
+h4 {
+    font-weight: 700;
+    line-height: inherit;
 }
 
 p {

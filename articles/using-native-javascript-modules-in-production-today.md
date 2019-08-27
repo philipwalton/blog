@@ -46,6 +46,12 @@ In fact, modules is the format we all *should* be bundling to because browsers a
 
 Fortunately, at least one popular bundler today ([Rollup](https://rollupjs.org)) supports [modules as an output format](https://rollupjs.org/guide/en/#outputformat), which means it's possible to both bundle your code *and* deploy modules in production (without all the loader boilerplate). And since Rollup has fantastic tree-shaking (the best of any bundler in my experience), bundling to modules with Rollup produces the smallest final code size of any option currently available.
 
+<aside class="Info">
+
+**Update:** Parcel [plans to add module support](https://twitter.com/devongovett/status/1163792519764877312) in the next version. Webpack does not currently support a module output format, but here are a few issues to follow the discussion ([#2933](https://github.com/webpack/webpack/issues/2933), [#8895](https://github.com/webpack/webpack/issues/8895), [#8896](https://github.com/webpack/webpack/issues/8896)).
+
+</aside>
+
 Another misconception is that you can't use modules unless 100% of your dependencies use modules, and unfortunately (very unfortunate in my opinion), most npm packages are still published as CommonJS (some actually even author as ES2015 but then transpile to CommonJS before publishing to npm)!
 
 Again, though, Rollup has a plugin ([rollup-plugin-commonjs](https://github.com/rollup/rollup-plugin-commonjs)) that can actually consume CommonJS source code and convert it to ES2015. While it's definitely [*better*](https://rollupjs.org/guide/en/#why-are-es-modules-better-than-commonjs-modules) if your dependencies are in ES2015 module format to begin with, having a few that aren't definitely does not prevent you from deploying modules.
@@ -231,12 +237,6 @@ If you're already using a bundler like [webpack](https://webpack.js.org/), and y
 
 When using real modules, users on modern browsers don't have to load any unnecessary module loading or dependency management code. For example the [webpack runtime and manifest](https://webpack.js.org/concepts/manifest/) would not be needed at all if using real modules.
 
-<aside class="Info">
-
-**Note:** webpack does not currently support modules as an output format, but there are several open issues you can follow to keep up-to-date on these feature requests ([#2933](https://github.com/webpack/webpack/issues/2933), [#8895](https://github.com/webpack/webpack/issues/8895), [#8896](https://github.com/webpack/webpack/issues/8896)). Hopefully soon all bundlers will support modules so users can get the benefits without having to switch tools.
-
-</aside>
-
 #### Better preloading
 
 As I mentioned in the previous section, using `modulepreload` allows you to load code and parse/compile it off the main thread. All other things being equal, this means your pages will get interactive faster, and the main thread is less likely to be blocked during user interaction.
@@ -269,6 +269,16 @@ For browsers that don't support modules at all, you can use the `module/nomodule
 ### A working example
 
 Since it's always easier to talk about cross-browser compatibility than it is to actually make it work, I've built [a demo app](https://rollup-native-modules-boilerplate.glitch.me/) that uses all the techniques I outlined here.
+
+<figure>
+  <a href="https://rollup-native-modules-boilerplate.glitch.me/">
+    <img srcset="
+      {{ 'native-javascript-modules-demo-1400w.png' | revision }},
+      {{ 'native-javascript-modules-demo.png' | revision }} 700w"
+      src="{{ 'native-javascript-modules-demo.png' | revision }}"
+      alt="A demo app showing how to use native JavaScript modules with legacy browser support">
+  </a>
+</figure>
 
 The demo works in browsers that don't support dynamic `import()` (like Edge 18 and Firefox ESR), and it also works in browsers that don't support modules (like Internet Explorer 11).
 

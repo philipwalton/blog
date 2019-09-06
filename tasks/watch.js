@@ -11,7 +11,7 @@ gulp.task('watch', gulp.series('build', 'server', () => {
       gulp.series('images', 'content'));
   gulp.watch('assets/javascript/*.js',
       gulp.series('javascript', 'content', 'sw'));
-  gulp.watch(['templates/**/*.html', 'articles/*.md'],
+  gulp.watch(['book.yaml', 'templates/**/*.html', 'articles/*.md'],
       gulp.series('content', 'sw'));
   gulp.watch('assets/sw/**/*.js',
       gulp.series('sw'));

@@ -66,6 +66,7 @@
     "md5": "^2.2.1",
     "mocha": "^6.2.0",
     "moment-timezone": "^0.5.26",
+    "morgan": "^1.9.1",
     "name-all-modules-plugin": "^1.0.1",
     "nunjucks": "^3.2.0",
     "path": "^0.12.7",

@@ -1,12 +1,14 @@
 const express = require('express');
+const morgan = require('morgan');
 const path = require('path');
 const superstatic = require('superstatic');
-
 
 const PORT = 5000;
 let server;
 
 const app = express()
+    // Log requests that make it to the server.
+    .use(morgan('dev'))
     // Any request matching this pattern will return a test fixture.
     .use(/^\/__(.+)__/, (req, res, next) => {
       res.sendFile(path.resolve(`test/fixtures/${req.params[0]}.html`));

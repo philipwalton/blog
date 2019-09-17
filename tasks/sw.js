@@ -63,6 +63,9 @@ gulp.task('sw', async () => {
       format: 'es',
     });
   } catch (err) {
+    // Beep!
+    process.stdout.write('\x07');
+
     // Log but don't throw so watching still works.
     console.error(err);
   }

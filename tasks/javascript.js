@@ -223,9 +223,17 @@ const compileClassicBundle = async () => {
 };
 
 gulp.task('javascript', async () => {
-  await compileModuleBundle();
+  try {
+    await compileModuleBundle();
 
-  if (ENV !== 'development') {
-    await compileClassicBundle();
+    if (ENV !== 'development') {
+      await compileClassicBundle();
+    }
+  } catch (err) {
+    // Beep!
+    process.stdout.write('\x07');
+
+    // Log but don't throw so watching still works.
+    console.error(err);
   }
 });

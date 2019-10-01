@@ -1,16 +1,15 @@
 import {deleteUnusedCaches} from './caches.js';
 import {messageWindows} from './messenger.js';
 import {getStoredMetadata, getAndUpdateMetadata} from './metadata.js';
-
-import * as precache from './precache.js';
 import * as offlineAnalytics from './offline-analytics.js';
+import * as precache from './precache.js';
 import * as router from './router.js';
 
 
 let metadataChanges;
 
-router.init();
 precache.init();
+router.init();
 offlineAnalytics.init();
 
 addEventListener('install', (event) => {
@@ -47,7 +46,6 @@ addEventListener('activate', (event) => {
   };
   event.waitUntil(activateComplete());
 });
-
 
 addEventListener('message', (event) => {
   if (event.data && event.data.type === 'GET_METADATA') {

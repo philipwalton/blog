@@ -48,6 +48,7 @@
     "firebase-tools": "^7.2.2",
     "fs-extra": "^8.1.0",
     "glob": "^7.1.4",
+    "globby": "^10.0.1",
     "gm": "^1.23.1",
     "gulp": "^4.0.2",
     "gulp-webdriver": "^2.0.3",

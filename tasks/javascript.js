@@ -60,6 +60,7 @@ const manifestPlugin = () => {
   };
 };
 
+
 const reportBundleSizePlugin = () => {
   let entryNames;
   return {
@@ -114,7 +115,6 @@ const compileModuleBundle = async () => {
     checkDuplicatesPlugin(),
     modulepreloadPlugin(),
     reportBundleSizePlugin(),
-    manifestPlugin(),
   ];
   if (ENV !== 'development') {
     plugins.push(terserRollupPlugin(terserConfig));
@@ -136,10 +136,10 @@ const compileModuleBundle = async () => {
   moduleBundleCache = bundle.cache;
 
   await bundle.write({
-    dir: config.publicStaticDir,
+    dir: config.publicModulesDir,
     format: 'esm',
-    chunkFileNames: '[name]-[hash].mjs',
-    entryFileNames: '[name]-[hash].mjs',
+    chunkFileNames: '[name].mjs',
+    entryFileNames: '[name].mjs',
 
     // Don't rewrite dynamic import when developing (for easier debugging).
     dynamicImportFunction: ENV === 'development' ? undefined : '__import__',
@@ -198,6 +198,7 @@ const compileClassicBundle = async () => {
 
 gulp.task('javascript', async () => {
   try {
+    await fs.remove(config.publicModulesDir);
     await compileModuleBundle();
 
     if (ENV !== 'development') {

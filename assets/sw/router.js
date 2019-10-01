@@ -1,21 +1,21 @@
 import {Router} from 'workbox-routing/Router.mjs';
+import {createPrecacheRoute} from './precache.js';
 import {createContentRoute} from './routes/content.js';
-import {createPageRoute} from './routes/page.js';
-import {createShellRoute} from './routes/shell.js';
+import {createPagesRoute} from './routes/pages.js';
 import {createStaticAssetsRoute} from './routes/static-assets.js';
 import {createThirdPartyAssetsRoute} from './routes/third-party-assets.js';
 
 
 // Order matters. Earlier routes are tried first.
 const precacheRoutes = {
-  createShellRoute,
+  createPrecacheRoute,
 };
 
 // Order matters. Earlier routes are tried first.
 const runtimeRoutes = {
   createStaticAssetsRoute,
   createContentRoute,
-  createPageRoute,
+  createPagesRoute,
   createThirdPartyAssetsRoute,
 };
 

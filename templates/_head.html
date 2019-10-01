@@ -13,7 +13,7 @@
 {% for module in 'main-module' | modulepreload %}
   <link rel="modulepreload" href="{{ module }}"></script>
 {%- endfor %}
-<script type="module" src="{{ 'main-module.mjs' | revision }}"></script>
+<script type="module" src="/modules/main-module.mjs"></script>
 
 {% include '_analytics.html' %}
 

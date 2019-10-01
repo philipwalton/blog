@@ -55,7 +55,7 @@ const initTemplates = () => {
 
   env.addFilter('modulepreload', catchAndLogErrors((entryModule) => {
     return modulepreload[entryModule].map((importedModule) => {
-      return path.join(config.publicStaticPath, importedModule);
+      return path.join(config.publicModulesPath, importedModule);
     });
   }));
 

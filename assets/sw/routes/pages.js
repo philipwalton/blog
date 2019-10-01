@@ -1,15 +1,10 @@
-/* global __SHELL_START_PATH__, __SHELL_END_PATH__ */
-
 import {Route} from 'workbox-routing/Route.mjs';
 import {strategy as streamsStrategy} from 'workbox-streams/strategy.mjs';
 import {contentStrategy} from './content.js';
-import {shellStrategy} from './shell.js';
+import {precacheHandler} from '../precache.js';
 
 
-const shellStartPath = __SHELL_START_PATH__;
-const shellEndPath = __SHELL_END_PATH__;
-
-const pageMatcher = ({url}) => {
+const pagesMatcher = ({url}) => {
   return url.hostname === location.hostname &&
       (url.pathname === '/' ||
       url.pathname.match(/^\/(?:about|articles)\/([\w-]+\/)?$/));
@@ -23,18 +18,18 @@ const contentHandler = ({event, url}) => {
 };
 
 const streamHandler = streamsStrategy([
-  ({event}) => shellStrategy.handle({
-    request: new Request(shellStartPath),
+  ({event}) => precacheHandler({
+    request: new Request('/shell-start.html'),
     event,
   }),
   contentHandler,
-  ({event}) => shellStrategy.handle({
-    request: new Request(shellEndPath),
+  ({event}) => precacheHandler({
+    request: new Request('/shell-end.html'),
     event,
   }),
 ]);
 
-const pageHandler = (opts) => {
+const pagesHandler = (opts) => {
   // If the request is a navigation request, assume it's going to be consumed
   // by a browser and return the full stream. Otherwise assume it's from
   // either an SPA load or a CACHE_URLS message, so only the content partial
@@ -46,6 +41,6 @@ const pageHandler = (opts) => {
   }
 };
 
-export const createPageRoute = () => {
-  return new Route(pageMatcher, pageHandler);
+export const createPagesRoute = () => {
+  return new Route(pagesMatcher, pagesHandler);
 };

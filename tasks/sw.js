@@ -2,13 +2,15 @@
 
 const fse = require('fs-extra');
 const gulp = require('gulp');
+const path = require('path');
 const {rollup} = require('rollup');
 const replace = require('rollup-plugin-replace');
 const resolve = require('rollup-plugin-node-resolve');
 const terserRollupPlugin = require('rollup-plugin-terser').terser;
-const {getManifest, getRevisionedAssetUrl} = require('./utils/assets');
-const {checkModuleDuplicates} = require('./utils/check-module-duplicates');
+const {getRevisionedAssetUrl} = require('./utils/assets');
+const {checkDuplicatesPlugin} = require('./utils/check-duplicates-plugin');
 const {ENV} = require('./utils/env');
+const config = require('../config.json');
 
 
 gulp.task('sw', async () => {
@@ -22,10 +24,15 @@ gulp.task('sw', async () => {
       shellStartPath,
       shellEndPath,
     ];
-    for (const filename of Object.values(getManifest())) {
-      if (filename.match(/\.(css|mjs)$/)) {
-        criticalAssets.push(`/static/${filename}`);
-      }
+
+    const moduleMap = fse.readJsonSync(
+        path.join(config.publicDir, 'module-map.json'), 'utf-8');
+
+    for (const [filename, revision] of Object.entries(moduleMap)) {
+      criticalAssets.push({
+        url: path.join(config.publicModulesPath, filename),
+        revision,
+      });
     }
 
     const plugins = [
@@ -38,6 +45,7 @@ gulp.task('sw', async () => {
         '__SHELL_START_PATH__': JSON.stringify(shellStartPath),
         '__SHELL_END_PATH__': JSON.stringify(shellEndPath),
       }),
+      checkDuplicatesPlugin(),
     ];
     if (ENV !== 'development') {
       plugins.push(terserRollupPlugin({
@@ -54,8 +62,6 @@ gulp.task('sw', async () => {
       input: 'assets/sw/sw.js',
       plugins,
     });
-
-    checkModuleDuplicates(bundle.cache.modules.map((m) => m.id));
 
     await bundle.write({
       file: 'build/sw.js',

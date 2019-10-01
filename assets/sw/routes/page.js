@@ -36,8 +36,9 @@ const streamHandler = streamsStrategy([
 
 const pageHandler = (opts) => {
   // If the request is a navigation request, assume it's going to be consumed
-  // by a browser and return the full stream. If the request is from a
-  // CACHE_URLS message, only the content partial needs to be cached.
+  // by a browser and return the full stream. Otherwise assume it's from
+  // either an SPA load or a CACHE_URLS message, so only the content partial
+  // needs to be returned.
   if (opts.request && opts.request.mode === 'navigate') {
     return streamHandler(opts);
   } else {

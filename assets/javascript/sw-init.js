@@ -1,6 +1,7 @@
 import {Workbox} from 'workbox-window/Workbox.mjs';
 import {loadPage} from './content-loader';
 import {initialSWState} from './sw-state';
+import {NULL_GA_VALUE} from './constants';
 
 
 // Defining a Workbox instance has no side effects, so it's OK to do it
@@ -12,18 +13,18 @@ const MESSAGE_TIMEOUT = 5000;
 
 
 const setSiteVersionOrTimeout = async () => {
-  const {ga, dimensions, NULL_VALUE} = await import('./analytics');
+  const {ga, dimensions} = await import('./analytics');
 
   // Set the site version, if available.
   const {version} = await new Promise((resolve) => {
     // Uncontrolled pages won't have a version.
     if (initialSWState !== 'controlled') {
-      resolve({version: NULL_VALUE});
+      resolve({version: NULL_GA_VALUE});
     }
 
     wb.messageSW({type: 'GET_METADATA'}).then(resolve);
 
-    setTimeout(() => resolve({version: NULL_VALUE}), MESSAGE_TIMEOUT);
+    setTimeout(() => resolve({version: NULL_GA_VALUE}), MESSAGE_TIMEOUT);
   });
 
   ga('set', dimensions.SITE_VERSION, version);
@@ -31,7 +32,7 @@ const setSiteVersionOrTimeout = async () => {
 
 
 const setNavigationCacheOrTimeout = async () => {
-  const {ga, dimensions, NULL_VALUE} = await import('./analytics');
+  const {ga, dimensions} = await import('./analytics');
 
   // Before sending any perf data, determine whether the page was served
   // entirely cache-first.
@@ -47,7 +48,7 @@ const setNavigationCacheOrTimeout = async () => {
       }
     });
 
-    setTimeout(() => resolve({cacheHit: NULL_VALUE}), MESSAGE_TIMEOUT);
+    setTimeout(() => resolve({cacheHit: NULL_GA_VALUE}), MESSAGE_TIMEOUT);
   });
 
   ga('set', dimensions.CACHE_HIT, String(cacheHit));
@@ -119,7 +120,7 @@ const addCacheUpdateListener = () => {
   // Listen for cache update messages and swap out the content.
   // TODO(philipwalton): consider whether this is the best UX.
   wb.addEventListener('message', async ({data}) => {
-    if (data.type === 'CACHE_UPDATED') {
+    if (data && data.type === 'CACHE_UPDATED') {
       const {updatedURL} = data.payload;
 
       // Perform an in-place update with the next content. In most cases this
@@ -140,8 +141,8 @@ const addCacheUpdateListener = () => {
 
 const addSWUpdateListener = () => {
   wb.addEventListener('message', async ({data}) => {
-    if (data.type === 'UPDATE_AVAILABLE') {
-      const {ga, NULL_VALUE} = await import('./analytics');
+    if (data && data.type === 'UPDATE_AVAILABLE') {
+      const {ga} = await import('./analytics');
 
       // Default to showing an update message. This is helpful in the event
       // a future version causes an error parsing the message data, the
@@ -162,7 +163,7 @@ const addSWUpdateListener = () => {
           eventAction,
           eventValue: timeSinceNewVersionDeployed || 0,
           eventLabel: newVersion ?
-              `${oldVersion || NULL_VALUE} => ${newVersion}` : NULL_VALUE,
+              `${oldVersion || NULL_GA_VALUE} => ${newVersion}` : NULL_GA_VALUE,
         });
       };
 

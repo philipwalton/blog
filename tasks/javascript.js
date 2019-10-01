@@ -10,7 +10,7 @@ const resolve = require('rollup-plugin-node-resolve');
 const replace = require('rollup-plugin-replace');
 const terserRollupPlugin = require('rollup-plugin-terser').terser;
 const {addAsset} = require('./utils/assets');
-const {checkModuleDuplicates} = require('./utils/check-module-duplicates');
+const {checkDuplicatesPlugin} = require('./utils/check-duplicates-plugin');
 const {ENV} = require('./utils/env');
 const config = require('../config.json');
 
@@ -38,31 +38,6 @@ const modulepreloadPlugin = () => {
       fs.outputJsonSync(
           path.join(config.publicDir, 'modulepreload.json'),
           modulepreloadMap, {spaces: 2});
-    },
-  };
-};
-
-/**
- * A Rollup plugin that will fail the build it two chunks are detected with
- * the same name. This is to avoid the issue described here (and need to be
- * used until it's resolved):
- * https://github.com/rollup/rollup/issues/3060#issuecomment-522719783
- * @return {Object}
- */
-const checkDuplicateChunksPlugin = () => {
-  return {
-    name: 'manifest',
-    generateBundle(options, bundle) {
-      const chunkNames = new Set();
-
-      for (const chunkInfo of Object.values(bundle)) {
-        const name = chunkInfo.name;
-
-        if (chunkNames.has(name)) {
-          throw new Error(`Duplicate chunk name '${name}' detected`);
-        }
-        chunkNames.add(name);
-      }
     },
   };
 };
@@ -136,7 +111,7 @@ const compileModuleBundle = async () => {
     replace({
       'process.env.NODE_ENV': JSON.stringify(ENV),
     }),
-    checkDuplicateChunksPlugin(),
+    checkDuplicatesPlugin(),
     modulepreloadPlugin(),
     reportBundleSizePlugin(),
     manifestPlugin(),
@@ -159,8 +134,6 @@ const compileModuleBundle = async () => {
   });
 
   moduleBundleCache = bundle.cache;
-
-  checkModuleDuplicates(bundle.cache.modules.map((m) => m.id));
 
   await bundle.write({
     dir: config.publicStaticDir,
@@ -196,6 +169,7 @@ const compileClassicBundle = async () => {
       }]],
       plugins: ['@babel/plugin-syntax-dynamic-import'],
     }),
+    checkDuplicatesPlugin(),
     reportBundleSizePlugin(),
     manifestPlugin(),
   ];

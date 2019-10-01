@@ -6,6 +6,7 @@ import * as precache from './precache.js';
 import * as offlineAnalytics from './offline-analytics.js';
 import * as router from './router.js';
 
+
 let metadataChanges;
 
 router.init();

@@ -1,11 +1,11 @@
 import * as breakpoints from './breakpoints';
 import * as contentLoader from './content-loader';
 import * as drawer from './drawer';
+import * as sw from './sw-init';
 
 
 const initServiceWorker = async () => {
   if ('serviceWorker' in navigator) {
-    const sw = await import('./sw-init');
     try {
       await sw.init();
     } catch (err) {
@@ -19,7 +19,6 @@ const initAnalytics = async () => {
   const analytics = await import('./analytics');
   analytics.init();
 };
-
 
 /**
  * The main script entry point for the site. Initalizes all the sub modules

@@ -2,6 +2,7 @@ import {IdleQueue} from 'idlize/IdleQueue.mjs';
 import {getActiveBreakpoint} from './breakpoints';
 import {timeOrigin} from './performance';
 import {initialSWState} from './sw-state';
+import {NULL_GA_VALUE} from './constants';
 
 
 // Initialize the command queue in case analytics.js hasn't loaded yet.
@@ -39,14 +40,6 @@ const queue = new IdleQueue({
 export const ga = (...args) => {
   queue.pushTask(() => window.ga(...args));
 };
-
-
-/**
- * A default value for dimensions so unset values always are reported as
- * something. This is needed since Google Analytics will drop empty dimension
- * values in reports.
- */
-export const NULL_VALUE = '(not set)';
 
 
 /**
@@ -242,7 +235,7 @@ const trackCustomDimensions = () => {
   // in your reports.
   const dimensionsObj = {};
   Object.keys(dimensions).forEach((key) => {
-    dimensionsObj[dimensions[key]] = NULL_VALUE;
+    dimensionsObj[dimensions[key]] = NULL_GA_VALUE;
   });
   ga('set', dimensionsObj);
 
@@ -290,7 +283,7 @@ const trackFcp = () => {
         ga('send', 'event', {
           eventCategory: 'Performance',
           eventAction: 'first-contentful-paint',
-          eventLabel: NULL_VALUE,
+          eventLabel: NULL_GA_VALUE,
           nonInteraction: true,
           [metrics.FCP]: Math.round(fcpEntry.startTime),
           [metrics.FCP_SAMPLE]: 1,
@@ -369,7 +362,7 @@ const trackNavigationTimingMetrics = async () => {
         const fieldsObj = {
           eventCategory: 'Performance',
           eventAction: 'navigation',
-          eventLabel: NULL_VALUE,
+          eventLabel: NULL_GA_VALUE,
           nonInteraction: true,
           [metrics.NT_SAMPLE]: 1,
           [metrics.REQUEST_START_TIME]: requestStart,
@@ -392,7 +385,7 @@ const trackNavigationTimingMetrics = async () => {
  * @return {string}
  */
 const getEffectiveConnectionType = () => navigator.connection &&
-    navigator.connection.effectiveType || NULL_VALUE;
+    navigator.connection.effectiveType || NULL_GA_VALUE;
 
 
 const getPixelDensity = () => {

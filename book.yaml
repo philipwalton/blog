@@ -172,3 +172,6 @@ articles:
 - title: "Using Native JavaScript Modules in Production Today"
   path: /articles/using-native-javascript-modules-in-production-today/
   date: 2019-08-20T00:20:17-07:00
+- title: "Cascading Cache Invalidation"
+  path: /articles/cascading-cache-invalidation/
+  date: 2019-10-09T01:26:44-07:00

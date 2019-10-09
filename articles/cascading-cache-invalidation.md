@@ -9,7 +9,7 @@ Every bundling tool I know of supports adding content hashes with a simple confi
 filename: '[name]-[contenthash].js'
 ```
 
-The other thing most performance experts recommend is [code splitting](https://web.dev/codelab-code-splitting), which allows you to split your JavaScript code into several separate bundles that can be loaded in parallel or even on demand.
+The other thing most performance experts recommend is [code splitting](https://web.dev/reduce-javascript-payloads-with-code-splitting), which allows you to split your JavaScript code into several separate bundles that can be loaded in parallel or even on demand.
 
 Specifically in regards to caching best practices, one of the many claimed benefits of code splitting is that changes made to a single source file won't invalidate the entire bundle. In other words, if a security fix is released for a single npm dependency, and you're code-splitting all your `node_module` dependencies into a separate "vendor" chunk, then only your vendor chunk should have to change.
 
@@ -32,7 +32,7 @@ In the following dependency graph, there's a _main_ entry chunk, three asynchron
 
 Since the _dep2_ and _dep3_ chunks import modules from the _vendor_ chunk, at the top of their generated output code you'll likely see import statements that looks like this:
 ```js
-import {...} from '/vendor-5e6f.js';
+import {...} from '/vendor-5e6f.mjs';
 ```
 
 Now consider what happens if the contents of the _vendor_ chunk change.
@@ -40,8 +40,8 @@ Now consider what happens if the contents of the _vendor_ chunk change.
 If the contents of the _vendor_ chunk change, then the hash in the filename will have to change as well. And since the _vendor_ chunk's filename is referenced in import statements in both the _dep2_ and _dep3_ chunks, then those import statements will have to change too:
 
 ```diff
--import {...} from '/vendor-5e6f.js';
-+import {...} from '/vendor-d4a1.js';
+-import {...} from '/vendor-5e6f.mjs';
++import {...} from '/vendor-d4a1.mjs';
 ```
 
 But since those import statements are part of the contents of the _dep2_ and _dep3_ chunks, changing them means _their_ content hash will change, and thus their filenames must *also* change.
@@ -49,10 +49,10 @@ But since those import statements are part of the contents of the _dep2_ and _de
 But it doesn't stop there. Since the _main_ chunk imports the _dep2_ and _dep3_ chunks and their filenames have changed, the import statements in _main_ will have to change too:
 
 ```diff
--import {...} from '/dep2-3c4d.js';
-+import {...} from '/dep2-2be5.js';
--import {...} from '/dep3-d4e5.js';
-+import {...} from '/dep3-3c6f.js';
+-import {...} from '/dep2-3c4d.mjs';
++import {...} from '/dep2-2be5.mjs';
+-import {...} from '/dep3-d4e5.mjs';
++import {...} from '/dep3-3c6f.mjs';
 ```
 
 Finally, since the contents of _main_ have changed, its filename must change along with the others.
@@ -206,11 +206,11 @@ To precache files with [workbox-precaching](https://developers.google.com/web/to
 import {preacacheAndRoute} from 'workbox-precaching';
 
 precacheAndRoute([
-  {url: '/main.js', revision: '1a2b'},
-  {url: '/dep1.js', revision: 'b2c3'},
-  {url: '/dep2.js', revision: '3c4d'},
-  {url: '/dep3.js', revision: 'd4e5'},
-  {url: '/vendor.js', revision: '5e6f'},
+  {url: '/main.mjs', revision: '1a2b'},
+  {url: '/dep1.mjs', revision: 'b2c3'},
+  {url: '/dep2.mjs', revision: '3c4d'},
+  {url: '/dep3.mjs', revision: 'd4e5'},
+  {url: '/vendor.mjs', revision: '5e6f'},
 ]);
 ```
 

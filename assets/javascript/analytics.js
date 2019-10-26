@@ -136,18 +136,27 @@ const createTracker = () => {
   // Set the page field and ignore any search params.
   ga('set', 'page', location.pathname);
 
-  // Log hits in development.
-  if (process.env.NODE_ENV !== 'production') {
-    ga((tracker) => {
-      const originalSendHitTask = tracker.get('sendHitTask');
-      tracker.set('sendHitTask', (model) => {
-        originalSendHitTask(model);
+  ga((tracker) => {
+    const originalSendHitTask = tracker.get('sendHitTask');
+    tracker.set('sendHitTask', (model) => {
+      originalSendHitTask(model);
 
+      const hitPayload = model.get('hitPayload');
+
+      // Log the hit locally, using sendBeacon if available, otherwise fetch.
+      if (navigator.sendBeacon) {
+        const beaconSent = navigator.sendBeacon('/log', hitPayload);
+        if (!beaconSent) {
+          fetch('/log', {method: 'POST', body: hitPayload});
+        }
+      }
+
+      // Log hits in development.
+      if (process.env.NODE_ENV !== 'production') {
         const paramsToIgnore = ['v', 'did', 't', 'tid', 'ec', 'ea', 'el', 'ev',
             'a', 'z', 'ul', 'de', 'sd', 'sr', 'vp', 'je', 'fl', 'jid'];
 
         const hitType = model.get('&t');
-        const hitPayload = model.get('hitPayload');
         const hit = hitPayload
             .split('&')
             .map(decodeURIComponent)
@@ -167,9 +176,9 @@ const createTracker = () => {
 
         // eslint-disable-next-line no-console
         console.log(...parts, hit);
-      });
+      }
     });
-  }
+  });
 };
 
 

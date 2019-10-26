@@ -1,6 +1,5 @@
 {
-  "hosting":
-  {
+  "hosting": {
     "public": "build",
     "ignore": [
       "firebase.json",
@@ -10,59 +9,75 @@
     "headers": [
       {
         "source": "/static/*",
-        "headers": [{
-          "key": "Cache-Control",
-          "value": "max-age=31536000"
-        }]
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "max-age=31536000"
+          }
+        ]
       },
       {
         "source": "/**/",
-        "headers": [{
-          "key": "Cache-Control",
-          "value": "no-cache"
-        }]
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-cache"
+          }
+        ]
       },
       {
         "source": "/**/*.html",
-        "headers": [{
-          "key": "Cache-Control",
-          "value": "no-cache"
-        }]
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-cache"
+          }
+        ]
       },
       {
         "source": "/sw.js",
-        "headers": [{
-          "key": "Cache-Control",
-          "value": "no-cache"
-        }]
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-cache"
+          }
+        ]
       },
       {
         "source": "/modules/*",
-        "headers": [{
-          "key": "Cache-Control",
-          "value": "no-cache"
-        }]
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-cache"
+          }
+        ]
       },
       {
         "source": "/atom.xml",
-        "headers": [{
-          "key": "Cache-Control",
-          "value": "no-cache"
-        }]
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-cache"
+          }
+        ]
       },
       {
         "source": "/manifest.json",
-        "headers": [{
-          "key": "Cache-Control",
-          "value": "no-cache"
-        }]
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-cache"
+          }
+        ]
       },
       {
         "source": "/favicon.ico",
-        "headers": [{
-          "key": "Cache-Control",
-          "value": "max-age=31536000"
-        }]
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "max-age=31536000"
+          }
+        ]
       }
     ],
     "redirects": [
@@ -80,6 +95,12 @@
         "source": "/articles/:slug/index.html",
         "destination": "/articles/:slug/",
         "type": 301
+      }
+    ],
+    "rewrites": [
+      {
+        "source": "/log",
+        "function": "log"
       }
     ]
   }

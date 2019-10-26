@@ -203,7 +203,7 @@ So as long as you don't deploy new versions of your modules without also updatin
 To precache files with [workbox-precaching](https://developers.google.com/web/tools/workbox/modules/workbox-precaching), you can pass a list of asset URLs along with their corresponding revision strings to its `precacheAndRoute()` method:
 
 ```js
-import {preacacheAndRoute} from 'workbox-precaching';
+import {precacheAndRoute} from 'workbox-precaching';
 
 precacheAndRoute([
   {url: '/main.mjs', revision: '1a2b'},

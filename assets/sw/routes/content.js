@@ -20,27 +20,29 @@ const broadcastUpdatePlugin = new BroadcastUpdatePlugin({
 });
 
 const navigationReportPlugin = {
-  async cachedResponseWillBeUsed({cachedResponse, event}) {
-    const {resultingClientId} = event || {};
+  async cachedResponseWillBeUsed({cachedResponse, event, request}) {
+    if (request.mode === 'navigate') {
+      const {resultingClientId} = event || {};
 
-    resultingClientExists(resultingClientId).then(async (resultingClient) => {
-      // Give browsers that don't implement `resultingClientId`` a bit of time
-      // for the JS to load, since it's likely they also don't implement
-      // `postMessage()` buffering.
-      if (!resultingClient) {
-        await sleep(3000);
-      }
+      resultingClientExists(resultingClientId).then(async (resultingClient) => {
+        // Give browsers that don't implement `resultingClientId`` a bit of time
+        // for the JS to load, since it's likely they also don't implement
+        // `postMessage()` buffering.
+        if (!resultingClient) {
+          await sleep(3000);
+        }
 
-      messageWindows({
-        type: 'NAVIGATION_REPORT',
-        payload: {
-          url: event.request.url,
-          cacheHit: Boolean(cachedResponse),
-        },
+        messageWindows({
+          type: 'NAVIGATION_REPORT',
+          payload: {
+            url: event.request.url,
+            cacheHit: Boolean(cachedResponse),
+          },
+        });
       });
-    });
 
-    return cachedResponse;
+      return cachedResponse;
+    }
   },
 };
 

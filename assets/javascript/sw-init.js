@@ -13,7 +13,7 @@ const MESSAGE_TIMEOUT = 5000;
 
 
 const setSiteVersionOrTimeout = async () => {
-  const {ga, dimensions} = await import('./analytics');
+  const {ga, dimensions} = await import('./log');
 
   // Set the site version, if available.
   const {version} = await new Promise((resolve) => {
@@ -32,7 +32,7 @@ const setSiteVersionOrTimeout = async () => {
 
 
 const setNavigationCacheOrTimeout = async () => {
-  const {ga, dimensions} = await import('./analytics');
+  const {ga, dimensions} = await import('./log');
 
   // Before sending any perf data, determine whether the page was served
   // entirely cache-first.
@@ -96,16 +96,7 @@ const addFirstInstalledListener = () => {
     if (!event.isUpdate) {
       const urlsToCache = [
         location.href,
-        ...performance.getEntriesByType('resource').map((resource) => {
-          const url = resource.name;
-
-          // The analytics.js script must be loaded with `no-cors` mode.
-          if (url.includes('google-analytics.com/analytics.js')) {
-            return [url, {mode: 'no-cors'}];
-          } else {
-            return url;
-          }
-        }),
+        ...performance.getEntriesByType('resource').map((r) => r.name),
       ];
       wb.messageSW({
         type: 'CACHE_URLS',
@@ -128,7 +119,7 @@ const addCacheUpdateListener = () => {
       // it occurs to get a bit more insight into any UX concerns.
       loadPage(updatedURL);
 
-      const {ga} = await import('./analytics');
+      const {ga} = await import('./log');
       ga('send', 'event', {
         eventCategory: 'Service Worker',
         eventAction: 'cache-update',
@@ -142,7 +133,7 @@ const addCacheUpdateListener = () => {
 const addSWUpdateListener = () => {
   wb.addEventListener('message', async ({data}) => {
     if (data && data.type === 'UPDATE_AVAILABLE') {
-      const {ga} = await import('./analytics');
+      const {ga} = await import('./log');
 
       // Default to showing an update message. This is helpful in the event
       // a future version causes an error parsing the message data, the
@@ -205,7 +196,7 @@ export const init = async () => {
   addCacheUpdateListener();
   addSWUpdateListener();
 
-  const {addPreSendDependency} = await import('./analytics');
+  const {addPreSendDependency} = await import('./log');
   addPreSendDependency(setSiteVersionOrTimeout());
   addPreSendDependency(setNavigationCacheOrTimeout());
 

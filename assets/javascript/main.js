@@ -9,20 +9,20 @@ const initServiceWorker = async () => {
     try {
       await sw.init();
     } catch (err) {
-      const analytics = await import('./analytics');
-      analytics.trackError(err);
+      const log = await import('./log');
+      log.trackError(err);
     }
   }
 };
 
-const initAnalytics = async () => {
-  const analytics = await import('./analytics');
-  analytics.init();
+const initLog = async () => {
+  const log = await import('./log');
+  log.init();
 };
 
 /**
- * The main script entry point for the site. Initalizes all the sub modules
- * analytics tracking, and the service worker.
+ * The main script entry point for the site. Initializes all the sub modules
+ * log tracking, and the service worker.
  */
 export const main = async () => {
   contentLoader.init();
@@ -31,7 +31,7 @@ export const main = async () => {
 
   // Everything after this includes dynamic imports.
   // NOTE: make sure `initServiceWorker()` finishes before running
-  // `initAnalytics()` because it needs to add pre-send dependencies.
+  // `initLog()` because it needs to add pre-send dependencies.
   await initServiceWorker();
-  await initAnalytics();
+  await initLog();
 };

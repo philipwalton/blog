@@ -38,7 +38,7 @@ const fetchPageContent = async (path) => {
     const responseDuration = now() - responseStartTime;
     const cacheHit = Boolean(response.headers.get('X-Cache-Hit'));
 
-    import('./analytics').then(({ga, dimensions}) => {
+    import('./log').then(({ga, dimensions}) => {
       ga('set', dimensions.CACHE_HIT, String(cacheHit));
       ga('send', 'event', {
         page: path,
@@ -113,11 +113,11 @@ const setScroll = (hash) => {
 
 
 /**
- * Updates analytics to reflect the current page.
+ * Updates log to reflect the current page.
  * @param {string} pathname
  */
 const trackPageview = async (pathname) => {
-  const {ga, dimensions} = await import('./analytics');
+  const {ga, dimensions} = await import('./log');
 
   ga('set', 'page', pathname);
   ga('send', 'pageview', {[dimensions.HIT_SOURCE]: 'SPA'});
@@ -147,7 +147,7 @@ export const init = () => {
       setScroll(state.hash);
       trackPageview(state.pathname);
     } catch (err) {
-      const {trackError} = await import('./analytics');
+      const {trackError} = await import('./log');
 
       trackError(/** @type {!Error} */ (err));
       throw err;

@@ -2,6 +2,8 @@ const chalk = require('chalk');
 const fs = require('fs-extra');
 const gulp = require('gulp');
 const gzipSize = require('gzip-size');
+const fetch = require('node-fetch');
+
 const path = require('path');
 const {rollup} = require('rollup');
 const babel = require('rollup-plugin-babel');
@@ -9,10 +11,18 @@ const commonjs = require('rollup-plugin-commonjs');
 const resolve = require('rollup-plugin-node-resolve');
 const replace = require('rollup-plugin-replace');
 const terserRollupPlugin = require('rollup-plugin-terser').terser;
-const {addAsset} = require('./utils/assets');
+const {addAsset, generateRevisionedAsset, getAsset} = require('./utils/assets');
 const {checkDuplicatesPlugin} = require('./utils/check-duplicates-plugin');
 const {ENV} = require('./utils/env');
 const config = require('../config.json');
+
+
+const ensureAnalyticsLogger = async () => {
+  if (!getAsset('log.js')) {
+    const response = await fetch('https://www.google-analytics.com/analytics.js');
+    generateRevisionedAsset('log.js', await response.text());
+  }
+};
 
 
 /**
@@ -200,6 +210,7 @@ gulp.task('javascript', async () => {
   try {
     await fs.remove(config.publicModulesDir);
     await compileModuleBundle();
+    await ensureAnalyticsLogger();
 
     if (ENV !== 'development') {
       await compileClassicBundle();

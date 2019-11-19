@@ -6,7 +6,7 @@ import {NULL_GA_VALUE} from './constants';
 
 // Defining a Workbox instance has no side effects, so it's OK to do it
 // here in the top-level scope.
-export const wb = new Workbox('/sw.js');
+let wb;
 
 
 const MESSAGE_TIMEOUT = 5000;
@@ -192,6 +192,10 @@ const addSWUpdateListener = () => {
 };
 
 export const init = async () => {
+  // Instantiating the Workbox instance adds an event listener to
+  // `navigator.serviceWorker`, which will be undefined in older browsers.
+  wb = new Workbox('/sw.js');
+
   addFirstInstalledListener();
   addCacheUpdateListener();
   addSWUpdateListener();

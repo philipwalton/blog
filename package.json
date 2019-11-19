@@ -18,6 +18,7 @@
     "build": "gulp build",
     "deploy": "git push --follow-tags && firebase deploy -P philipwalton-site",
     "lint": "eslint \"assets/**/*.js\" \"tasks/**/*.js\" \"test/**/*.js\"",
+    "lint:fix": "eslint --fix \"assets/**/*.js\" \"tasks/**/*.js\" \"test/**/*.js\"",
     "release:major": "npm version major -m 'Release v%s'",
     "release:minor": "npm version minor -m 'Release v%s'",
     "release:patch": "npm version patch -m 'Release v%s'",

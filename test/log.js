@@ -1,22 +1,31 @@
-const qs = require('qs');
+const fs = require('fs-extra');
+const assert = require('assert').strict;
 const {initBook} = require('../tasks/utils/book');
 
 let articles;
 let pages;
 
-const TRACKING_ID = 'UA-21292978-1';
+const LOG_FILE = 'beacons.log';
+const cd = {
+  BREAKPOINT: 'cd1',
+  PIXEL_DENSITY: 'cd2',
+  SITE_VERSION: 'cd3',
+  HIT_SOURCE: 'cd4',
+  EFFECTIVE_CONNECTION_TYPE: 'cd5',
+  METRIC_VALUE: 'cd6',
+  CLIENT_ID: 'cd7',
+  SERVICE_WORKER_REPLAY: 'cd8',
+  SERVICE_WORKER_STATE: 'cd9',
+  CACHE_HIT: 'cd10',
+  WINDOW_ID: 'cd11',
+  VISIBILITY_STATE: 'cd12',
+  HIT_TYPE: 'cd13',
+  HIT_ID: 'cd14',
+  HIT_TIME: 'cd15',
+  TRACKING_VERSION: 'cd16',
+};
 
 describe('analytics', function() {
-  const browserName = browser.capabilities.browserName;
-
-  // TODO: Safari fails these tests for some reason that's hard to nail down.
-  // It appears that in some cases it won't send hits using `sendBeacon()`
-  // even when that transport mechanism is set. I'm not able to reproduce
-  // this outside of running safari webdriver.
-  if (browserName === 'safari') {
-    return;
-  }
-
   before(async () => {
     const book = await initBook();
     articles = book.articles;
@@ -24,33 +33,54 @@ describe('analytics', function() {
   });
 
   beforeEach(async () => {
+    await clearBeacons();
     await browser.url('/');
-
-    await browser.execute(function() {
-      window.__beacons = [];
-      const originalSendBeacon = navigator.sendBeacon;
-      Object.defineProperty(navigator, 'sendBeacon', {
-        value: function() {
-          /* eslint-disable */
-          window.__beacons.push(arguments);
-          return originalSendBeacon.apply(navigator, arguments);
-          /* eslint-enable */
-        },
-      });
-    });
   });
 
   it('should send pageview hits on pageload', async () => {
     await browser.waitUntil(async () => await beaconsContain({
-      tid: TRACKING_ID,
       t: 'pageview',
       dp: '/',
     }));
   });
 
+  it('should include ALL required measurement protocol parameters', async () => {
+    await browser.waitUntil(async () => await beaconsContain({
+      t: 'pageview',
+      dp: '/',
+    }));
+
+    const beacons = await getBeacons();
+    for (const beacon of beacons) {
+      assert.strictEqual(beacon.get('v'), '1');
+      assert.strictEqual(beacon.get('tid'), 'UA-21292978-1');
+
+      assert(beacon.get(cd.HIT_ID).match(
+          /\w{8}-\w{4}-4\w{3}-[89aAbB]\w{3}-\w{12}/));
+
+      assert(beacon.get('uip').length > 0);
+
+      assert.strictEqual(beacon.get('ht'), null);
+      assert(beacon.get('qt').match(/\d+/));
+
+      assert.strictEqual(beacon.get(cd.HIT_TYPE), beacon.get('t'));
+
+      // // Ensure all custom dimensions have a value
+      for (const param of Object.values(cd)) {
+        assert.notStrictEqual(beacon.get(param), null);
+      }
+
+      // Ensure (for event hits), all event dimensions have a value
+      if (beacon.get('t') === 'event') {
+        for (const param of ['ec', 'ea', 'el']) {
+          assert.notStrictEqual(beacon.get(param), null);
+        }
+      }
+    }
+  });
+
   it('should send pageview hits on SPA pageloads', async () => {
     await browser.waitUntil(async () => await beaconsContain({
-      tid: TRACKING_ID,
       t: 'pageview',
       dp: '/',
     }));
@@ -64,7 +94,6 @@ describe('analytics', function() {
 
     await browser.waitUntil(async () => {
       return await beaconsContain({
-        tid: TRACKING_ID,
         t: 'pageview',
         dp: articles[0].path,
       });
@@ -73,7 +102,6 @@ describe('analytics', function() {
 
   it('should send pageview hits on back/forward navigations', async () => {
     await browser.waitUntil(async () => await beaconsContain({
-      tid: TRACKING_ID,
       t: 'pageview',
       dp: '/',
     }));
@@ -87,7 +115,6 @@ describe('analytics', function() {
     });
 
     await browser.waitUntil(async () => await beaconsContain({
-      tid: TRACKING_ID,
       t: 'pageview',
       dp: pages[1].path,
     }));
@@ -101,7 +128,6 @@ describe('analytics', function() {
     });
 
     await browser.waitUntil(async () => await beaconsContain({
-      tid: TRACKING_ID,
       t: 'pageview',
       dp: pages[0].path,
     }));
@@ -115,7 +141,6 @@ describe('analytics', function() {
     });
 
     await browser.waitUntil(async () => await beaconsContain({
-      tid: TRACKING_ID,
       t: 'pageview',
       dp: pages[1].path,
     }));
@@ -134,7 +159,7 @@ async function beaconsContain(params) {
   for (const beacon of beacons) {
     const paramsToCheck = new Set(Object.keys(params));
     for (const param of paramsToCheck) {
-      if (beacon[param] === params[param]) {
+      if (beacon.get(param) === params[param]) {
         paramsToCheck.delete(param);
       }
     }
@@ -150,10 +175,8 @@ async function beaconsContain(params) {
  * @return {Promise<Array>}
  */
 async function getBeacons() {
-  const beacons = await browser.execute(() => window.__beacons);
-  return beacons
-      .filter((args) => args[0].includes('www.google-analytics.com'))
-      .map((beacon) => qs.parse(beacon[1]));
+  const beacons = await fs.readFile(LOG_FILE, 'utf-8');
+  return beacons.trim().split('\n').map((b) => new URLSearchParams(b));
 }
 
 /**
@@ -161,9 +184,7 @@ async function getBeacons() {
  * @return {Promise<void>}
  */
 async function clearBeacons() {
-  await browser.execute(() => {
-    return window.__beacons.splice(0, window.__beacons.length);
-  });
+  await fs.remove(LOG_FILE);
 }
 
 /**

@@ -2,8 +2,6 @@ const chalk = require('chalk');
 const fs = require('fs-extra');
 const gulp = require('gulp');
 const gzipSize = require('gzip-size');
-const fetch = require('node-fetch');
-
 const path = require('path');
 const {rollup} = require('rollup');
 const babel = require('rollup-plugin-babel');
@@ -11,19 +9,21 @@ const commonjs = require('rollup-plugin-commonjs');
 const resolve = require('rollup-plugin-node-resolve');
 const replace = require('rollup-plugin-replace');
 const terserRollupPlugin = require('rollup-plugin-terser').terser;
-const {addAsset, generateRevisionedAsset, getAsset} = require('./utils/assets');
+const {addAsset} = require('./utils/assets');
 const {checkDuplicatesPlugin} = require('./utils/check-duplicates-plugin');
 const {ENV} = require('./utils/env');
 const config = require('../config.json');
 
-
-const ensureAnalyticsLogger = async () => {
-  if (!getAsset('log.js')) {
-    const response = await fetch('https://www.google-analytics.com/analytics.js');
-    generateRevisionedAsset('log.js', await response.text());
-  }
+// Set global variables to be replaced in the source files.
+const globals = {
+  'process.env.NODE_ENV': JSON.stringify(ENV),
 };
-
+for (const [key, value] of Object.entries(config.analytics.dimensions)) {
+  globals[key] = JSON.stringify(value);
+}
+for (const [key, value] of Object.entries(config.analytics.metrics)) {
+  globals[key] = JSON.stringify(value);
+}
 
 /**
  * A Rollup plugin to generate a list of import dependencies for each entry
@@ -119,9 +119,7 @@ const compileModuleBundle = async () => {
   const plugins = [
     resolve(),
     commonjs(),
-    replace({
-      'process.env.NODE_ENV': JSON.stringify(ENV),
-    }),
+    replace(globals),
     checkDuplicatesPlugin(),
     modulepreloadPlugin(),
     reportBundleSizePlugin(),
@@ -162,9 +160,7 @@ const compileClassicBundle = async () => {
   const plugins = [
     resolve(),
     commonjs(),
-    replace({
-      'process.env.NODE_ENV': JSON.stringify(ENV),
-    }),
+    replace(globals),
     babel({
       exclude: [
         /core-js/,
@@ -210,7 +206,6 @@ gulp.task('javascript', async () => {
   try {
     await fs.remove(config.publicModulesDir);
     await compileModuleBundle();
-    await ensureAnalyticsLogger();
 
     if (ENV !== 'development') {
       await compileClassicBundle();

@@ -26,7 +26,8 @@
       "ignorePattern": "^\\s*import|^\\s*it\\(|^\\s*describe\\(",
       "ignoreUrls": true
     }],
-    "require-atomic-updates": 0
+    "require-atomic-updates": 0,
+    "valid-jsdoc": 0,
   },
   "overrides": [{
     "files": ["tasks/**/*.{js,mjs}"],

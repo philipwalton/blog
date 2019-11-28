@@ -15,103 +15,139 @@ describe('The content loader', async () => {
     pages = book.pages;
   });
 
-  beforeEach(() => {
-    browser.url('/');
+  beforeEach(async () => {
+    await browser.url('/');
 
     // I'm not sure why this is needed, but sometime the above command
     // doesn't appear to wait until the page is loaded.
     // (possibly due to service worker???)
-    browser.waitUntil(() => {
-      return browser.getTitle() == pages[0].title + site.titleSuffix;
+    await browser.waitUntil(async () => {
+      const title = await browser.getTitle();
+      return title == pages[0].title + site.titleSuffix;
     });
 
     // Don't use an arrow function since this is eval'ed in test browsers.
-    browser.execute(function() {
+    await browser.execute(function() {
       return window.__INITIAL_PAGE_LOAD__ = true;
     });
   });
 
-  it('should load page partials instead of full pages', () => {
-    browser.click(`a[href="${articles[0].path}"]`);
-    browser.waitUntil(() =>
-        browser.getTitle() == articles[0].title + site.titleSuffix &&
-        getUrlPath() == articles[0].path);
+  it('should load page partials instead of full pages', async () => {
+    const articleLink = await $(`a[href="${articles[0].path}"]`);
+    await articleLink.click();
 
-    assertIsInitialPageLoad();
+    await browser.waitUntil(async () => {
+      const title = await browser.getTitle();
+      const urlPath = await getUrlPath();
+      return title == articles[0].title + site.titleSuffix &&
+          urlPath == articles[0].path;
+    });
+
+    await assertIsInitialPageLoad();
   });
 
-  it('should not attempt to load non-HTML content', () => {
-    browser.click(`a[href="${articles[28].path}"]`);
+  it('should not attempt to load non-HTML content', async () => {
+    const articleLink = await $(`a[href="${articles[28].path}"]`);
+    await articleLink.click();
 
-    browser.waitUntil(() =>
-        browser.getTitle() == articles[28].title + site.titleSuffix &&
-        getUrlPath() == articles[28].path);
+    await browser.waitUntil(async () => {
+      const urlPath = await getUrlPath();
+      return urlPath == articles[28].path;
+    });
 
-    browser.click('figure img');
-    browser.waitUntil(() => /\.png$/.test(getUrlPath()));
+    const img = await $('figure img');
+    await img.click();
+
+    await browser.waitUntil(async () => /\.png$/.test(await getUrlPath()));
   });
 
-
-  it('should work with the back and forward buttons', () => {
+  it('should work with the back and forward buttons', async () => {
     // Ensures the viewport is big enough so all navigation is present.
-    browser.setViewportSize({width: 1024, height: 768}, true);
+    browser.setWindowSize(1024, 768);
 
     // Navigates to an article.
-    browser.click(`a[href="${articles[0].path}"]`);
-    browser.waitUntil(() =>
-        browser.getTitle() == articles[0].title + site.titleSuffix &&
-        getUrlPath() == articles[0].path);
+    const articleLink = await $(`a[href="${articles[0].path}"]`);
+    await articleLink.click();
+    await browser.waitUntil(async () => {
+      const title = await browser.getTitle();
+      const urlPath = await getUrlPath();
+      return title == articles[0].title + site.titleSuffix &&
+          urlPath == articles[0].path;
+    });
 
     // Navigates to a page.
-    browser.click(`a[href="${pages[2].path}"]`);
-    browser.waitUntil(() =>
-        browser.getTitle() == pages[2].title + site.titleSuffix &&
-        getUrlPath() == pages[2].path);
+    const pageLink = await $(`a[href="${pages[2].path}"]`);
+    await pageLink.click();
+    await browser.waitUntil(async () => {
+      const title = await browser.getTitle();
+      const urlPath = await getUrlPath();
+      return title == pages[2].title + site.titleSuffix &&
+          urlPath == pages[2].path;
+    });
 
     // Navigates back to the article.
-    browser.back();
-    browser.waitUntil(() =>
-        browser.getTitle() == articles[0].title + site.titleSuffix &&
-        getUrlPath() == articles[0].path);
-
+    await browser.back();
+    await browser.waitUntil(async () => {
+      const title = await browser.getTitle();
+      const urlPath = await getUrlPath();
+      return title == articles[0].title + site.titleSuffix &&
+          urlPath == articles[0].path;
+    });
 
     // Navigates back home.
-    browser.back();
-    browser.waitUntil(() =>
-        browser.getTitle() == pages[0].title + site.titleSuffix &&
-        getUrlPath() == pages[0].path);
+    await browser.back();
+    await browser.waitUntil(async () => {
+      const title = await browser.getTitle();
+      const urlPath = await getUrlPath();
+      return title == pages[0].title + site.titleSuffix &&
+          urlPath == pages[0].path;
+    });
 
     // Navigates forward to the article.
-    browser.forward();
-    browser.waitUntil(() =>
-        browser.getTitle() == articles[0].title + site.titleSuffix &&
-        getUrlPath() == articles[0].path);
+    await browser.forward();
+    await browser.waitUntil(async () => {
+      const title = await browser.getTitle();
+      const urlPath = await getUrlPath();
+      return title == articles[0].title + site.titleSuffix &&
+          urlPath == articles[0].path;
+    });
 
     // Navigates forward to the page.
-    browser.forward();
-    browser.waitUntil(() =>
-        browser.getTitle() == pages[2].title + site.titleSuffix &&
-        getUrlPath() == pages[2].path);
+    await browser.forward();
+    await browser.waitUntil(async () => {
+      const title = await browser.getTitle();
+      const urlPath = await getUrlPath();
+      return title == pages[2].title + site.titleSuffix &&
+          urlPath == pages[2].path;
+    });
 
-    assertIsInitialPageLoad();
+    await assertIsInitialPageLoad();
   });
 
-  it('should scroll to the top for "new" pages', () => {
-    browser
-        .click('.ArticleList-item:last-child a')
-        .waitForVisible('.ContentHeader-articleTitle');
+  it('should scroll to the top for "new" pages', async () => {
+    const articleLink = await $('.ArticleList-item:last-child a');
+    await articleLink.click();
 
-    assertIsInitialPageLoad();
+    const articleTitle = await $('.ContentHeader-articleTitle');
+    await articleTitle.waitForDisplayed();
+
+    await assertIsInitialPageLoad();
   });
 
-  it('should jump to an anchor for URLs with hash fragments', () => {
+  it('should jump to an anchor for URLs with hash fragments', async () => {
     // Adds a hash fragments to an article URL.
     // Don't use an arrow function since this is eval'ed in test browsers.
-    browser.execute(function() {
+    await browser.execute(function() {
       document.querySelector('.ArticleList-item:last-child a').href += '#share';
-    }).click('.ArticleList-item:last-child a').waitForVisible('#share');
+    });
 
-    assertIsInitialPageLoad();
+    const articleLink = await $('.ArticleList-item:last-child a');
+    await articleLink.click();
+
+    const shareButton = await $('#share');
+    assert(await shareButton.isDisplayedInViewport());
+
+    await assertIsInitialPageLoad();
   });
 });
 
@@ -119,9 +155,9 @@ describe('The content loader', async () => {
 /**
  * Asserts that the browser hasn't reloaded the page since the test started.
  */
-function assertIsInitialPageLoad() {
+async function assertIsInitialPageLoad() {
   // Don't use an arrow function since this is eval'ed in test browsers.
-  const {value: isInitialPageLoad} = browser.execute(function() {
+  const isInitialPageLoad = await browser.execute(function() {
     return window.__INITIAL_PAGE_LOAD__;
   });
 
@@ -133,10 +169,6 @@ function assertIsInitialPageLoad() {
  * Gets the URL path for the given page.
  * @return {string} The URL path.
  */
-function getUrlPath() {
-  // Don't use an arrow function since this is eval'ed in test browsers.
-  const {value: urlPath} = browser.execute(function() {
-    return location.pathname;
-  });
-  return urlPath;
+async function getUrlPath() {
+  return new URL(await browser.getUrl(), site.baseUrl).pathname;
 }

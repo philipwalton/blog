@@ -1,14 +1,14 @@
 const qs = require('qs');
 const {initBook} = require('../tasks/utils/book');
 
-
 let articles;
 let pages;
 
 const TRACKING_ID = 'UA-21292978-1';
 
 describe('analytics', function() {
-  const browserName = browser.desiredCapabilities.browserName;
+  const browserName = browser.capabilities.browserName;
+
   // TODO: Safari fails these tests for some reason that's hard to nail down.
   // It appears that in some cases it won't send hits using `sendBeacon()`
   // even when that transport mechanism is set. I'm not able to reproduce
@@ -23,10 +23,10 @@ describe('analytics', function() {
     pages = book.pages;
   });
 
-  beforeEach(() => {
-    browser.url('/');
+  beforeEach(async () => {
+    await browser.url('/');
 
-    browser.execute(function() {
+    await browser.execute(function() {
       window.__beacons = [];
       const originalSendBeacon = navigator.sendBeacon;
       Object.defineProperty(navigator, 'sendBeacon', {
@@ -40,44 +40,53 @@ describe('analytics', function() {
     });
   });
 
-  it('should send pageview hits on pageload', () => {
-    browser.waitUntil(() => beaconsContain({
+  it('should send pageview hits on pageload', async () => {
+    await browser.waitUntil(async () => await beaconsContain({
       tid: TRACKING_ID,
       t: 'pageview',
       dp: '/',
     }));
   });
 
-  it('should send pageview hits on SPA pageloads', () => {
-    browser.waitUntil(() => beaconsContain({
+  it('should send pageview hits on SPA pageloads', async () => {
+    await browser.waitUntil(async () => await beaconsContain({
       tid: TRACKING_ID,
       t: 'pageview',
       dp: '/',
     }));
 
-    browser.click(`a[href="${articles[0].path}"]`);
-    browser.waitUntil(() => getUrlPath() == articles[0].path);
+    const articleLink = await $(`a[href="${articles[0].path}"]`);
+    await articleLink.click();
+    await browser.waitUntil(async () => {
+      const urlPath = await getUrlPath();
+      return urlPath === articles[0].path;
+    });
 
-    browser.waitUntil(() => beaconsContain({
-      tid: TRACKING_ID,
-      t: 'pageview',
-      dp: articles[0].path,
-    }));
+    await browser.waitUntil(async () => {
+      return await beaconsContain({
+        tid: TRACKING_ID,
+        t: 'pageview',
+        dp: articles[0].path,
+      });
+    });
   });
 
-  it('should send pageview hits on back/forward navigations', () => {
-    browser.waitUntil(() => beaconsContain({
+  it('should send pageview hits on back/forward navigations', async () => {
+    await browser.waitUntil(async () => await beaconsContain({
       tid: TRACKING_ID,
       t: 'pageview',
       dp: '/',
     }));
 
-    // Load articles page.
+    // Load a page.
 
-    browser.click(`a[href="${pages[1].path}"]`);
-    browser.waitUntil(() => getUrlPath() == pages[1].path);
+    const articleLink = await $(`a[href="${pages[1].path}"]`);
+    await articleLink.click();
+    await browser.waitUntil(async () => {
+      return await getUrlPath() === pages[1].path;
+    });
 
-    browser.waitUntil(() => beaconsContain({
+    await browser.waitUntil(async () => await beaconsContain({
       tid: TRACKING_ID,
       t: 'pageview',
       dp: pages[1].path,
@@ -85,11 +94,13 @@ describe('analytics', function() {
 
     // Click 'back' to the home page
 
-    clearBeacons();
-    browser.back();
-    browser.waitUntil(() => getUrlPath() == pages[0].path);
+    await clearBeacons();
+    await browser.back();
+    await browser.waitUntil(async () => {
+      return await getUrlPath() === pages[0].path;
+    });
 
-    browser.waitUntil(() => beaconsContain({
+    await browser.waitUntil(async () => await beaconsContain({
       tid: TRACKING_ID,
       t: 'pageview',
       dp: pages[0].path,
@@ -97,11 +108,13 @@ describe('analytics', function() {
 
     // Click 'forward' to the articles page
 
-    clearBeacons();
-    browser.forward();
-    browser.waitUntil(() => getUrlPath() == pages[1].path);
+    await clearBeacons();
+    await browser.forward();
+    await browser.waitUntil(async () => {
+      return await getUrlPath() == pages[1].path;
+    });
 
-    browser.waitUntil(() => beaconsContain({
+    await browser.waitUntil(async () => await beaconsContain({
       tid: TRACKING_ID,
       t: 'pageview',
       dp: pages[1].path,
@@ -111,11 +124,12 @@ describe('analytics', function() {
 
 
 /**
- * @param {!Object} params
- * @return {boolean} True if the params are found in any one of the beacons.
+ * @param {Object} params
+ * @return {Promise<boolean>} True if the params are found in any one of the
+ *     beacons.
  */
-const beaconsContain = (params) => {
-  const beacons = getBeacons();
+async function beaconsContain(params) {
+  const beacons = await getBeacons();
 
   for (const beacon of beacons) {
     const paramsToCheck = new Set(Object.keys(params));
@@ -129,32 +143,33 @@ const beaconsContain = (params) => {
     }
   }
   return false;
-};
+}
 
 /**
  * Gets the array of beacons sent for the current page load.
- * @return {Array}
+ * @return {Promise<Array>}
  */
-const getBeacons = () => {
-  const {value: beacons} = browser.execute(() => window.__beacons);
-  return beacons.map((beacon) => qs.parse(beacon[1]));
-};
+async function getBeacons() {
+  const beacons = await browser.execute(() => window.__beacons);
+  return beacons
+      .filter((args) => args[0].includes('www.google-analytics.com'))
+      .map((beacon) => qs.parse(beacon[1]));
+}
 
 /**
  * Clears the array of beacons on the page.
+ * @return {Promise<void>}
  */
-const clearBeacons = () => {
-  browser.execute(() => window.__beacons.splice(0, window.__beacons.length));
-};
+async function clearBeacons() {
+  await browser.execute(() => {
+    return window.__beacons.splice(0, window.__beacons.length);
+  });
+}
 
 /**
  * Gets the URL path for the given page.
- * @return {string} The URL path.
+ * @return {Promise<string>} The URL path.
  */
-const getUrlPath = () => {
-  // Don't use an arrow function since this is eval'ed in test browsers.
-  const {value: urlPath} = browser.execute(function() {
-    return location.pathname;
-  });
-  return urlPath;
-};
+async function getUrlPath() {
+  return new URL(await browser.getUrl()).pathname;
+}

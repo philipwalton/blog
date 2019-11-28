@@ -15,47 +15,59 @@ describe('The home page', () => {
   });
 
   before(async () => {
-    browser.url('/').setViewportSize({width: 800, height: 600}, false);
+    await browser.url('/');
+    await browser.setWindowSize(800, 600);
 
     // I'm not sure why this is needed, but sometime the above command
     // doesn't appear to wait until the page is loaded.
     // (possibly due to service worker???)
-    browser.waitUntil(() => {
-      return browser.getTitle() == pages[0].title + site.titleSuffix;
+    await browser.waitUntil(async () => {
+      const title = await browser.getTitle();
+      return title === pages[0].title + site.titleSuffix;
     });
   });
 
-  beforeEach(() => {
-    if (browser.url().value != '/') {
-      browser.click('a[href="/"]');
+  beforeEach(async () => {
+    const url = await browser.getUrl();
+    if (url !== '/') {
+      const homepageLink = await $('a[href="/"]');
+      await homepageLink.click();
     }
   });
 
-  it('should have the right title', () => {
-    const actualTitle = browser.getTitle();
+  it('should have the right title', async () => {
+    const actualTitle = await browser.getTitle();
     const expectedTitle = pages[0].title + site.titleSuffix;
     assert.equal(actualTitle, expectedTitle);
   });
 
-  it('should contain working links to all published articles', () => {
+  it('should contain working links to all published articles', async () => {
+    const lastArticle = articles[articles.length - 1];
+
     for (let i = 1, article; article = articles[i - 1]; i++) {
-      const headingQuery = `.ArticleList-item:nth-last-child(${i}) h2`;
-      const linkQuery = `.ArticleList-item:nth-last-child(${i}) a`;
+      const heading = await $(`.ArticleList-item:nth-last-child(${i}) h2`);
+      const link = await $(`.ArticleList-item:nth-last-child(${i}) a`);
 
-      // Waits for the link to appear to reduce flakiness.
-      browser.click('a[href="/"]').waitForVisible(linkQuery);
+      const headingTitle = await heading.getText();
+      assert.equal(headingTitle, article.title);
 
-      const title = browser.getText(headingQuery);
-      const href = browser.getAttribute(linkQuery, 'href');
-      assert.equal(title, article.title);
-      assert.equal(new URL(href, site.baseUrl).pathname, article.path);
+      const linkHref = await link.getAttribute('href');
+      assert.equal(new URL(linkHref, site.baseUrl).pathname, article.path);
 
-      browser.click(linkQuery).waitUntil(urlMatches(article.path));
-      assert.equal(browser.getTitle(), article.title + site.titleSuffix);
+      await link.click();
+      await browser.waitUntil(urlMatches(article.path));
+
+      const pageTitle = await browser.getTitle();
+      assert.equal(pageTitle, article.title + site.titleSuffix);
+
+      if (article !== lastArticle) {
+        const homepageLink = await $('a[href="/"]');
+        await homepageLink.click();
+      }
     }
   });
 
-  it('should contain working links to pages', () => {
+  it('should contain working links to pages', async () => {
     const contentPages = pages.filter((page) => {
       return !(
           page.path == '/404.html' ||
@@ -64,16 +76,15 @@ describe('The home page', () => {
     });
 
     for (let i = 1, page; page = contentPages[i-1]; i++) {
-      const linkQuery = `.Header a[title="${page.title}"]`;
+      const pageLink = await $(`.Header a[title="${page.title}"]`);
+      const pageLinkHref = await pageLink.getAttribute('href');
+      assert.equal(new URL(pageLinkHref, site.baseUrl).pathname, page.path);
 
-      // Waits for the link to appear to reduce flakiness.
-      browser.click('a[href="/"]').waitForVisible(linkQuery);
+      await pageLink.click();
+      await browser.waitUntil(urlMatches(page.path));
 
-      const href = browser.getAttribute(linkQuery, 'href');
-      assert.equal(new URL(href, site.baseUrl).pathname, page.path);
-
-      browser.click(linkQuery).waitUntil(urlMatches(page.path));
-      assert.equal(browser.getTitle(), page.title + site.titleSuffix);
+      const pageTitle = await browser.getTitle();
+      assert.equal(pageTitle, page.title + site.titleSuffix);
     }
   });
 });
@@ -82,8 +93,11 @@ describe('The home page', () => {
 /**
  * Returns whether the passed URL matches the URL for the current page.
  * @param {string} expectedUrl The URL to test against.
- * @return {boolean} True if the passed URL matches.
+ * @return {() => Promise<boolean>} True if the passed URL matches.
  */
 function urlMatches(expectedUrl) {
-  return () => browser.url().value.includes(expectedUrl);
+  return async () => {
+    const url = await browser.getUrl();
+    return url.includes(expectedUrl);
+  };
 }

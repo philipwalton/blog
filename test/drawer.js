@@ -13,70 +13,86 @@ describe('Navigation drawer', () => {
   });
 
   beforeEach(async () => {
-    browser.url('/');
+    await browser.url('/');
 
     // I'm not sure why this is needed, but sometime the above command
     // doesn't appear to wait until the page is loaded.
     // (possibly due to service worker???)
-    browser.waitUntil(() => {
-      return browser.getTitle() == pages[0].title + site.titleSuffix;
+    await browser.waitUntil(async () => {
+      const title = await browser.getTitle();
+      return title === pages[0].title + site.titleSuffix;
     });
   });
 
-  it('should show the menu icon but no nav links on small screens', () => {
-    browser
-        .setViewportSize({width: 375, height: 627}, false)
-        .waitForVisible('#drawer-toggle');
+  it('should show the menu icon but no nav links on small screens', async () => {
+    await browser.setWindowSize(375, 627);
+
+    const drawerToggle = await $('#drawer-toggle');
+    await drawerToggle.waitForDisplayed();
   });
 
-  it('should show the nav links but no menu icon on large screens', () => {
-    browser
-        .setViewportSize({width: 800, height: 600}, false)
-        .waitForVisible('#drawer');
+  it('should show the nav links but no menu icon on large screens', async () => {
+    await browser.setWindowSize(800, 600);
 
-    assert(!browser.isVisible('#drawer-toggle'));
+    const drawer = await $('#drawer');
+    await drawer.waitForDisplayed();
+
+    const drawerToggle = await $('#drawer-toggle');
+    assert.equal(await drawerToggle.isDisplayed(), false);
   });
 
-  it('should open a closed drawer when the menu icon is clicked', () => {
-    browser
-        .setViewportSize({width: 375, height: 627}, false)
-        .click('#drawer-toggle')
-        .waitForVisible('#drawer');
+  it('should open a closed drawer when the menu icon is clicked', async () => {
+    await browser.setWindowSize(375, 627);
+
+    const drawerToggle = await $('#drawer-toggle');
+    await drawerToggle.click();
+
+    const drawer = await $('#drawer');
+    await drawer.waitForDisplayed();
   });
 
-  it('should close an open drawer when the menu icon is clicked', () => {
-    browser
-        .setViewportSize({width: 375, height: 627}, false)
-        .click('#drawer-toggle')
-        .waitForVisible('#drawer');
+  it('should close an open drawer when the menu icon is clicked', async () => {
+    await browser.setWindowSize(375, 627);
 
-    browser
-        .click('#drawer-toggle')
-        .waitUntil(() => !browser.isVisible('#drawer'));
+    const drawerToggle = await $('#drawer-toggle');
+    await drawerToggle.click();
+
+    const drawer = await $('#drawer');
+    await drawer.waitForDisplayed();
+
+    await drawerToggle.click();
+    await drawer.waitForDisplayed(undefined, true); // Wait for not displayed.
   });
 
-  it('should close an open drawer when clicking a nav link to a new page',
-      () => {
-    browser.setViewportSize({width: 375, height: 627}, false);
-    // Waits for the links to be clickable.
-    browser.click('#drawer-toggle').pause(200);
-    browser.click(`a[href="${pages[2].path}"]`);
+  it('should close an open drawer when clicking a nav link to a new page', async () => {
+    await browser.setWindowSize(375, 627);
 
-    browser.waitUntil(() =>
-        browser.getTitle() == pages[2].title + site.titleSuffix);
+    const drawerToggle = await $('#drawer-toggle');
+    await drawerToggle.click();
+    await browser.pause(200);
 
-    browser.waitUntil(() => !browser.isVisible('#drawer'));
+    const pageLink = await $(`a[href="${pages[2].path}"]`);
+    await pageLink.click();
+
+    browser.waitUntil(async () => {
+      return (await browser.getTitle()) == pages[2].title + site.titleSuffix;
+    });
+
+    const drawer = await $('#drawer');
+    await drawer.waitForDisplayed(undefined, true); // Wait for not displayed.
   });
 
-  it('should close an open drawer when clicking anywhere else', () => {
-    browser.setViewportSize({width: 375, height: 627}, false);
+  it('should close an open drawer when clicking anywhere else', async () => {
+    await browser.setWindowSize(375, 627);
 
-    browser
-        .click('#drawer-toggle')
-        .waitForVisible('#drawer');
+    const drawerToggle = await $('#drawer-toggle');
+    await drawerToggle.click();
 
-    browser
-        .click('body')
-        .waitUntil(() => !browser.isVisible('#drawer'));
+    const drawer = await $('#drawer');
+    await browser.waitUntil(() => drawer.isDisplayed());
+
+    const body = await $('body');
+    await body.click();
+    await drawer.waitForDisplayed(undefined, true); // Wait for not displayed.
   });
 });

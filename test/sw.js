@@ -1,96 +1,120 @@
 const assert = require('assert');
-const fse = require('fs-extra');
+const fs = require('fs-extra');
 
 
 describe('Service Worker', () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     restoreSWVersion();
-    browser.url('/__reset__');
+    await browser.url('/__reset__');
   });
 
   after(() => {
     restoreSWVersion();
   });
 
-  it(`should not show an update notice after the very first registration`, () => {
-    browser.url('/');
-    waitUntilControlling();
+  it(`should not show an update notice after the very first registration`, async () => {
+    await browser.url('/');
+    await waitUntilControlling();
 
-    assert(!$('.Message').isExisting());
+    const message = await $('.Message');
+    assert.equal(await message.isExisting(), false);
   });
 
-  it(`should show an update notice if the major version in the SW changes`, () => {
-    updateSWVersion('1.0.0');
+  it(`should show an update notice if the major version in the SW changes`, async () => {
+    await updateSWVersion('1.0.0');
 
-    browser.url('/?v=1');
-    waitUntilControlling();
+    await browser.url('/?v=1');
+    await waitUntilControlling();
 
-    updateSWVersion('2.0.0');
-    browser.url('/?v=2');
 
-    $('.Message').waitForExist(5000);
+    await updateSWVersion('2.0.0');
+
+    // For some reason, the SW update check doesn't always trigger if we
+    // reload the page right away.
+    await browser.pause(2000);
+
+    await browser.url('/?v=2');
+
+    const message = await $('.Message');
+    await message.waitForDisplayed();
+
+    // Pause so when watching the test you can visually see the message.
+    await browser.pause(1000);
   });
 
-  it(`should not show an update notice for non-major SW version changes`, () => {
-    updateSWVersion('1.0.0');
+  it(`should not show an update notice for non-major SW version changes`, async () => {
+    await updateSWVersion('1.0.0');
 
-    browser.url('/');
-    waitUntilControlling();
+    await browser.url('/');
+    await waitUntilControlling();
 
-    updateSWVersion('1.9.9');
-    browser.url('/');
+    await updateSWVersion('1.9.9');
+    await browser.url('/');
 
     // This is a bit hacky, but just waiting the controllerchange in an
     // `executeAsync()` call fails for some reason...`
-    browser.execute((done) => {
+    await browser.execute(() => {
       navigator.serviceWorker.addEventListener('controllerchange', () => {
         window.__controllerVersion__ = '1.9.9';
       });
     });
 
-    browser.waitUntil(() => {
-      return browser.execute(() => {
+    await browser.waitUntil(async () => {
+      return await browser.execute(() => {
         return window.__controllerVersion__ === '1.9.9';
       });
     });
 
-    assert(!$('.Message').isExisting());
+    // Pause for a bit longer to really ensure the message isn't showing.
+    await browser.pause(1000);
+
+    const message = await $('.Message');
+    assert.equal(await message.isExisting(), false);
   });
 });
 
 
-const originalSWContents = fse.readFileSync('./build/sw.js', 'utf-8');
+const originalSWContents = fs.readFileSync('./build/sw.js', 'utf-8');
 const originalSWVersion =
-    JSON.stringify(fse.readJSONSync('./package.json').version);
+    JSON.stringify(fs.readJSONSync('./package.json').version);
 
-const updateSWVersion = (newVersion) => {
+/**
+ * @param {string} newVersion
+ * @return {Promise<void>}
+ */
+async function updateSWVersion(newVersion) {
   const oldVersion =
       new RegExp(originalSWVersion.replace(/\./g, '\\.'), ['g']);
 
-  fse.outputFileSync('./build/sw.js',
+  await fs.outputFile('./build/sw.js',
       originalSWContents.replace(oldVersion, JSON.stringify(newVersion)));
 
-  browser.waitUntil(() => {
-    const {value} = browser.executeAsync(async (done) => {
+  await browser.waitUntil(async () => {
+    const match = await browser.executeAsync(async (done) => {
       const res = await fetch('/sw.js');
       const text = await res.text();
       done(/"\d+\.\d+\.\d+"/.exec(text));
     });
-    return value && value[0] === JSON.stringify(newVersion);
+    return match && match[0] === JSON.stringify(newVersion);
   });
-};
+}
 
-const restoreSWVersion = () => {
-  fse.outputFileSync('./build/sw.js', originalSWContents);
-};
+/**
+ * @return {Promise<void>}
+ */
+async function restoreSWVersion() {
+  await fs.outputFile('./build/sw.js', originalSWContents);
+}
 
-const waitUntilControlling = () => {
-  browser.waitUntil(() => {
-    const {value} = browser.executeAsync(async (done) => {
+/**
+ * @return {Promise<void>}
+ */
+async function waitUntilControlling() {
+  await browser.waitUntil(async () => {
+    return await browser.executeAsync(async (done) => {
       const reg = await navigator.serviceWorker.getRegistration();
       done(reg && reg.active &&
           reg.active === navigator.serviceWorker.controller);
     });
-    return value === true;
   });
-};
+}

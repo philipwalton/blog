@@ -1,13 +1,15 @@
 .Drawer {
   box-shadow: var(--shadow);
-  opacity: 0;
+  visibility: hidden;
   transform: translate3d(0, 0, 0);
 }
 .Drawer--isTransitioning {
+  visibility: visible;
   transition: transform .25s var(--quantum-easing),
               opacity .25s var(--quantum-easing);
 }
 .Drawer--isOpen {
+  visibility: visible;
   opacity: 1;
   transform: translate3d(0, 100%, 0);
 }

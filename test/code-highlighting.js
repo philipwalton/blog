@@ -17,21 +17,24 @@ describe('Code syntax highlighting', () => {
       return article.path.includes(specificityArticleSlug);
     });
 
-    browser.url(specificityArticle.path);
+    await browser.url(specificityArticle.path);
 
     // I'm not sure why this is needed, but sometime the above command
     // doesn't appear to wait until the page is loaded.
     // (possibly due to service worker???)
-    browser.waitUntil(() => {
-      return browser.getTitle() == specificityArticle.title + site.titleSuffix;
+    await browser.waitUntil(async () => {
+      const title = await browser.getTitle();
+      return title === specificityArticle.title + site.titleSuffix;
     });
   });
 
-  it('should be present on code blocks', () => {
-    browser.waitForExist('pre code.language-css');
+  it('should be present on code blocks', async () => {
+    const code = await $('pre code.language-css');
+    await code.waitForExist();
   });
 
-  it('should allow for marking specific sections', () => {
-    browser.waitForExist('pre code.language-css mark');
+  it('should allow for marking specific sections', async () => {
+    const mark = await $('pre code.language-css mark');
+    await mark.waitForExist();
   });
 });

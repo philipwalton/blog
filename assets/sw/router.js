@@ -3,7 +3,7 @@ import {createPrecacheRoute} from './precache.js';
 import {createContentRoute} from './routes/content.js';
 import {createPagesRoute} from './routes/pages.js';
 import {createStaticAssetsRoute} from './routes/static-assets.js';
-// import {createThirdPartyAssetsRoute} from './routes/third-party-assets.js';
+import {createLogRoute} from './routes/log.js';
 
 
 // Order matters. Earlier routes are tried first.
@@ -16,7 +16,11 @@ const runtimeRoutes = {
   createStaticAssetsRoute,
   createContentRoute,
   createPagesRoute,
-  // createThirdPartyAssetsRoute,
+};
+
+// Order matters. Earlier routes are tried first.
+const logRoutes = {
+  createLogRoute,
 };
 
 const registerRoutes = (router, routes) => {
@@ -36,4 +40,8 @@ export const init = () => {
 
   // Only add the cache listener for runtime routes.
   runtimeRouter.addCacheListener();
+
+  const logRouter = new Router();
+  registerRoutes(logRouter, logRoutes);
+  logRouter.addFetchListener();
 };

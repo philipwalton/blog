@@ -1,14 +1,31 @@
-import {IdleQueue} from 'idlize/IdleQueue.mjs';
 import {getActiveBreakpoint} from './breakpoints';
 import {timeOrigin} from './performance';
 import {initialSWState} from './sw-state';
-import {NULL_GA_VALUE} from './constants';
+import {uuid} from './uuid';
+import {Logger} from './Logger';
 
+/* global CD_BREAKPOINT */ // 'cd1'
+/* global CD_PIXEL_DENSITY */ // 'cd2'
+/* global CD_HIT_SOURCE */ // 'cd4'
+/* global CD_EFFECTIVE_CONNECTION_TYPE */ // 'cd5'
+/* global CD_METRIC_VALUE */ // 'cd6'
+/* global CD_SERVICE_WORKER_STATE */ // 'cd9'
+/* global CD_WINDOW_ID */ // 'cd11'
+/* global CD_VISIBILITY_STATE */ // 'cd12'
+/* global CD_HIT_TIME */ // 'cd15'
+/* global CD_TRACKING_VERSION */ // 'cd16'
 
-// Initialize the command queue in case analytics.js hasn't loaded yet.
-// https://developers.google.com/analytics/devguides/collection/analyticsjs/
-// eslint-disable-next-line
-window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};
+/* global CM_FCP */ // 'cm1',
+/* global CM_FCP_SAMPLE */ // 'cm2',
+/* global CM_NT_SAMPLE */ // 'cm3',
+/* global CM_DOM_LOAD_TIME */ // 'cm4',
+/* global CM_WINDOW_LOAD_TIME */ // 'cm5',
+/* global CM_REQUEST_START_TIME */ // 'cm6',
+/* global CM_RESPONSE_END_TIME */ // 'cm7',
+/* global CM_RESPONSE_START_TIME */ // 'cm8',
+/* global CM_WORKER_START_TIME */ // 'cm9',
+/* global CM_FID */ // 'cm10',
+/* global CM_FID_SAMPLE */ // 'cm11',
 
 
 /**
@@ -16,71 +33,12 @@ window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};
  * implementation. This allows you to create a segment or view filter
  * that isolates only data captured with the most recent tracking changes.
  */
-const TRACKING_VERSION = '58';
+const TRACKING_VERSION = '59';
 
-
-/**
- * The property ID for philipwalton.com
- */
-const TRACKING_ID = 'UA-21292978-1';
-
-
-// A queue to ensure all analytics tasks to run when idle.
-const queue = new IdleQueue({
-  defaultMinTaskTime: 40, // Only run if there's lots of time left.
-  ensureTasksRun: true,
+export const log = new Logger((params, state) => {
+  params[CD_HIT_TIME] = state.time;
+  params[CD_VISIBILITY_STATE] = state.visibilityState;
 });
-
-
-/**
- * A wrapper function for the global `ga()` provided by analytics.js that
- * runs all commands via an IdleQueue.
- * @param {...*} args
- */
-export const ga = (...args) => {
-  queue.pushTask(() => window.ga(...args));
-};
-
-
-/**
- * A mapping between custom dimension names and their indexes.
- */
-export const dimensions = {
-  BREAKPOINT: 'dimension1',
-  PIXEL_DENSITY: 'dimension2',
-  SITE_VERSION: 'dimension3',
-  HIT_SOURCE: 'dimension4',
-  EFFECTIVE_CONNECTION_TYPE: 'dimension5',
-  METRIC_VALUE: 'dimension6',
-  CLIENT_ID: 'dimension7',
-  SERVICE_WORKER_REPLAY: 'dimension8',
-  SERVICE_WORKER_STATE: 'dimension9',
-  CACHE_HIT: 'dimension10',
-  WINDOW_ID: 'dimension11',
-  VISIBILITY_STATE: 'dimension12',
-  HIT_TYPE: 'dimension13',
-  HIT_ID: 'dimension14',
-  HIT_TIME: 'dimension15',
-  TRACKING_VERSION: 'dimension16',
-};
-
-
-/**
- * A mapping between custom dimension names and their indexes.
- */
-export const metrics = {
-  FCP: 'metric1',
-  FCP_SAMPLE: 'metric2',
-  NT_SAMPLE: 'metric3',
-  DOM_LOAD_TIME: 'metric4',
-  WINDOW_LOAD_TIME: 'metric5',
-  REQUEST_START_TIME: 'metric6',
-  RESPONSE_END_TIME: 'metric7',
-  RESPONSE_START_TIME: 'metric8',
-  WORKER_START_TIME: 'metric9',
-  FID: 'metric10',
-  FID_SAMPLE: 'metric11',
-};
 
 
 const whenWindowLoaded = new Promise((resolve) => {
@@ -95,90 +53,34 @@ const whenWindowLoaded = new Promise((resolve) => {
 });
 
 
-const preSendDependencies = [];
-export const addPreSendDependency = (dependency) => {
-  preSendDependencies.push(dependency);
-};
-
-
 /**
  * Initializes all the analytics setup. Creates trackers and sets initial
  * values on the trackers.
  */
 export const init = async () => {
-  createTracker();
+  log.set({
+    [CD_BREAKPOINT]: getActiveBreakpoint().name,
+    [CD_PIXEL_DENSITY]: getPixelDensity(),
+    [CD_TRACKING_VERSION]: TRACKING_VERSION,
+    // [CD_CLIENT_ID]: log.get('cid'), // TODO: set on the server.
+    [CD_WINDOW_ID]: uuid(),
+    [CD_SERVICE_WORKER_STATE]: initialSWState,
+  });
+
+  const effectiveConnectionType = getEffectiveConnectionType();
+  if (effectiveConnectionType) {
+    log.set({[CD_EFFECTIVE_CONNECTION_TYPE]: effectiveConnectionType});
+  }
+
   trackErrors();
-  trackCustomDimensions();
 
-  // presend dependencies
-  await Promise.all(preSendDependencies);
-
-  ga('send', 'pageview', {[dimensions.HIT_SOURCE]: 'navigation'});
+  log.send('pageview', {[CD_HIT_SOURCE]: 'navigation'});
 
   if (window.__wasAlwaysVisible) {
     trackFcp();
     trackFid();
     trackNavigationTimingMetrics();
   }
-};
-
-
-/**
- * Creates the trackers and sets the default transport and tracking
- * version fields. In non-production environments it also logs hits.
- */
-const createTracker = () => {
-  ga('create', TRACKING_ID, 'auto', {siteSpeedSampleRate: 0});
-
-  // Ensures all hits are sent via `navigator.sendBeacon()`.
-  ga('set', 'transport', 'beacon');
-
-  // Set the page field and ignore any search params.
-  ga('set', 'page', location.pathname);
-
-  ga((tracker) => {
-    const originalSendHitTask = tracker.get('sendHitTask');
-    tracker.set('sendHitTask', (model) => {
-      originalSendHitTask(model);
-
-      const hitPayload = model.get('hitPayload');
-
-      // Log the hit locally, using sendBeacon if available, otherwise fetch.
-      if (navigator.sendBeacon) {
-        const beaconSent = navigator.sendBeacon('/log', hitPayload);
-        if (!beaconSent) {
-          fetch('/log', {method: 'POST', body: hitPayload});
-        }
-      }
-
-      // Log hits in development.
-      if (process.env.NODE_ENV !== 'production') {
-        const paramsToIgnore = ['v', 'did', 't', 'tid', 'ec', 'ea', 'el', 'ev',
-            'a', 'z', 'ul', 'de', 'sd', 'sr', 'vp', 'je', 'fl', 'jid'];
-
-        const hitType = model.get('&t');
-        const hit = hitPayload
-            .split('&')
-            .map(decodeURIComponent)
-            .filter((item) => {
-              const [param] = item.split('=');
-              return !(param.charAt(0) === '_' ||
-                  paramsToIgnore.indexOf(param) > -1);
-            });
-
-        const parts = [hitType];
-        if (hitType == 'event') {
-          parts.push(model.get('&ec'), model.get('&ea'), model.get('&el'));
-          if (model.get('&ev')) {
-            parts.push(model.get('&ev'));
-          }
-        }
-
-        // eslint-disable-next-line no-console
-        console.log(...parts, hit);
-      }
-    });
-  });
 };
 
 
@@ -190,15 +92,15 @@ const createTracker = () => {
  *    `fetch('/api.json').catch(trackError);`
  *
  * @param {*=} err
- * @param {FieldsObj=} fieldsObj
+ * @param {ParamOverrides=} paramOverrides
  */
-export const trackError = (err = {}, fieldsObj = {}) => {
-  ga('send', 'event', Object.assign({
-    eventCategory: 'Error',
-    eventAction: err.name || '(no error name)',
-    eventLabel: `${err.message}\n${err.stack || '(no stack trace)'}`,
-    nonInteraction: true,
-  }, fieldsObj));
+export const trackError = (err = {}, paramOverrides = {}) => {
+  log.send('event', Object.assign({
+    ec: 'Error',
+    ev: err.name || '(no error name)',
+    el: `${err.message}\n${err.stack || '(no stack trace)'}`,
+    ni: '1',
+  }, paramOverrides));
 };
 
 
@@ -212,16 +114,15 @@ const trackErrors = () => {
   const loadErrorEvents = window.__e && window.__e.q || [];
 
   const trackErrorEvent = (event) => {
-    // Use a different eventCategory for uncaught errors.
-    /** @type {FieldsObj} */
-    const fieldsObj = {eventCategory: 'Uncaught Error'};
+    // Use a different `ec` value for uncaught errors.
+    const paramOverrides = {ec: 'Uncaught Error'};
 
     // Some browsers don't have an error property, so we fake it.
     const err = event.error || {
       message: `${event.message} (${event.lineno}:${event.colno})`,
     };
 
-    trackError(err, fieldsObj);
+    trackError(err, paramOverrides);
   };
 
   // Replay any stored load error events.
@@ -234,54 +135,6 @@ const trackErrors = () => {
 };
 
 
-/**
- * Sets a default dimension value for all custom dimensions on all trackers.
- */
-const trackCustomDimensions = () => {
-  // Set a default dimension value for all custom dimensions to ensure
-  // that every dimension in every hit has *some* value. This is necessary
-  // because Google Analytics will drop rows with empty dimension values
-  // in your reports.
-  const dimensionsObj = {};
-  Object.keys(dimensions).forEach((key) => {
-    dimensionsObj[dimensions[key]] = NULL_GA_VALUE;
-  });
-  ga('set', dimensionsObj);
-
-  // Add tracking of dimensions known at page load time.
-  ga((tracker) => {
-    tracker.set({
-      [dimensions.BREAKPOINT]: getActiveBreakpoint().name,
-      [dimensions.PIXEL_DENSITY]: getPixelDensity(),
-      [dimensions.TRACKING_VERSION]: TRACKING_VERSION,
-      [dimensions.CLIENT_ID]: tracker.get('clientId'),
-      [dimensions.WINDOW_ID]: uuid(),
-      [dimensions.SERVICE_WORKER_STATE]: initialSWState,
-      [dimensions.EFFECTIVE_CONNECTION_TYPE]: getEffectiveConnectionType(),
-    });
-  });
-
-  // Add tracking to record each the type, time, uuid, and visibility state
-  // of each hit immediately before it's sent.
-  ga((tracker) => {
-    const originalBuildHitTask = tracker.get('buildHitTask');
-
-    tracker.set('buildHitTask', (model) => {
-      const hitType = model.get('hitType');
-      model.set(dimensions.HIT_ID, uuid(), true);
-      model.set(dimensions.HIT_TYPE, hitType, true);
-
-      // Use the visibilityState at task queue time if available.
-      const visibilityState = (queue.getState() || document).visibilityState;
-      model.set(dimensions.VISIBILITY_STATE, visibilityState, true);
-      model.set(dimensions.HIT_TIME, `${+new Date}`, true);
-
-      originalBuildHitTask(model);
-    });
-  });
-};
-
-
 const trackFcp = () => {
   if (window.PerformancePaintTiming) {
     const reportFcpIfAvailable = async (entriesList) => {
@@ -289,13 +142,12 @@ const trackFcp = () => {
           'first-contentful-paint', 'paint')[0];
 
       if (fcpEntry) {
-        ga('send', 'event', {
-          eventCategory: 'Performance',
-          eventAction: 'first-contentful-paint',
-          eventLabel: NULL_GA_VALUE,
-          nonInteraction: true,
-          [metrics.FCP]: Math.round(fcpEntry.startTime),
-          [metrics.FCP_SAMPLE]: 1,
+        log.send('event', {
+          ec: 'Performance',
+          ea: 'first-contentful-paint',
+          ni: '1',
+          [CM_FCP]: Math.round(fcpEntry.startTime),
+          [CM_FCP_SAMPLE]: 1,
         });
       } else {
         new PerformanceObserver((list, observer) => {
@@ -312,15 +164,15 @@ const trackFid = () => {
   window.perfMetrics.onFirstInputDelay((delay, event) => {
     const delayInMs = Math.round(delay);
 
-    ga('send', 'event', {
-      eventCategory: 'Performance',
-      eventAction: 'first-input-delay',
-      eventLabel: event.type,
-      eventValue: delayInMs,
-      nonInteraction: true,
-      [metrics.FID]: delayInMs,
-      [metrics.FID_SAMPLE]: 1,
-      [dimensions.METRIC_VALUE]: event.timeStamp,
+    log.send('event', {
+      ec: 'Performance',
+      ea: 'first-input-delay',
+      el: event.type,
+      ev: delayInMs,
+      ni: '1',
+      [CM_FID]: delayInMs,
+      [CM_FID_SAMPLE]: 1,
+      [CD_METRIC_VALUE]: event.timeStamp,
     });
   });
 };
@@ -368,22 +220,21 @@ const trackNavigationTimingMetrics = async () => {
 
       if (allValuesAreValid(
           requestStart, responseStart, responseEnd, domLoaded, windowLoaded)) {
-        const fieldsObj = {
-          eventCategory: 'Performance',
-          eventAction: 'navigation',
-          eventLabel: NULL_GA_VALUE,
-          nonInteraction: true,
-          [metrics.NT_SAMPLE]: 1,
-          [metrics.REQUEST_START_TIME]: requestStart,
-          [metrics.RESPONSE_START_TIME]: responseStart,
-          [metrics.RESPONSE_END_TIME]: responseEnd,
-          [metrics.DOM_LOAD_TIME]: domLoaded,
-          [metrics.WINDOW_LOAD_TIME]: windowLoaded,
+        const paramOverrides = {
+          ec: 'Performance',
+          ea: 'navigation',
+          ni: '1',
+          [CM_NT_SAMPLE]: 1,
+          [CM_REQUEST_START_TIME]: requestStart,
+          [CM_RESPONSE_START_TIME]: responseStart,
+          [CM_RESPONSE_END_TIME]: responseEnd,
+          [CM_DOM_LOAD_TIME]: domLoaded,
+          [CM_WINDOW_LOAD_TIME]: windowLoaded,
         };
         if (initialSWState === 'controlled' && 'workerStart' in nt) {
-          fieldsObj[metrics.WORKER_START_TIME] = Math.round(nt.workerStart);
+          paramOverrides[CM_WORKER_START_TIME] = Math.round(nt.workerStart);
         }
-        ga('send', 'event', fieldsObj);
+        log.send('event', paramOverrides);
       }
     }
   }
@@ -393,8 +244,9 @@ const trackNavigationTimingMetrics = async () => {
  * Gets the effective connection type information if available.
  * @return {string}
  */
-const getEffectiveConnectionType = () => navigator.connection &&
-    navigator.connection.effectiveType || NULL_GA_VALUE;
+const getEffectiveConnectionType = () => {
+  return navigator.connection && navigator.connection.effectiveType;
+};
 
 
 const getPixelDensity = () => {
@@ -410,14 +262,4 @@ const getPixelDensity = () => {
     }
   }
   return activeDensity;
-};
-
-
-/**
- * Performantly generate a unique, 27-char string by combining the current
- * timestamp with a 13-digit random number.
- * @return {string}
- */
-const uuid = () => {
-  return `${Date.now()}-${Math.floor(Math.random() * (9e12 - 1)) + 1e12}`;
 };

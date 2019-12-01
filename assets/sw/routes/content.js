@@ -21,9 +21,13 @@ const broadcastUpdatePlugin = new BroadcastUpdatePlugin({
 
 const navigationReportPlugin = {
   async cachedResponseWillBeUsed({cachedResponse, event, request}) {
-    if (request.mode === 'navigate') {
-      const {resultingClientId} = event || {};
+    // Check `event.request` instead of `request` since the latter is a
+    // code-generated request for the content partial and is not a
+    // navigation request.
+    if (event && event.request && event.request.mode === 'navigate') {
+      const {resultingClientId} = event;
 
+      // Don't await this promise (otherwise it would delay the response).
       resultingClientExists(resultingClientId).then(async (resultingClient) => {
         // Give browsers that don't implement `resultingClientId`` a bit of time
         // for the JS to load, since it's likely they also don't implement
@@ -40,14 +44,13 @@ const navigationReportPlugin = {
           },
         });
       });
-
-      return cachedResponse;
     }
+    return cachedResponse;
   },
 };
 
 const addCacheHeadersPlugin = {
-  // Add the `X-Cache-Hit` header for requests going to the cache
+  // Add the `X-Cache-Date` header for requests going to the cache
   async cacheWillUpdate({response}) {
     return copyResponse(response, (responseInit) => {
       responseInit.headers.set('X-Cache-Date', new Date().toUTCString());

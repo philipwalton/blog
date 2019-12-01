@@ -9,8 +9,9 @@ require('./javascript.js');
 require('./sw.js');
 
 gulp.task('build', gulp.series(
-    'clean',
-    gulp.parallel('css', 'images'),
+    // 'clean',
+    // gulp.parallel('css', 'images'),
+    gulp.parallel('css'),
     'javascript',
     'content',
     'sw'));

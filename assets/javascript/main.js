@@ -9,14 +9,16 @@ const initServiceWorker = async () => {
     try {
       await sw.init();
     } catch (err) {
-      const log = await import('./log');
+      const log = await import('./log.js');
       log.trackError(err);
     }
   }
 };
 
 const initLog = async () => {
-  const log = await import('./log');
+  // Cannot use the variable name `log` until this issue is resolved:
+  // https://github.com/rollup/rollup/issues/3245
+  const log = await import('./log.js');
   log.init();
 };
 
@@ -34,4 +36,6 @@ export const main = async () => {
   // `initLog()` because it needs to add pre-send dependencies.
   await initServiceWorker();
   await initLog();
+
+  // await import('./log2');
 };

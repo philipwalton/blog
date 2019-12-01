@@ -2,6 +2,9 @@ import * as drawer from './drawer';
 import History2 from './history2';
 import {now} from './performance';
 
+/* global CD_CACHE_HIT */
+/* global CD_HIT_SOURCE */
+
 
 const CONTENT_SUFFIX = '.content.html';
 
@@ -38,14 +41,15 @@ const fetchPageContent = async (path) => {
     const responseDuration = now() - responseStartTime;
     const cacheHit = Boolean(response.headers.get('X-Cache-Hit'));
 
-    import('./log').then(({ga, dimensions}) => {
-      ga('set', dimensions.CACHE_HIT, String(cacheHit));
-      ga('send', 'event', {
-        page: path,
-        eventCategory: 'SPA',
-        eventAction: 'fetch',
-        eventLabel: cacheHit ? 'cache' : 'network',
-        eventValue: Math.round(responseDuration),
+    import('./log').then(({log}) => {
+      log.set({[CD_CACHE_HIT]: String(cacheHit)});
+      log.send('event', {
+        dp: path,
+        ec: 'SPA',
+        ea: 'fetch',
+        el: cacheHit ? 'cache' : 'network',
+        ev: Math.round(responseDuration),
+        ni: '1',
       });
     });
 
@@ -117,10 +121,10 @@ const setScroll = (hash) => {
  * @param {string} pathname
  */
 const trackPageview = async (pathname) => {
-  const {ga, dimensions} = await import('./log');
+  const {log} = await import('./log');
 
-  ga('set', 'page', pathname);
-  ga('send', 'pageview', {[dimensions.HIT_SOURCE]: 'SPA'});
+  log.set({dp: pathname});
+  log.send('pageview', {[CD_HIT_SOURCE]: 'SPA'});
 };
 
 

@@ -1,7 +1,9 @@
 import {Workbox} from 'workbox-window/Workbox.mjs';
 import {loadPage} from './content-loader';
 import {initialSWState} from './sw-state';
-import {NULL_GA_VALUE} from './constants';
+
+/* global CD_SITE_VERSION */
+/* global CD_CACHE_HIT */
 
 
 // Defining a Workbox instance has no side effects, so it's OK to do it
@@ -13,26 +15,28 @@ const MESSAGE_TIMEOUT = 5000;
 
 
 const setSiteVersionOrTimeout = async () => {
-  const {ga, dimensions} = await import('./log');
+  const {log} = await import('./log');
 
   // Set the site version, if available.
   const {version} = await new Promise((resolve) => {
     // Uncontrolled pages won't have a version.
     if (initialSWState !== 'controlled') {
-      resolve({version: NULL_GA_VALUE});
+      resolve({version: null});
     }
 
     wb.messageSW({type: 'GET_METADATA'}).then(resolve);
 
-    setTimeout(() => resolve({version: NULL_GA_VALUE}), MESSAGE_TIMEOUT);
+    setTimeout(() => resolve({version: null}), MESSAGE_TIMEOUT);
   });
 
-  ga('set', dimensions.SITE_VERSION, version);
+  if (version !== null) {
+    log.set({[CD_SITE_VERSION]: version});
+  }
 };
 
 
 const setNavigationCacheOrTimeout = async () => {
-  const {ga, dimensions} = await import('./log');
+  const {log} = await import('./log');
 
   // Before sending any perf data, determine whether the page was served
   // entirely cache-first.
@@ -48,10 +52,12 @@ const setNavigationCacheOrTimeout = async () => {
       }
     });
 
-    setTimeout(() => resolve({cacheHit: NULL_GA_VALUE}), MESSAGE_TIMEOUT);
+    setTimeout(() => resolve({cacheHit: null}), MESSAGE_TIMEOUT);
   });
 
-  ga('set', dimensions.CACHE_HIT, String(cacheHit));
+  if (cacheHit !== null) {
+    log.set({[CD_CACHE_HIT]: String(cacheHit)});
+  }
 };
 
 
@@ -119,11 +125,12 @@ const addCacheUpdateListener = () => {
       // it occurs to get a bit more insight into any UX concerns.
       loadPage(updatedURL);
 
-      const {ga} = await import('./log');
-      ga('send', 'event', {
-        eventCategory: 'Service Worker',
-        eventAction: 'cache-update',
-        eventLabel: updatedURL,
+      const {log} = await import('./log');
+      log.send('event', {
+        ec: 'Service Worker',
+        ea: 'cache-update',
+        el: updatedURL,
+        ni: '1',
       });
     }
   });
@@ -133,7 +140,7 @@ const addCacheUpdateListener = () => {
 const addSWUpdateListener = () => {
   wb.addEventListener('message', async ({data}) => {
     if (data && data.type === 'UPDATE_AVAILABLE') {
-      const {ga} = await import('./log');
+      const {log} = await import('./log');
 
       // Default to showing an update message. This is helpful in the event
       // a future version causes an error parsing the message data, the
@@ -148,14 +155,19 @@ const addSWUpdateListener = () => {
         timeSinceNewVersionDeployed,
       } = processMetadata(data.payload);
 
-      const sendEvent = (eventCategory, eventAction) => {
-        ga('send', 'event', {
-          eventCategory,
-          eventAction,
-          eventValue: timeSinceNewVersionDeployed || 0,
-          eventLabel: newVersion ?
-              `${oldVersion || NULL_GA_VALUE} => ${newVersion}` : NULL_GA_VALUE,
-        });
+      const sendEvent = (ec, ea) => {
+        const params = {
+          ec,
+          ea,
+          ev: timeSinceNewVersionDeployed || 0,
+          ni: '1',
+        };
+
+        if (newVersion) {
+          params.el = `${oldVersion || '(not set)'} => ${newVersion}`;
+        }
+
+        log.send('event', params);
       };
 
       sendEvent('Service Worker', 'sw-update');
@@ -200,10 +212,10 @@ export const init = async () => {
   addCacheUpdateListener();
   addSWUpdateListener();
 
-  const {addPreSendDependency} = await import('./log');
-  addPreSendDependency(setSiteVersionOrTimeout());
-  addPreSendDependency(setNavigationCacheOrTimeout());
+  const {log} = await import('./log');
+  log.awaitBeforeSending(setSiteVersionOrTimeout());
+  log.awaitBeforeSending(setNavigationCacheOrTimeout());
 
-  // Calling register must happen after all presendDependencies get added.
+  // Calling register must happen after all presend dependencies get added.
   await wb.register();
 };

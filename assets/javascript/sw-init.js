@@ -14,6 +14,21 @@ let wb;
 const MESSAGE_TIMEOUT = 5000;
 
 
+// A promise that resolves when the navigation report is received.
+// NOTE: this needs to be here because the `message` event listener needs
+// to be added before DOMContentLoaded fires (or it may be missed).
+let navigationReportPromise;
+const addNavigationReportListener = () => {
+  navigationReportPromise = new Promise((resolve) => {
+    wb.addEventListener('message', ({data}) => {
+      if (data.type === 'NAVIGATION_REPORT') {
+        resolve(data.payload);
+      }
+    });
+  });
+};
+
+
 const setSiteVersionOrTimeout = async () => {
   const {log} = await import('./log');
 
@@ -44,15 +59,11 @@ const setNavigationCacheOrTimeout = async () => {
     // Uncontrolled pages can never be fully cache-first.
     if (initialSWState !== 'controlled') {
       resolve({cacheHit: false});
+    } else {
+      // Otherwise, resolve with the navigation report promise or timeout.
+      navigationReportPromise.then(resolve);
+      setTimeout(() => resolve({cacheHit: null}), MESSAGE_TIMEOUT);
     }
-
-    wb.addEventListener('message', ({data}) => {
-      if (data.type === 'NAVIGATION_REPORT') {
-        resolve(data.payload);
-      }
-    });
-
-    setTimeout(() => resolve({cacheHit: null}), MESSAGE_TIMEOUT);
   });
 
   if (cacheHit !== null) {
@@ -203,11 +214,13 @@ const addSWUpdateListener = () => {
   });
 };
 
+
 export const init = async () => {
   // Instantiating the Workbox instance adds an event listener to
   // `navigator.serviceWorker`, which will be undefined in older browsers.
   wb = new Workbox('/sw.js');
 
+  addNavigationReportListener();
   addFirstInstalledListener();
   addCacheUpdateListener();
   addSWUpdateListener();

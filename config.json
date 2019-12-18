@@ -39,7 +39,11 @@
       "CM_RESPONSE_START_TIME": "cm8",
       "CM_WORKER_START_TIME": "cm9",
       "CM_FID": "cm10",
-      "CM_FID_SAMPLE": "cm11"
+      "CM_FID_SAMPLE": "cm11",
+      "CM_LCP": "cm12",
+      "CM_LCP_SAMPLE": "cm13",
+      "CM_CLS": "cm14",
+      "CM_CLS_SAMPLE": "cm15"
     }
   }
 }

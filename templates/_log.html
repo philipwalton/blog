@@ -1,21 +1,39 @@
 <!-- Track errors -->
 <script>addEventListener('error', window.__e=function f(e){f.q=f.q||[];f.q.push(e)});</script>
 
-<!-- Track whether the window was ever hidden -->
-<script>
-window.__wasAlwaysVisible = document.visibilityState !== 'hidden';
-addEventListener('visibilitychange', function f() {
-  if (document.visibilityState === 'hidden') {
-    window.__wasAlwaysVisible = false;
-    removeEventListener('visibilitychange', f, true);
-  }
-}, true);
-</script>
-
 <!-- Track FID -->
 <script>
 (function(){function g(a,b){d||(d=b,c=a,h=new Date,k(removeEventListener),l())}function l(){0<=c&&c<h-m&&(e.forEach(function(a){a(c,d)}),e=[])}function n(a,b){function c(){g(a,b);e()}function d(){e()}function e(){removeEventListener("pointerup",c,f);removeEventListener("pointercancel",d,f)}addEventListener("pointerup",c,f);addEventListener("pointercancel",d,f)}function p(a){if(a.cancelable){var b=(1E12<a.timeStamp?new Date:performance.now())-a.timeStamp;"pointerdown"==a.type?n(b,a):g(b,a)}}function k(a){["click",
-"mousedown","keydown","touchstart","pointerdown"].forEach(function(b){a(b,p,f)})}var d,c,h,e=[],f={passive:!0,capture:!0},m=new Date;k(addEventListener);self.perfMetrics=self.perfMetrics||{};self.perfMetrics.onFirstInputDelay=function(a){e.push(a);l()}})();
+"mousedown","keydown","touchstart","pointerdown"].forEach(function(b){a(b,p,f)})}var d,c,h,e=[],f={passive:!0,capture:!0},m=new Date;k(addEventListener);window.perfMetrics=window.perfMetrics||{};window.perfMetrics.onFirstInputDelay=function(a){e.push(a);l()}})();
+</script>
+
+<script>
+(function() {
+// Track whether or not the document was always visible.
+window.__wasAlwaysVisible = document.visibilityState !== 'hidden';
+function onVisibilityChange() {
+  if (document.visibilityState === 'hidden') {
+    window.__wasAlwaysVisible = false;
+    removeEventListener('visibilitychange', onVisibilityChange, true);
+  }
+}
+addEventListener('visibilitychange', onVisibilityChange, true);
+
+// Track whether or not input has occurred this page load.
+// Reuse the FID logic to do this.
+window.__hadInput = false;
+window.perfMetrics.onFirstInputDelay(function() {
+  window.__hadInput = true;
+});
+
+// Track whether or not a scroll has occurred this page load.
+window.__hadScroll = false;
+function onScroll() {
+  window.__hadScroll = true;
+  removeEventListener('scroll', onScroll, true);
+}
+addEventListener('scroll', onScroll, true);
+})();
 </script>
 
 <script async src="{{ 'log.js' | revision }}"></script>

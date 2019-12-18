@@ -3,12 +3,13 @@ import {timeOrigin} from './performance';
 import {initialSWState} from './sw-state';
 import {uuid} from './uuid';
 import {Logger} from './Logger';
+import * as visibilitychange from './visibilitychange';
+
 
 /* global CD_BREAKPOINT */ // 'cd1'
 /* global CD_PIXEL_DENSITY */ // 'cd2'
 /* global CD_HIT_SOURCE */ // 'cd4'
 /* global CD_EFFECTIVE_CONNECTION_TYPE */ // 'cd5'
-/* global CD_METRIC_VALUE */ // 'cd6'
 /* global CD_SERVICE_WORKER_STATE */ // 'cd9'
 /* global CD_WINDOW_ID */ // 'cd11'
 /* global CD_VISIBILITY_STATE */ // 'cd12'
@@ -26,6 +27,10 @@ import {Logger} from './Logger';
 /* global CM_WORKER_START_TIME */ // 'cm9',
 /* global CM_FID */ // 'cm10',
 /* global CM_FID_SAMPLE */ // 'cm11',
+/* global CM_LCP */ // 'cm12',
+/* global CM_LCP_SAMPLE */ // 'cm13',
+/* global CM_CLS */ // 'cm14',
+/* global CM_CLS_SAMPLE */ // 'cm15',
 
 
 /**
@@ -33,7 +38,7 @@ import {Logger} from './Logger';
  * implementation. This allows you to create a segment or view filter
  * that isolates only data captured with the most recent tracking changes.
  */
-const TRACKING_VERSION = '60';
+const TRACKING_VERSION = '61';
 
 export const log = new Logger((params, state) => {
   params[CD_HIT_TIME] = state.time;
@@ -51,6 +56,21 @@ const whenWindowLoaded = new Promise((resolve) => {
     });
   }
 });
+
+
+const perfObserve = (type, callback) => {
+  if (typeof PerformanceObserver !== 'undefined' &&
+      PerformanceObserver.supportedEntryTypes &&
+      PerformanceObserver.supportedEntryTypes.includes(type)) {
+    try {
+      const po = new PerformanceObserver(callback);
+      po.observe({type, buffered: true});
+      return po;
+    } catch (err) {
+      // Do nothing.
+    }
+  }
+};
 
 
 /**
@@ -78,9 +98,11 @@ export const init = async () => {
 
   if (window.__wasAlwaysVisible) {
     trackFcp();
+    trackLcp();
     trackFid();
     trackNavigationTimingMetrics();
   }
+  trackCls();
 };
 
 
@@ -136,45 +158,106 @@ const trackErrors = () => {
 
 
 const trackFcp = () => {
-  if (window.PerformancePaintTiming) {
-    const reportFcpIfAvailable = async (entriesList) => {
-      const fcpEntry = entriesList.getEntriesByName(
-          'first-contentful-paint', 'paint')[0];
+  perfObserve('paint', (list, observer) => {
+    const entry = list.getEntriesByName('first-contentful-paint')[0];
+    if (entry) {
+      const fcp = Math.round(entry.startTime);
+      log.send('event', {
+        ec: 'Performance',
+        ea: 'first-contentful-paint',
+        ev: fcp,
+        ni: '1',
+        [CM_FCP]: fcp,
+        [CM_FCP_SAMPLE]: 1,
+      });
+      observer.disconnect();
+    }
+  });
+};
 
-      if (fcpEntry) {
-        log.send('event', {
-          ec: 'Performance',
-          ea: 'first-contentful-paint',
-          ni: '1',
-          [CM_FCP]: Math.round(fcpEntry.startTime),
-          [CM_FCP_SAMPLE]: 1,
-        });
-      } else {
-        new PerformanceObserver((list, observer) => {
-          observer.disconnect();
-          reportFcpIfAvailable(list);
-        }).observe({entryTypes: ['paint']});
-      }
-    };
-    reportFcpIfAvailable(window.performance);
-  }
+
+const trackLcp = async () => {
+  // Since we don't load any content post-load. We can be confident the
+  // last LCP candidate at this point is not going to change.
+  // NOTE: will not be needed after this issue is resolved:
+  // https://github.com/WICG/largest-contentful-paint/issues/43
+  await whenWindowLoaded;
+
+  perfObserve('largest-contentful-paint', (list, observer) => {
+    const entries = list.getEntries();
+    const lastEntry = entries[entries.length - 1];
+    const lcp = Math.round(lastEntry.startTime);
+
+    log.send('event', {
+      ec: 'Performance',
+      ea: 'largest-contentful-paint',
+      el: String(window.__hadInput || window.__hadScroll),
+      ev: lcp,
+      ni: '1',
+      [CM_LCP]: Math.round(lcp),
+      [CM_LCP_SAMPLE]: 1,
+    });
+    observer.disconnect();
+  });
 };
 
 const trackFid = () => {
   window.perfMetrics.onFirstInputDelay((delay, event) => {
-    const delayInMs = Math.round(delay);
+    const fid = Math.round(delay);
 
     log.send('event', {
       ec: 'Performance',
       ea: 'first-input-delay',
       el: event.type,
-      ev: delayInMs,
+      ev: fid,
       ni: '1',
-      [CM_FID]: delayInMs,
+      [CM_FID]: fid,
       [CM_FID_SAMPLE]: 1,
-      [CD_METRIC_VALUE]: event.timeStamp,
     });
   });
+};
+
+
+const trackCls = () => {
+  // Stores the current layout shift score for the page.
+  let cls = 0;
+
+  // Detects new layout shift occurrences and updates the
+  // `cls` variable.
+  const observer = perfObserve('layout-shift', (list) => {
+    for (const entry of list.getEntries()) {
+      // Only count layout shifts without recent user input.
+      if (!entry.hadRecentInput) {
+        cls += entry.value;
+      }
+    }
+  });
+
+  // If `observer` is undefined it means the browser doesn't support
+  // tracing `layout-shift` entries via `PerformanceObserver`.
+  if (observer) {
+    // Sends the final score to your analytics back end once
+    // the page's lifecycle state becomes hidden.
+    visibilitychange.addListener(function fn({visibilityState}) {
+      if (visibilityState === 'hidden') {
+        visibilitychange.removeListener(fn);
+
+        // Force any pending records to be dispatched.
+        observer.takeRecords();
+        observer.disconnect();
+
+        const kCls = Math.round(cls * 1000);
+        log.send('event', {
+          ec: 'Performance',
+          ea: 'cumulative-layout-shift',
+          ev: kCls,
+          ni: '1',
+          [CM_CLS]: kCls,
+          [CM_CLS_SAMPLE]: 1,
+        });
+      }
+    });
+  }
 };
 
 

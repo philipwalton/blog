@@ -98,7 +98,7 @@ export class Logger {
       if (process.env.NODE_ENV !== 'production') {
         // Log hits in development.
         if (data.t === 'event') {
-          console.log(data.t, data.ec, data.ea, data);
+          console.log(data.t, data.ec, data.ea, data.ev, data.el, data);
         } else {
           console.log(data.t, data);
         }

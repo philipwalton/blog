@@ -290,7 +290,7 @@ To end, I want to emphasize a couple of key pieces of performance advice from th
 
 - [Streaming Service Workers](https://youtu.be/3Tr-scf7trE) (Live coding a streaming service worker by Jake Archibald and Surma, a technique similar to what I recommend in this article)
 - [Fun Hacks for Faster Content](https://jakearchibald.com/2016/fun-hacks-faster-content/) (A technique Jake discovered for getting streaming to work in SPAs)
-- [Offline-first for Your Templated Site](https://jeffy.info/2016/11/02/offline-first-for-your-templated-site-part-1.html) (A similar approach by Jeff Posnik that does templating in the service worker)
-- [Beyond SPAs](https://developers.google.com/web/updates/2018/05/beyond-spa) (alternative architectures for your PWA by Jeff Posnik).
+- [Offline-first for Your Templated Site](https://jeffy.info/2016/11/02/offline-first-for-your-templated-site-part-1.html) (A similar approach by Jeff Posnick that does templating in the service worker)
+- [Beyond SPAs](https://developers.google.com/web/updates/2018/05/beyond-spa) (alternative architectures for your PWA by Jeff Posnick).
 - [Service Workers for the Rest of Us](https://vimeo.com/362260166) (My talk on service workers at SmashingConf, where at the end I do a live demo of the technique presented here)
 - [Building Faster, More Resilient Apps with Service Worker](https://youtu.be/25aCD5XL1Jk) (my service worker performance advice from Chrome Dev Summit 2018)

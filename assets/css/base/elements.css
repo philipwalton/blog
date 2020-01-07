@@ -92,6 +92,7 @@ code {
   display: inline-block;
   padding: 2px 3px 1px;
   text-decoration: inherit;
+  word-break: break-word;
 }
 
 pre code {

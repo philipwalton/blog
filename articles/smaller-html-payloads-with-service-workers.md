@@ -113,7 +113,7 @@ addEventListener('fetch', (event) => {
       const textPartials = await Promise.all([
         getText(caches.match(getCacheKeyForURL(**'/shell-start.html'**))),
         getText(fetch(**event.request.url + 'index.content.html'**)),
-        getText(caches.match(getCacheKeyForURL(**'/shell-start.html'**))),
+        getText(caches.match(getCacheKeyForURL(**'/shell-end.html'**))),
       ]);
 
       return new Response(textPartials.join(''), {

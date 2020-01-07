@@ -568,7 +568,7 @@ Lastly, since the point of all this work was to improve my FID, after releasing 
     <td>3ms</td>
   </tr>
   <tr>
-    <td>After  <em>Idle-until-urgent</em></td>
+    <td>After  <em>idle-until-urgent</em></td>
     <td><strong>85ms</strong></td>
     <td>16ms</td>
     <td>3ms</td>

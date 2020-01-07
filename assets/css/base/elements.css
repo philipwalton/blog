@@ -81,12 +81,15 @@ article strong a {
   color: inherit;
 }
 
+tt, code {
+  font-family: Monaco, monospace;
+  font-size: 0.875em;
+}
+
 code {
   background: var(--code-bg-color);
   border-radius: 2px;
   display: inline-block;
-  font-family: Monaco, monospace;
-  font-size: 0.875em;
   padding: 2px 3px 1px;
   text-decoration: inherit;
 }
@@ -171,10 +174,13 @@ figcaption a:hover {
 }
 
 figure img {
-  border: 1px solid var(--border-color);
-  border-radius: var(--border-radius);
   height: auto;
   max-width: 100%;
+}
+
+figure:not([noborder]) img {
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
   padding: 3px;
 }
 

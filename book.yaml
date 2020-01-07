@@ -175,3 +175,6 @@ articles:
 - title: "Cascading Cache Invalidation"
   path: /articles/cascading-cache-invalidation/
   date: 2019-10-09T01:26:44-07:00
+- title: "Smaller HTML Payloads with Service Workers"
+  path: /articles/smaller-html-payloads-with-service-workers/
+  date: 2020-01-07T00:02:37-08:00

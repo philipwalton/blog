@@ -5,9 +5,7 @@ const imagemin = require('imagemin');
 const imageminPngquant = require('imagemin-pngquant');
 const path = require('path');
 const {generateRevisionedAsset} = require('./utils/assets');
-
-const {promisify} = require('util');
-const glob = promisify(require('glob'));
+const globby = require('globby');
 
 
 const resizeImage = (filepath, width) => {
@@ -69,19 +67,19 @@ const generateRevisionedAssets = (filenames) => {
 gulp.task('images', async () => {
   try {
     // Article screenshots.
-    const articlPngFilenames = await glob('assets/images/articles/*.png');
-    await generateLowResArticleImages(articlPngFilenames);
-    await generateHighResArticleImages(articlPngFilenames);
+    const articlePngFilenames = await globby('assets/images/articles/*.png');
+    await generateLowResArticleImages(articlePngFilenames);
+    await generateHighResArticleImages(articlePngFilenames);
 
     // Manifest images.
-    const manifestPngFilenames = await glob('assets/images/*.png');
+    const manifestPngFilenames = await globby('assets/images/*.png');
     await optimizeManifestImages(manifestPngFilenames);
 
     // GIF and SVG assets
-    const svgFilenames = await glob('assets/images/**/*.+(gif|svg)');
+    const svgFilenames = await globby('assets/images/**/*.+(gif|svg)');
     await generateRevisionedAssets(svgFilenames);
   } catch (err) {
-    console.log(err);
+    console.log(err.stack);
     console.log(err.stdout.toString());
     console.log(err.stderr.toString());
   }

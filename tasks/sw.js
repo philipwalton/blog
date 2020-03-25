@@ -61,6 +61,7 @@ gulp.task('sw', async () => {
     const bundle = await rollup({
       input: 'assets/sw/sw.js',
       plugins,
+      preserveSymlinks: true, // Needed for `file:` entries in package.json.
     });
 
     await bundle.write({

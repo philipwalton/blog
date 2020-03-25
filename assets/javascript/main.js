@@ -36,6 +36,4 @@ export const main = async () => {
   // `initLog()` because it needs to add pre-send dependencies.
   await initServiceWorker();
   await initLog();
-
-  // await import('./log2');
 };

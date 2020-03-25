@@ -104,13 +104,9 @@ export class Logger {
         }
       }
 
-      // Use sendBeacon if available, otherwise fetch.
-      if (navigator.sendBeacon) {
-        const beaconSent = navigator.sendBeacon('/log', body);
-        if (!beaconSent) {
-          fetch('/log', {method: 'POST', body});
-        }
-      }
+      // Use `navigator.sendBeacon()` if available, with a fallback to `fetch()`
+      (navigator.sendBeacon && navigator.sendBeacon('/log', body)) ||
+          fetch('/log', {body, method: 'POST', keepalive: true});
     });
   }
 

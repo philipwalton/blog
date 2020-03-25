@@ -1,9 +1,9 @@
+import {getCLS, getFCP, getFID, getLCP} from 'web-vitals';
 import {getActiveBreakpoint} from './breakpoints';
 import {timeOrigin} from './performance';
 import {initialSWState} from './sw-state';
 import {uuid} from './uuid';
 import {Logger} from './Logger';
-import * as visibilitychange from './visibilitychange';
 
 
 /* global CD_BREAKPOINT */ // 'cd1'
@@ -38,7 +38,7 @@ import * as visibilitychange from './visibilitychange';
  * implementation. This allows you to create a segment or view filter
  * that isolates only data captured with the most recent tracking changes.
  */
-const TRACKING_VERSION = '61';
+const TRACKING_VERSION = '62';
 
 export const log = new Logger((params, state) => {
   params[CD_HIT_TIME] = state.time;
@@ -57,19 +57,15 @@ const whenWindowLoaded = new Promise((resolve) => {
   }
 });
 
-
-const perfObserve = (type, callback) => {
-  if (typeof PerformanceObserver !== 'undefined' &&
-      PerformanceObserver.supportedEntryTypes &&
-      PerformanceObserver.supportedEntryTypes.includes(type)) {
-    try {
-      const po = new PerformanceObserver(callback);
-      po.observe({type, buffered: true});
-      return po;
-    } catch (err) {
-      // Do nothing.
-    }
+const getElementSelector = (el) => {
+  let name = el.nodeName.toLowerCase();
+  if (el.id) {
+    name += `#${el.id}`;
   }
+  if (el.className) {
+    name += `.${el.className.trim().split(/\s/)[0]}`;
+  }
+  return name;
 };
 
 
@@ -96,13 +92,11 @@ export const init = async () => {
 
   log.send('pageview', {[CD_HIT_SOURCE]: 'navigation'});
 
-  if (window.__wasAlwaysVisible) {
-    trackFcp();
-    trackLcp();
-    trackFid();
-    trackNavigationTimingMetrics();
-  }
+  trackFcp();
+  trackLcp();
+  trackFid();
   trackCls();
+  trackNavigationTimingMetrics();
 };
 
 
@@ -157,107 +151,66 @@ const trackErrors = () => {
 };
 
 
-const trackFcp = () => {
-  perfObserve('paint', (list, observer) => {
-    const entry = list.getEntriesByName('first-contentful-paint')[0];
-    if (entry) {
-      const fcp = Math.round(entry.startTime);
-      log.send('event', {
-        ec: 'Performance',
-        ea: 'first-contentful-paint',
-        ev: fcp,
-        ni: '1',
-        [CM_FCP]: fcp,
-        [CM_FCP_SAMPLE]: 1,
-      });
-      observer.disconnect();
-    }
+const trackFcp = async () => {
+  const {value} = await getFCP();
+  const fcp = Math.round(value);
+
+  log.send('event', {
+    ec: 'Performance',
+    ea: 'first-contentful-paint',
+    ev: fcp,
+    ni: '1',
+    [CM_FCP]: fcp,
+    [CM_FCP_SAMPLE]: 1,
   });
 };
 
 
 const trackLcp = async () => {
-  // Since we don't load any content post-load. We can be confident the
-  // last LCP candidate at this point is not going to change.
-  // NOTE: will not be needed after this issue is resolved:
-  // https://github.com/WICG/largest-contentful-paint/issues/43
-  await whenWindowLoaded;
+  const {value, entries} = await getLCP();
+  const {element} = entries[entries.length - 1];
+  const lcp = Math.round(value);
 
-  perfObserve('largest-contentful-paint', (list, observer) => {
-    const entries = list.getEntries();
-    const lastEntry = entries[entries.length - 1];
-    const lcp = Math.round(lastEntry.startTime);
-
-    log.send('event', {
-      ec: 'Performance',
-      ea: 'largest-contentful-paint',
-      el: String(window.__hadInput || window.__hadScroll),
-      ev: lcp,
-      ni: '1',
-      [CM_LCP]: Math.round(lcp),
-      [CM_LCP_SAMPLE]: 1,
-    });
-    observer.disconnect();
+  log.send('event', {
+    ec: 'Performance',
+    ea: 'largest-contentful-paint',
+    el: getElementSelector(element),
+    ev: lcp,
+    ni: '1',
+    [CM_LCP]: Math.round(lcp),
+    [CM_LCP_SAMPLE]: 1,
   });
 };
 
-const trackFid = () => {
-  window.perfMetrics.onFirstInputDelay((delay, event) => {
-    const fid = Math.round(delay);
+const trackFid = async () => {
+  const {value, entries, event} = await getFID();
+  const eventType = entries[0] && entries[0].name || event.type;
+  const fid = Math.round(value);
 
-    log.send('event', {
-      ec: 'Performance',
-      ea: 'first-input-delay',
-      el: event.type,
-      ev: fid,
-      ni: '1',
-      [CM_FID]: fid,
-      [CM_FID_SAMPLE]: 1,
-    });
+  log.send('event', {
+    ec: 'Performance',
+    ea: 'first-input-delay',
+    el: eventType,
+    ev: fid,
+    ni: '1',
+    [CM_FID]: fid,
+    [CM_FID_SAMPLE]: 1,
   });
 };
 
 
-const trackCls = () => {
-  // Stores the current layout shift score for the page.
-  let cls = 0;
+const trackCls = async () => {
+  const {value} = await getCLS();
+  const kCls = Math.round(value * 1000);
 
-  // Detects new layout shift occurrences and updates the
-  // `cls` variable.
-  const observer = perfObserve('layout-shift', (list) => {
-    for (const entry of list.getEntries()) {
-      // Only count layout shifts without recent user input.
-      if (!entry.hadRecentInput) {
-        cls += entry.value;
-      }
-    }
+  log.send('event', {
+    ec: 'Performance',
+    ea: 'cumulative-layout-shift',
+    ev: kCls,
+    ni: '1',
+    [CM_CLS]: kCls,
+    [CM_CLS_SAMPLE]: 1,
   });
-
-  // If `observer` is undefined it means the browser doesn't support
-  // tracing `layout-shift` entries via `PerformanceObserver`.
-  if (observer) {
-    // Sends the final score to your analytics back end once
-    // the page's lifecycle state becomes hidden.
-    visibilitychange.addListener(function fn({visibilityState}) {
-      if (visibilityState === 'hidden') {
-        visibilitychange.removeListener(fn);
-
-        // Force any pending records to be dispatched.
-        observer.takeRecords();
-        observer.disconnect();
-
-        const kCls = Math.round(cls * 1000);
-        log.send('event', {
-          ec: 'Performance',
-          ea: 'cumulative-layout-shift',
-          ev: kCls,
-          ni: '1',
-          [CM_CLS]: kCls,
-          [CM_CLS_SAMPLE]: 1,
-        });
-      }
-    });
-  }
 };
 
 

@@ -1,6 +1,5 @@
-import {getCLS, getFCP, getFID, getLCP} from 'web-vitals';
+import {getCLS, getFCP, getFID, getLCP, getTTFB} from 'web-vitals';
 import {getActiveBreakpoint} from './breakpoints';
-import {timeOrigin} from './performance';
 import {initialSWState} from './sw-state';
 import {uuid} from './uuid';
 import {Logger} from './Logger';
@@ -38,24 +37,13 @@ import {Logger} from './Logger';
  * implementation. This allows you to create a segment or view filter
  * that isolates only data captured with the most recent tracking changes.
  */
-const TRACKING_VERSION = '62';
+const TRACKING_VERSION = '63';
 
 export const log = new Logger((params, state) => {
   params[CD_HIT_TIME] = state.time;
   params[CD_VISIBILITY_STATE] = state.visibilityState;
 });
 
-
-const whenWindowLoaded = new Promise((resolve) => {
-  if (document.readyState === 'complete') {
-    resolve();
-  } else {
-    addEventListener('load', function f() {
-      resolve();
-      removeEventListener('load', f);
-    });
-  }
-});
 
 const getElementSelector = (el) => {
   let name = el.nodeName.toLowerCase();
@@ -92,11 +80,11 @@ export const init = async () => {
 
   log.send('pageview', {[CD_HIT_SOURCE]: 'navigation'});
 
-  trackFcp();
-  trackLcp();
-  trackFid();
-  trackCls();
-  trackNavigationTimingMetrics();
+  trackCLS();
+  trackFCP();
+  trackFID();
+  trackLCP();
+  trackTTFB();
 };
 
 
@@ -150,130 +138,90 @@ const trackErrors = () => {
   window.addEventListener('error', trackErrorEvent);
 };
 
+const trackCLS = async () => {
+  getCLS(({name, delta}) => {
+    const cls = Math.round(delta * 1000);
 
-const trackFcp = async () => {
-  const {value} = await getFCP();
-  const fcp = Math.round(value);
-
-  log.send('event', {
-    ec: 'Performance',
-    ea: 'first-contentful-paint',
-    ev: fcp,
-    ni: '1',
-    [CM_FCP]: fcp,
-    [CM_FCP_SAMPLE]: 1,
+    log.send('event', {
+      ec: 'Web Vitals',
+      ea: name,
+      ev: cls,
+      ni: '1',
+      [CM_CLS]: cls,
+      [CM_CLS_SAMPLE]: 1,
+    });
   });
 };
 
+const trackFCP = async () => {
+  getFCP(({name, delta}) => {
+    const fcp = Math.round(delta);
 
-const trackLcp = async () => {
-  const {value, entries} = await getLCP();
-  const {element} = entries[entries.length - 1];
-  const lcp = Math.round(value);
-
-  log.send('event', {
-    ec: 'Performance',
-    ea: 'largest-contentful-paint',
-    el: getElementSelector(element),
-    ev: lcp,
-    ni: '1',
-    [CM_LCP]: Math.round(lcp),
-    [CM_LCP_SAMPLE]: 1,
+    log.send('event', {
+      ec: 'Web Vitals',
+      ea: name,
+      ev: fcp,
+      ni: '1',
+      [CM_FCP]: fcp,
+      [CM_FCP_SAMPLE]: 1,
+    });
   });
 };
 
-const trackFid = async () => {
-  const {value, entries, event} = await getFID();
-  const eventType = entries[0] && entries[0].name || event.type;
-  const fid = Math.round(value);
+const trackFID = async () => {
+  getFID(({name, delta, entries}) => {
+    const fid = Math.round(delta);
 
-  log.send('event', {
-    ec: 'Performance',
-    ea: 'first-input-delay',
-    el: eventType,
-    ev: fid,
-    ni: '1',
-    [CM_FID]: fid,
-    [CM_FID_SAMPLE]: 1,
+    log.send('event', {
+      ec: 'Web Vitals',
+      ea: name,
+      el: entries[0].name,
+      ev: fid,
+      ni: '1',
+      [CM_FID]: fid,
+      [CM_FID_SAMPLE]: 1,
+    });
   });
 };
 
+const trackLCP = async () => {
+  getLCP(({name, delta, entries}) => {
+    const {element} = entries[entries.length - 1];
+    const lcp = Math.round(delta);
 
-const trackCls = async () => {
-  const {value} = await getCLS();
-  const kCls = Math.round(value * 1000);
-
-  log.send('event', {
-    ec: 'Performance',
-    ea: 'cumulative-layout-shift',
-    ev: kCls,
-    ni: '1',
-    [CM_CLS]: kCls,
-    [CM_CLS_SAMPLE]: 1,
+    log.send('event', {
+      ec: 'Web Vitals',
+      ea: name,
+      el: getElementSelector(element),
+      ev: lcp,
+      ni: '1',
+      [CM_LCP]: Math.round(lcp),
+      [CM_LCP_SAMPLE]: 1,
+    });
   });
 };
 
-
-/**
- * Gets the DOM and window load times and sends them as custom metrics to
- * Google Analytics via an event hit.
- */
-const trackNavigationTimingMetrics = async () => {
-  // Only track performance in supporting browsers.
-  if (window.performance &&
-      window.performance.timing &&
-      window.performance.getEntriesByType) {
-    await whenWindowLoaded;
-
-    let nt = performance.getEntriesByType('navigation')[0];
-
-    // Fall back to the performance timeline in browsers that don't
-    // support Navigation Timing Level 2.
-    if (!nt) {
-      const pt = performance.timing;
-      nt = {
-        workerStart: 0,
-        requestStart: pt.requestStart - timeOrigin,
-        responseStart: pt.responseStart - timeOrigin,
-        responseEnd: pt.responseEnd - timeOrigin,
-        domContentLoadedEventStart: pt.domContentLoadedEventStart - timeOrigin,
-        loadEventStart: pt.loadEventStart - timeOrigin,
-      };
+const trackTTFB = () => {
+  getTTFB(({name, delta, entries}) => {
+    const ttfb = Math.round(delta);
+    const navEntry = entries[0];
+    const paramOverrides = {
+      ec: 'Web Vitals',
+      ea: name,
+      ev: ttfb,
+      ni: '1',
+      [CM_NT_SAMPLE]: 1,
+      [CM_REQUEST_START_TIME]: Math.round(navEntry.requestStart),
+      [CM_RESPONSE_START_TIME]: ttfb,
+      [CM_RESPONSE_END_TIME]: Math.round(navEntry.responseEnd),
+      [CM_DOM_LOAD_TIME]: Math.round(navEntry.domContentLoadedEventEnd),
+      [CM_WINDOW_LOAD_TIME]: Math.round(navEntry.loadEventEnd),
+    };
+    if (initialSWState === 'controlled' && 'workerStart' in navEntry) {
+      paramOverrides[CM_WORKER_START_TIME] = Math.round(navEntry.workerStart);
     }
-
-    if (nt) {
-      const requestStart = Math.round(nt.requestStart);
-      const responseStart = Math.round(nt.responseStart);
-      const responseEnd = Math.round(nt.responseEnd);
-      const domLoaded = Math.round(nt.domContentLoadedEventStart);
-      const windowLoaded = Math.round(nt.loadEventStart);
-
-      // In some edge cases browsers return very obviously incorrect NT values,
-      // e.g. negative or future times. This validates values before sending.
-      const allValuesAreValid = (...values) => {
-        return values.every((value) => value >= 0 && value < 6e6);
-      };
-
-      if (allValuesAreValid(
-          requestStart, responseStart, responseEnd, domLoaded, windowLoaded)) {
-        const paramOverrides = {
-          ec: 'Performance',
-          ea: 'navigation',
-          ni: '1',
-          [CM_NT_SAMPLE]: 1,
-          [CM_REQUEST_START_TIME]: requestStart,
-          [CM_RESPONSE_START_TIME]: responseStart,
-          [CM_RESPONSE_END_TIME]: responseEnd,
-          [CM_DOM_LOAD_TIME]: domLoaded,
-          [CM_WINDOW_LOAD_TIME]: windowLoaded,
-        };
-        if (initialSWState === 'controlled' && 'workerStart' in nt) {
-          paramOverrides[CM_WORKER_START_TIME] = Math.round(nt.workerStart);
-        }
-        log.send('event', paramOverrides);
-      }
-    }
-  }
+    log.send('event', paramOverrides);
+  });
 };
 
 /**

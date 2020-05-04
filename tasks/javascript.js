@@ -109,7 +109,12 @@ const manualChunks = (id) => {
     // The directory name following the last `node_modules`.
     // Usually this is the package, but it could also be the scope.
     const directories = id.split(path.sep);
-    return directories[directories.lastIndexOf('node_modules') + 1];
+    const chunk = directories[directories.lastIndexOf('node_modules') + 1];
+
+    if (chunk.startsWith('workbox-')) {
+      return 'workbox';
+    }
+    return chunk;
   }
 };
 

@@ -7,7 +7,7 @@ import {Logger} from './Logger';
 
 /* global CD_BREAKPOINT */ // 'cd1'
 /* global CD_PIXEL_DENSITY */ // 'cd2'
-/* global CD_HIT_SOURCE */ // 'cd4'
+/* global CD_HIT_META */ // 'cd4'
 /* global CD_EFFECTIVE_CONNECTION_TYPE */ // 'cd5'
 /* global CD_SERVICE_WORKER_STATE */ // 'cd9'
 /* global CD_WINDOW_ID */ // 'cd11'
@@ -31,13 +31,12 @@ import {Logger} from './Logger';
 /* global CM_CLS */ // 'cm14',
 /* global CM_CLS_SAMPLE */ // 'cm15',
 
-
 /**
  * Bump this when making backwards incompatible changes to the tracking
  * implementation. This allows you to create a segment or view filter
  * that isolates only data captured with the most recent tracking changes.
  */
-const TRACKING_VERSION = '63';
+const TRACKING_VERSION = '64';
 
 export const log = new Logger((params, state) => {
   params[CD_HIT_TIME] = state.time;
@@ -78,7 +77,7 @@ export const init = async () => {
 
   trackErrors();
 
-  log.send('pageview', {[CD_HIT_SOURCE]: 'navigation'});
+  log.send('pageview', {[CD_HIT_META]: 'navigation'});
 
   trackCLS();
   trackFCP();
@@ -139,12 +138,13 @@ const trackErrors = () => {
 };
 
 const trackCLS = async () => {
-  getCLS(({name, delta}) => {
+  getCLS(({name, delta, id}) => {
     const cls = Math.round(delta * 1000);
 
     log.send('event', {
       ec: 'Web Vitals',
       ea: name,
+      el: id,
       ev: cls,
       ni: '1',
       [CM_CLS]: cls,
@@ -154,12 +154,13 @@ const trackCLS = async () => {
 };
 
 const trackFCP = async () => {
-  getFCP(({name, delta}) => {
+  getFCP(({name, delta, id}) => {
     const fcp = Math.round(delta);
 
     log.send('event', {
       ec: 'Web Vitals',
       ea: name,
+      el: id,
       ev: fcp,
       ni: '1',
       [CM_FCP]: fcp,
@@ -169,15 +170,16 @@ const trackFCP = async () => {
 };
 
 const trackFID = async () => {
-  getFID(({name, delta, entries}) => {
+  getFID(({name, delta, entries, id}) => {
     const fid = Math.round(delta);
 
     log.send('event', {
       ec: 'Web Vitals',
       ea: name,
-      el: entries[0].name,
+      el: id,
       ev: fid,
       ni: '1',
+      [CD_HIT_META]: entries[0].name,
       [CM_FID]: fid,
       [CM_FID_SAMPLE]: 1,
     });
@@ -185,16 +187,17 @@ const trackFID = async () => {
 };
 
 const trackLCP = async () => {
-  getLCP(({name, delta, entries}) => {
+  getLCP(({name, delta, entries, id}) => {
     const {element} = entries[entries.length - 1];
     const lcp = Math.round(delta);
 
     log.send('event', {
       ec: 'Web Vitals',
       ea: name,
-      el: getElementSelector(element),
+      el: id,
       ev: lcp,
       ni: '1',
+      [CD_HIT_META]: getElementSelector(element),
       [CM_LCP]: Math.round(lcp),
       [CM_LCP_SAMPLE]: 1,
     });
@@ -202,12 +205,13 @@ const trackLCP = async () => {
 };
 
 const trackTTFB = () => {
-  getTTFB(({name, delta, entries}) => {
+  getTTFB(({name, delta, entries, id}) => {
     const ttfb = Math.round(delta);
     const navEntry = entries[0];
     const paramOverrides = {
       ec: 'Web Vitals',
       ea: name,
+      el: id,
       ev: ttfb,
       ni: '1',
       [CM_NT_SAMPLE]: 1,

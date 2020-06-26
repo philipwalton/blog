@@ -14,7 +14,7 @@
       "CD_BREAKPOINT": "cd1",
       "CD_PIXEL_DENSITY": "cd2",
       "CD_SITE_VERSION": "cd3",
-      "CD_HIT_SOURCE": "cd4",
+      "CD_HIT_META": "cd4",
       "CD_EFFECTIVE_CONNECTION_TYPE": "cd5",
       "CD_METRIC_VALUE": "cd6",
       "CD_CLIENT_ID": "cd7",

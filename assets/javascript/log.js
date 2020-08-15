@@ -36,7 +36,7 @@ import {Logger} from './Logger';
  * implementation. This allows you to create a segment or view filter
  * that isolates only data captured with the most recent tracking changes.
  */
-const TRACKING_VERSION = '64';
+const TRACKING_VERSION = '65';
 
 export const log = new Logger((params, state) => {
   params[CD_HIT_TIME] = state.time;
@@ -55,6 +55,7 @@ const getElementSelector = (el) => {
   return name;
 };
 
+const originalPathname = location.pathName;
 
 /**
  * Initializes all the analytics setup. Creates trackers and sets initial
@@ -147,6 +148,7 @@ const trackCLS = async () => {
       el: id,
       ev: cls,
       ni: '1',
+      dp: originalPathname,
       [CM_CLS]: cls,
       [CM_CLS_SAMPLE]: 1,
     });
@@ -163,6 +165,7 @@ const trackFCP = async () => {
       el: id,
       ev: fcp,
       ni: '1',
+      dp: originalPathname,
       [CM_FCP]: fcp,
       [CM_FCP_SAMPLE]: 1,
     });
@@ -179,6 +182,7 @@ const trackFID = async () => {
       el: id,
       ev: fid,
       ni: '1',
+      dp: originalPathname,
       [CD_HIT_META]: entries[0].name,
       [CM_FID]: fid,
       [CM_FID_SAMPLE]: 1,
@@ -197,6 +201,7 @@ const trackLCP = async () => {
       el: id,
       ev: lcp,
       ni: '1',
+      dp: originalPathname,
       [CD_HIT_META]: getElementSelector(element),
       [CM_LCP]: Math.round(lcp),
       [CM_LCP_SAMPLE]: 1,
@@ -214,6 +219,7 @@ const trackTTFB = () => {
       el: id,
       ev: ttfb,
       ni: '1',
+      dp: originalPathname,
       [CM_NT_SAMPLE]: 1,
       [CM_REQUEST_START_TIME]: Math.round(navEntry.requestStart),
       [CM_RESPONSE_START_TIME]: ttfb,

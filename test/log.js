@@ -10,7 +10,7 @@ const cd = {
   BREAKPOINT: 'cd1',
   PIXEL_DENSITY: 'cd2',
   SITE_VERSION: 'cd3',
-  HIT_SOURCE: 'cd4',
+  HIT_META: 'cd4',
   EFFECTIVE_CONNECTION_TYPE: 'cd5',
   METRIC_VALUE: 'cd6',
   CLIENT_ID: 'cd7',

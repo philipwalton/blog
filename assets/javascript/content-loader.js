@@ -3,7 +3,7 @@ import History2 from './history2';
 import {now} from './performance';
 
 /* global CD_CACHE_HIT */
-/* global CD_HIT_SOURCE */
+/* global CD_HIT_META */
 
 
 const CONTENT_SUFFIX = '.content.html';
@@ -124,7 +124,7 @@ const trackPageview = async (pathname) => {
   const {log} = await import('./log');
 
   log.set({dp: pathname});
-  log.send('pageview', {[CD_HIT_SOURCE]: 'SPA'});
+  log.send('pageview', {[CD_HIT_META]: 'SPA'});
 };
 
 

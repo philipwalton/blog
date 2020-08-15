@@ -5,6 +5,7 @@ import {now} from './performance';
 /* global CD_CACHE_HIT */
 /* global CD_HIT_META */
 
+let history2;
 
 const CONTENT_SUFFIX = '.content.html';
 
@@ -138,13 +139,21 @@ export const loadPage = async (pathname) => {
 };
 
 /**
+ * Disables the history2 instance, which forces a full page load on the next
+ * link click.
+ */
+export const disableLoader = () => {
+  history2 && history2.disable();
+};
+
+/**
  * Initializes the dynamic, page-loading code.
  */
 export const init = () => {
-  // Only load external content via AJAX if the browser support pushState.
+  // Only load external content via fetch if the browser support pushState.
   if (!(window.history && window.history.pushState)) return;
 
-  new History2(async (state) => {
+  history2 = new History2(async (state) => {
     try {
       await loadPage(state.pathname);
       drawer.close();

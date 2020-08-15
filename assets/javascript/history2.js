@@ -28,19 +28,20 @@ export default class History2 {
       this.update({url, title, isPopState: true});
     });
 
-    delegate(document, 'click', 'a[href]', (event, delegateTarget) => {
+    this._delegate = delegate(document, 'click', 'a[href]',
+        (event, delegateTarget) => {
       // Don't load content if the user is doing anything other than a normal
       // left click to open a page in the same window.
-      if (// On mac, command clicking will open a link in a new tab. Control
-          // clicking does this on windows.
+      if (// On mac, cmd+click will open a link in a new tab.
+          // Ctrl+click does this on windows.
           event.metaKey || event.ctrlKey ||
-          // Shift clicking in Chrome/Firefox opens the link in a new window
+          // Shift+click in Chrome/Firefox opens the link in a new window
           // In Safari it adds the URL to a favorites list.
           event.shiftKey ||
-          // On Mac, clicking with the option key is used to download a resouce.
+          // On Mac, opt+click is used to download a resource.
           event.altKey ||
           // Middle mouse button clicks (which == 2) are used to open a link
-          // in a new tab, and right clicks (which == 3) on Firefox trigger
+          // in a new tab, and right clicks (which == 3) on Firefox triggers
           // a click event.
           event.which > 1) return;
 
@@ -53,7 +54,7 @@ export default class History2 {
       if (link.href == page.href) event.preventDefault();
 
       // If the clicked link is on the same site but has a different path,
-      // prevent the browser from navigating there and load the page via ajax.
+      // prevent the browser from navigating there and load the page manually.
       if ((link.origin == page.origin) && (link.pathname != page.pathname)) {
         event.preventDefault();
         this.update({
@@ -61,6 +62,14 @@ export default class History2 {
         });
       }
     });
+  }
+
+  /**
+   * Removes the delegated event listener, effectively disabling all
+   * fetch loads.
+   */
+  disable() {
+    this._delegate.destroy();
   }
 
   /**

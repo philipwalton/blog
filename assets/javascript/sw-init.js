@@ -1,6 +1,7 @@
 import {Workbox} from 'workbox-window/Workbox.mjs';
 import {loadPage} from './content-loader';
 import {initialSWState} from './sw-state';
+import {disableLoader} from './content-loader';
 
 /* global CD_SITE_VERSION */
 /* global CD_CACHE_HIT */
@@ -107,10 +108,16 @@ const processMetadata = (payload = {}) => {
 };
 
 
-const addFirstInstalledListener = () => {
+const addInstallListener = () => {
   wb.addEventListener('installed', (event) => {
     // `isUpdate` means this is not the first install.
-    if (!event.isUpdate) {
+    if (event.isUpdate) {
+      // Any time there's a SW update we want to disable SPA loads, since
+      // a SW update means the code running on this page may be out of date
+      // and we want the user to update as soon as they can.
+      disableLoader();
+    } else {
+      // On the first install, send a list of URLs to cache to the SW.
       const urlsToCache = [
         location.href,
         ...performance.getEntriesByType('resource').map((r) => r.name),
@@ -221,7 +228,7 @@ export const init = async () => {
   wb = new Workbox('/sw.js');
 
   addNavigationReportListener();
-  addFirstInstalledListener();
+  addInstallListener();
   addCacheUpdateListener();
   addSWUpdateListener();
 

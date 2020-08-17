@@ -36,7 +36,7 @@ import {Logger} from './Logger';
  * implementation. This allows you to create a segment or view filter
  * that isolates only data captured with the most recent tracking changes.
  */
-const TRACKING_VERSION = '65';
+const TRACKING_VERSION = '66';
 
 export const log = new Logger((params, state) => {
   params[CD_HIT_TIME] = state.time;
@@ -55,7 +55,7 @@ const getElementSelector = (el) => {
   return name;
 };
 
-const originalPathname = location.pathName;
+const originalPathname = location.pathname;
 
 /**
  * Initializes all the analytics setup. Creates trackers and sets initial

@@ -1,29 +1,13 @@
 const fs = require('fs-extra');
 const assert = require('assert').strict;
 const {initBook} = require('../tasks/utils/book');
+const {dimensions} = require('../function/log');
 
 let articles;
 let pages;
 
 const LOG_FILE = 'beacons.log';
-const cd = {
-  BREAKPOINT: 'cd1',
-  PIXEL_DENSITY: 'cd2',
-  SITE_VERSION: 'cd3',
-  HIT_META: 'cd4',
-  EFFECTIVE_CONNECTION_TYPE: 'cd5',
-  METRIC_VALUE: 'cd6',
-  CLIENT_ID: 'cd7',
-  SERVICE_WORKER_REPLAY: 'cd8',
-  SERVICE_WORKER_STATE: 'cd9',
-  CACHE_HIT: 'cd10',
-  WINDOW_ID: 'cd11',
-  VISIBILITY_STATE: 'cd12',
-  HIT_TYPE: 'cd13',
-  HIT_ID: 'cd14',
-  HIT_TIME: 'cd15',
-  TRACKING_VERSION: 'cd16',
-};
+
 
 describe('analytics', function() {
   before(async () => {
@@ -55,7 +39,7 @@ describe('analytics', function() {
       assert.strictEqual(beacon.get('v'), '1');
       assert.strictEqual(beacon.get('tid'), 'UA-21292978-1');
 
-      assert(beacon.get(cd.HIT_ID).match(
+      assert(beacon.get(dimensions.CD_HIT_ID).match(
           /\w{8}-\w{4}-4\w{3}-[89aAbB]\w{3}-\w{12}/));
 
       assert(beacon.get('uip').length > 0);
@@ -63,10 +47,10 @@ describe('analytics', function() {
       assert.strictEqual(beacon.get('ht'), null);
       assert(beacon.get('qt').match(/\d+/));
 
-      assert.strictEqual(beacon.get(cd.HIT_TYPE), beacon.get('t'));
+      assert.strictEqual(beacon.get(dimensions.CD_HIT_TYPE), beacon.get('t'));
 
       // // Ensure all custom dimensions have a value
-      for (const param of Object.values(cd)) {
+      for (const param of Object.values(dimensions)) {
         assert.notStrictEqual(beacon.get(param), null);
       }
 

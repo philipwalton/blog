@@ -62,7 +62,12 @@ const initTemplates = () => {
   const inlineCache = {};
   env.addFilter('inline', catchAndLogErrors((fileURL) => {
     if (!inlineCache[fileURL]) {
-      const assetPath = path.join(config.publicDir, fileURL.slice(1));
+      // Inline from node_modules with the `npm:` prefix,
+      // otherwise inline from the build directory.
+      const assetPath = fileURL.startsWith('npm:') ?
+          require.resolve(fileURL.slice(4)) :
+          path.join(config.publicDir, fileURL.slice(1));
+
       inlineCache[fileURL] = fs.readFileSync(assetPath, 'utf-8');
     }
     return inlineCache[fileURL];

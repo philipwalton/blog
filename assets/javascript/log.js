@@ -1,4 +1,4 @@
-import {getCLS, getFCP, getFID, getLCP, getTTFB} from 'web-vitals';
+import {getCLS, getFCP, getFID, getLCP, getTTFB} from 'web-vitals/base';
 import {getActiveBreakpoint} from './breakpoints';
 import {initialSWState} from './sw-state';
 import {uuid} from './uuid';
@@ -14,6 +14,8 @@ import {Logger} from './Logger';
 /* global CD_VISIBILITY_STATE */ // 'cd12'
 /* global CD_HIT_TIME */ // 'cd15'
 /* global CD_TRACKING_VERSION */ // 'cd16'
+/* global CD_VISIT_ID */ // 'cd17'
+/* global CD_NAVIGATION_TYPE */ // 'cd18'
 
 /* global CM_FCP */ // 'cm1',
 /* global CM_FCP_SAMPLE */ // 'cm2',
@@ -36,13 +38,12 @@ import {Logger} from './Logger';
  * implementation. This allows you to create a segment or view filter
  * that isolates only data captured with the most recent tracking changes.
  */
-const TRACKING_VERSION = '66';
+const TRACKING_VERSION = '67';
 
 export const log = new Logger((params, state) => {
   params[CD_HIT_TIME] = state.time;
   params[CD_VISIBILITY_STATE] = state.visibilityState;
 });
-
 
 const getElementSelector = (el) => {
   let name = el.nodeName.toLowerCase();
@@ -62,29 +63,53 @@ const originalPathname = location.pathname;
  * values on the trackers.
  */
 export const init = async () => {
-  log.set({
-    [CD_BREAKPOINT]: getActiveBreakpoint().name,
-    [CD_PIXEL_DENSITY]: getPixelDensity(),
-    [CD_TRACKING_VERSION]: TRACKING_VERSION,
-    // [CD_CLIENT_ID]: log.get('cid'), // TODO: set on the server.
-    [CD_WINDOW_ID]: uuid(),
-    [CD_SERVICE_WORKER_STATE]: initialSWState,
-  });
-
-  const effectiveConnectionType = getEffectiveConnectionType();
-  if (effectiveConnectionType) {
-    log.set({[CD_EFFECTIVE_CONNECTION_TYPE]: effectiveConnectionType});
-  }
+  setInitialDimensions();
 
   trackErrors();
-
-  log.send('pageview', {[CD_HIT_META]: 'navigation'});
+  trackPageviews();
 
   trackCLS();
   trackFCP();
   trackFID();
   trackLCP();
   trackTTFB();
+};
+
+
+const setInitialDimensions = () => {
+  log.set({
+    [CD_BREAKPOINT]: getActiveBreakpoint().name,
+    [CD_PIXEL_DENSITY]: getPixelDensity(),
+    [CD_TRACKING_VERSION]: TRACKING_VERSION,
+    // [CD_CLIENT_ID]: log.get('cid'), // This is set on the server.
+    [CD_WINDOW_ID]: uuid(),
+    [CD_VISIT_ID]: uuid(),
+    [CD_SERVICE_WORKER_STATE]: initialSWState,
+  });
+
+  const navigationEntry = performance.getEntriesByType('navigation')[0];
+  if (navigationEntry) {
+    log.set({[CD_NAVIGATION_TYPE]: navigationEntry.type});
+  }
+
+  const effectiveConnectionType = getEffectiveConnectionType();
+  if (effectiveConnectionType) {
+    log.set({[CD_EFFECTIVE_CONNECTION_TYPE]: effectiveConnectionType});
+  }
+};
+
+const trackPageviews = () => {
+  log.send('pageview', {[CD_HIT_META]: 'navigation'});
+
+  addEventListener('pageshow', (event) => {
+    if (event.persisted) {
+      log.set({
+        [CD_NAVIGATION_TYPE]: 'bfcache',
+        [CD_VISIT_ID]: uuid(),
+      });
+      log.send('pageview', {[CD_HIT_META]: 'bfcache'});
+    }
+  }, true);
 };
 
 
@@ -138,20 +163,48 @@ const trackErrors = () => {
   window.addEventListener('error', trackErrorEvent);
 };
 
+
+const getRating = (value, thresholds) => {
+  if (value > thresholds[1]) {
+    return 'poor';
+  }
+  if (value > thresholds[0]) {
+    return 'ni';
+  }
+  return 'good';
+};
+
 const trackCLS = async () => {
-  getCLS(({name, delta, id}) => {
+  getCLS(({name, delta, id, entries}) => {
     const cls = Math.round(delta * 1000);
 
-    log.send('event', {
+    const eventData = {
       ec: 'Web Vitals',
       ea: name,
-      el: id,
+      el: getRating(cls, [100, 250]),
       ev: cls,
       ni: '1',
       dp: originalPathname,
       [CM_CLS]: cls,
       [CM_CLS_SAMPLE]: 1,
-    });
+    };
+
+    if (entries.length) {
+      const largestShift = entries.reduce((a, b) => {
+        return a && a.value > b.value ? a : b;
+      });
+      if (largestShift && largestShift.sources) {
+        const largestSource = largestShift.sources.reduce((a, b) => {
+          return a.node && a.previousRect.width * a.previousRect.height >
+              b.previousRect.width * b.previousRect.height ? a : b;
+        });
+        if (largestSource) {
+          eventData[CD_HIT_META] = getElementSelector(largestSource.node);
+        }
+      }
+    }
+
+    log.send('event', eventData);
   });
 };
 
@@ -162,7 +215,7 @@ const trackFCP = async () => {
     log.send('event', {
       ec: 'Web Vitals',
       ea: name,
-      el: id,
+      el: getRating(fcp, [1800, 3000]),
       ev: fcp,
       ni: '1',
       dp: originalPathname,
@@ -179,7 +232,7 @@ const trackFID = async () => {
     log.send('event', {
       ec: 'Web Vitals',
       ea: name,
-      el: id,
+      el: getRating(fid, [100, 300]),
       ev: fid,
       ni: '1',
       dp: originalPathname,
@@ -192,17 +245,17 @@ const trackFID = async () => {
 
 const trackLCP = async () => {
   getLCP(({name, delta, entries, id}) => {
-    const {element} = entries[entries.length - 1];
+    const element = entries.length && entries[entries.length - 1].element;
     const lcp = Math.round(delta);
 
     log.send('event', {
       ec: 'Web Vitals',
       ea: name,
-      el: id,
+      el: getRating(lcp, [2500, 4000]),
       ev: lcp,
       ni: '1',
       dp: originalPathname,
-      [CD_HIT_META]: getElementSelector(element),
+      [CD_HIT_META]: element ? getElementSelector(element) : '(unknown)',
       [CM_LCP]: Math.round(lcp),
       [CM_LCP_SAMPLE]: 1,
     });
@@ -216,7 +269,6 @@ const trackTTFB = () => {
     const paramOverrides = {
       ec: 'Web Vitals',
       ea: name,
-      el: id,
       ev: ttfb,
       ni: '1',
       dp: originalPathname,

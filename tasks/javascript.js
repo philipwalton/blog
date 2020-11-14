@@ -12,16 +12,17 @@ const terserRollupPlugin = require('rollup-plugin-terser').terser;
 const {addAsset} = require('./utils/assets');
 const {checkDuplicatesPlugin} = require('./utils/check-duplicates-plugin');
 const {ENV} = require('./utils/env');
+const {dimensions, metrics} = require('../functions/log');
 const config = require('../config.json');
 
 // Set global variables to be replaced in the source files.
 const globals = {
   'process.env.NODE_ENV': JSON.stringify(ENV),
 };
-for (const [key, value] of Object.entries(config.analytics.dimensions)) {
+for (const [key, value] of Object.entries(dimensions)) {
   globals[key] = JSON.stringify(value);
 }
-for (const [key, value] of Object.entries(config.analytics.metrics)) {
+for (const [key, value] of Object.entries(metrics)) {
   globals[key] = JSON.stringify(value);
 }
 

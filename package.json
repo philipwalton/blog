@@ -61,7 +61,7 @@
     "gulp": "^4.0.2",
     "gzip-size": "^5.1.1",
     "he": "~1.2.0",
-    "highlight.js": "^9.18.1",
+    "highlight.js": "^10.1.2",
     "html-minifier": "^4.0.0",
     "husky": "^4.0.0",
     "idlize": "^0.1.1",

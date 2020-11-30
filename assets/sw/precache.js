@@ -6,7 +6,9 @@ import {CacheFirst} from 'workbox-strategies/CacheFirst.mjs';
 import {cacheNames} from './caches.js';
 
 
-const pc = new PrecacheController(cacheNames.SHELL);
+const pc = new PrecacheController({
+  cacheName: cacheNames.SHELL,
+});
 
 const precacheMatcher = ({url}) => {
   return Boolean(pc.getCacheKeyForURL(url.href));
@@ -27,8 +29,8 @@ export const createPrecacheRoute = () => {
   return new Route(precacheMatcher, precacheHandler);
 };
 
-export const install = (opts) => pc.install(opts);
-export const activate = (opts) => pc.activate(opts);
+export const install = pc.install;
+export const activate = pc.activate;
 
 export const init = () => {
   pc.addToCacheList(__PRECACHE_MANIFEST__);

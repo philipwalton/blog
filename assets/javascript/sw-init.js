@@ -109,7 +109,7 @@ const processMetadata = (payload = {}) => {
 
 
 /**
- * Forces a page reload when the backgrounds the tab without closing it.
+ * Forces a page reload when the user backgrounds the tab without closing it.
  */
 const forceReloadOnHidden = () => {
   const reloadOnHidden = () => {

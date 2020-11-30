@@ -4,10 +4,10 @@ const gulp = require('gulp');
 const gzipSize = require('gzip-size');
 const path = require('path');
 const {rollup} = require('rollup');
-const babel = require('rollup-plugin-babel');
-const commonjs = require('rollup-plugin-commonjs');
-const resolve = require('rollup-plugin-node-resolve');
-const replace = require('rollup-plugin-replace');
+const {babel} = require('@rollup/plugin-babel');
+const commonjs = require('@rollup/plugin-commonjs');
+const {nodeResolve} = require('@rollup/plugin-node-resolve');
+const replace = require('@rollup/plugin-replace');
 const terserRollupPlugin = require('rollup-plugin-terser').terser;
 const {addAsset} = require('./utils/assets');
 const {checkDuplicatesPlugin} = require('./utils/check-duplicates-plugin');
@@ -123,7 +123,7 @@ let moduleBundleCache;
 
 const compileModuleBundle = async () => {
   const plugins = [
-    resolve(),
+    nodeResolve(),
     commonjs(),
     replace(globals),
     checkDuplicatesPlugin(),
@@ -142,8 +142,9 @@ const compileModuleBundle = async () => {
     plugins,
     manualChunks,
     preserveSymlinks: true, // Needed for `file:` entries in package.json.
+    preserveEntrySignatures: false,
     treeshake: {
-      pureExternalModules: true,
+      moduleSideEffects: 'no-external',
     },
   });
 
@@ -164,7 +165,7 @@ let nomoduleBundleCache;
 
 const compileClassicBundle = async () => {
   const plugins = [
-    resolve(),
+    nodeResolve(),
     commonjs(),
     replace(globals),
     babel({
@@ -172,6 +173,7 @@ const compileClassicBundle = async () => {
         /core-js/,
         /regenerator-runtime/,
       ],
+      babelHelpers: 'bundled',
       presets: [['@babel/preset-env', {
         targets: {browsers: ['ie 11']},
         useBuiltIns: 'usage',

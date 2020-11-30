@@ -1,7 +1,7 @@
 const fs = require('fs-extra');
 const assert = require('assert').strict;
 const {initBook} = require('../tasks/utils/book');
-const {dimensions} = require('../function/log');
+const {dimensions} = require('../functions/log');
 
 let articles;
 let pages;

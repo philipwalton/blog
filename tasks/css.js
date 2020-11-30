@@ -4,7 +4,7 @@ const gulp = require('gulp');
 const path = require('path');
 const postcss = require('postcss');
 const atImport = require('postcss-import');
-const cssnext = require('postcss-cssnext');
+const postcssPresetEnv = require('postcss-preset-env');
 const {generateRevisionedAsset} = require('./utils/assets');
 const {ENV} = require('./utils/env');
 
@@ -14,13 +14,11 @@ const compileCss = async (srcPath) => {
 
   const plugins = [
     atImport(),
-    cssnext({
+    postcssPresetEnv({
+      stage: 0,
       browsers: ENV === 'development' ? 'last 2 Chrome versions' : 'defaults',
       features: {
-        customProperties: {
-          warnings: true,
-          preserve: true,
-        },
+        'system-ui-font-family': false,
       },
     }),
   ];

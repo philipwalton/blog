@@ -6,8 +6,8 @@ const gulp = require('gulp');
 const path = require('path');
 const revHash = require('rev-hash');
 const {rollup} = require('rollup');
-const replace = require('rollup-plugin-replace');
-const resolve = require('rollup-plugin-node-resolve');
+const replace = require('@rollup/plugin-replace');
+const {nodeResolve} = require('@rollup/plugin-node-resolve');
 const terserRollupPlugin = require('rollup-plugin-terser').terser;
 const {checkDuplicatesPlugin} = require('./utils/check-duplicates-plugin');
 const {ENV} = require('./utils/env');
@@ -38,7 +38,15 @@ gulp.task('sw', async () => {
     }
 
     const plugins = [
-      resolve(),
+      {
+        resolveId(source, importer) {
+          // Use a custom strategy for precaching.
+          if (source.match(/PrecacheStrategy\.m?js/)) {
+            return path.resolve('./assets/sw/strategies/PrecacheStrategy.js');
+          }
+        },
+      },
+      nodeResolve(),
       replace({
         'process.env.NODE_ENV': JSON.stringify(ENV),
         '__VERSION__': JSON.stringify(version),

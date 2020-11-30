@@ -14,7 +14,7 @@ addEventListener('install', (event) => {
   skipWaiting();
 
   const installComplete = async () => {
-    await precache.install({event});
+    await precache.install(event);
     metadataChanges = await getAndUpdateMetadata();
   };
   event.waitUntil(installComplete());
@@ -38,7 +38,7 @@ addEventListener('activate', (event) => {
     // Run these in parallel so any one of them erroring won't prevent the
     // other ones from finishing.
     await Promise.all([
-      precache.activate({event}),
+      precache.activate(event),
       deleteUnusedCaches(),
     ]);
   };

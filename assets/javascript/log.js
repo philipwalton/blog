@@ -38,24 +38,30 @@ import {Logger} from './Logger';
  * implementation. This allows you to create a segment or view filter
  * that isolates only data captured with the most recent tracking changes.
  */
-const TRACKING_VERSION = '67';
+const TRACKING_VERSION = '68';
 
 export const log = new Logger((params, state) => {
   params[CD_HIT_TIME] = state.time;
   params[CD_VISIBILITY_STATE] = state.visibilityState;
 });
 
-const getElementSelector = (el) => {
-  let name = el.nodeName.toLowerCase();
-  if (el.id) {
-    name += `#${el.id}`;
+const getNodePath = (node) => {
+  try {
+    let name = node.nodeName.toLowerCase();
+    if (name === 'body') {
+      return 'html>body';
+    }
+    if (node.id) {
+      return `${name}#${node.id}`;
+    }
+    if (node.className && node.className.length) {
+      name += `.${[...node.classList.values()].join('.')}`;
+    }
+    return `${getNodePath(node.parentElement)}>${name}`;
+  } catch (error) {
+    return '(error)';
   }
-  if (el.className) {
-    name += `.${el.className.trim().split(/\s/)[0]}`;
-  }
-  return name;
 };
-
 const originalPathname = location.pathname;
 
 /**
@@ -199,7 +205,7 @@ const trackCLS = async () => {
               b.previousRect.width * b.previousRect.height ? a : b;
         });
         if (largestSource) {
-          eventData[CD_HIT_META] = getElementSelector(largestSource.node);
+          eventData[CD_HIT_META] = getNodePath(largestSource.node);
         }
       }
     }
@@ -225,9 +231,11 @@ const trackFCP = async () => {
   });
 };
 
+
 const trackFID = async () => {
   getFID(({name, delta, entries, id}) => {
     const fid = Math.round(delta);
+    const entry = entries[0];
 
     log.send('event', {
       ec: 'Web Vitals',
@@ -236,7 +244,8 @@ const trackFID = async () => {
       ev: fid,
       ni: '1',
       dp: originalPathname,
-      [CD_HIT_META]: entries[0].name,
+      [CD_HIT_META]: entry ?
+          `${entry.name}(${getNodePath(entry.target)})` : '(unknown)',
       [CM_FID]: fid,
       [CM_FID_SAMPLE]: 1,
     });
@@ -255,7 +264,7 @@ const trackLCP = async () => {
       ev: lcp,
       ni: '1',
       dp: originalPathname,
-      [CD_HIT_META]: element ? getElementSelector(element) : '(unknown)',
+      [CD_HIT_META]: element ? getNodePath(element) : '(unknown)',
       [CM_LCP]: Math.round(lcp),
       [CM_LCP_SAMPLE]: 1,
     });

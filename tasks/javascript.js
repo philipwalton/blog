@@ -12,7 +12,7 @@ const terserRollupPlugin = require('rollup-plugin-terser').terser;
 const {addAsset} = require('./utils/assets');
 const {checkDuplicatesPlugin} = require('./utils/check-duplicates-plugin');
 const {ENV} = require('./utils/env');
-const {dimensions, metrics} = require('../functions/log');
+const {dimensions, metrics} = require('../functions/constants');
 const config = require('../config.json');
 
 // Set global variables to be replaced in the source files.

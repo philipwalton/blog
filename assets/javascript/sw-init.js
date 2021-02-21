@@ -3,9 +3,6 @@ import {loadPage} from './content-loader';
 import {initialSWState} from './sw-state';
 import {disableLoader} from './content-loader';
 
-/* global CD_SITE_VERSION */
-/* global CD_CACHE_HIT */
-
 
 // Defining a Workbox instance has no side effects, so it's OK to do it
 // here in the top-level scope.
@@ -37,21 +34,20 @@ const setSiteVersionOrTimeout = async () => {
   const {version} = await new Promise((resolve) => {
     // Uncontrolled pages won't have a version.
     if (initialSWState !== 'controlled') {
-      resolve({version: null});
+      resolve({version: '(none)'});
     }
 
     wb.messageSW({type: 'GET_METADATA'}).then(resolve);
-
-    setTimeout(() => resolve({version: null}), MESSAGE_TIMEOUT);
+    setTimeout(() => resolve({version: '(unknown)'}), MESSAGE_TIMEOUT);
   });
 
   if (version !== null) {
-    log.set({[CD_SITE_VERSION]: version});
+    log.set({site_version: version});
   }
 };
 
 
-const setNavigationCacheOrTimeout = async () => {
+const setContentSourceOrTimeout = async () => {
   const {log} = await import('./log');
 
   // Before sending any perf data, determine whether the page was served
@@ -67,8 +63,10 @@ const setNavigationCacheOrTimeout = async () => {
     }
   });
 
-  if (cacheHit !== null) {
-    log.set({[CD_CACHE_HIT]: String(cacheHit)});
+  if (cacheHit === null) {
+    log.set({content_source: '(unknown)'});
+  } else {
+    log.set({content_source: cacheHit ? 'cache' : 'network'});
   }
 };
 
@@ -119,7 +117,7 @@ const forceReloadOnHidden = () => {
     }
   };
   addEventListener('visibilitychange', reloadOnHidden, true);
-  addEventListener('pagehide', () => {
+  addEventListener('pagehide', (event) => {
     if (!event.persisted) {
       removeEventListener('visibilitychange', reloadOnHidden, true);
     }
@@ -166,11 +164,8 @@ const addCacheUpdateListener = () => {
       loadPage(updatedURL);
 
       const {log} = await import('./log');
-      log.send('event', {
-        ec: 'Service Worker',
-        ea: 'cache-update',
-        el: updatedURL,
-        ni: '1',
+      log.event('sw_cache_update', {
+        updated_url: updatedURL,
       });
     }
   });
@@ -195,22 +190,16 @@ const addSWUpdateListener = () => {
         timeSinceNewVersionDeployed,
       } = processMetadata(data.payload);
 
-      const sendEvent = (ec, ea) => {
+      const sendEvent = (name) => {
         const params = {
-          ec,
-          ea,
-          ev: timeSinceNewVersionDeployed || 0,
-          ni: '1',
+          value: timeSinceNewVersionDeployed || 0,
+          old_version: oldVersion || '(unknown)',
+          new_version: newVersion || '(unknown)',
         };
-
-        if (newVersion) {
-          params.el = `${oldVersion || '(not set)'} => ${newVersion}`;
-        }
-
-        log.send('event', params);
+        log.event(name, params);
       };
 
-      sendEvent('Service Worker', 'sw-update');
+      sendEvent('sw_update');
 
       // If this is an update from a brand new SW installation, or if there
       // wasn't a major version change, log that it happened but don't notify
@@ -230,14 +219,14 @@ const addSWUpdateListener = () => {
           body: 'A newer version of this site is available.',
           action: 'Reload',
           onAction: async () => {
-            sendEvent('Messages', 'sw-update-reload');
+            sendEvent('sw_update_reload');
             setTimeout(() => location.reload(), 0);
           },
           onDismiss: () => {
-            sendEvent('Messages', 'sw-update-dismiss');
+            sendEvent('sw_update_dismiss');
           },
         });
-        sendEvent('Messages', 'sw-update-notify');
+        sendEvent('sw_update_notify');
       }
     }
   });
@@ -256,7 +245,7 @@ export const init = async () => {
 
   const {log} = await import('./log');
   log.awaitBeforeSending(setSiteVersionOrTimeout());
-  log.awaitBeforeSending(setNavigationCacheOrTimeout());
+  log.awaitBeforeSending(setContentSourceOrTimeout());
 
   // Calling register must happen after all presend dependencies get added.
   await wb.register();

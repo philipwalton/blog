@@ -1,9 +1,7 @@
 import * as drawer from './drawer';
 import History2 from './history2';
-import {now} from './performance';
+import {now} from './utils/performance';
 
-/* global CD_CACHE_HIT */
-/* global CD_HIT_META */
 
 let history2;
 
@@ -24,14 +22,14 @@ const getContentPartialPath = (pagePath) => {
  * takes. If the content is already in the page cache, do not make an
  * unnecessary fetch request. If an error occurs making the request, show
  * an alert to the user.
- * @param {string} path The page path to load.
+ * @param {string} pathname The page path to load.
  * @return {!Promise} A promise that fulfills with the HTML content of a
  *    page or rejects with the network error.
  */
-const fetchPageContent = async (path) => {
+const fetchPageContent = async (pathname) => {
   try {
     const responseStartTime = now();
-    const response = await fetch(getContentPartialPath(path));
+    const response = await fetch(getContentPartialPath(pathname));
 
     let content;
     if (response.ok) {
@@ -43,15 +41,11 @@ const fetchPageContent = async (path) => {
     const cacheHit = Boolean(response.headers.get('X-Cache-Hit'));
 
     import('./log').then(({log}) => {
-      log.set({[CD_CACHE_HIT]: String(cacheHit)});
-      log.send('event', {
-        dp: path,
-        ec: 'SPA',
-        ea: 'fetch',
-        el: cacheHit ? 'cache' : 'network',
-        ev: Math.round(responseDuration),
-        ni: '1',
+      log.set({
+        page_path: pathname,
+        content_source: cacheHit ? 'cache' : 'network',
       });
+      log.event('route_transition', {value: responseDuration});
     });
 
     return content;
@@ -124,8 +118,8 @@ const setScroll = (hash) => {
 const trackPageview = async (pathname) => {
   const {log} = await import('./log');
 
-  log.set({dp: pathname});
-  log.send('pageview', {[CD_HIT_META]: 'SPA'});
+  log.set({page_path: pathname});
+  log.event('page_view', {navigation_type: 'route_change'});
 };
 
 

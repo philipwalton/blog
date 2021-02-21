@@ -1,7 +1,164 @@
-import {IdleQueue} from 'idlize/IdleQueue.mjs';
 import {parseUrl} from 'dom-utils';
-import {get, set} from './kv-store';
-import {uuid} from './uuid';
+import {getActiveBreakpoint} from './breakpoints';
+import {initialSWState} from './sw-state';
+import {get, set} from './utils/kv-store';
+import {timeOrigin} from './utils/performance';
+import {round} from './utils/round.js';
+import {uuid} from './utils/uuid';
+
+
+// Bump this version any time the cloud function logic changes
+// in a backward-incompatible way.
+const LOG_VERSION = 2;
+
+
+const SEND_TIMEOUT = 5000;
+
+/**
+ * A class to manage building and sending analytics hits to the `/log` route.
+ */
+export class Logger {
+  /**
+   * @param {function(Object):void} hitFilter
+   */
+  constructor(hitFilter) {
+    this._hitFilter = hitFilter;
+    this._presendDependencies = [];
+    this._eventQueue = [];
+
+    this._pageParams = {
+      dl: location.href,
+      dt: document.title,
+      de: document.characterSet,
+      ul: navigator.language.toLowerCase(),
+      vp: `${innerWidth}x${innerHeight}`,
+      sr: `${screen.width}x${screen.height}`,
+      sd: `${screen.colorDepth}-bit`,
+      dr: getReferrer(),
+    };
+
+    this._userParams = prefixParams('u', {
+      breakpoint: getActiveBreakpoint().name,
+      effective_connection_type: getEffectiveConnectionType(),
+      pixel_density: getPixelDensity(),
+      service_worker_state: initialSWState,
+    });
+
+    // Add the initial values known at instantiation time.
+    this._eventParams = {
+      page_path: location.pathname,
+    };
+
+    this.awaitBeforeSending(this._setClientId());
+
+    onHiddenOrUnload(() => {
+      this._documentUnloading = true;
+      this._send();
+    });
+  }
+
+  /**
+   * @param {Promise} promise
+   */
+  awaitBeforeSending(promise) {
+    this._presendDependencies.push(promise);
+  }
+
+  /**
+   * @param {Object} params
+   */
+  set(params) {
+    Object.assign(this._eventParams, params);
+  }
+
+  /**
+   * @param {string} hitType
+   * @param {Object} paramOverrides
+   * @return {Promise<void>}
+   */
+  async event(eventName, paramOverrides = {}) {
+    if (this._presendDependencies.length) {
+      await Promise.all(this._presendDependencies);
+      this._presendDependencies = [];
+    }
+
+    const params = {...this._eventParams, ...paramOverrides};
+    if (this._hitFilter) {
+      Object.assign(params, this._hitFilter(params));
+    }
+
+    this._eventQueue.push({
+      en: eventName,
+      ...prefixParams('e', params),
+    });
+
+    if (this._documentUnloading) {
+      this._send();
+    } else {
+      this._sendTimeout = setTimeout(() => this._send(), SEND_TIMEOUT);
+    }
+  }
+
+  /**
+   * Sends all queued event data to the log endpoint and resets the queue.
+   */
+  async _send() {
+    clearTimeout(this._sendTimeout);
+    if (this._eventQueue.length > 0) {
+      const path = [
+        `/log?v=${LOG_VERSION}`,
+        toQueryString(this._pageParams),
+        toQueryString(this._userParams),
+      ].join('&');
+
+      const body = this._eventQueue.map((ep) => toQueryString(ep)).join('\n');
+
+      // Use `navigator.sendBeacon()` if available, with a fallback to `fetch()`
+      (navigator.sendBeacon && navigator.sendBeacon(path, body)) ||
+          fetch(path, {body, method: 'POST', keepalive: true});
+
+      this._eventQueue = [];
+    }
+  }
+
+  /**
+   * @return {Promise<void>}
+   */
+  async _setClientId() {
+    this._pageParams.cid = await getOrCreateClientId();
+  }
+}
+
+/**
+ * Accepts a letter prefix and an object of param/value pairs and returns a
+ * new object where every param is prefixed with `_p.` or `_pn.` (for number
+ * values).
+ * @param {string} initialLetter
+ * @param {Object} unprefixedParams
+ * @return {Object}
+ */
+function prefixParams(initialLetter, unprefixedParams) {
+  const prefixedParams = {};
+  for (const [key, value] of Object.entries(unprefixedParams)) {
+    const prefix = initialLetter + (typeof value === 'number' ? 'pn.' : 'p.');
+    prefixedParams[prefix + key] =
+        typeof value === 'number' ? round(value, 3) : value;
+  }
+  return prefixedParams;
+}
+
+
+/**
+ * Accepts and object of param/value pairs and returns a query string
+ * representation of the object with all values URL-encoded.
+ * @param {Object} params
+ * @return {string}
+ */
+function toQueryString(params) {
+  return Object.keys(params).map((key) => {
+    return `${key}=${encodeURIComponent(params[key])}`;
+  }).join('&');
+}
 
 
 /**
@@ -9,9 +166,9 @@ import {uuid} from './uuid';
  */
 async function getOrCreateClientId() {
   try {
-    return await get('clientId') || await set('clientId', uuid());
+    return await get('clientId') || await set('clientId', uuid(timeOrigin));
   } catch (error) {
-    return uuid();
+    return uuid(timeOrigin);
   }
 }
 
@@ -28,92 +185,47 @@ function getReferrer() {
 }
 
 /**
- * A class to manage building and sending analytics hits to the `/log` route.
+ * Gets the effective connection type information if available.
+ * @return {string}
  */
-export class Logger {
-  /**
-   * @param {function(Object):void} hitFilter
-   */
-  constructor(hitFilter) {
-    this._hitFilter = hitFilter;
-    this._presendDependencies = [];
-    this._queue = new IdleQueue({
-      defaultMinTaskTime: 40, // Only run if there's lots of time left.
-      ensureTasksRun: true,
-    });
+function getEffectiveConnectionType() {
+  return navigator.connection &&
+      navigator.connection.effectiveType || '(unknown)';
+}
 
-    // Add the initial values known at instantiation time.
-    this._params = {
-      dl: location.href,
-      dp: location.pathname,
-      dt: document.title,
-      de: document.characterSet,
-      ul: navigator.language.toLowerCase(),
-      vp: `${innerWidth}x${innerHeight}`,
-      sr: `${screen.width}x${screen.height}`,
-      sd: `${screen.colorDepth}-bit`,
-      dr: getReferrer(),
-    };
-
-    this.awaitBeforeSending(this._setClientId());
+/**
+ * Returns the currently-active pixel density.
+ * @return {string}
+ */
+function getPixelDensity() {
+  const densities = [
+    ['1x', 'all'],
+    ['1.5x', '(-webkit-min-device-pixel-ratio: 1.5),(min-resolution: 144dpi)'],
+    ['2x', '(-webkit-min-device-pixel-ratio: 2),(min-resolution: 192dpi)'],
+  ];
+  let activeDensity;
+  for (const [density, query] of densities) {
+    if (window.matchMedia(query).matches) {
+      activeDensity = density;
+    }
   }
+  return activeDensity;
+}
 
-  /**
-   * @param {Promise} promise
-   */
-  awaitBeforeSending(promise) {
-    this._presendDependencies.push(promise);
-  }
 
-  /**
-   * @param {Object} params
-   */
-  set(params) {
-    Object.assign(this._params, params);
-  }
-
-  /**
-   * @param {string} hitType
-   * @param {Object} paramOverrides
-   * @return {Promise<void>}
-   */
-  async send(hitType, paramOverrides = {}) {
-    await Promise.all(this._presendDependencies);
-    this._presendDependencies = [];
-
-    this._queue.pushTask((state) => {
-      const data = Object.assign({
-        t: hitType,
-        ht: state.time || Date.now(),
-      }, this._params, paramOverrides);
-
-      if (this._hitFilter) {
-        this._hitFilter(data, state);
-      }
-
-      const body = Object.keys(data).map((key) => {
-        return `${key}=${encodeURIComponent(data[key])}`;
-      }).join('&');
-
-      if (process.env.NODE_ENV !== 'production') {
-        // Log hits in development.
-        if (data.t === 'event') {
-          console.log(data.t, data.ec, data.ea, data.ev, data.el, data);
-        } else {
-          console.log(data.t, data);
-        }
-      }
-
-      // Use `navigator.sendBeacon()` if available, with a fallback to `fetch()`
-      (navigator.sendBeacon && navigator.sendBeacon('/log', body)) ||
-          fetch('/log', {body, method: 'POST', keepalive: true});
-    });
-  }
-
-  /**
-   * @return {Promise<void>}
-   */
-  async _setClientId() {
-    this._params.cid = await getOrCreateClientId();
-  }
+/**
+ * Adds an event listener for the passed callback to run anytime the
+ * page is backgrounded or unloaded.
+ * @param {*} callback
+ */
+function onHiddenOrUnload(callback) {
+  addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') {
+      callback();
+    }
+  });
+  // TODO: add this once web-vitals switches to use `pagehide` as well.
+  // addEventListener('pagehide', () => {
+  //   callback();
+  // });
 }

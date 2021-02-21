@@ -4,6 +4,9 @@
 # Node stuff
 node_modules
 
+# VSCode
+.vscode
+
 # Static site output
 build
 

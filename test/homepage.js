@@ -38,7 +38,7 @@ describe('The home page', () => {
   it('should have the right title', async () => {
     const actualTitle = await browser.getTitle();
     const expectedTitle = pages[0].title + site.titleSuffix;
-    assert.equal(actualTitle, expectedTitle);
+    assert.strictEqual(actualTitle, expectedTitle);
   });
 
   it('should contain working links to all published articles', async () => {
@@ -49,16 +49,17 @@ describe('The home page', () => {
       const link = await $(`.ArticleList-item:nth-last-child(${i}) a`);
 
       const headingTitle = await heading.getText();
-      assert.equal(headingTitle, article.title);
+      assert.strictEqual(headingTitle, article.title);
 
       const linkHref = await link.getAttribute('href');
-      assert.equal(new URL(linkHref, site.baseUrl).pathname, article.path);
+      assert.strictEqual(
+          new URL(linkHref, site.baseUrl).pathname, article.path);
 
       await link.click();
       await browser.waitUntil(urlMatches(article.path));
 
       const pageTitle = await browser.getTitle();
-      assert.equal(pageTitle, article.title + site.titleSuffix);
+      assert.strictEqual(pageTitle, article.title + site.titleSuffix);
 
       if (article !== lastArticle) {
         const homepageLink = await $('a[href="/"]');
@@ -78,13 +79,14 @@ describe('The home page', () => {
     for (let i = 1, page; page = contentPages[i-1]; i++) {
       const pageLink = await $(`.Header a[title="${page.title}"]`);
       const pageLinkHref = await pageLink.getAttribute('href');
-      assert.equal(new URL(pageLinkHref, site.baseUrl).pathname, page.path);
+      assert.strictEqual(
+          new URL(pageLinkHref, site.baseUrl).pathname, page.path);
 
       await pageLink.click();
       await browser.waitUntil(urlMatches(page.path));
 
       const pageTitle = await browser.getTitle();
-      assert.equal(pageTitle, page.title + site.titleSuffix);
+      assert.strictEqual(pageTitle, page.title + site.titleSuffix);
     }
   });
 });

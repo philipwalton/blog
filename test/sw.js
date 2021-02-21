@@ -17,7 +17,7 @@ describe('Service Worker', () => {
     await waitUntilControlling();
 
     const message = await $('.Message');
-    assert.equal(await message.isExisting(), false);
+    assert.strictEqual(await message.isExisting(), false);
   });
 
   it(`should show an update notice if the major version in the SW changes`, async () => {
@@ -69,7 +69,7 @@ describe('Service Worker', () => {
     await browser.pause(1000);
 
     const message = await $('.Message');
-    assert.equal(await message.isExisting(), false);
+    assert.strictEqual(await message.isExisting(), false);
   });
 });
 

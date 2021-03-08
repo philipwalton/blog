@@ -8,7 +8,6 @@ import {disableLoader} from './content-loader';
 // here in the top-level scope.
 let wb;
 
-
 const MESSAGE_TIMEOUT = 5000;
 
 
@@ -38,7 +37,7 @@ const setSiteVersionOrTimeout = async () => {
     }
 
     wb.messageSW({type: 'GET_METADATA'}).then(resolve);
-    setTimeout(() => resolve({version: '(unknown)'}), MESSAGE_TIMEOUT);
+    setTimeout(() => resolve({version: '(not set)'}), MESSAGE_TIMEOUT);
   });
 
   if (version !== null) {
@@ -64,7 +63,7 @@ const setContentSourceOrTimeout = async () => {
   });
 
   if (cacheHit === null) {
-    log.set({content_source: '(unknown)'});
+    log.set({content_source: '(not set)'});
   } else {
     log.set({content_source: cacheHit ? 'cache' : 'network'});
   }
@@ -193,8 +192,8 @@ const addSWUpdateListener = () => {
       const sendEvent = (name) => {
         const params = {
           value: timeSinceNewVersionDeployed || 0,
-          old_version: oldVersion || '(unknown)',
-          new_version: newVersion || '(unknown)',
+          old_version: oldVersion || '(not set)',
+          new_version: newVersion || '(not set)',
         };
         log.event(name, params);
       };

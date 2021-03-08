@@ -10,7 +10,7 @@ import {uuid} from './utils/uuid';
  * implementation. This allows you to create a segment or view filter
  * that isolates only data captured with the most recent tracking changes.
  */
-const TRACKING_VERSION = 69;
+const TRACKING_VERSION = 70;
 
 /**
  * A 13-digit, random identifier for the current page.
@@ -20,29 +20,30 @@ const TRACKING_VERSION = 69;
  */
 const PAGE_ID = uuid(timeOrigin);
 
+const originalPathname = location.pathname;
+
 export const log = new Logger(() => ({
   page_time: now(),
   visibility_state: document.visibilityState,
 }));
 
-const getNodePath = (node) => {
+const getSelector = (node, max = 100) => {
+  let sel = '';
   try {
-    let name = node.nodeName.toLowerCase();
-    if (name === 'body') {
-      return 'html>body';
+    while (node && node.nodeType !== 9) {
+      const part = node.nodeName.toLowerCase() + (node.id ?
+          '#' + node.id : (node.className && node.className.length) ?
+          '.' + Array.from(node.classList.values()).join('.') : '');
+      if (sel.length + part.length > max - 1) return sel || part;
+      sel = sel ? part + '>' + sel : part;
+      if (node.id) break;
+      node = node.parentNode;
     }
-    if (node.id) {
-      return `${name}#${node.id}`;
-    }
-    if (node.className && node.className.length) {
-      name += `.${[...node.classList.values()].join('.')}`;
-    }
-    return `${getNodePath(node.parentElement)}>${name}`;
-  } catch (error) {
-    return '(error)';
+  } catch (err) {
+    // Do nothing...
   }
+  return sel;
 };
-const originalPathname = location.pathname;
 
 /**
  * Initializes all the analytics setup. Creates trackers and sets initial
@@ -161,6 +162,7 @@ const trackCLS = async () => {
       metric_rating: getRating(value, [0.1, 0.25]),
       metric_value: value,
       metric_delta: delta,
+      debug_target: '(not set)', // May be overridden below.
     };
 
     if (entries.length) {
@@ -173,7 +175,7 @@ const trackCLS = async () => {
               b.previousRect.width * b.previousRect.height ? a : b;
         });
         if (largestSource) {
-          eventData.debug_target = getNodePath(largestSource.node);
+          eventData.debug_target = getSelector(largestSource.node);
         }
       }
     }
@@ -203,8 +205,8 @@ const trackFID = async () => {
       metric_rating: getRating(value, [100, 300]),
       metric_value: value,
       metric_delta: delta,
-      debug_target: entry ? getNodePath(entry.target) : '(unknown)',
-      debug_event: entry ? entry.name : '(unknown)',
+      debug_target: entry ? getSelector(entry.target) : '(not set)',
+      debug_event: entry ? entry.name : '(not set)',
     });
   });
 };
@@ -218,7 +220,7 @@ const trackLCP = async () => {
       metric_rating: getRating(value, [2500, 4000]),
       metric_value: value,
       metric_delta: delta,
-      debug_target: element ? getNodePath(element) : '(unknown)',
+      debug_target: element ? getSelector(element) : '(not set)',
     });
   });
 };

@@ -1,6 +1,5 @@
 const fs = require('fs-extra');
 const path = require('path');
-const yaml = require('js-yaml');
 const config = require('../../config.json');
 
 
@@ -48,7 +47,7 @@ const getPartialPath = (pathname) => {
 
 
 const initBook = async () => {
-  const book = yaml.safeLoad(await fs.readFile('./book.yaml', 'utf-8'));
+  const book = await fs.readJSON('./book.json');
 
   for (const page of book.pages) {
     page.template = getTemplate(page.path);

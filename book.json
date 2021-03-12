@@ -1,0 +1,289 @@
+{
+   "site": {
+      "title": "Philip Walton",
+      "titleSuffix": " — Philip Walton",
+      "slug": "philipwalton",
+      "themeColor": "#ffffff",
+      "backgroundColor": "#ffffff",
+      "description": "Thoughts on web development, open source, software architecture, and the future.",
+      "baseUrl": "https://philipwalton.com"
+   },
+   "pages": [
+      {
+         "title": "Home",
+         "path": "/"
+      },
+      {
+         "title": "Articles",
+         "path": "/articles/"
+      },
+      {
+         "title": "About",
+         "path": "/about/"
+      },
+      {
+         "title": "Page Not Found",
+         "path": "/404.html",
+         "private": true
+      }
+   ],
+   "resources": [
+      {
+         "title": "RSS Feed",
+         "path": "/atom.xml"
+      },
+      {
+         "title": "Web Manifest",
+         "path": "/manifest.json"
+      }
+   ],
+   "articles": [
+      {
+         "title": "CSS Architecture",
+         "path": "/articles/css-architecture/",
+         "date": "2012-11-17T02:04:25.000Z",
+         "excerpt": "To many Web developers, being good at CSS means you can take a visual mock-up and replicate it perfectly in code. You don't use tables, and you pride yourself on using as few images as possible. If you're really good, you use the latest and greatest techniques like media queries, transitions and transforms. While all this is certainly true of good CSS developers, there's an entirely separate side to CSS that rarely gets mentioned when assessing one's skill.",
+         "translations": {
+            "中文": "https://www.zfanw.com/blog/css-architecture.html"
+         }
+      },
+      {
+         "title": "What No One Told You About Z-Index",
+         "path": "/articles/what-no-one-told-you-about-z-index/",
+         "date": "2013-01-15T19:17:39.000Z",
+         "translations": {
+            "français": "https://iamvdo.me/blog/comprendre-z-index-et-les-contextes-dempilement"
+         }
+      },
+      {
+         "title": "The Future of OOCSS: A Proposal",
+         "path": "/articles/the-future-of-oocss-a-proposal/",
+         "date": "2013-01-17T19:02:16.000Z"
+      },
+      {
+         "title": "Defending Presentational Class Names",
+         "path": "/articles/defending-presentational-class-names/",
+         "date": "2013-01-24T16:57:01.000Z"
+      },
+      {
+         "title": "Dynamic Selectors",
+         "path": "/articles/dynamic-selectors/",
+         "date": "2013-02-20T22:22:24.000Z"
+      },
+      {
+         "title": "CSS: Everything is Global and How to Deal With It",
+         "path": "/articles/css-everything-is-global-and-how-to-deal-with-it/",
+         "date": "2013-03-26T03:21:57.000Z"
+      },
+      {
+         "title": "Introducing HTML Inspector",
+         "path": "/articles/introducing-html-inspector/",
+         "date": "2013-06-11T15:22:52.000Z"
+      },
+      {
+         "title": "How to Unit Test Private Functions in JavaScript",
+         "path": "/articles/how-to-unit-test-private-functions-in-javascript/",
+         "date": "2013-07-09T06:28:18.000Z",
+         "excerpt": "JavaScript's closures provide an excellent way to make variables and functions private, keeping them out of the global scope. This is particularly important in the browser because all scripts share the same scope, and it's quite easy to inadvertently pick a variable or function name used by another library."
+      },
+      {
+         "title": "Why I Test Private Functions In JavaScript",
+         "path": "/articles/why-i-test-private-functions-in-javascript/",
+         "date": "2013-07-17T15:47:00.000Z"
+      },
+      {
+         "title": "Decoupling Your HTML, CSS, and JavaScript",
+         "path": "/articles/decoupling-html-css-and-javascript/",
+         "date": "2013-08-18T19:39:09.000Z"
+      },
+      {
+         "title": "Solved by Flexbox",
+         "path": "/articles/solved-by-flexbox/",
+         "date": "2013-10-04T05:59:16.000Z"
+      },
+      {
+         "title": "Interviewing as a Front-End Engineer in San Francisco",
+         "path": "/articles/interviewing-as-a-front-end-engineer-in-san-francisco/",
+         "date": "2013-12-24T21:25:12.000Z"
+      },
+      {
+         "title": "How to Find Qualified Developers",
+         "path": "/articles/how-to-find-qualified-developers/",
+         "date": "2014-01-20T21:51:26.000Z"
+      },
+      {
+         "title": "Implementing Private and Protected Members in JavaScript",
+         "path": "/articles/implementing-private-and-protected-members-in-javascript/",
+         "date": "2014-04-10T03:59:27.000Z"
+      },
+      {
+         "title": "Stop Copying Social Code Snippets",
+         "path": "/articles/stop-copying-social-code-snippets/",
+         "date": "2014-04-20T23:17:32.000Z"
+      },
+      {
+         "title": "The Dangers of Stopping Event Propagation",
+         "path": "/articles/the-dangers-of-stopping-event-propagation/",
+         "date": "2014-05-20T13:32:55.000Z"
+      },
+      {
+         "title": "Measuring Your Site's Responsive Breakpoint Usage",
+         "path": "/articles/measuring-your-sites-responsive-breakpoint-usage/",
+         "date": "2014-12-23T06:38:36.000Z",
+         "translations": {
+            "Português": "https://imasters.com.br/analytics/medindo-o-uso-do-breakpoint-responsivo-de-um-site/"
+         }
+      },
+      {
+         "title": "Normalizing Cross-browser Flexbox Bugs",
+         "path": "/articles/normalizing-cross-browser-flexbox-bugs/",
+         "date": "2015-01-05T01:44:38.000Z",
+         "excerpt": "Way back in September of 2013, while testing my Solved by Flexbox project, I discovered a bug in Internet Explorer 10 and 11 that was preventing my sticky footer from actually sticking to the bottom of the page. I spent some time trying to work around the issue, but all my attempts failed.",
+         "translations": {
+            "Português": "https://imasters.com.br/front-end/css/normalizando-bugs-no-flexbox-em-diversos-navegadores/"
+         }
+      },
+      {
+         "title": "Side Effects in CSS",
+         "path": "/articles/side-effects-in-css/",
+         "date": "2015-03-04T05:25:06.000Z",
+         "translations": {
+            "Português": "https://imasters.com.br/front-end/css/efeitos-colaterais-no-css/"
+         }
+      },
+      {
+         "title": "Extending Styles",
+         "path": "/articles/extending-styles/",
+         "date": "2015-05-20T19:34:57.000Z",
+         "translations": {
+            "Português": "https://imasters.com.br/front-end/css/estendendo-estilos/"
+         }
+      },
+      {
+         "title": "How to Become a Great Front-End Engineer",
+         "path": "/articles/how-to-become-a-great-front-end-engineer/",
+         "date": "2015-08-02T22:39:17.000Z",
+         "translations": {
+            "한국어": "https://hyunseob.github.io/2016/02/21/how-to-become-a-great-frontend-engineer/"
+         }
+      },
+      {
+         "title": "Do We Actually Need Specificity In CSS?",
+         "path": "/articles/do-we-actually-need-specificity-in-css/",
+         "date": "2015-11-01T22:37:42.000Z",
+         "translations": {
+            "日本語": "http://postd.cc/do-we-actually-need-specificity-in-css/",
+            "Português": "https://imasters.com.br/desenvolvimento/sera-que-realmente-precisamos-da-especificidade-no-css/"
+         }
+      },
+      {
+         "title": "Why I'm Excited About Native CSS Variables",
+         "path": "/articles/why-im-excited-about-native-css-variables/",
+         "date": "2015-12-06T20:43:53.000Z",
+         "translations": {
+            "français": "https://terkel.github.io/why-im-excited-about-native-css-variables/"
+         }
+      },
+      {
+         "title": "Houdini: Maybe the Most Exciting Development in CSS You've Never Heard Of",
+         "path": "/articles/houdini-maybe-the-most-exciting-development-in-css-youve-never-heard-of/",
+         "date": "2016-03-24T22:43:07.000Z",
+         "translations": {
+            "中文": "https://zhuanlan.zhihu.com/p/20939640"
+         }
+      },
+      {
+         "title": "Learning How to Set Up Automated, Cross-browser JavaScript Unit Testing",
+         "path": "/articles/learning-how-to-set-up-automated-cross-browser-javascript-unit-testing/",
+         "date": "2016-07-11T06:48:41.000Z"
+      },
+      {
+         "title": "Untangling Deeply-Nested Promise Chains",
+         "path": "/articles/untangling-deeply-nested-promise-chains/",
+         "date": "2016-08-17T14:53:31.000Z"
+      },
+      {
+         "title": "Loading Polyfills Only When Needed",
+         "path": "/articles/loading-polyfills-only-when-needed/",
+         "date": "2016-09-27T22:41:26.000Z"
+      },
+      {
+         "title": "The Dark Side of Polyfilling CSS",
+         "path": "/articles/the-dark-side-of-polyfilling-css/",
+         "date": "2016-12-22T18:18:08.000Z"
+      },
+      {
+         "title": "The Google Analytics Setup I Use on Every Site I Build",
+         "path": "/articles/the-google-analytics-setup-i-use-on-every-site-i-build/",
+         "date": "2017-02-08T18:45:45.000Z"
+      },
+      {
+         "title": "How We Track Pageviews Is All Wrong",
+         "path": "/articles/how-we-track-pageviews-is-all-wrong/",
+         "date": "2017-04-11T17:46:25.000Z",
+         "translations": {
+            "русский": "https://web.archive.org/web/20190412205654/http://softdroid.net/kak-my-otslezhivaem-prosmotry-stranic"
+         }
+      },
+      {
+         "title": "Deploying ES2015+ Code in Production Today",
+         "path": "/articles/deploying-es2015-code-in-production-today/",
+         "date": "2017-09-13T19:23:12.000Z",
+         "translations": {
+            "中文": "https://jdc.jd.com/archives/4911"
+         }
+      },
+      {
+         "title": "Why Web Developers Need to Care about Interactivity",
+         "path": "/articles/why-web-developers-need-to-care-about-interactivity/",
+         "date": "2017-12-19T17:25:23.000Z",
+         "translations": {
+            "français": "https://frank.taillandier.me/2017/12/21/pourquoi-les-developpeurs-web-doivent-se-soucier-de-l-interactivite/"
+         }
+      },
+      {
+         "title": "Responsive Components: a Solution to the Container Queries Problem",
+         "path": "/articles/responsive-components-a-solution-to-the-container-queries-problem/",
+         "date": "2018-02-27T08:12:12.000Z",
+         "translations": {
+            "русский": "http://css-live.ru/javascript/otzyvchivye-komponenty-reshenie-problemy-vyrazhenij-ot-kontejnera.html",
+            "Português": "http://desenvolvimentoparaweb.com/css/responsive-components-container-queries/"
+         }
+      },
+      {
+         "title": "First Input Delay",
+         "path": "/articles/first-input-delay/",
+         "date": "2018-05-10T19:15:30.000Z"
+      },
+      {
+         "title": "Page Lifecycle API",
+         "path": "/articles/page-lifecycle-api/",
+         "date": "2018-07-24T18:41:57.000Z"
+      },
+      {
+         "title": "Idle Until Urgent",
+         "path": "/articles/idle-until-urgent/",
+         "date": "2018-09-20T07:25:36.000Z"
+      },
+      {
+         "title": "KV Storage: the Web's First Built-in Module",
+         "path": "/articles/kv-storage-the-webs-first-built-in-module/",
+         "date": "2019-03-12T05:27:02.000Z"
+      },
+      {
+         "title": "Using Native JavaScript Modules in Production Today",
+         "path": "/articles/using-native-javascript-modules-in-production-today/",
+         "date": "2019-08-20T07:20:17.000Z"
+      },
+      {
+         "title": "Cascading Cache Invalidation",
+         "path": "/articles/cascading-cache-invalidation/",
+         "date": "2019-10-09T08:26:44.000Z"
+      },
+      {
+         "title": "Smaller HTML Payloads with Service Workers",
+         "path": "/articles/smaller-html-payloads-with-service-workers/",
+         "date": "2020-01-07T08:02:37.000Z"
+      }
+   ]
+}

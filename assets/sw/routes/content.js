@@ -1,5 +1,5 @@
 import {BroadcastUpdatePlugin} from 'workbox-broadcast-update/BroadcastUpdatePlugin.mjs';
-import {resultingClientExists} from 'workbox-core/_private/resultingClientExists';
+import {resultingClientExists} from 'workbox-core/_private/resultingClientExists.mjs';
 import {copyResponse} from 'workbox-core/copyResponse.mjs';
 import {Route} from 'workbox-routing/Route.mjs';
 import {StaleWhileRevalidate} from 'workbox-strategies/StaleWhileRevalidate.mjs';
@@ -52,10 +52,14 @@ const navigationReportPlugin = {
 const addCacheHeadersPlugin = {
   // Add the `X-Cache-Date` header for requests going to the cache
   async cacheWillUpdate({response}) {
-    return copyResponse(response, (responseInit) => {
-      responseInit.headers.set('X-Cache-Date', new Date().toUTCString());
-      return responseInit;
-    });
+    if (response.url &&
+        response.ok &&
+        response.status < 400) {
+      return copyResponse(response, (responseInit) => {
+        responseInit.headers.set('X-Cache-Date', new Date().toUTCString());
+        return responseInit;
+      });
+    }
   },
 };
 

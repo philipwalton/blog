@@ -44,6 +44,11 @@ gulp.task('sw', async () => {
           if (source.match(/PrecacheStrategy\.m?js/)) {
             return path.resolve('./assets/sw/strategies/PrecacheStrategy.js');
           }
+
+          // Use the local version of workbox for now...
+          if (source.match(/^workbox-(.*)$/)) {
+            return path.resolve('../../GoogleChrome/workbox/packages/workbox-' + RegExp.$1);
+          }
         },
       },
       nodeResolve(),

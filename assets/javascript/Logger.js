@@ -4,7 +4,9 @@ import {initialSWState} from './sw-state';
 import {get, set} from './utils/kv-store';
 import {timeOrigin} from './utils/performance';
 import {round} from './utils/round.js';
+import {getVisibilityState, onHidden, onVisible} from './utils/visibility.js';
 import {uuid} from './utils/uuid';
+
 
 
 // Bump this version any time the cloud function logic changes
@@ -51,10 +53,7 @@ export class Logger {
 
     this.awaitBeforeSending(this._setClientId());
 
-    onHiddenOrUnload(() => {
-      this._documentUnloading = true;
-      this._send();
-    });
+    onHidden(() => this._send());
   }
 
   /**
@@ -92,7 +91,7 @@ export class Logger {
       ...prefixParams('e', params),
     });
 
-    if (this._documentUnloading) {
+    if (getVisibilityState() === 'hidden') {
       this._send();
     } else {
       this._sendTimeout = setTimeout(() => this._send(), SEND_TIMEOUT);
@@ -210,22 +209,4 @@ function getPixelDensity() {
     }
   }
   return activeDensity;
-}
-
-
-/**
- * Adds an event listener for the passed callback to run anytime the
- * page is backgrounded or unloaded.
- * @param {*} callback
- */
-function onHiddenOrUnload(callback) {
-  addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'hidden') {
-      callback();
-    }
-  });
-  // TODO: add this once web-vitals switches to use `pagehide` as well.
-  // addEventListener('pagehide', () => {
-  //   callback();
-  // });
 }

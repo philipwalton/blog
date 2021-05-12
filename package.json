@@ -81,7 +81,7 @@
     "node-fetch": "^2.6.1",
     "nunjucks": "^3.2.3",
     "path": "^0.12.7",
-    "postcss": "^8.2.8",
+    "postcss": "^8.2.10",
     "postcss-import": "^14.0.0",
     "postcss-preset-env": "^6.7.0",
     "postcss-url": "^10.1.1",

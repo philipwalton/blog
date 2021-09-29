@@ -1,7 +1,7 @@
-const assert = require('assert').strict;
-const {initBook} = require('../tasks/utils/book');
-const {dimensions} = require('../functions/constants');
-const {beaconsContain, clearBeacons, getBeacons} = require('./utils/beacons');
+import {strict as assert} from 'assert';
+import {initBook} from '../tasks/utils/book.js';
+import {dimensions} from '../functions/constants.js';
+import {beaconsContain, clearBeacons, getBeacons} from './utils/beacons.js';
 
 
 let articles;
@@ -187,6 +187,109 @@ describe('analytics', function() {
       v: '1',
       t: 'pageview',
       dp: pages[1].path,
+    }));
+  });
+
+  it('should invoke the v2 log function when `v=2` is set', async () => {
+    await browser.execute(function() {
+      const queryParams = [
+        'v=2',
+        'dl=http%3A%2F%2Flocalhost%3A5000%2F',
+        'dt=Home%20%E2%80%94%20Philip%20Walton',
+        'de=UTF-8',
+        'ul=en-us',
+        'vp=474x1016',
+        'sr=1792x1120',
+        'sd=30-bit',
+        'dr=',
+        'cid=1633059568188-9970492436839',
+        'up.breakpoint=sm',
+        'up.effective_connection_type=4g',
+        'up.pixel_density=2x',
+        'up.service_worker_state=controlled',
+      ].join('&');
+
+      const eventParams = [
+        'en=page_view',
+        'ep.page_path=%2F',
+        'ep.content_source=cache',
+        'epn.measurement_version=71',
+        'epn.time_origin=1633061440539.4',
+        'ep.page_id=1633061440539-3930979708627',
+        'epn.pageshow_count=1',
+        'ep.original_page_path=%2F',
+        'ep.navigation_type=reload',
+        'ep.site_version=3.6.0',
+        'epn.page_time=221.9',
+        'ep.visibility_state=hidden',
+      ].join('&');
+
+      navigator.sendBeacon('/log?' + queryParams, eventParams);
+    });
+
+    await browser.waitUntil(async () => await beaconsContain({
+      'v': '2',
+      'dl': 'http://localhost:5000/',
+      'dt': 'Home — Philip Walton',
+      'de': 'UTF-8',
+      'ul': 'en-us',
+      'vp': '474x1016',
+      'sr': '1792x1120',
+      'sd': '30-bit',
+      'dr': '',
+      'cid': '1633059568188-9970492436839',
+      'up.breakpoint': 'sm',
+      'up.effective_connection_type': '4g',
+      'up.pixel_density': '2x',
+      'up.service_worker_state': 'controlled',
+      'tid': 'G-GVKBFZ3VDY',
+      'en': 'page_view',
+      'ep.page_path': '/',
+      'ep.content_source': 'cache',
+      'epn.measurement_version': '71',
+      'epn.time_origin': '1633061440539.4',
+      'ep.page_id': '1633061440539-3930979708627',
+      'epn.pageshow_count': '1',
+      'ep.original_page_path': '/',
+      'ep.navigation_type': 'reload',
+      'ep.site_version': '3.6.0',
+      'epn.page_time': '221.9',
+      'ep.visibility_state': 'hidden',
+      '_uip': /[.:\w]+/,
+    }));
+    await browser.waitUntil(async () => await beaconsContain({
+      'v': '1',
+      'dl': 'http://localhost:5000/',
+      'dt': 'Home — Philip Walton',
+      'de': 'UTF-8',
+      'ul': 'en-us',
+      'vp': '474x1016',
+      'sr': '1792x1120',
+      'sd': '30-bit',
+      'dr': '',
+      'cid': '1633059568188-9970492436839',
+      'tid': 'UA-21292978-1',
+      't': 'pageview',
+      'dp': '/',
+      'cd14': /\w{8}-\w{4}-4\w{3}-[89aAbB]\w{3}-\w{12}/,
+      'uip': /[.:\w]+/,
+      'cd13': 'pageview',
+      'cd7': '1633059568188-9970492436839',
+      'cd1': 'sm',
+      'cd2': '2x',
+      'cd3': '3.6.0',
+      'cd4': 'cache',
+      'cd5': '4g',
+      'cd6': '(not set)',
+      'cd8': '(not set)',
+      'cd9': 'controlled',
+      'cd10': '(not set)',
+      'cd11': '1633061440539-3930979708627',
+      'cd12': 'hidden',
+      'cd15': '(not set)',
+      'cd16': '71',
+      'cd17': '1633061440539-3930979708627-1',
+      'cd18': 'reload',
     }));
   });
 

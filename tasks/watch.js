@@ -1,8 +1,8 @@
-const gulp = require('gulp');
+import gulp from 'gulp';
 
+// Ensure referenced tasks are imported.
+import './server.js';
 
-// Ensure referenced tasks are registered.
-require('./utils/server');
 
 gulp.task('watch', gulp.series('build', 'server', () => {
   gulp.watch('assets/css/**/*.css',

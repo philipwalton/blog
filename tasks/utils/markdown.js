@@ -1,28 +1,28 @@
-const he = require('he');
-const hljs = require('highlight.js');
-const MarkdownIt = require('markdown-it');
-const markdownItAnchor = require('markdown-it-anchor');
+import he from 'he';
+import hljs from 'highlight.js';
+import MarkdownIt from 'markdown-it';
+import markdownItAnchor from 'markdown-it-anchor';
 
 /**
  * Renders markdown content as HTML with syntax highlighted code blocks.
  * @param {string} content A markdown string.
  * @return {string} The rendered HTML.
  */
-const renderMarkdown = (content) => {
+export const renderMarkdown = (content) => {
   const md = new MarkdownIt({
     html: true,
     typographer: true,
-    highlight: function(code, lang) {
+    highlight: function(code, language) {
       // TODO(philipwalton): come up with a better way to do code marking.
       let mark = true;
-      if (lang.includes(':no-mark')) {
+      if (language.includes(':no-mark')) {
         mark = false;
-        lang = lang.replace(':no-mark', '');
+        language = language.replace(':no-mark', '');
       }
 
-      code = lang ? hljs.highlight(lang, code).value :
+      code = language ? hljs.highlight(code, {language}).value :
           // Since we're not using highlight.js here, we need to
-          // espace the html, but we have to unescape first in order
+          // escape the html, but we have to unescape first in order
           // to avoid double escaping.
           he.escape(he.unescape(code));
 
@@ -38,5 +38,3 @@ const renderMarkdown = (content) => {
 
   return md.render(content);
 };
-
-module.exports = {renderMarkdown};

@@ -1,1 +1,1 @@
-export {CacheFirst as PrecacheStrategy} from 'workbox-strategies/CacheFirst.mjs';
+export {CacheFirst as PrecacheStrategy} from 'workbox-strategies/CacheFirst.js';

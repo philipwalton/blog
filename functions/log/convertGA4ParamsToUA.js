@@ -1,5 +1,5 @@
-const {v4: uuid} = require('uuid');
-const {dimensions, metrics, UA_MEASUREMENT_ID} = require('../constants');
+import {v4 as uuid} from 'uuid';
+import {dimensions, metrics, UA_MEASUREMENT_ID} from '../constants.js';
 
 /**
  * @param {string} string
@@ -12,7 +12,7 @@ function round(string) {
 /**
  * @param {Object} params
  */
-function convertGA4ParamsToUA(params) {
+export function convertGA4ParamsToUA(params) {
   // Set data not specific to the client
   params.set('v', '1');
   params.set('tid', UA_MEASUREMENT_ID);
@@ -212,7 +212,3 @@ function convertGA4ParamsToUA(params) {
     }
   }
 }
-
-module.exports = {
-  convertGA4ParamsToUA,
-};

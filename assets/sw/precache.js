@@ -1,9 +1,10 @@
 /* global __PRECACHE_MANIFEST__ */
 
-import {PrecacheController} from 'workbox-precaching/PrecacheController.mjs';
-import {Route} from 'workbox-routing/Route.mjs';
-import {CacheFirst} from 'workbox-strategies/CacheFirst.mjs';
+import {PrecacheController} from 'workbox-precaching/PrecacheController.js';
+import {Route} from 'workbox-routing/Route.js';
+import {CacheFirst} from 'workbox-strategies/CacheFirst.js';
 import {cacheNames} from './caches.js';
+import {streamErrorPlugin} from './plugins/streamErrorPlugin.js';
 
 
 const pc = new PrecacheController({
@@ -14,7 +15,11 @@ const precacheMatcher = ({url}) => {
   return Boolean(pc.getCacheKeyForURL(url.href));
 };
 
-const cacheFirst = new CacheFirst({cacheName: cacheNames.SHELL});
+const cacheFirst = new CacheFirst({
+  cacheName: cacheNames.SHELL,
+  plugins: [streamErrorPlugin],
+});
+
 
 export const precacheHandler = ({request, event}) => {
   const cacheKey = pc.getCacheKeyForURL(request.url);

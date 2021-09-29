@@ -1,7 +1,8 @@
-const fs = require('fs-extra');
-const path = require('path');
-const config = require('../../config.json');
+import fs from 'fs-extra';
+import path from 'path';
 
+
+const config = fs.readJSONSync('./config.json');
 
 const getTemplate = (pathname) => {
   let templateFile;
@@ -18,7 +19,7 @@ const getTemplate = (pathname) => {
 };
 
 
-const getOutputFile = (pathname) => {
+export const getOutputFile = (pathname) => {
   if (pathname.endsWith('/')) {
     pathname += 'index.html';
   }
@@ -46,7 +47,7 @@ const getPartialPath = (pathname) => {
 };
 
 
-const initBook = async () => {
+export const initBook = async () => {
   const book = await fs.readJSON('./book.json');
 
   for (const page of book.pages) {
@@ -72,5 +73,3 @@ const initBook = async () => {
 
   return book;
 };
-
-module.exports = {getOutputFile, initBook};

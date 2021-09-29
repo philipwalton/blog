@@ -1,9 +1,9 @@
-const bodyParser = require('body-parser');
-const express = require('express');
-const morgan = require('morgan');
-const path = require('path');
-const superstatic = require('superstatic');
-const {log} = require('../../functions/log');
+import bodyParser from 'body-parser';
+import express from 'express';
+import morgan from 'morgan';
+import path from 'path';
+import superstatic from 'superstatic';
+import {log} from '../../functions/log.js';
 
 
 const PORT = 5000;
@@ -27,7 +27,7 @@ const app = express()
     // https://github.com/firebase/superstatic#superstaticoptions
     .use(superstatic());
 
-const start = async ({verbose = true} = {}) => {
+export const start = async ({verbose = true} = {}) => {
   await new Promise((resolve, reject) => {
     server = app.listen(PORT, (err) => {
       if (err) {
@@ -39,11 +39,6 @@ const start = async ({verbose = true} = {}) => {
   });
 };
 
-const stop = () => {
+export const stop = () => {
   server.close();
-};
-
-module.exports = {
-  start,
-  stop,
 };

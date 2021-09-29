@@ -1,19 +1,21 @@
-const chalk = require('chalk');
-const fs = require('fs-extra');
-const gulp = require('gulp');
-const gzipSize = require('gzip-size');
-const path = require('path');
-const {rollup} = require('rollup');
-const {babel} = require('@rollup/plugin-babel');
-const commonjs = require('@rollup/plugin-commonjs');
-const {nodeResolve} = require('@rollup/plugin-node-resolve');
-const replace = require('@rollup/plugin-replace');
-const terserRollupPlugin = require('rollup-plugin-terser').terser;
-const {addAsset} = require('./utils/assets');
-const {checkDuplicatesPlugin} = require('./utils/check-duplicates-plugin');
-const {ENV} = require('./utils/env');
-const {dimensions, metrics} = require('../functions/constants');
-const config = require('../config.json');
+import chalk from 'chalk';
+import fs from 'fs-extra';
+import gulp from 'gulp';
+import gzipSize from 'gzip-size';
+import path from 'path';
+import {rollup} from 'rollup';
+import {babel} from '@rollup/plugin-babel';
+import commonjs from '@rollup/plugin-commonjs';
+import {nodeResolve} from '@rollup/plugin-node-resolve';
+import replace from '@rollup/plugin-replace';
+import {terser as terserRollupPlugin} from 'rollup-plugin-terser';
+import {addAsset} from './utils/assets.js';
+import {checkDuplicatesPlugin} from './utils/check-duplicates-plugin.js';
+import {ENV} from './utils/env.js';
+import {dimensions, metrics} from '../functions/constants.js';
+
+
+const config = fs.readJSONSync('./config.json');
 
 // Set global variables to be replaced in the source files.
 const globals = {
@@ -128,7 +130,10 @@ const compileModuleBundle = async () => {
   const plugins = [
     nodeResolve(),
     commonjs(),
-    replace(globals),
+    replace({
+      values: globals,
+      preventAssignment: true,
+    }),
     checkDuplicatesPlugin(),
     modulepreloadPlugin(),
     reportBundleSizePlugin(),
@@ -170,7 +175,10 @@ const compileClassicBundle = async () => {
   const plugins = [
     nodeResolve(),
     commonjs(),
-    replace(globals),
+    replace({
+      values: globals,
+      preventAssignment: true,
+    }),
     babel({
       exclude: [
         /core-js/,

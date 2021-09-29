@@ -1,4 +1,4 @@
-import {Router} from 'workbox-routing/Router.mjs';
+import {Router} from 'workbox-routing/Router.js';
 import {createPrecacheRoute} from './precache.js';
 import {createContentRoute} from './routes/content.js';
 import {createPagesRoute} from './routes/pages.js';

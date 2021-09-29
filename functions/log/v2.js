@@ -1,14 +1,14 @@
-const fs = require('fs');
-const fetch = require('node-fetch');
-const {convertGA4ParamsToUA} = require('./convertGA4ParamsToUA');
-const {GA4_MEASUREMENT_ID} = require('../constants');
+import fs from 'fs';
+import fetch from 'node-fetch';
+import {convertGA4ParamsToUA} from './convertGA4ParamsToUA.js';
+import {GA4_MEASUREMENT_ID} from '../constants.js';
 
 
 /**
  *
  * @param {Object} request
  */
-async function log(request) {
+export async function v2(request) {
   const queryParams = new URLSearchParams(request.query);
 
   queryParams.set('tid', GA4_MEASUREMENT_ID);
@@ -63,7 +63,3 @@ async function log(request) {
     }
   }
 }
-
-module.exports = {
-  log,
-};

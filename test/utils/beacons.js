@@ -1,5 +1,5 @@
-const fs = require('fs-extra');
-const assert = require('assert').strict;
+import {strict as assert} from 'assert';
+import fs from 'fs-extra';
 
 
 const LOG_FILE = 'beacons.log';
@@ -9,13 +9,15 @@ const LOG_FILE = 'beacons.log';
  * @return {Promise<boolean>} True if the params are found in any one of the
  *     beacons.
  */
-async function beaconsContain(params) {
+export async function beaconsContain(params) {
   const beacons = await getBeacons();
 
   for (const beacon of beacons) {
     const paramsToCheck = new Set(Object.keys(params));
     for (const param of paramsToCheck) {
-      if (beacon.get(param) === params[param]) {
+      const value = params[param];
+      if (value === beacon.get(param) ||
+          value instanceof RegExp && value.test(beacon.get(param))) {
         paramsToCheck.delete(param);
       }
     }
@@ -30,7 +32,7 @@ async function beaconsContain(params) {
  * Gets the array of beacons sent for the current page load.
  * @return {Promise<Array>}
  */
-async function getBeacons() {
+export async function getBeacons() {
   await fs.ensureFile(LOG_FILE);
   const log = await fs.readFile(LOG_FILE, 'utf-8');
 
@@ -65,12 +67,6 @@ async function getBeacons() {
  * Clears the array of beacons on the page.
  * @return {Promise<void>}
  */
-async function clearBeacons() {
+export async function clearBeacons() {
   await fs.remove(LOG_FILE);
 }
-
-module.exports = {
-  beaconsContain,
-  getBeacons,
-  clearBeacons,
-};

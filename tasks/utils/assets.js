@@ -1,12 +1,11 @@
-const fs = require('fs-extra');
-const path = require('path');
-const revHash = require('rev-hash');
-const revPath = require('rev-path');
-const config = require('../../config');
+import fs from 'fs-extra';
+import path from 'path';
+import revHash from 'rev-hash';
+import revPath from 'rev-path';
 
 
+const config = fs.readJSONSync('./config.json');
 let manifest;
-
 
 const ensureManifest = () => {
   if (!manifest) {
@@ -17,26 +16,26 @@ const ensureManifest = () => {
 };
 
 
-const getManifest = () => {
+export const getManifest = () => {
   ensureManifest();
   return manifest;
 };
 
 
-const saveManifest = () => {
+export const saveManifest = () => {
   fs.outputJsonSync(
       path.join(config.publicDir, config.manifestFileName),
       manifest, {spaces: 2});
 };
 
 
-const resetManifest = () => {
+export const resetManifest = () => {
   manifest = {};
   saveManifest();
 };
 
 
-const getAsset = (filename) => {
+export const getAsset = (filename) => {
   ensureManifest();
 
   if (!manifest[filename]) {
@@ -47,7 +46,7 @@ const getAsset = (filename) => {
 };
 
 
-const addAsset = (filename, revisionedFilename) => {
+export const addAsset = (filename, revisionedFilename) => {
   ensureManifest();
 
   manifest[filename] = revisionedFilename;
@@ -56,12 +55,12 @@ const addAsset = (filename, revisionedFilename) => {
 };
 
 
-const getRevisionedAssetUrl = (filename) => {
+export const getRevisionedAssetUrl = (filename) => {
   return path.join(config.publicStaticPath, getAsset(filename) || filename);
 };
 
 
-const generateRevisionedAsset = (filename, content) => {
+export const generateRevisionedAsset = (filename, content) => {
   const hash = revHash(content);
   const revisionedFilename = revPath(filename, hash);
 
@@ -70,14 +69,4 @@ const generateRevisionedAsset = (filename, content) => {
 
   fs.outputFileSync(
       path.join(config.publicStaticDir, revisionedFilename), content);
-};
-
-module.exports = {
-  getManifest,
-  saveManifest,
-  resetManifest,
-  getAsset,
-  addAsset,
-  getRevisionedAssetUrl,
-  generateRevisionedAsset,
 };

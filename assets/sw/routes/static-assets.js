@@ -1,6 +1,6 @@
-import {ExpirationPlugin} from 'workbox-expiration/ExpirationPlugin.mjs';
-import {Route} from 'workbox-routing/Route.mjs';
-import {CacheFirst} from 'workbox-strategies/CacheFirst.mjs';
+import {ExpirationPlugin} from 'workbox-expiration/ExpirationPlugin.js';
+import {Route} from 'workbox-routing/Route.js';
+import {CacheFirst} from 'workbox-strategies/CacheFirst.js';
 import {cacheNames} from '../caches.js';
 
 const staticAssetsMatcher = ({url}) => {

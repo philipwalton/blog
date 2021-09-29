@@ -1,4 +1,4 @@
-const {initBook} = require('../tasks/utils/book');
+import {initBook} from '../tasks/utils/book.js';
 
 
 let site;

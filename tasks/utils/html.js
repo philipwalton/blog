@@ -1,5 +1,5 @@
-const htmlMinifier = require('html-minifier');
-const {ENV} = require('./env');
+import htmlMinifier from 'html-minifier';
+import {ENV} from './env.js';
 
 
 const minifyHtml = (html) => {
@@ -19,8 +19,6 @@ const minifyHtml = (html) => {
 };
 
 
-const processHtml = (html) => {
+export const processHtml = (html) => {
   return ENV === 'development' ? html : minifyHtml(html);
 };
-
-module.exports = {processHtml};

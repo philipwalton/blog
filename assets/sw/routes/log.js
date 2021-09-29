@@ -1,6 +1,6 @@
-import {Route} from 'workbox-routing/Route.mjs';
-import {NetworkOnly} from 'workbox-strategies/NetworkOnly.mjs';
-import {BackgroundSyncPlugin} from 'workbox-background-sync/BackgroundSyncPlugin.mjs';
+import {Route} from 'workbox-routing/Route.js';
+import {NetworkOnly} from 'workbox-strategies/NetworkOnly.js';
+import {BackgroundSyncPlugin} from 'workbox-background-sync/BackgroundSyncPlugin.js';
 
 
 const logMatcher = ({url}) => {

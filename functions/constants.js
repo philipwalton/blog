@@ -1,4 +1,4 @@
-const dimensions = {
+export const dimensions = {
   CD_BREAKPOINT: 'cd1',
   CD_PIXEL_DENSITY: 'cd2',
   CD_SITE_VERSION: 'cd3',
@@ -19,7 +19,7 @@ const dimensions = {
   CD_NAVIGATION_TYPE: 'cd18',
 };
 
-const metrics = {
+export const metrics = {
   CM_FCP: 'cm1',
   CM_FCP_SAMPLE: 'cm2',
   CM_NT_SAMPLE: 'cm3',
@@ -37,12 +37,5 @@ const metrics = {
   CM_CLS_SAMPLE: 'cm15',
 };
 
-const GA4_MEASUREMENT_ID = 'G-GVKBFZ3VDY';
-const UA_MEASUREMENT_ID = 'UA-21292978-1';
-
-module.exports = {
-  dimensions,
-  metrics,
-  GA4_MEASUREMENT_ID,
-  UA_MEASUREMENT_ID,
-};
+export const GA4_MEASUREMENT_ID = 'G-GVKBFZ3VDY';
+export const UA_MEASUREMENT_ID = 'UA-21292978-1';

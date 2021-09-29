@@ -1,11 +1,14 @@
-const fs = require('fs-extra');
-const he = require('he');
-const jsesc = require('jsesc');
-const moment = require('moment-timezone');
-const nunjucks = require('nunjucks');
-const path = require('path');
-const {getRevisionedAssetUrl} = require('./assets');
-const config = require('../../config.json');
+import fs from 'fs-extra';
+import he from 'he';
+import jsesc from 'jsesc';
+import moment from 'moment-timezone';
+import nunjucks from 'nunjucks';
+import path from 'path';
+import resolve from 'resolve';
+import {getRevisionedAssetUrl} from './assets.js';
+
+
+const config = fs.readJSONSync('./config.json');
 
 /**
  * Nunjucks silently catches errors, which can make debugging incredibly hard.
@@ -26,7 +29,7 @@ const catchAndLogErrors = (fn) => {
 };
 
 
-const initTemplates = () => {
+export const initTemplates = () => {
   const modulepreload = fs.readJsonSync(
       path.join(config.publicDir, 'modulepreload.json'));
 
@@ -65,7 +68,7 @@ const initTemplates = () => {
       // Inline from node_modules with the `npm:` prefix,
       // otherwise inline from the build directory.
       const assetPath = fileURL.startsWith('npm:') ?
-          require.resolve(fileURL.slice(4)) :
+          resolve.sync(fileURL.slice(4)) :
           path.join(config.publicDir, fileURL.slice(1));
 
       inlineCache[fileURL] = fs.readFileSync(assetPath, 'utf-8');
@@ -73,5 +76,3 @@ const initTemplates = () => {
     return inlineCache[fileURL];
   }));
 };
-
-module.exports = {initTemplates};

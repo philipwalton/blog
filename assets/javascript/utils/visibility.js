@@ -1,11 +1,5 @@
-// Managing separately is required until the following bug (currently fixed)
-// is actually released in Safari stable (currently only in STP):
-// https://bugs.webkit.org/show_bug.cgi?id=151234
-let visibilityState = document.visibilityState;
-
 const calledHiddenListeners = new Set();
 const calledVisibleListeners = new Set();
-
 
 /**
  * Adds an event listener for the passed callback to run anytime the
@@ -14,15 +8,12 @@ const calledVisibleListeners = new Set();
  */
 export function onHidden(callback, opts = {}) {
   const listener = (event) => {
-    console.log(event);
-
     if (!calledHiddenListeners.has(listener) &&
         (event.type === 'pagehide' || document.visibilityState === 'hidden')) {
       calledVisibleListeners.clear();
       calledHiddenListeners.add(listener);
 
-      visibilityState = 'hidden';
-      callback();
+      callback(event);
 
       if (opts.once) {
         document.removeEventListener('visibilitychange', listener, opts);
@@ -45,8 +36,7 @@ export function onVisible(callback, opts = {}) {
       calledHiddenListeners.clear();
       calledVisibleListeners.add(listener);
 
-      visibilityState = 'visible';
-      callback();
+      callback(event);
 
       if (opts.once) {
         document.removeEventListener('visibilitychange', listener, opts);
@@ -56,11 +46,4 @@ export function onVisible(callback, opts = {}) {
   }
   document.addEventListener('visibilitychange', listener, opts);
   window.addEventListener('pageshow', listener, opts);
-}
-
-/**
- * @return {sting}
- */
-export function getVisibilityState() {
-  return visibilityState;
 }

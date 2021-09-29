@@ -4,17 +4,21 @@ import {initialSWState} from './sw-state';
 import {get, set} from './utils/kv-store';
 import {timeOrigin} from './utils/performance';
 import {round} from './utils/round.js';
-import {getVisibilityState, onHidden, onVisible} from './utils/visibility.js';
+import {onHidden, onVisible} from './utils/visibility.js';
 import {uuid} from './utils/uuid';
-
 
 
 // Bump this version any time the cloud function logic changes
 // in a backward-incompatible way.
-const LOG_VERSION = 2;
+const LOG_VERSION = 3;
 
 
 const SEND_TIMEOUT = 5000;
+
+// Managing separately is required until the following bug (currently fixed)
+// is actually released in Safari stable (currently only in STP):
+// https://bugs.webkit.org/show_bug.cgi?id=151234
+let visibilityState;
 
 /**
  * A class to manage building and sending analytics hits to the `/log` route.
@@ -52,6 +56,12 @@ export class Logger {
     };
 
     this.awaitBeforeSending(this._setClientId());
+
+    if (!visibilityState) {
+      visibilityState = document.visibilityState;
+      onHidden(() => visibilityState = 'hidden');
+      onVisible(() => visibilityState = 'visible');
+    }
 
     onHidden(() => this._send());
   }
@@ -91,7 +101,7 @@ export class Logger {
       ...prefixParams('e', params),
     });
 
-    if (getVisibilityState() === 'hidden') {
+    if (visibilityState === 'hidden') {
       this._send();
     } else {
       this._sendTimeout = setTimeout(() => this._send(), SEND_TIMEOUT);
@@ -104,13 +114,11 @@ export class Logger {
   async _send() {
     clearTimeout(this._sendTimeout);
     if (this._eventQueue.length > 0) {
-      const path = [
-        `/log?v=${LOG_VERSION}`,
-        toQueryString(this._pageParams),
-        toQueryString(this._userParams),
-      ].join('&');
-
-      const body = this._eventQueue.map((ep) => toQueryString(ep)).join('\n');
+      const path = `/log?v=${LOG_VERSION}`;
+      const body =
+          toQueryString(this._pageParams) + '&' +
+          toQueryString(this._userParams) + '\n' +
+          this._eventQueue.map((ep) => toQueryString(ep)).join('\n');
 
       // Use `navigator.sendBeacon()` if available, with a fallback to `fetch()`
       (navigator.sendBeacon && navigator.sendBeacon(path, body)) ||

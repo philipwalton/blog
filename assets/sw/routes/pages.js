@@ -1,5 +1,5 @@
-import {Route} from 'workbox-routing/Route.mjs';
-import {strategy as streamsStrategy} from 'workbox-streams/strategy.mjs';
+import {Route} from 'workbox-routing/Route.js';
+import {strategy as streamsStrategy} from 'workbox-streams/strategy.js';
 import {contentStrategy} from './content.js';
 import {precacheHandler} from '../precache.js';
 

@@ -9,7 +9,7 @@
  *
  * @param {Array<string>} modulePaths
  */
-const checkModuleDuplicates = (modulePaths) => {
+export const checkModuleDuplicates = (modulePaths) => {
   const NODE_MODULES = 'node_modules';
   const moduleIds = {};
   for (const modulePath of modulePaths) {
@@ -39,7 +39,7 @@ const checkModuleDuplicates = (modulePaths) => {
  * https://github.com/rollup/rollup/issues/3060#issuecomment-522719783
  * @return {Object}
  */
-const checkDuplicatesPlugin = () => {
+export const checkDuplicatesPlugin = () => {
   const NODE_MODULES = 'node_modules';
   const nodeModuleIds = new Map();
 
@@ -71,9 +71,4 @@ const checkDuplicatesPlugin = () => {
       }
     },
   };
-};
-
-module.exports = {
-  checkModuleDuplicates,
-  checkDuplicatesPlugin,
 };

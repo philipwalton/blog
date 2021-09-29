@@ -1,15 +1,15 @@
-const fs = require('fs-extra');
-const gulp = require('gulp');
-const nunjucks = require('nunjucks');
-const path = require('path');
-const {initBook} = require('./utils/book');
-const {ENV} = require('./utils/env');
-const {processHtml} = require('./utils/html');
-const {renderMarkdown} = require('./utils/markdown');
-const {initTemplates} = require('./utils/templates');
-const config = require('../config.json');
+import fs from 'fs-extra';
+import gulp from 'gulp';
+import nunjucks from 'nunjucks';
+import path from 'path';
+import {initBook} from './utils/book.js';
+import {ENV} from './utils/env.js';
+import {processHtml} from './utils/html.js';
+import {renderMarkdown} from './utils/markdown.js';
+import {initTemplates} from './utils/templates.js';
 
 
+const config = fs.readJSONSync('./config.json');
 let book;
 
 const renderArticleContentPartials = async () => {

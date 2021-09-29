@@ -1,10 +1,11 @@
-import {BroadcastUpdatePlugin} from 'workbox-broadcast-update/BroadcastUpdatePlugin.mjs';
-import {resultingClientExists} from 'workbox-core/_private/resultingClientExists.mjs';
-import {copyResponse} from 'workbox-core/copyResponse.mjs';
-import {Route} from 'workbox-routing/Route.mjs';
-import {StaleWhileRevalidate} from 'workbox-strategies/StaleWhileRevalidate.mjs';
+import {BroadcastUpdatePlugin} from 'workbox-broadcast-update/BroadcastUpdatePlugin.js';
+import {resultingClientExists} from 'workbox-core/_private/resultingClientExists.js';
+import {copyResponse} from 'workbox-core/copyResponse.js';
+import {Route} from 'workbox-routing/Route.js';
+import {StaleWhileRevalidate} from 'workbox-strategies/StaleWhileRevalidate.js';
 import {cacheNames} from '../caches.js';
 import {messageWindows} from '../messenger.js';
+import {streamErrorPlugin} from '../plugins/streamErrorPlugin.js';
 
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -71,6 +72,7 @@ const contentMatcher = ({url}) => {
 export const contentStrategy = new StaleWhileRevalidate({
   cacheName: cacheNames.CONTENT,
   plugins: [
+    streamErrorPlugin,
     addCacheHeadersPlugin,
     broadcastUpdatePlugin,
     navigationReportPlugin,

@@ -1,8 +1,15 @@
-const assert = require('assert');
-const fs = require('fs-extra');
+import assert from 'assert';
+import fs from 'fs-extra';
 
 
 describe('Service Worker', () => {
+
+  it('does stuff', () => {
+    console.log('It worked!');
+  });
+
+  return;
+
   beforeEach(async () => {
     restoreSWVersion();
     await browser.url('/__reset__');

@@ -1,6 +1,6 @@
-const functions = require('firebase-functions');
-const {log} = require('./log');
+import functions from 'firebase-functions';
+import {log as logFn} from './log.js';
 
 
 // https://firebase.google.com/docs/functions/write-firebase-functions
-exports.log = functions.https.onRequest(log);
+export const log = functions.https.onRequest(logFn);

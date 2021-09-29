@@ -1,12 +1,13 @@
-const gulp = require('gulp');
+import gulp from 'gulp';
 
 // Ensure referenced tasks are registered.
-require('./clean.js');
-require('./content.js');
-require('./css.js');
-require('./images.js');
-require('./javascript.js');
-require('./sw.js');
+import './clean.js';
+import './content.js';
+import './css.js';
+import './images.js';
+import './javascript.js';
+import './sw.js';
+
 
 gulp.task('build', gulp.series(
     // 'clean',

@@ -1,11 +1,11 @@
-const fs = require('fs-extra');
-const gm = require('gm');
-const gulp = require('gulp');
-const imagemin = require('imagemin');
-const imageminPngquant = require('imagemin-pngquant');
-const path = require('path');
-const {generateRevisionedAsset} = require('./utils/assets');
-const globby = require('globby');
+import fs from 'fs-extra';
+import {globby} from 'globby';
+import gm from 'gm';
+import gulp from 'gulp';
+import imagemin from 'imagemin';
+import imageminPngquant from 'imagemin-pngquant';
+import path from 'path';
+import {generateRevisionedAsset} from './utils/assets.js';
 
 
 const resizeImage = (filepath, width) => {
@@ -84,4 +84,3 @@ gulp.task('images', async () => {
     console.log(err.stderr.toString());
   }
 });
-

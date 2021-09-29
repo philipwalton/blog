@@ -1,5 +1,5 @@
-const assert = require('assert');
-const {initBook} = require('../tasks/utils/book');
+import assert from 'assert';
+import {initBook} from '../tasks/utils/book.js';
 
 
 let site;

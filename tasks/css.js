@@ -1,12 +1,12 @@
-const cssnano = require('cssnano');
-const fs = require('fs-extra');
-const gulp = require('gulp');
-const path = require('path');
-const postcss = require('postcss');
-const atImport = require('postcss-import');
-const postcssPresetEnv = require('postcss-preset-env');
-const {generateRevisionedAsset} = require('./utils/assets');
-const {ENV} = require('./utils/env');
+import cssnano from 'cssnano';
+import fs from 'fs-extra';
+import gulp from 'gulp';
+import path from 'path';
+import postcss from 'postcss';
+import atImport from 'postcss-import';
+import postcssPresetEnv from 'postcss-preset-env';
+import {generateRevisionedAsset} from './utils/assets.js';
+import {ENV} from './utils/env.js';
 
 
 const compileCss = async (srcPath) => {

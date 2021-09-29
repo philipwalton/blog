@@ -1,18 +1,19 @@
 /* eslint-disable no-console */
 
-const fs = require('fs-extra');
-const globby = require('globby');
-const gulp = require('gulp');
-const path = require('path');
-const revHash = require('rev-hash');
-const {rollup} = require('rollup');
-const replace = require('@rollup/plugin-replace');
-const {nodeResolve} = require('@rollup/plugin-node-resolve');
-const terserRollupPlugin = require('rollup-plugin-terser').terser;
-const {checkDuplicatesPlugin} = require('./utils/check-duplicates-plugin');
-const {ENV} = require('./utils/env');
-const config = require('../config.json');
+import fs from 'fs-extra';
+import {globby} from 'globby';
+import gulp from 'gulp';
+import path from 'path';
+import revHash from 'rev-hash';
+import {rollup} from 'rollup';
+import replace from '@rollup/plugin-replace';
+import {nodeResolve} from '@rollup/plugin-node-resolve';
+import {terser} from 'rollup-plugin-terser';
+import {checkDuplicatesPlugin} from './utils/check-duplicates-plugin.js';
+import {ENV} from './utils/env.js';
 
+
+const config = fs.readJSONSync('./config.json');
 
 gulp.task('sw', async () => {
   try {
@@ -48,15 +49,18 @@ gulp.task('sw', async () => {
       },
       nodeResolve(),
       replace({
-        'process.env.NODE_ENV': JSON.stringify(ENV),
-        '__VERSION__': JSON.stringify(version),
-        '__BUILD_TIME__': JSON.stringify(buildTime),
-        '__PRECACHE_MANIFEST__': JSON.stringify(criticalAssets),
+        values: {
+          'process.env.NODE_ENV': JSON.stringify(ENV),
+          '__VERSION__': JSON.stringify(version),
+          '__BUILD_TIME__': JSON.stringify(buildTime),
+          '__PRECACHE_MANIFEST__': JSON.stringify(criticalAssets),
+        },
+        preventAssignment: true,
       }),
       checkDuplicatesPlugin(),
     ];
     if (ENV !== 'development') {
-      plugins.push(terserRollupPlugin({
+      plugins.push(terser({
         mangle: {
           toplevel: true,
           properties: {

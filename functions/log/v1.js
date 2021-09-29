@@ -1,13 +1,13 @@
-const fs = require('fs');
-const {v4: uuid} = require('uuid');
-const fetch = require('node-fetch');
-const {dimensions, UA_MEASUREMENT_ID} = require('../constants');
+import fs from 'fs';
+import {v4 as uuid} from 'uuid';
+import fetch from 'node-fetch';
+import {dimensions, UA_MEASUREMENT_ID} from '../constants.js';
 
 
 /**
  * @param {Object} request
  */
-async function log(request) {
+export async function v1(request) {
   const params = new URLSearchParams(request.body);
 
   // Set data not specific to the client
@@ -75,7 +75,3 @@ async function log(request) {
     }
   }
 }
-
-module.exports = {
-  log,
-};

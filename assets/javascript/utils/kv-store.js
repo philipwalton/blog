@@ -9,13 +9,21 @@ function openDB() {
       resolve(db);
     } else {
       const req = indexedDB.open('kv-store', 1);
-      req.onsuccess = () => resolve(db = req.result);
-      req.onerror = () => reject(req.error);
       req.onupgradeneeded = () => req.result.createObjectStore('kv-store');
+      req.onerror = () => reject(req.error);
+      req.onsuccess = () => {
+        // Close the connection to make the page eligible for bfcache.
+        addEventListener('pagehide', () => {
+          if (db) {
+            db.close();
+            db = null;
+          }
+        }, {once: true, capture: true});
+        resolve(db = req.result);
+      }
     }
   });
 }
-
 
 /**
  * @param {string} key
@@ -46,4 +54,3 @@ export async function set(key, value) {
     txn.objectStore('kv-store').put(value, key);
   });
 }
-

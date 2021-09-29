@@ -166,11 +166,11 @@ const trackCLS = async () => {
     };
 
     if (entries.length) {
-      const largestShift = entries.reduce((a, b) => {
+      const largestEntry = entries.reduce((a, b) => {
         return a && a.value > b.value ? a : b;
       });
-      if (largestShift && largestShift.sources) {
-        const largestSource = largestShift.sources.reduce((a, b) => {
+      if (largestEntry && largestEntry.sources && largestEntry.sources.length) {
+        const largestSource = largestEntry.sources.reduce((a, b) => {
           return a.node && a.previousRect.width * a.previousRect.height >
               b.previousRect.width * b.previousRect.height ? a : b;
         });

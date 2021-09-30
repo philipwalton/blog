@@ -242,9 +242,13 @@ export const init = async () => {
   addCacheUpdateListener();
   addSWUpdateListener();
 
-  const {log} = await import('./log');
-  log.awaitBeforeSending(setSiteVersionOrTimeout());
-  log.awaitBeforeSending(setContentSourceOrTimeout());
+  try {
+    const {log} = await import('./log');
+    log.awaitBeforeSending(setSiteVersionOrTimeout());
+    log.awaitBeforeSending(setContentSourceOrTimeout());
+  } catch (err) {
+    // Do nothing.
+  }
 
   // Calling register must happen after all presend dependencies get added.
   await wb.register();

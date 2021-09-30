@@ -107,6 +107,9 @@ const terserConfig = {
 
 const manualChunks = (id) => {
   if (id.includes('node_modules')) {
+    // Don't manually exclude web-vitals since its already lazy loaded
+    if (id.includes('web-vitals')) return;
+
     // The directory name following the last `node_modules`.
     // Usually this is the package, but it could also be the scope.
     const directories = id.split(path.sep);

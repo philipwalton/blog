@@ -20,7 +20,7 @@ export function onHidden(callback, opts = {}) {
         window.removeEventListener('pagehide', listener, opts);
       }
     }
-  }
+  };
   document.addEventListener('visibilitychange', listener, opts);
   window.addEventListener('pagehide', listener, opts);
 }
@@ -43,7 +43,7 @@ export function onVisible(callback, opts = {}) {
         window.removeEventListener('pageshow', listener, opts);
       }
     }
-  }
+  };
   document.addEventListener('visibilitychange', listener, opts);
   window.addEventListener('pageshow', listener, opts);
 }

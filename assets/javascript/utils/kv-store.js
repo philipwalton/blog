@@ -20,7 +20,7 @@ function openDB() {
           }
         }, {once: true, capture: true});
         resolve(db = req.result);
-      }
+      };
     }
   });
 }

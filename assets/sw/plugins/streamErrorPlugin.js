@@ -26,8 +26,8 @@ export const streamErrorPlugin = {
             reg.update();
           }
           updateSW();
-        </script>`
+        </script>`,
       ].join(''), {status: 404});
     }
-  }
-}
+  },
+};

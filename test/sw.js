@@ -3,12 +3,9 @@ import fs from 'fs-extra';
 
 
 describe('Service Worker', () => {
-
   it('does stuff', () => {
     console.log('It worked!');
   });
-
-  return;
 
   beforeEach(async () => {
     restoreSWVersion();

@@ -109,7 +109,7 @@ const trackPageviews = () => {
 export const trackError = (err = {}, paramOverrides = {}) => {
   log.event('error', Object.assign({
     error_name: err.name || '(no error name)',
-    error_message: `${err.message}\n${err.stack || '(no stack trace)'}`,
+    error_message: `${err.stack || err.message || '(no stack trace)'}`,
   }, paramOverrides));
 };
 
@@ -124,15 +124,13 @@ const trackErrors = () => {
   const loadErrorEvents = window.__e && window.__e.q || [];
 
   const trackErrorEvent = (event) => {
-    // Use a different `ec` value for uncaught errors.
-    const paramOverrides = {error_name: 'UncaughtError'};
-
     // Some browsers don't have an error property, so we fake it.
     const err = event.error || {
       message: `${event.message} (${event.lineno}:${event.colno})`,
     };
-
-    trackError(err, paramOverrides);
+    trackError(err, {
+      error_name: err.name || 'UncaughtError',
+    });
   };
 
   // Replay any stored load error events.
@@ -142,6 +140,9 @@ const trackErrors = () => {
 
   // Add a new listener to track event immediately.
   window.addEventListener('error', trackErrorEvent);
+
+  // Remove the old listener.
+  window.removeEventListener('error', window.__e);
 };
 
 

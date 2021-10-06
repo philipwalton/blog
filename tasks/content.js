@@ -36,7 +36,7 @@ const buildArticles = async () => {
     const data = {
       ENV,
       site: book.site,
-      page: article,
+      page: {type: 'article', ...article},
       layout: 'shell.html',
     };
     const html = nunjucks.render(article.template, data);

@@ -39,6 +39,6 @@
     padding-top: calc(var(--vgap-lg) * 3);
   }
   .Site-content {
-    max-width: 40em;
+    max-width: 48em;
   }
 }

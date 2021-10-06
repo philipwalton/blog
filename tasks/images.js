@@ -71,6 +71,10 @@ gulp.task('images', async () => {
     await generateLowResArticleImages(articlePngFilenames);
     await generateHighResArticleImages(articlePngFilenames);
 
+    // Poster images
+    const posterFilenames = await globby('assets/images/poster/*.png');
+    await generateRevisionedAssets(posterFilenames);
+
     // Manifest images.
     const manifestPngFilenames = await globby('assets/images/*.png');
     await optimizeManifestImages(manifestPngFilenames);

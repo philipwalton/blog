@@ -284,6 +284,13 @@
          "title": "Smaller HTML Payloads with Service Workers",
          "path": "/articles/smaller-html-payloads-with-service-workers/",
          "date": "2020-01-07T08:02:37.000Z"
+      },
+      {
+         "title": "My Challenge to the Web Performance Community",
+         "path": "/articles/my-challenge-to-the-web-performance-community/",
+         "date": "2021-10-06T07:18:38.000Z",
+         "image": "lh-cwv-correlation-poster.png",
+         "excerpt": "Performance optimization should be about making your users happy, not about making your tools happy. And if we really believe that, we should lead by example."
       }
    ]
 }

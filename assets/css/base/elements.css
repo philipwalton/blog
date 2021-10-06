@@ -58,6 +58,14 @@ h4 {
   line-height: 1.2;
   margin: 1em 0;
 }
+@media (--break-md) {
+  h1,
+  h2,
+  h3,
+  h4 {
+    margin: 1.5em 0;
+  }
+}
 
 h4 {
     font-weight: 700;
@@ -70,6 +78,7 @@ p {
 
 a {
   color: var(--link-color);
+  text-underline-offset: 1px;
 }
 
 article sup a {
@@ -130,7 +139,12 @@ blockquote p:last-child {
 
 ol, ul {
   margin: 0 0 var(--vgap);
-  padding-left: 2em;
+  padding-left: 1.25em;
+}
+@media (--break-md) {
+  ol, ul {
+    padding-left: 1.5em;
+  }
 }
 
 ul {

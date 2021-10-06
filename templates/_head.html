@@ -29,11 +29,20 @@
 <meta name="theme-color" content="{{ site.themeColor }}">
 
 <link href="https://feeds.feedburner.com/philipwalton" rel="alternate" title="{{site.title}}" type="application/atom+xml">
-
 <meta name="description" content="{% if page.excerpt %}{{ page.excerpt }}{% else %}{{ site.description }}{% endif %}">
 
 {% if not page.private %}
-  <link rel="canonical" href="{{ site.baseUrl }}{{ page.path }}" />
+  <link rel="canonical" href="{{ site.baseUrl }}{{ page.path }}">
+  {% if page.type === 'article' %}
+    <meta name="og:title" content="{{ page.title }}">
+    <meta name="og:type" content="{{ page.type }}">
+    <meta name="og:url" content="{{ site.baseUrl }}{{ page.path }}">
+    {% if page.image and page.excerpt %}
+      <meta name="og:image" content="{{ site.baseUrl }}{{ page.image | revision }}">
+      <meta name="og:description" content="{{ page.excerpt }}">
+      <meta name="twitter:card" content="summary_large_image">
+    {% endif %}
+  {% endif %}
 {% endif %}
 
 {% include '_css.html' %}

@@ -121,6 +121,7 @@ The following companies all offer RUM analytics services. While I haven't used a
 * [SpeedCurve](https://www.speedcurve.com/)
 * [Blue Triangle](https://bluetriangle.com/products/real-user-monitoring/)
 * [Datadog](https://www.datadoghq.com/product/real-user-monitoring/)
+* [Catchpoint Real User Monitoring](https://www.catchpoint.com/real-user-monitoring)
 
 ### General guidance for measuring performance in the field
 

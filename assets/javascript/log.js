@@ -10,7 +10,7 @@ import {uuid} from './utils/uuid';
  * implementation. This allows you to create a segment or view filter
  * that isolates only data captured with the most recent tracking changes.
  */
-const TRACKING_VERSION = 73;
+const TRACKING_VERSION = 74;
 
 /**
  * A 13-digit, random identifier for the current page.
@@ -162,7 +162,6 @@ const trackCLS = async () => {
       value: delta,
       metric_rating: getRating(value, [0.1, 0.25]),
       metric_value: value,
-      metric_delta: delta,
       debug_target: '(not set)', // May be overridden below.
     };
 
@@ -191,7 +190,6 @@ const trackFCP = async () => {
       value: delta,
       metric_rating: getRating(value, [1800, 3000]),
       metric_value: value,
-      metric_delta: delta,
       original_page_path: originalPathname,
     });
   });
@@ -205,7 +203,6 @@ const trackFID = async () => {
       value: delta,
       metric_rating: getRating(value, [100, 300]),
       metric_value: value,
-      metric_delta: delta,
       debug_target: entry ? getSelector(entry.target) : '(not set)',
       debug_event: entry ? entry.name : '(not set)',
     });
@@ -214,15 +211,32 @@ const trackFID = async () => {
 
 const trackLCP = async () => {
   getLCP(({name, value, delta, entries}) => {
-    const element = entries.length && entries[entries.length - 1].element;
-
-    log.event(name, {
+    const lastEntry = entries.length && entries[entries.length - 1];
+    const params = {
       value: delta,
       metric_rating: getRating(value, [2500, 4000]),
       metric_value: value,
-      metric_delta: delta,
-      debug_target: element ? getSelector(element) : '(not set)',
-    });
+      debug_target: lastEntry ? getSelector(lastEntry.element) : '(not set)',
+    };
+
+    // The entry will have a URL property if it's an image.
+    // If it is then add timing params from the Resource Timing API.
+    if (lastEntry && lastEntry.url) {
+      const rtEntry = performance.getEntriesByType('resource')
+          .find((e) => e.name === lastEntry.url);
+
+      if (rtEntry) {
+        Object.assign(params, {
+          url: lastEntry.url,
+          start_time: rtEntry.startTime,
+          request_start: rtEntry.requestStart,
+          response_start: rtEntry.responseStart,
+          response_end: rtEntry.responseEnd,
+        });
+      }
+    }
+
+    log.event(name, params);
   });
 };
 
@@ -231,6 +245,10 @@ const trackTTFB = () => {
     const navEntry = entries[0];
     const params = {
       value: value,
+      domain_lookup_start: navEntry.domainLookupStart,
+      domain_lookup_end: navEntry.domainLookupEnd,
+      connect_start: navEntry.connectStart,
+      connect_end: navEntry.connectEnd,
       request_start: navEntry.requestStart,
       response_start: value,
       response_end: navEntry.responseEnd,

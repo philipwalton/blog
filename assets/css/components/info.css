@@ -27,3 +27,7 @@
 .Info--warning {
   background: hsla(20, 100%, 50%, .15)
 }
+
+.Info--subtle {
+  background: var(--bg-color);
+}

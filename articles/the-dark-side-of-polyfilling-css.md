@@ -10,7 +10,7 @@ So the best way I can think of to answer this question&mdash;and explain why I'm
 
 And the best way to do that is to write a polyfill ourselves.
 
-<div class="Callout">
+<div class="Info Info--subtle">
   <div class="Media">
     <div class="Media-subject">
       <div class="VideoContainer">

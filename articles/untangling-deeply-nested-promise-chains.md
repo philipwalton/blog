@@ -27,7 +27,7 @@ Speaking from personal experience, about a week ago I started playing around wit
 
 After spending a few hours refactoring and really exploring these new APIs, I came up with a few strategies for improving the readability of my code that I wanted to share. The strategies range from general software development tips and best-practices to leveraging new JavaScript language features like [async functions](https://tc39.github.io/ecmascript-asyncawait/).
 
-<div class="Callout">
+<div class="Info">
 
 **Note:** my intent here is not to critique people who have written Service Worker tutorials. I've learned a great deal from that content, and I think it's invaluable. I also understand that when writing blog posts, concise examples often have a place.
 

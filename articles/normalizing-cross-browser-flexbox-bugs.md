@@ -1,4 +1,4 @@
-<div class="Callout">
+<div class="Info">
 
 **Update:** as a follow-up to this article, I've created the Github repo [Flexbugs](https://github.com/philipwalton/flexbugs): a community curated list of cross-browser flexbox issues and their known workarounds. The goal is if you're building a website using flexbox, and something isn't working as you'd expect, you can find the solution there.
 

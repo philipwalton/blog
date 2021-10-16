@@ -17,7 +17,7 @@ CSS preprocessors are fantastic tools, but their variables are static and lexica
 
 In this article I'm going to discuss some of the things you can do with CSS custom properties that you can't do with preprocessor variables. I'll also demo some of the new design patterns that custom properties enable. Finally, I'll discuss why I think in the future we'll most likely use preprocessor variables and custom properties together, to leverage the best of both worlds.
 
-<div class="Callout">
+<div class="Info">
 
 **Note:** this article is *not* an introduction to CSS custom properties. If you've never heard of them or are unfamiliar with how they work, I'd recommend [getting yourself acquainted](https://developer.mozilla.org/en-US/docs/Web/CSS/Using_CSS_variables) first.
 

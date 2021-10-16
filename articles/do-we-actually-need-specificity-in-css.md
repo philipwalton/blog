@@ -216,7 +216,7 @@ I suspect it would vastly simplify things, but it also might uncover how much we
 
 If there's a large team out there constantly fighting specificity battles, it would be interesting to hear if something like this helps. If you do try it, feel free to [let me know](/about/#contact) your findings. Or better yet, write a follow-up article and I'll link to it.
 
-<div class="Callout">
+<div class="Info">
 
 **Update:** *(November 3, 2015)*
 
@@ -228,7 +228,7 @@ The downside of using `:not()` is you must be careful to pick a selector that's 
 
 </div>
 
-<div class="Callout">
+<div class="Info">
 
 **Update:** *(November 14, 2015)*
 

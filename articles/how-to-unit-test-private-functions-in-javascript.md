@@ -1,4 +1,4 @@
-<div class="Callout">
+<div class="Info">
 
 **Update:** A lot of readers have commented or tweeted that I shouldn't be unit testing private functions in the first place. Admittedly, this article is a little light on the *why* and mainly focuses on the *how*.
 

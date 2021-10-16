@@ -65,7 +65,7 @@ In fact, even interactions like scrolling (which are usually handled on a separa
 
 To see a blocked main thread in action, click the button below (which will add a `wheel` and `touchstart` event listener and run the `while` loop shown above), then try to select any text, click any link, or scroll around. Also, notice how the animated GIF stops animating:
 
-<aside class="Callout">
+<aside class="Info">
 
 **Update:** some browsers are now able to render animated GIFs while the main thread is blocked; however, that has not historically been the case, and not all browsers currently support this feature.
 

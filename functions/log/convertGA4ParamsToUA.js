@@ -112,7 +112,7 @@ export function convertGA4ParamsToUA(params) {
   params.set(dimensions.CD_SITE_VERSION, siteVersion);
 
   const visibilityState = params.get('ep.visibility_state');
-  params.set(dimensions.CD_VISIBILITY_STATE, visibilityState);
+  params.set(dimensions.CD_VISIBILITY_STATE, visibilityState || '(not set)');
 
   // Ensure event values are set and always integers.
   let value = params.get('epn.value');

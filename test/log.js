@@ -51,8 +51,6 @@ describe('analytics', function() {
         assert.match(beacon.get('epn.measurement_version'), /\d+/);
         assert.match(beacon.get('ep.navigation_type'),
             /(navigate|reload|route_change)/);
-        assert.match(beacon.get('ep.visibility_state'),
-            /(visible|hidden)/);
 
         assert(beacon.get('epn.time_origin') <= Date.now());
         assert(beacon.get('epn.time_origin') > Date.now() - (60 * 1000));

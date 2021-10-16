@@ -13,6 +13,9 @@ import {uuid} from './utils/uuid';
 const LOG_VERSION = 3;
 
 
+const SESSION_TIMEOUT = 1000 * 60 * 30; // 30 minutes.
+
+
 const SEND_TIMEOUT = 5000;
 
 // Managing separately is required until the following bug (currently fixed)
@@ -45,7 +48,7 @@ export class Logger {
 
     this._userParams = prefixParams('u', {
       breakpoint: getActiveBreakpoint().name,
-      effective_connection_type: getEffectiveConnectionType(),
+      connection_type: getEffectiveConnectionType(),
       pixel_density: getPixelDensity(),
       service_worker_state: initialSWState,
     });
@@ -56,6 +59,7 @@ export class Logger {
     };
 
     this.awaitBeforeSending(this._setClientId());
+    this.awaitBeforeSending(this._updateSessionInfo());
 
     if (!visibilityState) {
       visibilityState = document.visibilityState;
@@ -86,14 +90,14 @@ export class Logger {
    * @return {Promise<void>}
    */
   async event(eventName, paramOverrides = {}) {
-    if (this._presendDependencies.length) {
-      await Promise.all(this._presendDependencies);
-      this._presendDependencies = [];
-    }
-
     const params = {...this._eventParams, ...paramOverrides};
     if (this._hitFilter) {
       Object.assign(params, this._hitFilter(params));
+    }
+
+    if (this._presendDependencies.length) {
+      await Promise.all(this._presendDependencies);
+      this._presendDependencies = [];
     }
 
     this._eventQueue.push({
@@ -114,6 +118,10 @@ export class Logger {
   async _send() {
     clearTimeout(this._sendTimeout);
     if (this._eventQueue.length > 0) {
+      // Update the session timestamp after hits are sent.
+      // Do not await. It's OK if this fails for some reason.
+      this._updateSessionInfo();
+
       const path = `/log?v=${LOG_VERSION}`;
       const body =
           toQueryString(this._pageParams) + '&' +
@@ -133,6 +141,14 @@ export class Logger {
    */
   async _setClientId() {
     this._pageParams.cid = await getOrCreateClientId();
+  }
+
+  /**
+   * @return {Promise<void>}
+   */
+  async _updateSessionInfo() {
+    const {sid, sct} = await updateOrCreateSessionInfo();
+    Object.assign(this._pageParams, {sid, sct});
   }
 }
 
@@ -177,6 +193,39 @@ async function getOrCreateClientId() {
   } catch (error) {
     return uuid(timeOrigin);
   }
+}
+
+/**
+ * @return {Promise<Object>}
+ */
+ async function updateOrCreateSessionInfo() {
+  const time = Date.now();
+  let sessionInfo = {sct: 1, sid: time, _et: time};
+
+  try {
+    const storedSessionInfo = await get('sessionInfo');
+
+    if (storedSessionInfo) {
+      sessionInfo = storedSessionInfo;
+      const isSessionExpired = time - sessionInfo._et > SESSION_TIMEOUT;
+
+      // If the previous session has expired, start a new one.
+      if (isSessionExpired) {
+        sessionInfo.sid = time;
+        sessionInfo.sct++;
+      }
+
+      // Update the session time to the current time.
+      sessionInfo._et = time;
+    }
+  } catch (error) {
+    // Do nothing...
+  }
+
+  // Update the stored sessionInfo data but don't await
+  set('sessionInfo', sessionInfo);
+
+  return sessionInfo;
 }
 
 /**

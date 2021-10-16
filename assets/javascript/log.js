@@ -10,7 +10,7 @@ import {uuid} from './utils/uuid';
  * implementation. This allows you to create a segment or view filter
  * that isolates only data captured with the most recent tracking changes.
  */
-const TRACKING_VERSION = 74;
+const MEASUREMENT_VERSION = 75;
 
 /**
  * A 13-digit, random identifier for the current page.
@@ -22,10 +22,12 @@ const PAGE_ID = uuid(timeOrigin);
 
 const originalPathname = location.pathname;
 
-export const log = new Logger(() => ({
-  page_time: now(),
-  visibility_state: document.visibilityState,
-}));
+export const log = new Logger((params) => {
+  return {
+    page_time: now(),
+    event_id: params.event_id || uuid(),
+  };
+});
 
 const getSelector = (node, max = 100) => {
   let sel = '';
@@ -62,10 +64,9 @@ export const init = async () => {
   trackTTFB();
 };
 
-
 const setInitialParams = () => {
   log.set({
-    measurement_version: TRACKING_VERSION,
+    measurement_version: MEASUREMENT_VERSION,
     time_origin: timeOrigin,
     page_id: PAGE_ID,
     pageshow_count: 1,
@@ -80,7 +81,7 @@ const setInitialParams = () => {
 
 let pageshowCount = 1;
 const trackPageviews = () => {
-  log.event('page_view');
+  log.event('page_view', {visibility_state: document.visibilityState});
 
   addEventListener('pageshow', (event) => {
     if (event.persisted) {
@@ -90,7 +91,7 @@ const trackPageviews = () => {
         navigation_type: 'bfcache_restore',
         pageshow_count: pageshowCount,
       });
-      log.event('page_view');
+      log.event('page_view', {visibility_state: document.visibilityState});
     }
   }, true);
 };
@@ -157,12 +158,13 @@ const getRating = (value, thresholds) => {
 };
 
 const trackCLS = async () => {
-  getCLS(({name, value, delta, entries}) => {
+  getCLS(({name, value, delta, entries, id}) => {
     const eventData = {
       value: delta,
       metric_rating: getRating(value, [0.1, 0.25]),
       metric_value: value,
       debug_target: '(not set)', // May be overridden below.
+      event_id: id,
     };
 
     if (entries.length) {
@@ -185,18 +187,19 @@ const trackCLS = async () => {
 };
 
 const trackFCP = async () => {
-  getFCP(({name, value, delta}) => {
+  getFCP(({name, value, delta, id}) => {
     log.event(name, {
       value: delta,
       metric_rating: getRating(value, [1800, 3000]),
       metric_value: value,
       original_page_path: originalPathname,
+      event_id: id,
     });
   });
 };
 
 const trackFID = async () => {
-  getFID(({name, value, delta, entries}) => {
+  getFID(({name, value, delta, entries, id}) => {
     const entry = entries[0];
 
     log.event(name, {
@@ -205,18 +208,20 @@ const trackFID = async () => {
       metric_value: value,
       debug_target: entry ? getSelector(entry.target) : '(not set)',
       debug_event: entry ? entry.name : '(not set)',
+      event_id: id,
     });
   });
 };
 
 const trackLCP = async () => {
-  getLCP(({name, value, delta, entries}) => {
+  getLCP(({name, value, delta, entries, id}) => {
     const lastEntry = entries.length && entries[entries.length - 1];
     const params = {
       value: delta,
       metric_rating: getRating(value, [2500, 4000]),
       metric_value: value,
       debug_target: lastEntry ? getSelector(lastEntry.element) : '(not set)',
+      event_id: id,
     };
 
     // The entry will have a URL property if it's an image.
@@ -241,10 +246,12 @@ const trackLCP = async () => {
 };
 
 const trackTTFB = () => {
-  getTTFB(({name, value, entries}) => {
+  getTTFB(({name, value, entries, id}) => {
     const navEntry = entries[0];
     const params = {
       value: value,
+      metric_value: value,
+      fetch_start: navEntry.fetchStart,
       domain_lookup_start: navEntry.domainLookupStart,
       domain_lookup_end: navEntry.domainLookupEnd,
       connect_start: navEntry.connectStart,
@@ -254,6 +261,7 @@ const trackTTFB = () => {
       response_end: navEntry.responseEnd,
       dom_load_end: navEntry.domContentLoadedEventEnd,
       window_load_end: navEntry.loadEventEnd,
+      event_id: id,
     };
     if (initialSWState === 'controlled' && 'workerStart' in navEntry) {
       params.worker_start = navEntry.workerStart;

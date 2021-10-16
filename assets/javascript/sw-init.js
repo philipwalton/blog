@@ -105,25 +105,6 @@ const processMetadata = (payload = {}) => {
 };
 
 
-/**
- * Forces a page reload when the user backgrounds the tab without closing it.
- */
-const forceReloadOnHidden = () => {
-  const reloadOnHidden = () => {
-    if (document.visibilityState === 'hidden') {
-      removeEventListener('visibilitychange', reloadOnHidden, true);
-      location.reload();
-    }
-  };
-  addEventListener('visibilitychange', reloadOnHidden, true);
-  addEventListener('pagehide', (event) => {
-    if (!event.persisted) {
-      removeEventListener('visibilitychange', reloadOnHidden, true);
-    }
-  });
-};
-
-
 const addInstallListener = () => {
   wb.addEventListener('installed', (event) => {
     // `isUpdate` means this is not the first install.
@@ -132,9 +113,6 @@ const addInstallListener = () => {
       // a SW update means the code running on this page may be out of date
       // and we want the user to update as soon as they can.
       disableLoader();
-
-      // We also want to force a reload of the tab if the tab is backgrounded.
-      forceReloadOnHidden();
     } else {
       // On the first install, send a list of URLs to cache to the SW.
       const urlsToCache = [

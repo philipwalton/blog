@@ -16,8 +16,6 @@ const initServiceWorker = async () => {
 };
 
 const initLog = async () => {
-  // Cannot use the variable name `log` until this issue is resolved:
-  // https://github.com/rollup/rollup/issues/3245
   const log = await import('./log.js');
   log.init();
 };

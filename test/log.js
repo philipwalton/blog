@@ -7,7 +7,7 @@ import {beaconsContain, clearBeacons, getBeacons} from './utils/beacons.js';
 let articles;
 let pages;
 
-describe('analytics', function() {
+describe('log', function() {
   before(async () => {
     const book = await initBook();
     articles = book.articles;
@@ -16,338 +16,419 @@ describe('analytics', function() {
 
   beforeEach(async () => {
     await clearBeacons();
-    await browser.url('/');
+    await browser.url('/__reset__');
+    await browser.waitUntil(async () => {
+      return await browser.execute(() => {
+        return window.__ready__ === true;
+      });
+    });
   });
 
-  it('should send pageview hits on pageload', async () => {
-    await browser.waitUntil(async () => await beaconsContain({
-      'v': '2',
-      'en': 'page_view',
-      'ep.page_path': '/',
-    }));
-    await browser.waitUntil(async () => await beaconsContain({
-      v: '1',
-      t: 'pageview',
-      dp: '/',
-    }));
-  });
+  describe('v3', () => {
+    beforeEach(async () => {
+      await browser.url('/?utm_source=log');
+    });
 
-  it('should include all relevant parameters', async () => {
-    await browser.waitUntil(async () => (await getBeacons()).length > 2);
+    it('should send pageview hits on pageload', async () => {
+      await browser.waitUntil(async () => await beaconsContain({
+        'v': '2',
+        'en': 'page_view',
+        'ep.page_path': '/',
+      }));
+      await browser.waitUntil(async () => await beaconsContain({
+        v: '1',
+        t: 'pageview',
+        dp: '/',
+      }));
+    });
 
-    const beacons = await getBeacons();
-    for (const beacon of beacons) {
-      const v = beacon.get('v');
-      assert(v === '2' || v === '1');
+    it('should include all relevant parameters', async () => {
+      await browser.waitUntil(async () => (await getBeacons()).length > 2);
 
-      // MPv2
-      if (v === '2') {
-        assert.strictEqual(beacon.get('v'), '2');
-        assert.strictEqual(beacon.get('tid'), 'G-GVKBFZ3VDY');
-        assert.match(beacon.get('cid'), /^\d{13}-\d{13}$/);
+      const beacons = await getBeacons();
+      for (const beacon of beacons) {
+        const v = beacon.get('v');
+        assert(v === '2' || v === '1');
 
-        assert.strictEqual(beacon.get('epn.pageshow_count'), '1');
-        assert.strictEqual(beacon.get('ep.original_page_path'), '/');
-        assert.match(beacon.get('epn.measurement_version'), /\d+/);
-        assert.match(beacon.get('ep.navigation_type'),
-            /(navigate|reload|route_change)/);
+        // MPv2
+        if (v === '2') {
+          assert.strictEqual(beacon.get('v'), '2');
+          assert.strictEqual(beacon.get('tid'), 'G-GVKBFZ3VDY');
+          assert.match(beacon.get('cid'), /^\d{13}-\d{13}$/);
 
-        assert(beacon.get('epn.time_origin') <= Date.now());
-        assert(beacon.get('epn.time_origin') > Date.now() - (60 * 1000));
-        assert(beacon.get('epn.page_time') > 0);
-        assert(beacon.get('epn.page_time') < 60 * 1000);
-      }
+          assert.match(beacon.get('sid'), /^\d{13}$/);
+          assert.match(beacon.get('sct'), /^\d+$/);
+          assert.match(beacon.get('seg'), /^(0|1)+$/);
 
-      // MPv1
-      if (v === '1') {
-        assert.strictEqual(beacon.get('v'), '1');
-        assert.strictEqual(beacon.get('tid'), 'UA-21292978-1');
-        assert.match(beacon.get('cid'), /^\d{13}-\d{13}$/);
+          assert.strictEqual(beacon.get('epn.pageshow_count'), '1');
+          assert.strictEqual(beacon.get('ep.original_page_path'), '/');
+          assert.match(beacon.get('epn.measurement_version'), /\d+/);
+          assert.match(beacon.get('ep.navigation_type'),
+              /(navigate|reload|route_change)/);
 
-        assert.match(beacon.get(dimensions.CD_HIT_ID),
-            /\w{8}-\w{4}-4\w{3}-[89aAbB]\w{3}-\w{12}/);
-
-        assert.match(beacon.get(dimensions.CD_WINDOW_ID), /\d{13}-\d{13}/);
-        assert.match(beacon.get(dimensions.CD_VISIT_ID), /\d{13}-\d{13}-\d+/);
-
-        assert(beacon.get('uip').length > 0);
-
-        // `qt` should be used rather than `ht` in MPv1,
-        assert.strictEqual(beacon.get('ht'), null);
-        const qt = beacon.get('qt');
-        if (qt) {
-          assert.strictEqual(qt, /\d+/);
+          assert(beacon.get('epn.time_origin') <= Date.now());
+          assert(beacon.get('epn.time_origin') > Date.now() - (60 * 1000));
+          assert(beacon.get('epn.page_time') > 0);
+          assert(beacon.get('epn.page_time') < 60 * 1000);
         }
 
-        assert.strictEqual(beacon.get(dimensions.CD_HIT_TYPE), beacon.get('t'));
+        // MPv1
+        if (v === '1') {
+          assert.strictEqual(beacon.get('v'), '1');
+          assert.strictEqual(beacon.get('tid'), 'UA-21292978-1');
+          assert.match(beacon.get('cid'), /^\d{13}-\d{13}$/);
 
-        // // Ensure all custom dimensions have a value
-        for (const param of Object.values(dimensions)) {
-          assert.notStrictEqual(beacon.get(param), null);
-        }
+          assert.match(beacon.get(dimensions.CD_HIT_ID),
+              /\w{8}-\w{4}-4\w{3}-[89aAbB]\w{3}-\w{12}/);
 
-        // Ensure (for event hits), all event dimensions have a value
-        if (beacon.get('t') === 'event') {
-          for (const param of ['ec', 'ea', 'el']) {
+          assert.match(beacon.get(dimensions.CD_WINDOW_ID), /\d{13}-\d{13}/);
+          assert.match(beacon.get(dimensions.CD_VISIT_ID), /\d{13}-\d{13}-\d+/);
+
+          assert(beacon.get('uip').length > 0);
+
+          // `qt` should be used rather than `ht` in MPv1,
+          assert.strictEqual(beacon.get('ht'), null);
+          const qt = beacon.get('qt');
+          if (qt) {
+            assert.strictEqual(qt, /\d+/);
+          }
+
+          assert.strictEqual(beacon.get(dimensions.CD_HIT_TYPE), beacon.get('t'));
+
+          // // Ensure all custom dimensions have a value
+          for (const param of Object.values(dimensions)) {
             assert.notStrictEqual(beacon.get(param), null);
+          }
+
+          // Ensure (for event hits), all event dimensions have a value
+          if (beacon.get('t') === 'event') {
+            for (const param of ['ec', 'ea', 'el']) {
+              assert.notStrictEqual(beacon.get(param), null);
+            }
           }
         }
       }
-    }
-  });
-
-  it('should send pageview hits on SPA pageloads', async () => {
-    await browser.waitUntil(async () => await beaconsContain({
-      'v': '2',
-      'en': 'page_view',
-      'ep.original_page_path': '/',
-    }));
-    await browser.waitUntil(async () => await beaconsContain({
-      v: '1',
-      t: 'pageview',
-      dp: '/',
-    }));
-
-    const articleLink = await $(`a[href="${articles[0].path}"]`);
-    await articleLink.click();
-
-    await browser.waitUntil(async () => await beaconsContain({
-      'v': '2',
-      'en': 'page_view',
-      'ep.page_path': articles[0].path,
-      'ep.original_page_path': '/',
-    }));
-    await browser.waitUntil(async () => await beaconsContain({
-      v: '1',
-      t: 'pageview',
-      dp: articles[0].path,
-    }));
-  });
-
-  it('should send pageview hits on back/forward navigations', async () => {
-    await browser.waitUntil(async () => await beaconsContain({
-      'v': '2',
-      'en': 'page_view',
-      'ep.page_path': '/',
-    }));
-    await browser.waitUntil(async () => await beaconsContain({
-      v: '1',
-      t: 'pageview',
-      dp: '/',
-    }));
-
-    // Load a page.
-
-    const articleLink = await $(`a[href="${pages[1].path}"]`);
-    await articleLink.click();
-
-    await browser.waitUntil(async () => await beaconsContain({
-      'v': '2',
-      'en': 'page_view',
-      'ep.page_path': pages[1].path,
-      'ep.original_page_path': '/',
-    }));
-    await browser.waitUntil(async () => await beaconsContain({
-      v: '1',
-      t: 'pageview',
-      dp: pages[1].path,
-    }));
-
-    // Click 'back' to the home page
-
-    await clearBeacons();
-    await browser.back();
-
-    await browser.waitUntil(async () => await beaconsContain({
-      'v': '2',
-      'en': 'page_view',
-      'ep.page_path': pages[0].path,
-      'ep.original_page_path': '/',
-    }));
-    await browser.waitUntil(async () => await beaconsContain({
-      v: '1',
-      t: 'pageview',
-      dp: pages[0].path,
-    }));
-
-    // Click 'forward' to the articles page
-
-    await clearBeacons();
-    await browser.forward();
-
-    await browser.waitUntil(async () => await beaconsContain({
-      'v': '2',
-      'en': 'page_view',
-      'ep.page_path': pages[1].path,
-      'ep.original_page_path': '/',
-    }));
-    await browser.waitUntil(async () => await beaconsContain({
-      v: '1',
-      t: 'pageview',
-      dp: pages[1].path,
-    }));
-  });
-
-  it('should invoke the v2 log function when `v=2` is set', async () => {
-    await browser.execute(function() {
-      const queryParams = [
-        'v=2',
-        'dl=http%3A%2F%2Flocalhost%3A5000%2F',
-        'dt=Home%20%E2%80%94%20Philip%20Walton',
-        'de=UTF-8',
-        'ul=en-us',
-        'vp=474x1016',
-        'sr=1792x1120',
-        'sd=30-bit',
-        'dr=',
-        'cid=1633059568188-9970492436839',
-        'up.breakpoint=sm',
-        'up.effective_connection_type=4g',
-        'up.pixel_density=2x',
-        'up.service_worker_state=controlled',
-      ].join('&');
-
-      const eventParams = [
-        'en=page_view',
-        'ep.page_path=%2F',
-        'ep.content_source=cache',
-        'epn.measurement_version=71',
-        'epn.time_origin=1633061440539.4',
-        'ep.page_id=1633061440539-3930979708627',
-        'epn.pageshow_count=1',
-        'ep.original_page_path=%2F',
-        'ep.navigation_type=reload',
-        'ep.site_version=3.6.0',
-        'epn.page_time=221.9',
-        'ep.visibility_state=hidden',
-      ].join('&');
-
-      navigator.sendBeacon('/log?' + queryParams, eventParams);
     });
 
-    await browser.waitUntil(async () => await beaconsContain({
-      'v': '2',
-      'dl': 'http://localhost:5000/',
-      'dt': 'Home — Philip Walton',
-      'de': 'UTF-8',
-      'ul': 'en-us',
-      'vp': '474x1016',
-      'sr': '1792x1120',
-      'sd': '30-bit',
-      'dr': '',
-      'cid': '1633059568188-9970492436839',
-      'up.breakpoint': 'sm',
-      'up.effective_connection_type': '4g',
-      'up.pixel_density': '2x',
-      'up.service_worker_state': 'controlled',
-      'tid': 'G-GVKBFZ3VDY',
-      'en': 'page_view',
-      'ep.page_path': '/',
-      'ep.content_source': 'cache',
-      'epn.measurement_version': '71',
-      'epn.time_origin': '1633061440539.4',
-      'ep.page_id': '1633061440539-3930979708627',
-      'epn.pageshow_count': '1',
-      'ep.original_page_path': '/',
-      'ep.navigation_type': 'reload',
-      'ep.site_version': '3.6.0',
-      'epn.page_time': '221.9',
-      'ep.visibility_state': 'hidden',
-      '_uip': /[.:\w]+/,
-    }));
-    await browser.waitUntil(async () => await beaconsContain({
-      'v': '1',
-      'dl': 'http://localhost:5000/',
-      'dt': 'Home — Philip Walton',
-      'de': 'UTF-8',
-      'ul': 'en-us',
-      'vp': '474x1016',
-      'sr': '1792x1120',
-      'sd': '30-bit',
-      'dr': '',
-      'cid': '1633059568188-9970492436839',
-      'tid': 'UA-21292978-1',
-      't': 'pageview',
-      'dp': '/',
-      'cd14': /\w{8}-\w{4}-4\w{3}-[89aAbB]\w{3}-\w{12}/,
-      'uip': /[.:\w]+/,
-      'cd13': 'pageview',
-      'cd7': '1633059568188-9970492436839',
-      'cd1': 'sm',
-      'cd2': '2x',
-      'cd3': '3.6.0',
-      'cd4': 'cache',
-      'cd5': '4g',
-      'cd6': '(not set)',
-      'cd8': '(not set)',
-      'cd9': 'controlled',
-      'cd10': '(not set)',
-      'cd11': '1633061440539-3930979708627',
-      'cd12': 'hidden',
-      'cd15': '(not set)',
-      'cd16': '71',
-      'cd17': '1633061440539-3930979708627-1',
-      'cd18': 'reload',
-    }));
-  });
+    it('should update the session count and engagement status after additional visits', async () => {
+      await browser.waitUntil(async () => await beaconsContain({
+        'v': '2',
+        // 'seg': '0',
+        // 'sct': '1',
+        // 'sid': /^\d{13}$/,
+        'en': 'page_view',
+        'ep.page_path': '/',
+      }));
 
-  it('should invoke the v1 log function when no `v` param is present', async () => {
-    await browser.execute(function() {
-      navigator.sendBeacon('/log', [
-        't=pageview',
-        'ht=1614466715909',
-        'dl=https%3A%2F%2Fphilipwalton.com%2F',
-        'dp=%2F',
-        'dt=Home%20%E2%80%94%20Philip%20Walton',
-        'de=UTF-8',
-        'ul=en-us',
-        'vp=1792x414',
-        'sr=1792x1120',
-        'sd=30-bit',
-        'dr=',
-        'cd10=true',
-        'cd1=lg',
-        'cd2=2x',
-        'cd16=68',
-        'cd11=1614466715883-5755939763374',
-        'cd17=1614466715883-6197446999056',
-        'cd9=controlled',
-        'cd18=navigate',
-        'cd5=4g',
-        'cd3=3.3.0',
-        'cid=1600110148295-9925491440728',
-        'cd4=navigation',
-        'cd15=1614466715909',
-        'cd12=visible',
-      ].join('&'));
+      const beacons1 = await getBeacons();
+      console.warn('BEACON COUNT', beacons1.length);
+
+      const sid1 = beacons1.find((b) => b.get('v') === '2').get('sid');
+
+      await browser.url('/about/?utm_source=log');
+      await browser.waitUntil(async () => await beaconsContain({
+        'v': '2',
+        'seg': '1',
+        'sct': '1',
+        'sid': sid1,
+        'en': 'page_view',
+        'ep.page_path': '/about/',
+      }));
+
+      // Update the data in IndexedDB to expire the session.
+      await browser.executeAsync(async (done) => {
+        const req = indexedDB.open('kv-store', 1);
+        req.onupgradeneeded = () => req.result.createObjectStore('kv-store');
+        req.onsuccess = () => {
+          const time = Date.now() - (1000 * 60 * 31); // 31 minutes ago...
+          const db = req.result;
+          const txn = db.transaction('kv-store', 'readwrite');
+          txn.oncomplete = () => done();
+          txn.objectStore('kv-store').put({
+            seg: 0,
+            sct: 8,
+            sid: time,
+            _et: time,
+          }, 'sessionInfo');
+        };
+      });
+
+      await clearBeacons();
+
+      await browser.url('/articles/?utm_source=log');
+      await browser.waitUntil(async () => await beaconsContain({
+        'v': '2',
+        'seg': '0',
+        'sct': '9',
+        'sid': /^\d{13}$/,
+        'en': 'page_view',
+        'ep.page_path': '/articles/',
+      }));
+
+      const beacons2 = await getBeacons();
+      const sid2 = beacons2
+          .find((b) => b.get('ep.page_path') === '/articles/').get('sid');
+
+      assert(sid2 > sid1);
     });
 
-    await browser.waitUntil(async () => await beaconsContain({
-      'v': '1',
-      't': 'pageview',
-      'dl': 'https://philipwalton.com/',
-      'dp': '/',
-      'dt': 'Home — Philip Walton',
-      'de': 'UTF-8',
-      'ul': 'en-us',
-      'vp': '1792x414',
-      'sr': '1792x1120',
-      'sd': '30-bit',
-      'dr': '',
-      'cd10': 'true',
-      'cd1': 'lg',
-      'cd2': '2x',
-      'cd16': '68',
-      'cd11': '1614466715883-5755939763374',
-      'cd17': '1614466715883-6197446999056',
-      'cd9': 'controlled',
-      'cd18': 'navigate',
-      'cd5': '4g',
-      'cd3': '3.3.0',
-      'cid': '1600110148295-9925491440728',
-      'cd4': 'navigation',
-      'cd15': '1614466715909',
-      'cd12': 'visible',
-    }));
+    it('should send pageview hits on SPA pageloads', async () => {
+      await browser.waitUntil(async () => await beaconsContain({
+        'v': '2',
+        'en': 'page_view',
+        'ep.original_page_path': '/',
+      }));
+      await browser.waitUntil(async () => await beaconsContain({
+        v: '1',
+        t: 'pageview',
+        dp: '/',
+      }));
+
+      const articleLink = await $(`a[href="${articles[0].path}"]`);
+      await articleLink.click();
+
+      await browser.waitUntil(async () => await beaconsContain({
+        'v': '2',
+        'en': 'page_view',
+        'ep.page_path': articles[0].path,
+        'ep.original_page_path': '/',
+      }));
+      await browser.waitUntil(async () => await beaconsContain({
+        v: '1',
+        t: 'pageview',
+        dp: articles[0].path,
+      }));
+    });
+
+    it('should send pageview hits on back/forward navigations', async () => {
+      await browser.waitUntil(async () => await beaconsContain({
+        'v': '2',
+        'en': 'page_view',
+        'ep.page_path': '/',
+      }));
+      await browser.waitUntil(async () => await beaconsContain({
+        v: '1',
+        t: 'pageview',
+        dp: '/',
+      }));
+
+      // Load a page.
+
+      const articleLink = await $(`a[href="${pages[1].path}"]`);
+      await articleLink.click();
+
+      await browser.waitUntil(async () => await beaconsContain({
+        'v': '2',
+        'en': 'page_view',
+        'ep.page_path': pages[1].path,
+        'ep.original_page_path': '/',
+      }));
+      await browser.waitUntil(async () => await beaconsContain({
+        v: '1',
+        t: 'pageview',
+        dp: pages[1].path,
+      }));
+
+      // Click 'back' to the home page
+
+      await clearBeacons();
+      await browser.back();
+
+      await browser.waitUntil(async () => await beaconsContain({
+        'v': '2',
+        'en': 'page_view',
+        'ep.page_path': pages[0].path,
+        'ep.original_page_path': '/',
+      }));
+      await browser.waitUntil(async () => await beaconsContain({
+        v: '1',
+        t: 'pageview',
+        dp: pages[0].path,
+      }));
+
+      // Click 'forward' to the articles page
+
+      await clearBeacons();
+      await browser.forward();
+
+      await browser.waitUntil(async () => await beaconsContain({
+        'v': '2',
+        'en': 'page_view',
+        'ep.page_path': pages[1].path,
+        'ep.original_page_path': '/',
+      }));
+      await browser.waitUntil(async () => await beaconsContain({
+        v: '1',
+        t: 'pageview',
+        dp: pages[1].path,
+      }));
+    });
+  });
+
+  describe('v2', () => {
+    it('should invoke the v2 log function when `v=2` is set', async () => {
+      await browser.execute(function() {
+        const queryParams = [
+          'v=2',
+          'dl=https%3A%2F%2Fphilipwalton.com%2F%3Futm_source%3Dlog',
+          'dt=Home%20%E2%80%94%20Philip%20Walton',
+          'de=UTF-8',
+          'ul=en-us',
+          'vp=474x1016',
+          'sr=1792x1120',
+          'sd=30-bit',
+          'dr=',
+          'cid=1633059568188-9970492436839',
+          'up.breakpoint=sm',
+          'up.effective_connection_type=4g',
+          'up.pixel_density=2x',
+          'up.service_worker_state=controlled',
+        ].join('&');
+
+        const eventParams = [
+          'en=page_view',
+          'ep.page_path=%2F',
+          'ep.content_source=cache',
+          'epn.measurement_version=71',
+          'epn.time_origin=1633061440539.4',
+          'ep.page_id=1633061440539-3930979708627',
+          'epn.pageshow_count=1',
+          'ep.original_page_path=%2F',
+          'ep.navigation_type=reload',
+          'ep.site_version=3.6.0',
+          'epn.page_time=221.9',
+          'ep.visibility_state=hidden',
+        ].join('&');
+
+        navigator.sendBeacon('/log?' + queryParams, eventParams);
+      });
+
+      await browser.waitUntil(async () => await beaconsContain({
+        'v': '2',
+        'dl': 'https://philipwalton.com/?utm_source=log',
+        'dt': 'Home — Philip Walton',
+        'de': 'UTF-8',
+        'ul': 'en-us',
+        'vp': '474x1016',
+        'sr': '1792x1120',
+        'sd': '30-bit',
+        'dr': '',
+        'cid': '1633059568188-9970492436839',
+        'up.breakpoint': 'sm',
+        'up.effective_connection_type': '4g',
+        'up.pixel_density': '2x',
+        'up.service_worker_state': 'controlled',
+        'tid': 'G-GVKBFZ3VDY',
+        'en': 'page_view',
+        'ep.page_path': '/',
+        'ep.content_source': 'cache',
+        'epn.measurement_version': '71',
+        'epn.time_origin': '1633061440539.4',
+        'ep.page_id': '1633061440539-3930979708627',
+        'epn.pageshow_count': '1',
+        'ep.original_page_path': '/',
+        'ep.navigation_type': 'reload',
+        'ep.site_version': '3.6.0',
+        'epn.page_time': '221.9',
+        'ep.visibility_state': 'hidden',
+        '_uip': /[.:\w]+/,
+      }));
+      await browser.waitUntil(async () => await beaconsContain({
+        'v': '1',
+        'dl': 'https://philipwalton.com/?utm_source=log',
+        'dt': 'Home — Philip Walton',
+        'de': 'UTF-8',
+        'ul': 'en-us',
+        'vp': '474x1016',
+        'sr': '1792x1120',
+        'sd': '30-bit',
+        'dr': '',
+        'cid': '1633059568188-9970492436839',
+        'tid': 'UA-21292978-1',
+        't': 'pageview',
+        'dp': '/',
+        'cd14': /\w{8}-\w{4}-4\w{3}-[89aAbB]\w{3}-\w{12}/,
+        'uip': /[.:\w]+/,
+        'cd13': 'pageview',
+        'cd7': '1633059568188-9970492436839',
+        'cd1': 'sm',
+        'cd2': '2x',
+        'cd3': '3.6.0',
+        'cd4': 'cache',
+        'cd5': '4g',
+        'cd6': '(not set)',
+        'cd8': '(not set)',
+        'cd9': 'controlled',
+        'cd10': '(not set)',
+        'cd11': '1633061440539-3930979708627',
+        'cd12': 'hidden',
+        'cd15': '(not set)',
+        'cd16': '71',
+        'cd17': '1633061440539-3930979708627-1',
+        'cd18': 'reload',
+      }));
+    });
+  });
+
+  describe('v1', () => {
+    it('should invoke the v1 log function when no `v` param is present', async () => {
+      await browser.execute(function() {
+        navigator.sendBeacon('/log', [
+          't=pageview',
+          'ht=1614466715909',
+          'dl=https%3A%2F%2Fphilipwalton.com%2F%3Futm_source%3Dlog',
+          'dp=%2F',
+          'dt=Home%20%E2%80%94%20Philip%20Walton',
+          'de=UTF-8',
+          'ul=en-us',
+          'vp=1792x414',
+          'sr=1792x1120',
+          'sd=30-bit',
+          'dr=',
+          'cd10=true',
+          'cd1=lg',
+          'cd2=2x',
+          'cd16=68',
+          'cd11=1614466715883-5755939763374',
+          'cd17=1614466715883-6197446999056',
+          'cd9=controlled',
+          'cd18=navigate',
+          'cd5=4g',
+          'cd3=3.3.0',
+          'cid=1600110148295-9925491440728',
+          'cd4=navigation',
+          'cd15=1614466715909',
+          'cd12=visible',
+        ].join('&'));
+      });
+
+      await browser.waitUntil(async () => await beaconsContain({
+        'v': '1',
+        't': 'pageview',
+        'dl': 'https://philipwalton.com/?utm_source=log',
+        'dp': '/',
+        'dt': 'Home — Philip Walton',
+        'de': 'UTF-8',
+        'ul': 'en-us',
+        'vp': '1792x414',
+        'sr': '1792x1120',
+        'sd': '30-bit',
+        'dr': '',
+        'cd10': 'true',
+        'cd1': 'lg',
+        'cd2': '2x',
+        'cd16': '68',
+        'cd11': '1614466715883-5755939763374',
+        'cd17': '1614466715883-6197446999056',
+        'cd9': 'controlled',
+        'cd18': 'navigate',
+        'cd5': '4g',
+        'cd3': '3.3.0',
+        'cid': '1600110148295-9925491440728',
+        'cd4': 'navigation',
+        'cd15': '1614466715909',
+        'cd12': 'visible',
+      }));
+    });
   });
 });

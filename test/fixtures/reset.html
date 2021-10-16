@@ -11,5 +11,12 @@
   }
 
   localStorage.clear();
+
+  await new Promise((resolve) => {
+    const req = indexedDB.deleteDatabase("kv-store");
+    req.onsuccess = resolve;
+  })
+
+  window.__ready__ = true;
 })();
 </script>

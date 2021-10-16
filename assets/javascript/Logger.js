@@ -59,7 +59,7 @@ export class Logger {
     };
 
     this.awaitBeforeSending(this._setClientId());
-    this.awaitBeforeSending(this._updateSessionInfo());
+    this.awaitBeforeSending(this._updateSessionInfo(true));
 
     if (!visibilityState) {
       visibilityState = document.visibilityState;
@@ -140,15 +140,50 @@ export class Logger {
    * @return {Promise<void>}
    */
   async _setClientId() {
-    this._pageParams.cid = await getOrCreateClientId();
+    try {
+      this._pageParams.cid =
+          await get('clientId') || await set('clientId', uuid(timeOrigin));
+    } catch (error) {
+      this._pageParams.cid = uuid(timeOrigin);
+    }
   }
 
   /**
    * @return {Promise<void>}
    */
-  async _updateSessionInfo() {
-    const {sid, sct} = await updateOrCreateSessionInfo();
-    Object.assign(this._pageParams, {sid, sct});
+  async _updateSessionInfo(isInitialLoad) {
+    const time = Date.now();
+    let sessionInfo = {sct: 1, seg: 0, sid: time, _et: time};
+
+    try {
+      const storedSessionInfo = await get('sessionInfo');
+
+      if (storedSessionInfo) {
+        sessionInfo = storedSessionInfo;
+        const isSessionExpired = time - sessionInfo._et > SESSION_TIMEOUT;
+
+        // If the previous session has expired, start a new one.
+        // Otherwise, if this is the initial load, mark the session engaged.
+        if (isSessionExpired) {
+          sessionInfo.seg = 0;
+          sessionInfo.sid = time;
+          sessionInfo.sct++;
+        } else if (isInitialLoad) {
+          sessionInfo.seg = 1;
+        }
+
+        // Update the session time to the current time.
+        sessionInfo._et = time;
+      }
+    } catch (error) {
+      // Do nothing...
+    }
+
+    // Update the stored sessionInfo data but don't await
+    set('sessionInfo', sessionInfo);
+
+    const {sid, sct, seg} = sessionInfo;
+    Object.assign(this._pageParams, {sid, sct, seg});
   }
 }
 
@@ -183,50 +218,6 @@ function toQueryString(params) {
   }).join('&');
 }
 
-
-/**
- * @return {Promise<string>}
- */
-async function getOrCreateClientId() {
-  try {
-    return await get('clientId') || await set('clientId', uuid(timeOrigin));
-  } catch (error) {
-    return uuid(timeOrigin);
-  }
-}
-
-/**
- * @return {Promise<Object>}
- */
- async function updateOrCreateSessionInfo() {
-  const time = Date.now();
-  let sessionInfo = {sct: 1, sid: time, _et: time};
-
-  try {
-    const storedSessionInfo = await get('sessionInfo');
-
-    if (storedSessionInfo) {
-      sessionInfo = storedSessionInfo;
-      const isSessionExpired = time - sessionInfo._et > SESSION_TIMEOUT;
-
-      // If the previous session has expired, start a new one.
-      if (isSessionExpired) {
-        sessionInfo.sid = time;
-        sessionInfo.sct++;
-      }
-
-      // Update the session time to the current time.
-      sessionInfo._et = time;
-    }
-  } catch (error) {
-    // Do nothing...
-  }
-
-  // Update the stored sessionInfo data but don't await
-  set('sessionInfo', sessionInfo);
-
-  return sessionInfo;
-}
 
 /**
  * @return {Promise<string>}

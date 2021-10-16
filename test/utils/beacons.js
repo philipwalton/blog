@@ -36,7 +36,11 @@ export async function getBeacons() {
   await fs.ensureFile(LOG_FILE);
   const log = await fs.readFile(LOG_FILE, 'utf-8');
 
-  return log.trim().split('\n\n').filter(Boolean).map((payload) => {
+  return log.trim().split('\n\n').filter((payload) => {
+    // Only return payloads with the param `utm_source=log`, so that
+    // multiple tests running at the same time won't affect results.
+    return payload && payload.includes('utm_source%3Dlog');
+  }).map((payload) => {
     let [url, ...events] = payload.split('\n');
 
     url = new URL(url);

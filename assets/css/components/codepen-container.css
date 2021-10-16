@@ -1,5 +1,5 @@
 .CodepenContainer {
-  border: solid #3d3d3e;
-  border-width: 0 1px 1px;
+  border: 1px solid #ccc;
   margin: 0 0 var(--vgap);
+  padding: 2px;
 }

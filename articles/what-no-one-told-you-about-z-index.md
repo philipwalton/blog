@@ -35,8 +35,16 @@ Here's what the HTML and basic CSS look like. I've also included a visual demo (
   background: blue;
 }
 ```
+
 <div class="CodepenContainer">
-  <iframe src="//codepen.io/philipwalton/embed/ksBaI?height=250&theme-id=5742" scrolling="no" frameborder="0" height="250" allowtransparency="true"></iframe>
+  <iframe
+    allowtransparency="true"
+    frameborder="0"
+    height="300"
+    loading="lazy"
+    scrolling="no"
+    src="https://codepen.io/philipwalton/embed/ksBaI?height=300&theme-id=5742">
+  </iframe>
 </div>
 
 **Here's the challenge:** try to see if you can make the red `<span>` element stack behind the blue and green `<span>` elements without breaking any of the following rules:
@@ -49,9 +57,15 @@ To see if you can figure it out, click the *edit on Codepen* link above and play
 
 *Warning: Don't click on the CSS tab of the example below or it will give away the answer.*
 
-
 <div class="CodepenContainer">
-  <iframe src="//codepen.io/philipwalton/embed/dfCtb?height=250&theme-id=5742" scrolling="no" frameborder="0" height="250" allowtransparency="true"></iframe>
+  <iframe
+    allowtransparency="true"
+    frameborder="0"
+    height="300"
+    loading="lazy"
+    scrolling="no"
+    src="https://codepen.io/philipwalton/embed/dfCtb?height=300&theme-id=5742">
+  </iframe>
 </div>
 
 
@@ -97,7 +111,7 @@ The first and second ways to form stacking context make a lot of sense and are g
 
 The third way (opacity) is almost never mentioned outside of w3c specification documents.
 
-<p class="callout">
+<p class="Callout">
   <strong>Update:</strong> In addition to opacity, several newer CSS properties also create stacking contexts. These include: <a href="http://www.w3.org/TR/css3-transforms/">transforms</a>, <a href="http://www.w3.org/TR/filter-effects/">filters</a>, <a href="http://www.w3.org/TR/css3-regions/">css-regions</a>, <a href="http://www.w3.org/TR/css3-page/">paged media</a>, and possibly others. As a general rule, it seems that if a CSS property requires rendering in an offscreen context, it must create a new stacking context.
 </p>
 

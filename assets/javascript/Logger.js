@@ -16,7 +16,7 @@ const LOG_VERSION = 3;
 const SESSION_TIMEOUT = 1000 * 60 * 30; // 30 minutes.
 
 
-const SEND_TIMEOUT = 5000;
+const SEND_TIMEOUT = self.__ENV__ === 'production' ? 5000 : 1000;
 
 // Managing separately is required until the following bug (currently fixed)
 // is actually released in Safari stable (currently only in STP):
@@ -34,6 +34,7 @@ export class Logger {
     this._hitFilter = hitFilter;
     this._presendDependencies = [];
     this._eventQueue = [];
+    this._requestCount = 0;
 
     this._pageParams = {
       dl: location.href,
@@ -121,11 +122,18 @@ export class Logger {
   async _send() {
     clearTimeout(this._sendTimeout);
     if (this._eventQueue.length > 0) {
-      // Update the session timestamp after hits are sent.
-      // Do not await. It's OK if this fails for some reason.
+      // Update the session info, but do not await.
+      // It's OK if this fails for some reason.
       this._updateSessionInfo();
 
-      this._pageParams._s++;
+      this._requestCount++;
+      this._pageParams._s = this._requestCount;
+
+      // Remove _ss and _fv param after the first request.
+      if (this._requestCount > 1) {
+        delete this._pageParams._ss;
+        delete this._pageParams._fv;
+      }
 
       const path = `/log?v=${LOG_VERSION}`;
       const body =
@@ -145,11 +153,23 @@ export class Logger {
    * @return {Promise<void>}
    */
   async _setClientId() {
+    let cid;
     try {
-      this._pageParams.cid =
-          await get('clientId') || await set('clientId', uuid(timeOrigin));
-    } catch (error) {
-      this._pageParams.cid = uuid(timeOrigin);
+      cid = await get('clientId');
+    } catch (err) {
+      // Do nothing.
+    }
+
+    if (cid) {
+      this._pageParams.cid = cid;
+    } else {
+      cid = uuid(timeOrigin);
+      this._pageParams.cid = cid;
+      this._pageParams._fv = 1;
+      this._pageParams._ss = 1;
+
+      // Do not await...
+      set('clientId', cid);
     }
   }
 
@@ -159,6 +179,7 @@ export class Logger {
   async _updateSessionInfo(isInitialLoad) {
     const time = Date.now();
     let sessionInfo = {sct: 1, seg: 0, sid: time, _et: time};
+    let isNewSession;
 
     try {
       const storedSessionInfo = await get('sessionInfo');
@@ -170,15 +191,21 @@ export class Logger {
         // If the previous session has expired, start a new one.
         // Otherwise, if this is the initial load, mark the session engaged.
         if (isSessionExpired) {
+          isNewSession = true;
+
           sessionInfo.seg = 0;
           sessionInfo.sid = time;
           sessionInfo.sct++;
         } else if (isInitialLoad) {
+          // If the session has not expired this must be
+          // a new page load in the current session.
           sessionInfo.seg = 1;
         }
 
         // Update the session time to the current time.
         sessionInfo._et = time;
+      } else {
+        isNewSession = true;
       }
     } catch (error) {
       // Do nothing...
@@ -189,6 +216,9 @@ export class Logger {
 
     const {sid, sct, seg} = sessionInfo;
     Object.assign(this._pageParams, {sid, sct, seg});
+    if (isNewSession) {
+      this._pageParams._ss = 1;
+    }
   }
 }
 

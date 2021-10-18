@@ -7,6 +7,8 @@ import {beaconsContain, clearBeacons, getBeacons} from './utils/beacons.js';
 let articles;
 let pages;
 
+let testID = 0;
+
 describe('log', function() {
   before(async () => {
     const book = await initBook();
@@ -25,24 +27,26 @@ describe('log', function() {
   });
 
   describe('v3', () => {
-    beforeEach(async () => {
-      await browser.url('/?utm_source=log');
-    });
-
     it('should send pageview hits on pageload', async () => {
+      await browser.url(`/?test_id=${++testID}`);
+
       await browser.waitUntil(async () => await beaconsContain({
         'v': '2',
+        'dl': new RegExp(`test_id=${testID}`),
         'en': 'page_view',
         'ep.page_path': '/',
       }));
       await browser.waitUntil(async () => await beaconsContain({
         v: '1',
         t: 'pageview',
+        dl: new RegExp(`test_id=${testID}`),
         dp: '/',
       }));
     });
 
     it('should include all relevant parameters', async () => {
+      await browser.url(`/?test_id=${++testID}`);
+
       await browser.waitUntil(async () => (await getBeacons()).length > 2);
 
       const beacons = await getBeacons();
@@ -111,29 +115,35 @@ describe('log', function() {
     });
 
     it('should update the session count and engagement status after additional visits', async () => {
-      await browser.waitUntil(async () => await beaconsContain({
+      await browser.url(`/?test_id=${++testID}`);
+
+      const beacon1 = await browser.waitUntil(async () => await beaconsContain({
         'v': '2',
-        // 'seg': '0',
-        // 'sct': '1',
-        // 'sid': /^\d{13}$/,
+        'dl': new RegExp(`test_id=${testID}`),
+        'seg': '0',
+        'sct': '1',
+        'sid': /^\d{13}$/,
+        '_ss': '1',
+        '_fv': '1',
         'en': 'page_view',
         'ep.page_path': '/',
       }));
 
-      const beacons1 = await getBeacons();
-      console.warn('BEACON COUNT', beacons1.length);
+      await clearBeacons();
+      await browser.url(`/about/?test_id=${testID}`);
 
-      const sid1 = beacons1.find((b) => b.get('v') === '2').get('sid');
-
-      await browser.url('/about/?utm_source=log');
-      await browser.waitUntil(async () => await beaconsContain({
+      const beacon2 = await browser.waitUntil(async () => await beaconsContain({
         'v': '2',
         'seg': '1',
         'sct': '1',
-        'sid': sid1,
+        'sid': beacon1.get('sid'),
         'en': 'page_view',
+        'dl': new RegExp(`test_id=${testID}`),
         'ep.page_path': '/about/',
       }));
+
+      assert(!beacon2.has('_ss'));
+      assert(!beacon2.has('_fv'));
 
       // Update the data in IndexedDB to expire the session.
       await browser.executeAsync(async (done) => {
@@ -154,33 +164,36 @@ describe('log', function() {
       });
 
       await clearBeacons();
+      await browser.url(`/articles/?test_id=${testID}`);
 
-      await browser.url('/articles/?utm_source=log');
-      await browser.waitUntil(async () => await beaconsContain({
+      const beacon3 = await browser.waitUntil(async () => await beaconsContain({
         'v': '2',
         'seg': '0',
         'sct': '9',
         'sid': /^\d{13}$/,
+        '_ss': '1',
+        'dl': new RegExp(`test_id=${testID}`),
         'en': 'page_view',
         'ep.page_path': '/articles/',
       }));
 
-      const beacons2 = await getBeacons();
-      const sid2 = beacons2
-          .find((b) => b.get('ep.page_path') === '/articles/').get('sid');
-
-      assert(sid2 > sid1);
+      assert(!beacon3.has('_fv'));
+      assert(beacon3.get('sid') > beacon1.get('sid'));
     });
 
     it('should send pageview hits on SPA pageloads', async () => {
+      await browser.url(`/?test_id=${++testID}`);
+
       await browser.waitUntil(async () => await beaconsContain({
         'v': '2',
+        'dl': new RegExp(`test_id=${testID}`),
         'en': 'page_view',
         'ep.original_page_path': '/',
       }));
       await browser.waitUntil(async () => await beaconsContain({
         v: '1',
         t: 'pageview',
+        dl: new RegExp(`test_id=${testID}`),
         dp: '/',
       }));
 
@@ -201,13 +214,17 @@ describe('log', function() {
     });
 
     it('should send pageview hits on back/forward navigations', async () => {
+      await browser.url(`/?test_id=${++testID}`);
+
       await browser.waitUntil(async () => await beaconsContain({
         'v': '2',
+        'dl': new RegExp(`test_id=${testID}`),
         'en': 'page_view',
         'ep.page_path': '/',
       }));
       await browser.waitUntil(async () => await beaconsContain({
         v: '1',
+        dl: new RegExp(`test_id=${testID}`),
         t: 'pageview',
         dp: '/',
       }));
@@ -270,7 +287,7 @@ describe('log', function() {
       await browser.execute(function() {
         const queryParams = [
           'v=2',
-          'dl=https%3A%2F%2Fphilipwalton.com%2F%3Futm_source%3Dlog',
+          'dl=https%3A%2F%2Fphilipwalton.com%2F',
           'dt=Home%20%E2%80%94%20Philip%20Walton',
           'de=UTF-8',
           'ul=en-us',
@@ -305,7 +322,7 @@ describe('log', function() {
 
       await browser.waitUntil(async () => await beaconsContain({
         'v': '2',
-        'dl': 'https://philipwalton.com/?utm_source=log',
+        'dl': 'https://philipwalton.com/',
         'dt': 'Home — Philip Walton',
         'de': 'UTF-8',
         'ul': 'en-us',
@@ -335,7 +352,7 @@ describe('log', function() {
       }));
       await browser.waitUntil(async () => await beaconsContain({
         'v': '1',
-        'dl': 'https://philipwalton.com/?utm_source=log',
+        'dl': 'https://philipwalton.com/',
         'dt': 'Home — Philip Walton',
         'de': 'UTF-8',
         'ul': 'en-us',
@@ -376,7 +393,7 @@ describe('log', function() {
         navigator.sendBeacon('/log', [
           't=pageview',
           'ht=1614466715909',
-          'dl=https%3A%2F%2Fphilipwalton.com%2F%3Futm_source%3Dlog',
+          'dl=https%3A%2F%2Fphilipwalton.com%2F',
           'dp=%2F',
           'dt=Home%20%E2%80%94%20Philip%20Walton',
           'de=UTF-8',
@@ -405,7 +422,7 @@ describe('log', function() {
       await browser.waitUntil(async () => await beaconsContain({
         'v': '1',
         't': 'pageview',
-        'dl': 'https://philipwalton.com/?utm_source=log',
+        'dl': 'https://philipwalton.com/',
         'dp': '/',
         'dt': 'Home — Philip Walton',
         'de': 'UTF-8',

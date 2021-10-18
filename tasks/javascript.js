@@ -19,6 +19,7 @@ const config = fs.readJSONSync('./config.json');
 
 // Set global variables to be replaced in the source files.
 const globals = {
+  'self.__ENV__': JSON.stringify(ENV),
   'process.env.NODE_ENV': JSON.stringify(ENV),
 };
 for (const [key, value] of Object.entries(dimensions)) {

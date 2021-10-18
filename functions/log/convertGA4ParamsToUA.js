@@ -20,6 +20,8 @@ export function convertGA4ParamsToUA(params) {
   // Delete private v2 params.
   params.delete('_p');
   params.delete('_s');
+  params.delete('_ss');
+  params.delete('_fv');
 
   // Set the event name (or convert to a pageview).
   const en = params.get('en');

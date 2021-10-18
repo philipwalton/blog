@@ -10,6 +10,13 @@ describe('Navigation drawer', () => {
     const book = await initBook();
     site = book.site;
     pages = book.pages;
+
+    await browser.url('/__reset__');
+    await browser.waitUntil(async () => {
+      return await browser.execute(() => {
+        return window.__ready__ === true;
+      });
+    });
   });
 
   beforeEach(async () => {

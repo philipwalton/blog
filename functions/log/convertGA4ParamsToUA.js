@@ -17,6 +17,10 @@ export function convertGA4ParamsToUA(params) {
   params.set('v', '1');
   params.set('tid', UA_MEASUREMENT_ID);
 
+  // Delete private v2 params.
+  params.delete('_p');
+  params.delete('_s');
+
   // Set the event name (or convert to a pageview).
   const en = params.get('en');
   if (en === 'page_view') {

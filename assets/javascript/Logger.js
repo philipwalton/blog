@@ -44,6 +44,8 @@ export class Logger {
       sr: `${screen.width}x${screen.height}`,
       sd: `${screen.colorDepth}-bit`,
       dr: getReferrer(),
+      _p: Math.floor(Math.random() * 1e9),
+      _s: 0,
     };
 
     this._userParams = prefixParams('u', {
@@ -51,6 +53,7 @@ export class Logger {
       connection_type: getEffectiveConnectionType(),
       pixel_density: getPixelDensity(),
       service_worker_state: initialSWState,
+      user_agent: navigator.userAgent,
     });
 
     // Add the initial values known at instantiation time.
@@ -121,6 +124,8 @@ export class Logger {
       // Update the session timestamp after hits are sent.
       // Do not await. It's OK if this fails for some reason.
       this._updateSessionInfo();
+
+      this._pageParams._s++;
 
       const path = `/log?v=${LOG_VERSION}`;
       const body =

@@ -36,12 +36,21 @@ export async function beaconsContain(params) {
 export async function getBeacons() {
   await fs.ensureFile(LOG_FILE);
   const log = await fs.readFile(LOG_FILE, 'utf-8');
+  let idx = 0;
 
   return log.trim().split('\n\n').filter(Boolean).map((payload) => {
     let [url, ...events] = payload.split('\n');
-
     url = new URL(url);
-    events = events.map((e) => new URLSearchParams(url.search + '&' + e));
+
+    idx++;
+
+    if (events.length) {
+      events = events.map((e) => {
+        return new URLSearchParams(url.search + `&${e}&__idx=${idx}`);
+      });
+    } else {
+      events = [new URLSearchParams(url.search + `&__idx=${idx}`)];
+    }
 
     // Since this function only returns the beacon data,
     // assert the correct URL is used here.

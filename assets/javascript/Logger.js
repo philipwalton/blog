@@ -54,7 +54,6 @@ export class Logger {
       connection_type: getEffectiveConnectionType(),
       pixel_density: getPixelDensity(),
       service_worker_state: initialSWState,
-      user_agent: navigator.userAgent,
     });
 
     // Add the initial values known at instantiation time.

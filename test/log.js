@@ -97,7 +97,8 @@ describe('log', function() {
             assert.strictEqual(qt, /\d+/);
           }
 
-          assert.strictEqual(beacon.get(dimensions.CD_HIT_TYPE), beacon.get('t'));
+          assert.strictEqual(
+              beacon.get(dimensions.CD_HIT_TYPE), beacon.get('t'));
 
           // // Ensure all custom dimensions have a value
           for (const param of Object.values(dimensions)) {
@@ -129,6 +130,24 @@ describe('log', function() {
         'ep.page_path': '/',
       }));
 
+      const ttfb1 = await browser.waitUntil(async () => await beaconsContain({
+        'v': '2',
+        'dl': new RegExp(`test_id=${testID}`),
+        'en': 'TTFB',
+        'ep.page_path': '/',
+      }));
+      const fcp1 = await browser.waitUntil(async () => await beaconsContain({
+        'v': '2',
+        'dl': new RegExp(`test_id=${testID}`),
+        'en': 'FCP',
+        'ep.page_path': '/',
+      }));
+
+      // Assert that the pageview was sent as a separate request from the
+      // web vitals metric events (since it has session start data).
+      assert(beacon1.get('__idx') < ttfb1.get('__idx'));
+      assert.equal(ttfb1.get('__idx'), fcp1.get('__idx'));
+
       await clearBeacons();
       await browser.url(`/about/?test_id=${testID}`);
 
@@ -144,6 +163,24 @@ describe('log', function() {
 
       assert(!beacon2.has('_ss'));
       assert(!beacon2.has('_fv'));
+
+      const ttfb2 = await browser.waitUntil(async () => await beaconsContain({
+        'v': '2',
+        'dl': new RegExp(`test_id=${testID}`),
+        'en': 'TTFB',
+        'ep.page_path': '/about/',
+      }));
+      const fcp2 = await browser.waitUntil(async () => await beaconsContain({
+        'v': '2',
+        'dl': new RegExp(`test_id=${testID}`),
+        'en': 'FCP',
+        'ep.page_path': '/about/',
+      }));
+
+      // This time all three events should be in the same request
+      // because no new session was started.
+      assert.equal(beacon2.get('__idx'), ttfb2.get('__idx'));
+      assert.equal(ttfb2.get('__idx'), fcp2.get('__idx'));
 
       // Update the data in IndexedDB to expire the session.
       await browser.executeAsync(async (done) => {
@@ -179,6 +216,24 @@ describe('log', function() {
 
       assert(!beacon3.has('_fv'));
       assert(beacon3.get('sid') > beacon1.get('sid'));
+
+      const ttfb3 = await browser.waitUntil(async () => await beaconsContain({
+        'v': '2',
+        'dl': new RegExp(`test_id=${testID}`),
+        'en': 'TTFB',
+        'ep.page_path': '/articles/',
+      }));
+      const fcp3 = await browser.waitUntil(async () => await beaconsContain({
+        'v': '2',
+        'dl': new RegExp(`test_id=${testID}`),
+        'en': 'FCP',
+        'ep.page_path': '/articles/',
+      }));
+
+      // A new session was started so the pageview should have been sent
+      // as a separate request (similar to the first part of this test).
+      assert(beacon3.get('__idx') < ttfb3.get('__idx'));
+      assert.equal(ttfb3.get('__idx'), fcp3.get('__idx'));
     });
 
     it('should send pageview hits on SPA pageloads', async () => {

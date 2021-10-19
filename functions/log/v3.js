@@ -3,7 +3,6 @@ import fetch from 'node-fetch';
 import {convertGA4ParamsToUA} from './convertGA4ParamsToUA.js';
 import {GA4_MEASUREMENT_ID} from '../constants.js';
 
-
 /**
  *
  * @param {Object} request
@@ -11,19 +10,16 @@ import {GA4_MEASUREMENT_ID} from '../constants.js';
 export async function v3(request) {
   const [paramsLine, ...eventsLines] = request.body.split('\n');
 
-  let queryParams = [
+  const queryParams = new URLSearchParams([
     `v=2`,
     `tid=${GA4_MEASUREMENT_ID}`,
     paramsLine,
-  ].join('&');
+  ].join('&'));
 
   // Set the `_uip` param to the IP address of the user.
   if (request.ip) {
-    queryParams += `&_uip=${request.ip}`;
+    queryParams.set('_uip', request.ip);
   }
-
-  const ga4URL = 'https://www.google-analytics.com/g/collect?' + queryParams;
-  const ga4Body = eventsLines.join('\n');
 
   const uaURL = 'https://www.google-analytics.com/batch';
   const uaBody = eventsLines.map((eventParams) => {
@@ -32,13 +28,35 @@ export async function v3(request) {
     return params.toString();
   }).join('\n');
 
-  // Send beacons when running on Firebase, otherwise just log them.
-  if (process.env.FIREBASE_CONFIG) {
-    /**
-     * @param {string} url
-     * @param {string} body
-     */
-    const beacon = async (url, body) => {
+  // If the query params contain _ss or _fv and one of the events is a
+  // page view, split it out into two separate requests.
+  const newSessionPageviewEvent =
+      (queryParams.has('_ss') || queryParams.has('_fv')) &&
+      eventsLines.find((line) => line.trim().startsWith('en=page_view'));
+
+  const newSessionParams = newSessionPageviewEvent &&
+      new URLSearchParams(`${queryParams}&${newSessionPageviewEvent}`);
+
+  if (newSessionPageviewEvent) {
+    queryParams.delete('_fv');
+    queryParams.delete('_ss');
+    eventsLines.splice(eventsLines.indexOf(newSessionPageviewEvent), 1);
+  }
+
+  const ga4SessionURL = newSessionParams &&
+      'https://www.google-analytics.com/g/collect?' + newSessionParams;
+
+  const ga4URL = 'https://www.google-analytics.com/g/collect?' + queryParams;
+  const ga4Body = eventsLines.join('\n');
+
+
+  /**
+   * @param {string} url
+   * @param {string} body
+   */
+  const beacon = async (url, body) => {
+    // Send beacons when running on Firebase, otherwise just log them.
+    if (process.env.FIREBASE_CONFIG) {
       await fetch(url, {
         body,
         method: 'POST',
@@ -46,24 +64,25 @@ export async function v3(request) {
           'User-Agent': request.get('User-Agent'),
         },
       });
-    };
-
-    await Promise.all([
-      beacon(ga4URL, ga4Body),
-      beacon(uaURL, uaBody),
-    ]);
-  } else {
-    try {
-      fs.appendFileSync('beacons.log', [
-        ga4URL,
-        ga4Body,
-        '',
-        uaURL,
-        uaBody,
-        '\n',
-      ].join('\n'));
-    } catch (err) {
-      console.error('Could not write to file `beacons.log`', err);
+    } else {
+      try {
+        let contents = url + '\n';
+        if (body) {
+          contents += body + '\n';
+        }
+        fs.appendFileSync('beacons.log', contents + '\n');
+      } catch (err) {
+        console.error('Could not write to file `beacons.log`', err);
+      }
     }
+  };
+
+  const requests = [];
+  if (ga4SessionURL) {
+    requests.push(beacon(ga4SessionURL));
   }
+  requests.push(beacon(ga4URL, ga4Body));
+  requests.push(beacon(uaURL, uaBody));
+
+  await Promise.all(requests);
 }

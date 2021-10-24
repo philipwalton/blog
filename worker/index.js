@@ -31,9 +31,29 @@ async function handleDocumentRequest(request) {
   const response = await fetch(request, requestOpts);
   const clone = new Response(response.body, response);
 
+  addExperimentIDCookie(request, clone);
   addServerTimingHeaders(clone);
 
   return clone;
+}
+
+/**
+ * @param {Request} request
+ * @param {Response} response
+ */
+function addExperimentIDCookie(request, response) {
+  const cookie = request.headers.get('cookie') || '';
+  const xid = cookie.match(/(?:^|;) *xid=(\.\d+) *(?:;|$)/)
+      ? RegExp.$1 : `${Math.random()}`.slice(1, 5);
+
+  response.headers.set('Set-Cookie', [
+    'xid=' + xid,
+    'Path=/',
+    'Max-Age=31536000',
+    'SameSite=Strict',
+    'HttpOnly',
+    'Secure',
+  ].join('; '));
 }
 
 /**

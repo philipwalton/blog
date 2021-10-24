@@ -8,5 +8,9 @@
   "publicModulesDir": "build/modules",
   "publicModulesPath": "/modules",
   "templatesDir": "templates",
-  "timezone": "America/Los_Angeles"
+  "timezone": "America/Los_Angeles",
+  "experiments": [
+    "control",
+    "link_css"
+  ]
 }

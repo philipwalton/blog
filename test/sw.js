@@ -3,13 +3,11 @@ import fs from 'fs-extra';
 
 
 describe('Service Worker', () => {
-  it('does stuff', () => {
-    console.log('It worked!');
-  });
-
   beforeEach(async () => {
     restoreSWVersion();
     await browser.url('/__reset__');
+    // Set the default experiment group.
+    await browser.setCookies({name: 'xid', value: '.999', path: '/'});
   });
 
   after(() => {

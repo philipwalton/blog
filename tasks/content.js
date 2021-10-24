@@ -2,8 +2,10 @@ import fs from 'fs-extra';
 import gulp from 'gulp';
 import nunjucks from 'nunjucks';
 import path from 'path';
+import {generateRevisionedAsset} from './utils/assets.js';
 import {initBook} from './utils/book.js';
 import {ENV} from './utils/env.js';
+import {eachExperiment, getExperiment} from './utils/experiments.js';
 import {processHtml} from './utils/html.js';
 import {renderMarkdown} from './utils/markdown.js';
 import {initTemplates} from './utils/templates.js';
@@ -12,10 +14,16 @@ import {initTemplates} from './utils/templates.js';
 const config = fs.readJSONSync('./config.json');
 let book;
 
+const getExperimentDir = () => {
+  const experiment = getExperiment();
+  return path.join(config.publicDir, experiment ? `_${experiment}` : '.');
+};
+
 const renderArticleContentPartials = async () => {
   for (const article of book.articles) {
     const data = {
       ENV,
+      EXPERIMENT: getExperiment(),
       site: book.site,
       page: article,
       layout: 'partial.html',
@@ -31,17 +39,20 @@ const renderArticleContentPartials = async () => {
 
 const buildArticles = async () => {
   for (const article of book.articles) {
-    await fs.outputFile(article.partialOutput, processHtml(article.content));
+    await fs.outputFile(path.join(getExperimentDir(), article.partialFilePath),
+        processHtml(article.content));
 
     const data = {
       ENV,
+      EXPERIMENT: getExperiment(),
       site: book.site,
       page: {type: 'article', ...article},
       layout: 'shell.html',
     };
     const html = nunjucks.render(article.template, data);
 
-    await fs.outputFile(article.output, processHtml(html));
+    await fs.outputFile(
+        path.join(getExperimentDir(), article.filePath), processHtml(html));
   }
 };
 
@@ -49,6 +60,7 @@ const renderPageContentPartials = async () => {
   for (const page of book.pages) {
     if (!page.private) {
       const data = {
+        EXPERIMENT: getExperiment(),
         site: book.site,
         articles: book.articles,
         page: page,
@@ -65,11 +77,15 @@ const buildPages = async () => {
     // Private pages are those that cannot be found by following a link on the
     // site, and thus no content partial needs to be created for them.
     if (!page.private) {
-      await fs.outputFile(page.partialOutput, processHtml(page.content));
+      const partialFilePath =
+          path.join(getExperimentDir(), page.partialFilePath);
+
+      await fs.outputFile(partialFilePath, processHtml(page.content));
     }
 
     const data = {
       ENV,
+      EXPERIMENT: getExperiment(),
       site: book.site,
       articles: book.articles,
       page: page,
@@ -77,7 +93,8 @@ const buildPages = async () => {
     };
 
     const html = nunjucks.render(page.template, data);
-    await fs.outputFile(page.output, processHtml(html));
+    const filePath = path.join(getExperimentDir(), page.filePath);
+    await fs.outputFile(filePath, processHtml(html));
   }
 };
 
@@ -88,7 +105,8 @@ const buildResources = async () => {
   };
   for (const resource of book.resources) {
     const content = nunjucks.render(resource.template, data);
-    await fs.outputFile(resource.output, content);
+    await fs.outputFile(
+        path.join(config.publicDir, resource.filePath), content);
   }
 };
 
@@ -96,9 +114,11 @@ const buildShell = async () => {
   // html-minifier breaks when trying to minify partial HTML, so we have to
   // render the shell as a full page, minify it, and then split it up.
   const SHELL_SPLIT_POINT = 'SHELL_SPLIT_POINT';
+  const experiment = getExperiment();
 
   const data = {
     ENV,
+    EXPERIMENT: experiment,
     site: book.site,
     articles: book.articles,
     page: {
@@ -114,26 +134,29 @@ const buildShell = async () => {
 
   const [shellStart, shellEnd] = processedHtml.split(SHELL_SPLIT_POINT);
 
-  await fs.outputFile(
-      path.join(config.publicDir, 'shell-start.html'), shellStart);
-
-  await fs.outputFile(
-      path.join(config.publicDir, 'shell-end.html'), shellEnd);
+  await Promise.all([
+    generateRevisionedAsset('shell-start.html', shellStart, experiment),
+    generateRevisionedAsset('shell-end.html', shellEnd, experiment),
+  ]);
 };
 
 
 gulp.task('content', async () => {
+  book = await initBook();
+  initTemplates();
+
   try {
-    book = await initBook();
-    initTemplates();
+    await eachExperiment(async () => {
+      await renderArticleContentPartials();
+      await buildArticles();
 
-    await renderArticleContentPartials();
-    await renderPageContentPartials();
+      await renderPageContentPartials();
+      await buildPages();
 
-    await buildArticles();
-    await buildPages();
+      await buildShell();
+    });
+
     await buildResources();
-    await buildShell();
   } catch (err) {
     console.error(err);
   }

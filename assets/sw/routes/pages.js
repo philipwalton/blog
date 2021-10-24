@@ -1,3 +1,5 @@
+/* global __SHELL_START_URL__, __SHELL_END_URL__ */
+
 import {Route} from 'workbox-routing/Route.js';
 import {strategy as streamsStrategy} from 'workbox-streams/strategy.js';
 import {contentStrategy} from './content.js';
@@ -19,12 +21,12 @@ const contentHandler = ({event, url}) => {
 
 const streamHandler = streamsStrategy([
   ({event}) => precacheHandler({
-    request: new Request('/shell-start.html'),
+    request: new Request(__SHELL_START_URL__),
     event,
   }),
   contentHandler,
   ({event}) => precacheHandler({
-    request: new Request('/shell-end.html'),
+    request: new Request(__SHELL_END_URL__),
     event,
   }),
 ]);

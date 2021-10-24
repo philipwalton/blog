@@ -24,14 +24,7 @@ export const getOutputFile = (pathname) => {
     pathname += 'index.html';
   }
 
-  return path.resolve(path.join(config.publicDir, pathname));
-};
-
-
-const getPartialOutputFile = (outputFile) => {
-  const basename = path.basename(outputFile, '.html');
-  return path.join(
-      path.dirname(outputFile), `${basename}${config.contentPartialsSuffix}`);
+  return pathname;
 };
 
 
@@ -52,21 +45,25 @@ export const initBook = async () => {
 
   for (const page of book.pages) {
     page.template = getTemplate(page.path);
-    page.output = getOutputFile(page.path);
-    page.partialPath = getPartialPath(page.path);
-    page.partialOutput = getPartialOutputFile(page.output);
+    page.filePath = getOutputFile(page.path);
+
+    if (!page.private) {
+      page.partialFilePath = getPartialPath(page.path);
+    }
   }
 
   for (const resource of book.resources) {
     resource.template = getTemplate(resource.path);
-    resource.output = getOutputFile(resource.path);
+    resource.filePath = getOutputFile(resource.path);
   }
 
   for (const article of book.articles) {
     article.template = 'article.html';
-    article.output = getOutputFile(article.path);
-    article.partialPath = getPartialPath(article.path);
-    article.partialOutput = getPartialOutputFile(article.output);
+    article.filePath = getOutputFile(article.path);
+
+    if (!article.private) {
+      article.partialFilePath = getPartialPath(article.path);
+    }
   }
 
   book.site.buildTime = new Date();

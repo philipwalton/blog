@@ -49,12 +49,16 @@ export class Logger {
       _s: 0,
     };
 
-    this._userParams = prefixParams('u', {
+    const userParams = {
       breakpoint: getActiveBreakpoint().name,
       connection_type: getEffectiveConnectionType(),
       pixel_density: getPixelDensity(),
       service_worker_state: initialSWState,
-    });
+    };
+    if (self.__x) {
+      userParams.experiment = self.__x;
+    }
+    this._userParams = prefixParams('u', userParams);
 
     // Add the initial values known at instantiation time.
     this._eventParams = {

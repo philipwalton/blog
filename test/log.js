@@ -18,11 +18,73 @@ describe('log', function() {
 
   beforeEach(async () => {
     await clearBeacons();
+    await browser.deleteCookies(['xid']);
     await browser.url('/__reset__');
     await browser.waitUntil(async () => {
       return await browser.execute(() => {
         return window.__ready__ === true;
       });
+    });
+  });
+
+  describe('experiments', () => {
+    it('should load the proper experiment', async () => {
+      await browser.setCookies({name: 'xid', value: '.234', path: '/'});
+      await browser.url(`/?test_id=${++testID}`);
+
+      await browser.waitUntil(async () => await beaconsContain({
+        'v': '2',
+        'dl': new RegExp(`test_id=${testID}`),
+        'en': 'page_view',
+        'ep.page_path': '/',
+        'up.experiment': 'link_css',
+      }));
+      await browser.waitUntil(async () => await beaconsContain({
+        v: '1',
+        t: 'pageview',
+        dl: new RegExp(`test_id=${testID}`),
+        dp: '/',
+        cd19: 'link_css',
+      }));
+
+      await browser.url('/__reset__');
+      await browser.setCookies({name: 'xid', value: '.567', path: '/'});
+      await browser.url(`/about/?test_id=${++testID}`);
+
+      await browser.waitUntil(async () => await beaconsContain({
+        'v': '2',
+        'dl': new RegExp(`test_id=${testID}`),
+        'en': 'page_view',
+        'ep.page_path': '/about/',
+        'up.experiment': 'control',
+      }));
+      await browser.waitUntil(async () => await beaconsContain({
+        v: '1',
+        t: 'pageview',
+        dl: new RegExp(`test_id=${testID}`),
+        dp: '/about/',
+        cd19: 'control',
+      }));
+
+      await browser.url('/__reset__');
+      await browser.setCookies({name: 'xid', value: '.789', path: '/'});
+      await browser.url(`/articles/?test_id=${++testID}`);
+
+      const beacon = await browser.waitUntil(async () => await beaconsContain({
+        'v': '2',
+        'dl': new RegExp(`test_id=${testID}`),
+        'en': 'page_view',
+        'ep.page_path': '/articles/',
+      }));
+      assert(!beacon.has('up.experiment'));
+
+      await browser.waitUntil(async () => await beaconsContain({
+        v: '1',
+        t: 'pageview',
+        dl: new RegExp(`test_id=${testID}`),
+        dp: '/articles/',
+        cd19: '(not set)',
+      }));
     });
   });
 

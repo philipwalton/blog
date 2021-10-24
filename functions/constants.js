@@ -17,6 +17,7 @@ export const dimensions = {
   CD_TRACKING_VERSION: 'cd16',
   CD_VISIT_ID: 'cd17',
   CD_NAVIGATION_TYPE: 'cd18',
+  CD_EXPERIMENT: 'cd19',
 };
 
 export const metrics = {

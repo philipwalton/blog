@@ -1,1 +1,7 @@
-<style>{{ 'main.css' | revision | inline }}</style>
+<!-- Set an experiment global -->
+{% if EXPERIMENT == 'link_css' %}
+  <link rel="stylesheet" href="{{ 'main.css' | revision }}">
+{% else %}
+  <style>{{ 'main.css' | revision | inline }}</style>
+{% endif %}
+

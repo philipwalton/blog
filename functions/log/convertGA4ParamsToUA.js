@@ -87,6 +87,9 @@ export function convertGA4ParamsToUA(params) {
   }
 
   // Convert user params to their equivalent custom dimensions.
+  const experiment = params.get('up.experiment');
+  params.set(dimensions.CD_EXPERIMENT, experiment || '(not set)');
+
   const breakpoint = params.get('up.breakpoint');
   params.set(dimensions.CD_BREAKPOINT, breakpoint);
 

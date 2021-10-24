@@ -47,9 +47,19 @@ describe('log', function() {
     it('should include all relevant parameters', async () => {
       await browser.url(`/?test_id=${++testID}`);
 
-      await browser.waitUntil(async () => (await getBeacons()).length > 2);
+      await browser.waitUntil(async () => await beaconsContain({
+        'v': '1',
+        'dl': new RegExp(`test_id=${testID}`),
+      }));
+      await browser.waitUntil(async () => await beaconsContain({
+        'v': '2',
+        'dl': new RegExp(`test_id=${testID}`),
+      }));
 
-      const beacons = await getBeacons();
+      const beacons = await getBeacons((beacons) => {
+        return beacons.get('dl').includes(`?test_id=${testID}`);
+      });
+
       for (const beacon of beacons) {
         const v = beacon.get('v');
         assert(v === '2' || v === '1');

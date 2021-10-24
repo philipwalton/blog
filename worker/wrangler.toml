@@ -1,0 +1,25 @@
+name = "worker-dev"
+type = "javascript"
+account_id = "833aa47653f1a867bf6f206ed576cd2f"
+zone_id = "0e50c2f60402446c010a034e02a16288"
+
+compatibility_date = "2021-10-24"
+workers_dev = true
+
+[dev]
+port = 8888
+
+[vars]
+__ENV__ = "development"
+
+# Override values for `--env production` usage
+[env.production]
+name = "worker"
+workers_dev = false
+routes = [
+  "philipwalton.com/",
+  "philipwalton.com/articles*",
+  "philipwalton.com/about*",
+]
+[env.production.vars]
+__ENV__ = "production"

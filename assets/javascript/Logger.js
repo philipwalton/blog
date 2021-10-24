@@ -38,7 +38,7 @@ export class Logger {
 
     this._pageParams = {
       dl: location.href,
-      dt: document.title,
+      dt: document.title.replace(/\s+—.*$/, ''),
       de: document.characterSet,
       ul: navigator.language.toLowerCase(),
       vp: `${innerWidth}x${innerHeight}`,

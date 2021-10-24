@@ -33,12 +33,12 @@ export async function beaconsContain(params) {
  * Gets the array of beacons sent for the current page load.
  * @return {Promise<Array>}
  */
-export async function getBeacons() {
+export async function getBeacons(paramsFilter) {
   await fs.ensureFile(LOG_FILE);
   const log = await fs.readFile(LOG_FILE, 'utf-8');
   let idx = 0;
 
-  return log.trim().split('\n\n').filter(Boolean).map((payload) => {
+  const beacons = log.trim().split('\n\n').filter(Boolean).map((payload) => {
     let [url, ...events] = payload.split('\n');
     url = new URL(url);
 
@@ -70,7 +70,9 @@ export async function getBeacons() {
     }
 
     return events;
-  }).flat();
+  }).flat()
+
+  return paramsFilter ? beacons.filter(paramsFilter) : beacons;
 }
 
 /**

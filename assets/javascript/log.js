@@ -10,7 +10,7 @@ import {uuid} from './utils/uuid';
  * implementation. This allows you to create a segment or view filter
  * that isolates only data captured with the most recent tracking changes.
  */
-const MEASUREMENT_VERSION = 79;
+const MEASUREMENT_VERSION = 80;
 
 /**
  * A 13-digit, random identifier for the current page.
@@ -265,6 +265,11 @@ const trackTTFB = () => {
     };
     if (initialSWState === 'controlled' && 'workerStart' in navEntry) {
       params.worker_start = navEntry.workerStart;
+    }
+    if (Array.isArray(navEntry.serverTiming)) {
+      for (const {name, description} of navEntry.serverTiming) {
+        params[name] = description;
+      }
     }
     log.event(name, params);
   });

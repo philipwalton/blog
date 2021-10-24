@@ -11,7 +11,6 @@ import {streamErrorPlugin} from '../plugins/streamErrorPlugin.js';
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const broadcastUpdatePlugin = new BroadcastUpdatePlugin({
-  headersToCheck: ['etag'],
   generatePayload(data) {
     return {
       cacheName: data.cacheName,

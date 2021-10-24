@@ -7,3 +7,4 @@ import './tasks/javascript.js';
 import './tasks/server.js';
 import './tasks/sw.js';
 import './tasks/watch.js';
+import './tasks/worker.js';

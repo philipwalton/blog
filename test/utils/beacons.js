@@ -70,7 +70,7 @@ export async function getBeacons(paramsFilter) {
     }
 
     return events;
-  }).flat()
+  }).flat();
 
   return paramsFilter ? beacons.filter(paramsFilter) : beacons;
 }

@@ -8,7 +8,6 @@ addEventListener('fetch', (event) => {
       pathname.startsWith('/articles') ||
       // Pages and article content partials
       pathname.endsWith('index.content.html')) {
-
     event.respondWith(
       handleDocumentRequest(event.request).catch(
         (err) => new Response(err.stack, {status: 500})
@@ -41,13 +40,17 @@ async function handleDocumentRequest(request) {
  * @returns {Response}
  */
 function addServerTimingHeaders(response) {
+  const serverTiming = [];
+
   const cfCache = response.headers.get('cf-cache-status');
   if (cfCache) {
-    response.headers.append('Server-Timing', `cf_cache;desc="${cfCache}"`);
+    serverTiming.push(`cf_cache;desc=${cfCache}`);
   }
 
   const fastlyCache = response.headers.get('x-cache');
   if (fastlyCache) {
-    response.headers.append('Server-Timing', `fastly_cache;desc="${fastlyCache}"`);
+    serverTiming.push(`fastly_cache;desc=${fastlyCache}`);
   }
+
+  response.headers.set('Server-Timing', serverTiming.join(', '));
 }

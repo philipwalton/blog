@@ -43,11 +43,11 @@ async function handleDocumentRequest(request) {
 function addServerTimingHeaders(response) {
   const cfCache = response.headers.get('cf-cache-status');
   if (cfCache) {
-    response.headers.set('Server-Timing', `cf_cache;desc="${cfCache}"`);
+    response.headers.append('Server-Timing', `cf_cache;desc="${cfCache}"`);
   }
 
   const fastlyCache = response.headers.get('x-cache');
   if (fastlyCache) {
-    response.headers.set('Server-Timing', `fastly_cache;desc="${fastlyCache}"`);
+    response.headers.append('Server-Timing', `fastly_cache;desc="${fastlyCache}"`);
   }
 }

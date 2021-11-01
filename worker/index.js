@@ -55,7 +55,6 @@ async function handleRequest({request, url}) {
     redirect: request.redirect,
     cf: {
       cacheEverything: self.__ENV__ === 'production',
-      scrapeShield: false,
     },
   });
 

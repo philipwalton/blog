@@ -20,6 +20,7 @@ routes = [
   "philipwalton.com/",
   "philipwalton.com/articles*",
   "philipwalton.com/about*",
+  "philipwalton.com/sw.js",
 ]
 [env.production.vars]
 __ENV__ = "production"

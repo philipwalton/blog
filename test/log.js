@@ -86,6 +86,19 @@ describe('log', function() {
         cd19: '(not set)',
       }));
     });
+
+    it('should handle redirects properly', async () => {
+      await setExperimentCookie('.234');
+      await browser.url(`/about?test_id=${++testID}`);
+
+      await browser.waitUntil(async () => await beaconsContain({
+        'v': '2',
+        'dl': new RegExp(`test_id=${testID}`),
+        'en': 'page_view',
+        'ep.page_path': '/about/',
+        'up.experiment': 'link_css',
+      }));
+    });
   });
 
   describe('v3', () => {
@@ -576,3 +589,18 @@ describe('log', function() {
     });
   });
 });
+
+/**
+ * @param {string} value
+ */
+async function setExperimentCookie(value) {
+  await browser.setCookies({
+    name: 'xid',
+    value: value,
+    path: '/',
+    expiry: Math.floor((Date.now()/1000) + (60 * 60 * 24 * 365)),
+    secure: true,
+    httpOnly: true,
+    sameSite: 'Strict',
+  });
+}

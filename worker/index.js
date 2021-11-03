@@ -37,10 +37,23 @@ function getExperimentPath(xid) {
 }
 
 /**
+ * @param {URL} url
+ * @returns {boolean}
+ */
+function isMissingTrailingSlash(url) {
+  return !(url.pathname.endsWith('/') || url.pathname.match(/\.(js|html)$/));
+}
+
+/**
  * @param {Request} request
  * @returns {Promise<Response>}
  */
 async function handleRequest({request, url}) {
+  // Redirect URLs missing a trailing slash.
+  if (isMissingTrailingSlash(url)) {
+    return Response.redirect(`${url.origin}${url.pathname}/${url.search}`, 301);
+  }
+
   const cookie = request.headers.get('cookie') || '';
   const xid = cookie.match(/(?:^|;) *xid=(\.\d+) *(?:;|$)/) ?
       RegExp.$1 : `${Math.random()}`.slice(1, 5);

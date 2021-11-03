@@ -37,11 +37,22 @@ function getExperimentPath(xid) {
 }
 
 /**
- * @param {URL} url
- * @returns {boolean}
+ * @param {URL}
+ * @returns {string|void}
  */
-function isMissingTrailingSlash(url) {
-  return !(url.pathname.endsWith('/') || url.pathname.match(/\.(js|html)$/));
+function getRedirect(url) {
+  // Rename old Google Analytics post.
+  if (url.pathname.match(/^(\/_[^\/]+)?\/articles\/the-google-analytics(.+)/)) {
+    return `${url.origin}${RegExp.$1}/articles/the-ga${RegExp.$2}`;
+  }
+  // Check for proper trailing slash.
+  if (!(url.pathname.endsWith('/') || url.pathname.match(/\.(js|html)$/))) {
+    return `${url.origin}${url.pathname}/${url.search}`;
+  }
+  // Remove trailing index.html
+  if (url.pathname.endsWith('index.html')) {
+    return url.href.slice(0, -10);
+  }
 }
 
 /**
@@ -49,9 +60,9 @@ function isMissingTrailingSlash(url) {
  * @returns {Promise<Response>}
  */
 async function handleRequest({request, url}) {
-  // Redirect URLs missing a trailing slash.
-  if (isMissingTrailingSlash(url)) {
-    return Response.redirect(`${url.origin}${url.pathname}/${url.search}`, 301);
+  const redirect = getRedirect(url);
+  if (redirect) {
+    return Response.redirect(redirect, 301);
   }
 
   const cookie = request.headers.get('cookie') || '';
@@ -70,6 +81,12 @@ async function handleRequest({request, url}) {
       cacheEverything: self.__ENV__ === 'production',
     },
   });
+
+  // If the response isn't a 2XX, fall back to the original request.
+  if (response.status > 300) {
+    // TODO: figure out a way to determine how often this happens.
+    return fetch(request);
+  }
 
   const clone = new Response(response.body, response);
 

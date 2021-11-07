@@ -276,12 +276,9 @@ describe('log', function() {
           const db = req.result;
           const txn = db.transaction('kv-store', 'readwrite');
           txn.oncomplete = () => done();
-          txn.objectStore('kv-store').put({
-            seg: 0,
-            sct: 8,
-            sid: time,
-            _et: time,
-          }, 'sessionInfo');
+          txn.objectStore('kv-store').put(time, 'sessionId');
+          txn.objectStore('kv-store').put(8, 'sessionCount');
+          txn.objectStore('kv-store').put(time, 'lastEngagedTime');
         };
       });
 
@@ -319,6 +316,54 @@ describe('log', function() {
       // as a separate request (similar to the first part of this test).
       assert(beacon3.get('__idx') < ttfb3.get('__idx'));
       assert.equal(ttfb3.get('__idx'), fcp3.get('__idx'));
+    });
+
+    it('should track engagement time', async () => {
+      await browser.url(`/?test_id=${++testID}`);
+
+      await browser.waitUntil(async () => await beaconsContain({
+        'v': '2',
+        'dl': new RegExp(`test_id=${testID}`),
+        'en': 'page_view',
+        'ep.page_path': '/',
+      }));
+
+      // Ensure the page has focus and trigger FID.
+      const header = await $('.ContentHeader');
+      await header.click();
+
+      await browser.waitUntil(async () => await beaconsContain({
+        'v': '2',
+        'dl': new RegExp(`test_id=${testID}`),
+        'en': 'FID',
+        'ep.page_path': '/',
+      }));
+
+      // Wait a bit and then dispatch a pagehide event to trigger CLS.
+      await browser.pause(100);
+
+      await stubVisibilityChange('hidden');
+      await browser.waitUntil(async () => await beaconsContain({
+        'v': '2',
+        'dl': new RegExp(`test_id=${testID}`),
+        'en': 'CLS',
+        'ep.page_path': '/',
+        '_et': /\d\d+/, // 2-digit or more ms engagement
+      }));
+
+      // Show the page again, wait, and then dispatch pagehide again
+      // to trigger a `user_engagement` event.
+      await stubVisibilityChange('visible');
+      await browser.pause(1000);
+      await stubVisibilityChange('hidden');
+
+      await browser.waitUntil(async () => await beaconsContain({
+        'v': '2',
+        'dl': new RegExp(`test_id=${testID}`),
+        'en': 'user_engagement',
+        'ep.page_path': '/',
+        '_et': /\d\d\d+/,  // 3-digit or more ms engagement
+      }));
     });
 
     it('should send pageview hits on SPA pageloads', async () => {
@@ -589,6 +634,31 @@ describe('log', function() {
     });
   });
 });
+
+/**
+ * @param {string} visibilityState
+ */
+function stubVisibilityChange(visibilityState) {
+  return browser.execute((visibilityState) => {
+    if (visibilityState === 'hidden') {
+      Object.defineProperty(document, 'visibilityState', {
+        value: visibilityState,
+        configurable: true,
+      });
+      Object.defineProperty(document, 'hasFocus', {
+        value: () => false,
+        configurable: true,
+      });
+      document.body.hidden = true;
+    } else {
+      delete document.visibilityState;
+      delete document.hasFocus;
+      document.body.hidden = false;
+    }
+    console.log(document.visibilityState);
+    document.dispatchEvent(new Event('visibilitychange'));
+  }, visibilityState);
+}
 
 /**
  * @param {string} value

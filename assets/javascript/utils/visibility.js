@@ -6,7 +6,7 @@ const calledVisibleListeners = new Set();
  * page is backgrounded or unloaded.
  * @param {Function} callback
  */
-export function onHidden(callback, opts = {}) {
+export function onHidden(callback, opts) {
   const listener = (event) => {
     if (!calledHiddenListeners.has(listener) &&
         (event.type === 'pagehide' || document.visibilityState === 'hidden')) {
@@ -15,7 +15,7 @@ export function onHidden(callback, opts = {}) {
 
       callback(event);
 
-      if (opts.once) {
+      if (opts && opts.once) {
         document.removeEventListener('visibilitychange', listener, opts);
         window.removeEventListener('pagehide', listener, opts);
       }
@@ -30,7 +30,7 @@ export function onHidden(callback, opts = {}) {
  * page is backgrounded or unloaded.
  * @param {Function} callback
  */
-export function onVisible(callback, opts = {}) {
+export function onVisible(callback, opts) {
   const listener = (event) => {
     if (event.type === 'pageshow' || document.visibilityState === 'visible') {
       calledHiddenListeners.clear();
@@ -38,7 +38,7 @@ export function onVisible(callback, opts = {}) {
 
       callback(event);
 
-      if (opts.once) {
+      if (opts && opts.once) {
         document.removeEventListener('visibilitychange', listener, opts);
         window.removeEventListener('pageshow', listener, opts);
       }

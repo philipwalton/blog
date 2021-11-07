@@ -2,7 +2,7 @@ import {parseUrl} from 'dom-utils';
 import {getActiveBreakpoint} from './breakpoints';
 import {initialSWState} from './sw-state';
 import {get, set} from './utils/kv-store';
-import {timeOrigin} from './utils/performance';
+import {now, timeOrigin} from './utils/performance';
 import {round} from './utils/round.js';
 import {onHidden, onVisible} from './utils/visibility.js';
 import {uuid} from './utils/uuid';
@@ -31,10 +31,19 @@ export class Logger {
    * @param {function(Object):void} hitFilter
    */
   constructor(hitFilter) {
+    if (!visibilityState) {
+      visibilityState = document.visibilityState;
+      onHidden(() => visibilityState = 'hidden', true);
+      onVisible(() => visibilityState = 'visible', true);
+    }
+
     this._hitFilter = hitFilter;
     this._presendDependencies = [];
     this._eventQueue = [];
     this._requestCount = 0;
+    this._lastActiveTime = 0;
+    this._engagedTime = 0;
+    this._state = null;
 
     this._pageParams = {
       dl: location.href,
@@ -68,13 +77,56 @@ export class Logger {
     this.awaitBeforeSending(this._setClientId());
     this.awaitBeforeSending(this._updateSessionInfo(true));
 
-    if (!visibilityState) {
-      visibilityState = document.visibilityState;
-      onHidden(() => visibilityState = 'hidden');
-      onVisible(() => visibilityState = 'visible');
-    }
+    this._updateState();
 
-    onHidden(() => this._send());
+    addEventListener('focus', () => this._updateState(), true);
+    addEventListener('blur', () => this._updateState(), true);
+    onVisible(() => this._updateState(), true);
+    onHidden(() => {
+      this._updateState();
+      this._send();
+      // Queue a microtask to ensure another other queued events run first.
+      Promise.resolve().then(() => {
+        if (this._engagedTime && this._eventQueue.length === 0) {
+          this.event('user_engagement');
+        }
+      });
+    });
+  }
+
+  /**
+   *
+   */
+  _updateState() {
+    const nextState = getCurrentState();
+    if (nextState !== this._state) {
+      const changeTime = Math.round(now());
+      if (nextState === 'active') {
+        // If this is first change, assume active since the document was open.
+        if (this._state === null) {
+          this._engagedTime = changeTime;
+        }
+        this._lastActiveTime = changeTime;
+      } else if (this._lastActiveTime > 0) {
+        this._engagedTime += changeTime - this._lastActiveTime;
+        this._lastActiveTime = 0;
+        // Do not await...
+        set('lastEngagedTime', Math.round(timeOrigin + now));
+      }
+      this._state = nextState;
+    }
+  }
+
+  _getEngagedTime() {
+    let engagedTime = this._engagedTime;
+    this._engagedTime = 0;
+
+    if (this._state === 'active') {
+      const time = Math.round(now());
+      engagedTime += (time - this._lastActiveTime);
+      this._lastActiveTime = time;
+    }
+    return engagedTime;
   }
 
   /**
@@ -89,6 +141,10 @@ export class Logger {
    */
   set(params) {
     Object.assign(this._eventParams, params);
+  }
+
+  setEngaged() {
+    this._pageParams.seg = 1;
   }
 
   /**
@@ -107,10 +163,17 @@ export class Logger {
       this._presendDependencies = [];
     }
 
-    this._eventQueue.push({
+    const prefixedParams = {
       en: eventName,
       ...prefixParams('e', params),
-    });
+    };
+
+    const engagedTime = this._getEngagedTime();
+    if (engagedTime) {
+      prefixedParams._et = engagedTime;
+    }
+
+    this._eventQueue.push(prefixedParams);
 
     if (visibilityState === 'hidden') {
       this._send();
@@ -125,10 +188,6 @@ export class Logger {
   async _send() {
     clearTimeout(this._sendTimeout);
     if (this._eventQueue.length > 0) {
-      // Update the session info, but do not await.
-      // It's OK if this fails for some reason.
-      this._updateSessionInfo();
-
       this._requestCount++;
       this._pageParams._s = this._requestCount;
 
@@ -156,12 +215,7 @@ export class Logger {
    * @return {Promise<void>}
    */
   async _setClientId() {
-    let cid;
-    try {
-      cid = await get('clientId');
-    } catch (err) {
-      // Do nothing.
-    }
+    let cid = await get('clientId', null);
 
     if (cid) {
       this._pageParams.cid = cid;
@@ -181,48 +235,48 @@ export class Logger {
    */
   async _updateSessionInfo(isInitialLoad) {
     const time = Date.now();
-    let sessionInfo = {sct: 1, seg: 0, sid: time, _et: time};
-    let isNewSession;
 
-    try {
-      const storedSessionInfo = await get('sessionInfo');
+    let seg = 0;
+    let [sid, sct, lastEngagedTime] = await Promise.all([
+      get('sessionId', time),
+      get('sessionCount', 1),
+      get('lastEngagedTime', 0),
+    ]);
 
-      if (storedSessionInfo) {
-        sessionInfo = storedSessionInfo;
-        const isSessionExpired = time - sessionInfo._et > SESSION_TIMEOUT;
+    const isFirstVisit = Boolean(this._pageParams._fv);
+    const isSessionExpired = time - (lastEngagedTime || sid) > SESSION_TIMEOUT;
 
-        // If the previous session has expired, start a new one.
-        // Otherwise, if this is the initial load, mark the session engaged.
-        if (isSessionExpired) {
-          isNewSession = true;
-
-          sessionInfo.seg = 0;
-          sessionInfo.sid = time;
-          sessionInfo.sct++;
-        } else if (isInitialLoad) {
-          // If the session has not expired this must be
-          // a new page load in the current session.
-          sessionInfo.seg = 1;
-        }
-
-        // Update the session time to the current time.
-        sessionInfo._et = time;
-      } else {
-        isNewSession = true;
-      }
-    } catch (error) {
-      // Do nothing...
-    }
-
-    // Update the stored sessionInfo data but don't await
-    set('sessionInfo', sessionInfo);
-
-    const {sid, sct, seg} = sessionInfo;
-    Object.assign(this._pageParams, {sid, sct, seg});
-    if (isNewSession) {
+    if (isSessionExpired) {
       this._pageParams._ss = 1;
+      sid = time;
+      seg = 0;
+      sct++;
     }
+
+    if (!isFirstVisit && !isSessionExpired) {
+      seg = 1;
+    }
+
+    Object.assign(this._pageParams, {sid, sct, seg});
+
+    // Do not await
+    set('sessionId', sid);
+    set('sessionCount', sct);
+    set('lastEngagedTime', time);
   }
+}
+
+/**
+ * @returns {string}
+ */
+function getCurrentState() {
+  if (document.visibilityState === 'hidden') {
+    return 'hidden';
+  }
+  if (document.hasFocus()) {
+    return 'active';
+  }
+  return 'passive';
 }
 
 /**

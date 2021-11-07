@@ -97,8 +97,8 @@
         "type": 301
       },
       {
-        "regex": "/articles/the-google-analytics-(.+)",
-        "destination": "/articles/the-ga-:1",
+        "regex": "(.+)-google-analytics-(.+)",
+        "destination": ":1-ga-:2",
         "type": 301
       }
     ],

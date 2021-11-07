@@ -2,14 +2,15 @@ addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
 
   // Only respond to certain requests:
-  if (// Pages and article HTML files
+  if (event.request.method === 'GET' && (
+      // Pages and article HTML files
       url.pathname === '/' ||
       url.pathname.startsWith('/about') ||
       url.pathname.startsWith('/articles') ||
       // Pages and article content partials
       url.pathname.endsWith('index.content.html') ||
       // Service worker scripts.
-      url.pathname === '/sw.js') {
+      url.pathname === '/sw.js')) {
     event.respondWith(
       handleRequest({request: event.request, url, event}).catch(
         (err) => new Response(err.stack, {status: 500})
@@ -42,11 +43,11 @@ function getExperimentPath(xid) {
  */
 function getRedirect(url) {
   // Rename old Google Analytics post.
-  if (url.pathname.match(/^(\/_[^\/]+)?\/articles\/the-google-analytics(.+)/)) {
-    return `${url.origin}${RegExp.$1}/articles/the-ga${RegExp.$2}`;
+  if (url.pathname.match(/^(.+)google-analytics(.+)$/)) {
+    return `${url.origin}${RegExp.$1}ga${RegExp.$2}`;
   }
-  // Check for proper trailing slash.
-  if (!(url.pathname.endsWith('/') || url.pathname.match(/\.(js|html)$/))) {
+  // Check that the URL ends in a file extension or trailing slash.
+  if (!url.pathname.match(/(\/|\.(css|gif|html|jpg|js|png|svg|xml))$/)) {
     return `${url.origin}${url.pathname}/${url.search}`;
   }
   // Remove trailing index.html

@@ -362,7 +362,7 @@ describe('log', function() {
         'dl': new RegExp(`test_id=${testID}`),
         'en': 'user_engagement',
         'ep.page_path': '/',
-        '_et': /\d\d\d+/,  // 3-digit or more ms engagement
+        '_et': /\d\d\d+/, // 3-digit or more ms engagement
       }));
     });
 

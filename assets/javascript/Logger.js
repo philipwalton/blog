@@ -95,7 +95,8 @@ export class Logger {
   }
 
   /**
-   *
+   * Updates the stored lifecycle state and persists `lastEngagedTime`
+   * if changing away from the active state.
    */
   _updateState() {
     const nextState = getCurrentState();
@@ -117,6 +118,9 @@ export class Logger {
     }
   }
 
+  /**
+   * @returns {number}
+   */
   _getEngagedTime() {
     let engagedTime = this._engagedTime;
     this._engagedTime = 0;
@@ -141,10 +145,6 @@ export class Logger {
    */
   set(params) {
     Object.assign(this._eventParams, params);
-  }
-
-  setEngaged() {
-    this._pageParams.seg = 1;
   }
 
   /**

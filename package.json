@@ -27,7 +27,8 @@
     "start": "gulp watch",
     "test": "wdio run wdio.conf.cjs",
     "version": "NODE_ENV=production gulp build",
-    "postversion": "npm run deploy"
+    "postversion": "npm run deploy",
+    "prepare": "husky install"
   },
   "husky": {
     "hooks": {
@@ -68,7 +69,7 @@
     "he": "~1.2.0",
     "highlight.js": "^11.2.0",
     "html-minifier": "^4.0.0",
-    "husky": "^7.0.2",
+    "husky": "^7.0.4",
     "idlize": "^0.1.1",
     "imagemin": "^8.0.1",
     "imagemin-pngquant": "^9.0.2",

@@ -122,6 +122,7 @@ The following companies all offer RUM analytics services. While I haven't used a
 * [Blue Triangle](https://bluetriangle.com/products/real-user-monitoring/)
 * [Datadog](https://www.datadoghq.com/product/real-user-monitoring/)
 * [Catchpoint Real User Monitoring](https://www.catchpoint.com/real-user-monitoring)
+* [Sentry Performance Monitoring](https://sentry.io/for/performance/)
 
 ### General guidance for measuring performance in the field
 

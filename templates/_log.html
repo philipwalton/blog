@@ -1,8 +1,8 @@
 <!-- Track errors -->
 <script>addEventListener('error', self.__e=function f(e){f.q=f.q||[];f.q.push(e)});</script>
 
-<!-- Set an experiment global -->
 {% if EXPERIMENT %}
+  <!-- Set an experiment global -->
   <script>self.__x = '{{ EXPERIMENT }}'</script>
 {% endif %}
 

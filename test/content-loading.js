@@ -1,6 +1,6 @@
 import assert from 'assert';
+import {setExperimentCookie} from './utils/experiments.js';
 import {initBook} from '../tasks/utils/book.js';
-
 
 let site;
 let articles;
@@ -13,9 +13,17 @@ describe('The content loader', async () => {
     site = book.site;
     articles = book.articles;
     pages = book.pages;
+
+    await browser.url('/__reset__');
+    await browser.waitUntil(async () => {
+      return await browser.execute(() => {
+        return window.__ready__ === true;
+      });
+    });
   });
 
   beforeEach(async () => {
+    await setExperimentCookie('.789');
     await browser.url('/');
 
     // I'm not sure why this is needed, but sometime the above command

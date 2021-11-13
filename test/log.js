@@ -2,7 +2,7 @@ import {strict as assert} from 'assert';
 import {initBook} from '../tasks/utils/book.js';
 import {dimensions} from '../functions/constants.js';
 import {beaconsContain, clearBeacons, getBeacons} from './utils/beacons.js';
-
+import {clearExperimentCookie, setExperimentCookie} from './utils/experiments.js';
 
 let articles;
 let pages;
@@ -18,18 +18,12 @@ describe('log', function() {
 
   beforeEach(async () => {
     await clearBeacons();
-    await browser.deleteCookies(['xid']);
-    await browser.url('/__reset__');
-    await browser.waitUntil(async () => {
-      return await browser.execute(() => {
-        return window.__ready__ === true;
-      });
-    });
+    await clearExperimentCookie();
   });
 
   describe('experiments', () => {
     it('should load the proper experiment', async () => {
-      await browser.setCookies({name: 'xid', value: '.234', path: '/'});
+      await setExperimentCookie('.234');
       await browser.url(`/?test_id=${++testID}`);
 
       await browser.waitUntil(async () => await beaconsContain({
@@ -37,37 +31,18 @@ describe('log', function() {
         'dl': new RegExp(`test_id=${testID}`),
         'en': 'page_view',
         'ep.page_path': '/',
-        'up.experiment': 'link_css',
+        'up.experiment': 'no_spa',
       }));
       await browser.waitUntil(async () => await beaconsContain({
         v: '1',
         t: 'pageview',
         dl: new RegExp(`test_id=${testID}`),
         dp: '/',
-        cd19: 'link_css',
+        cd19: 'no_spa',
       }));
 
       await browser.url('/__reset__');
-      await browser.setCookies({name: 'xid', value: '.567', path: '/'});
-      await browser.url(`/about/?test_id=${++testID}`);
-
-      await browser.waitUntil(async () => await beaconsContain({
-        'v': '2',
-        'dl': new RegExp(`test_id=${testID}`),
-        'en': 'page_view',
-        'ep.page_path': '/about/',
-        'up.experiment': 'control',
-      }));
-      await browser.waitUntil(async () => await beaconsContain({
-        v: '1',
-        t: 'pageview',
-        dl: new RegExp(`test_id=${testID}`),
-        dp: '/about/',
-        cd19: 'control',
-      }));
-
-      await browser.url('/__reset__');
-      await browser.setCookies({name: 'xid', value: '.789', path: '/'});
+      await setExperimentCookie('.789');
       await browser.url(`/articles/?test_id=${++testID}`);
 
       const beacon = await browser.waitUntil(async () => await beaconsContain({
@@ -96,7 +71,7 @@ describe('log', function() {
         'dl': new RegExp(`test_id=${testID}`),
         'en': 'page_view',
         'ep.page_path': '/about/',
-        'up.experiment': 'link_css',
+        'up.experiment': 'no_spa',
       }));
     });
   });
@@ -367,6 +342,7 @@ describe('log', function() {
     });
 
     it('should send pageview hits on SPA pageloads', async () => {
+      await setExperimentCookie('.789'); // SPA requires >.5 xid.
       await browser.url(`/?test_id=${++testID}`);
 
       await browser.waitUntil(async () => await beaconsContain({
@@ -399,6 +375,7 @@ describe('log', function() {
     });
 
     it('should send pageview hits on back/forward navigations', async () => {
+      await setExperimentCookie('.789'); // SPA requires >.5 xid.
       await browser.url(`/?test_id=${++testID}`);
 
       await browser.waitUntil(async () => await beaconsContain({
@@ -658,19 +635,4 @@ function stubVisibilityChange(visibilityState) {
     console.log(document.visibilityState);
     document.dispatchEvent(new Event('visibilitychange'));
   }, visibilityState);
-}
-
-/**
- * @param {string} value
- */
-async function setExperimentCookie(value) {
-  await browser.setCookies({
-    name: 'xid',
-    value: value,
-    path: '/',
-    expiry: Math.floor((Date.now()/1000) + (60 * 60 * 24 * 365)),
-    secure: true,
-    httpOnly: true,
-    sameSite: 'Strict',
-  });
 }

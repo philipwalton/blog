@@ -10,7 +10,6 @@
   "templatesDir": "templates",
   "timezone": "America/Los_Angeles",
   "experiments": [
-    "control",
-    "link_css"
+    "no_spa"
   ]
 }

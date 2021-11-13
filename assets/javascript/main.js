@@ -25,7 +25,9 @@ const initLog = async () => {
  * log tracking, and the service worker.
  */
 export const main = async () => {
-  contentLoader.init();
+  if (self.__x !== 'no_spa') {
+    contentLoader.init();
+  }
   drawer.init();
   breakpoints.init();
 

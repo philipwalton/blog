@@ -119,7 +119,10 @@ const trackPageview = async (pathname) => {
   const {log} = await import('./log');
 
   log.set({page_path: pathname});
-  log.event('page_view', {navigation_type: 'route_change'});
+  log.event('page_view', {
+    navigation_type: 'route_change',
+    visibility_state: document.visibilityState,
+  });
 };
 
 

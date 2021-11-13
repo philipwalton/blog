@@ -109,7 +109,7 @@ export function convertGA4ParamsToUA(params) {
   params.set(dimensions.CD_TRACKING_VERSION, measurementVersion);
 
   const navigationType = params.get('ep.navigation_type');
-  params.set(dimensions.CD_NAVIGATION_TYPE, navigationType);
+  params.set(dimensions.CD_NAVIGATION_TYPE, navigationType || '(not set)');
 
   const windowId = params.get('ep.page_id');
   params.set(dimensions.CD_WINDOW_ID, windowId);

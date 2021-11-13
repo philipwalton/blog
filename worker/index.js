@@ -20,8 +20,7 @@ addEventListener('fetch', (event) => {
 });
 
 const experiments = {
-  link_css: [0, 1/3],
-  control: [1/3, 2/3],
+  // no_spa: [0, 1/2],
 };
 
 /**

@@ -1,5 +1,4 @@
 import assert from 'assert';
-import {setExperimentCookie} from './utils/experiments.js';
 import {initBook} from '../tasks/utils/book.js';
 
 let site;
@@ -23,7 +22,6 @@ describe('The content loader', async () => {
   });
 
   beforeEach(async () => {
-    await setExperimentCookie('.789');
     await browser.url('/');
 
     // I'm not sure why this is needed, but sometime the above command

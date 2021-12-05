@@ -6,7 +6,7 @@ import superstatic from 'superstatic';
 import {log} from '../../functions/log.js';
 
 
-const PORT = 5000;
+const PORT = 3000;
 let server;
 
 const app = express()

@@ -6,7 +6,7 @@ export const start = ({verbose = true} = {}) => {
   return new Promise((resolve, reject) => {
     subprocess = spawn('cloudflared', [
       'tunnel',
-      '--url=http://localhost:5000',
+      '--url=http://localhost:3000',
     ]);
 
     const urlRegExp = /https:\/\/[^.]+\.trycloudflare\.com/;

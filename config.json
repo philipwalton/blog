@@ -9,7 +9,5 @@
   "publicModulesPath": "/modules",
   "templatesDir": "templates",
   "timezone": "America/Los_Angeles",
-  "experiments": [
-    "no_spa"
-  ]
+  "experiments": []
 }

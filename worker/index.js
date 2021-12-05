@@ -19,9 +19,7 @@ addEventListener('fetch', (event) => {
   }
 });
 
-const experiments = {
-  no_spa: [0, 1/2],
-};
+const experiments = {};
 
 /**
  * @param {string} xid

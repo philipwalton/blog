@@ -23,23 +23,23 @@ describe('log', function() {
 
   describe('experiments', () => {
     it('should load the proper experiment', async () => {
-      await setExperimentCookie('.234');
-      await browser.url(`/?test_id=${++testID}`);
+      // await setExperimentCookie('.234');
+      // await browser.url(`/?test_id=${++testID}`);
 
-      await browser.waitUntil(async () => await beaconsContain({
-        'v': '2',
-        'dl': new RegExp(`test_id=${testID}`),
-        'en': 'page_view',
-        'ep.page_path': '/',
-        'up.experiment': 'no_spa',
-      }));
-      await browser.waitUntil(async () => await beaconsContain({
-        v: '1',
-        t: 'pageview',
-        dl: new RegExp(`test_id=${testID}`),
-        dp: '/',
-        cd19: 'no_spa',
-      }));
+      // await browser.waitUntil(async () => await beaconsContain({
+      //   'v': '2',
+      //   'dl': new RegExp(`test_id=${testID}`),
+      //   'en': 'page_view',
+      //   'ep.page_path': '/',
+      //   'up.experiment': 'exp_name',
+      // }));
+      // await browser.waitUntil(async () => await beaconsContain({
+      //   v: '1',
+      //   t: 'pageview',
+      //   dl: new RegExp(`test_id=${testID}`),
+      //   dp: '/',
+      //   cd19: 'exp_name',
+      // }));
 
       await browser.url('/__reset__');
       await setExperimentCookie('.789');
@@ -71,7 +71,6 @@ describe('log', function() {
         'dl': new RegExp(`test_id=${testID}`),
         'en': 'page_view',
         'ep.page_path': '/about/',
-        'up.experiment': 'no_spa',
       }));
     });
   });
@@ -342,7 +341,6 @@ describe('log', function() {
     });
 
     it('should send pageview hits on SPA pageloads', async () => {
-      await setExperimentCookie('.789'); // SPA requires >.5 xid.
       await browser.url(`/?test_id=${++testID}`);
 
       await browser.waitUntil(async () => await beaconsContain({
@@ -375,7 +373,6 @@ describe('log', function() {
     });
 
     it('should send pageview hits on back/forward navigations', async () => {
-      await setExperimentCookie('.789'); // SPA requires >.5 xid.
       await browser.url(`/?test_id=${++testID}`);
 
       await browser.waitUntil(async () => await beaconsContain({

@@ -46,13 +46,13 @@ gulp.task('css', async () => {
       const mainPath = experiment === 'modern_css' ?
           './assets/css/main.css' : './assets/css-legacy/main-legacy.css';
 
-      const main = await compileCss(mainPath);
+      const main = await compileCss(mainPath, experiment);
       await generateRevisionedAsset(path.basename(mainPath), main);
 
       if (experiment === 'modern_css') {
         const deferPath = './assets/css/defer.css';
 
-        const defer = await compileCss(deferPath);
+        const defer = await compileCss(deferPath, experiment);
         await generateRevisionedAsset(path.basename(deferPath), defer);
       }
     } catch (err) {

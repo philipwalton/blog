@@ -10,9 +10,9 @@ import './sw.js';
 
 
 gulp.task('build', gulp.series(
-    // 'clean',
-    gulp.parallel('css', 'images'),
-    gulp.parallel('css'),
+    'clean',
+    'images',
+    'css',
     'javascript',
     'content',
     'sw'));

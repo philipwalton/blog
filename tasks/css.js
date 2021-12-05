@@ -7,9 +7,10 @@ import atImport from 'postcss-import';
 import postcssPresetEnv from 'postcss-preset-env';
 import {generateRevisionedAsset} from './utils/assets.js';
 import {ENV} from './utils/env.js';
+import {eachExperiment} from './utils/experiments.js';
 
 
-const compileCss = async (srcPath) => {
+const compileCss = async (srcPath, experiment) => {
   const css = await fs.readFile(srcPath, 'utf-8');
 
   const plugins = [
@@ -19,6 +20,7 @@ const compileCss = async (srcPath) => {
       browsers: ENV === 'development' ? 'last 2 Chrome versions' : 'defaults',
       features: {
         'system-ui-font-family': false,
+        'custom-properties': experiment === 'modern_css' ? false : true,
       },
     }),
   ];
@@ -39,11 +41,22 @@ const compileCss = async (srcPath) => {
 };
 
 gulp.task('css', async () => {
-  try {
-    const srcPath = './assets/css/main.css';
-    const css = await compileCss(srcPath);
-    await generateRevisionedAsset(path.basename(srcPath), css);
-  } catch (err) {
-    console.error(err);
-  }
+  await eachExperiment(async (experiment) => {
+    try {
+      const mainPath = experiment === 'modern_css' ?
+          './assets/css/main.css' : './assets/css-legacy/main-legacy.css';
+
+      const main = await compileCss(mainPath);
+      await generateRevisionedAsset(path.basename(mainPath), main);
+
+      if (experiment === 'modern_css') {
+        const deferPath = './assets/css/defer.css';
+
+        const defer = await compileCss(deferPath);
+        await generateRevisionedAsset(path.basename(deferPath), defer);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  });
 });

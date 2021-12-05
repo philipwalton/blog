@@ -60,11 +60,9 @@ A session is a group of interactions that take place within a given time frame, 
 
 So getting back to the third step in the list above, my proposal is that if a user's session has timed out and the page's visibility state changes from hidden to visible, a new pageview should be sent. Visibility state changes that occur in the middle of a session should not be considered distinct pageviews (though they can still be tracked as events if that information is relevant).
 
-<div class="Info">
-
+{% Callout 'info' %}
 **Note:** if you use [autotrack](https://github.com/googleanalytics/autotrack) (specifically the [pageVisibilityTracker](https://github.com/googleanalytics/autotrack/blob/master/docs/plugins/page-visibility-tracker.md) and [urlChangeTracker](https://github.com/googleanalytics/autotrack/blob/master/docs/plugins/url-change-tracker.md) plugins), you don't have to worry about implementing this logic yourself. These plugins handle all of this for you automatically (with configuration options to customize the behavior).
-
-</div>
+{% endCallout %}
 
 ### Handling false positives
 

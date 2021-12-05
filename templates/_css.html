@@ -1,1 +1,5 @@
-<style>{{ 'main.css' | revision | inline }}</style>
+{% if EXPERIMENT === 'modern_css' %}
+  <style>{{ 'main.css' | revision | inline }}</style>
+{% else %}
+  <style>{{ 'main-legacy.css' | revision | inline }}</style>
+{% endif %}

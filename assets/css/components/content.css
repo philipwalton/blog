@@ -1,0 +1,22 @@
+.Content {
+  padding: 0 var(--gap);
+  margin: 2em auto 0;
+  max-width: 54em;
+}
+
+@media (--break-lg) {
+  .Content {
+    margin-top: 0;
+    padding: calc(2 * var(--gap));
+  }
+}
+
+@media (--break-xl) {
+  .Content {
+    margin-top: 2em;
+  }
+}
+
+.Content > article {
+  --gap: 1.5em; /* Within the content area keep a medium gap */
+}

@@ -1,93 +1,100 @@
 .Header {
+  --link-color: var(--text-color-inverted-faded);
+  --link-color-active: #fff;
+
+  display: grid;
   align-items: center;
-  background: var(--dark-bg-color);
-  box-shadow: none;
-  display: flex;
+  justify-content: space-between;
+  grid-template-columns: auto auto;
+  grid-template-areas:
+    'logo social'
+    'nav nav';
+
+  background: linear-gradient(to top left,
+    hsl(0, 0%, 25%), hsl(0, 0%, 20%));
+  color: var(--text-color-inverted);
   letter-spacing: 0.025em;
-  padding: var(--vgap) var(--hgap);
-  position: relative;
-}
-.Header--isTransitioning {
-  transition: border-color .5s var(--quantum-easing),
-              box-shadow .5s var(--quantum-easing);
-}
-.Header--isDrawerOpen {
-  box-shadow: var(--shadow);
 }
 
-
-.Header-info {
-  color: var(--text-color-dark-bg);
-  display: block;
-  flex: 1 0 0%;
+.Header a {
   text-decoration: none;
 }
+
+.Header-info {
+  --link-color: var(--text-color-inverted);
+
+  grid-area: logo;
+  padding: var(--gap);
+  text-decoration: none;
+}
+
 .Header-title {
-  color: inherit;
   font-size: 1.2em;
   line-height: 1;
-  margin: 0;
+  margin: 0.15em 0;
   text-transform: uppercase;
   word-spacing: 0.25em;
 }
 .Header-tagline {
-  font-size: .8em;
-  margin: .15em 0 0;
-  opacity: .8;
+  color: var(--text-color-inverted-faded);
+  font-size: 0.8em;
+  opacity: 0.8;
 }
 
-.Header-drawer {
-  bottom: 0;
-  left: 0;
-  position: absolute;
-  right: 0;
-  z-index: -1;
-}
+.Header-social {
+  grid-area: social;
 
-.Header-drawerToggle {
-  color: var(--text-color-dark-bg);
-  cursor: pointer;
+  gap: 0.8em;
   display: flex;
+  margin: auto var(--gap);
+  justify-content: end;
+}
+
+.Header-socialLink {
   font-size: 1.5em;
 }
 
-@media (--break-md) {
-  .Header {
-    padding: var(--vgap-md) var(--hgap-md);
-  }
+.Header-nav {
+  grid-area: nav;
+
+  display: flex;
+  gap: var(--gap);
+  padding: 1em var(--gap);
+
+  background: linear-gradient(to top left,
+    hsla(0, 0%, 0%, 0.1), hsla(0, 0%, 0%, 0.2));
+}
+
+.Header-navLink {
+  font-size: .9em;
+  font-weight: 600;
+  text-transform: uppercase;
 }
 
 @media (--break-lg) {
   .Header {
+    --link-color: inherit;
+    --link-color-active: var(--accent-color);
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-areas: 'logo social nav';
     background: var(--bg-color);
-    padding: var(--vgap-lg) var(--hgap-lg);
   }
-  .Header--isTransitioning {
-    transition: transform .25s var(--quantum-easing),
-                opacity .25s var(--quantum-easing);
-  }
-  .Header--isDrawerOpen {
-    box-shadow: none;
-  }
-
   .Header-info {
-    color: var(--link-color);
+    --link-color: inherit;
+    --link-color-active: var(--accent-color);
   }
-  .Header-info:hover .Header-title {
-    color: var(--accent-color);
+  .Header-tagline {
+    color: var(--text-color-faded);
   }
-  .Header-title {
-    transition: color .25s var(--quantum-easing);
+  .Header-social {
+    --link-color: #aaa;
+    justify-content: center;
   }
-  .Header-drawerToggle {
-    display: none;
+  .Header-socialLink {
+    --link-color-active: var(--fill);
   }
-  .Header-drawerToggle svg {
-    color: var(--link-color);
-  }
-  .Header-drawer {
-    flex: 2 0 0%;
-    position: static;
-    z-index: 0;
+  .Header-nav {
+    justify-content: end;
+    background: 0;
   }
 }

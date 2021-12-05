@@ -121,15 +121,15 @@ The next step is to update your HTML to conditionally load the ES2015+ bundle in
 <script nomodule src="main.es5.js"></script>
 ```
 
-<aside class="Info" id="mjs-warnings">
+<a id="mjs-warnings"></a>
 
+{% Callout 'info' %}
 **Note:** I've updated the examples in this article to use the `.mjs` file extension for any file I load as a module. Since [this practice](https://developers.google.com/web/fundamentals/primers/modules#mjs) is relatively new, I'd be remiss if I didn't point out a few gotcha you might encounter when using it:
 
 * Your web server needs to be configured to serve `.mjs` files with the `Content-Type` header `text/javascript`. If your browser is failing to load your `.mjs` files, that may be why.
 * If you're using Webpack and [babel-loader](https://github.com/babel/babel-loader) to bundle your JavaScript, you've likely copy/pasted [some configuration code](https://github.com/babel/babel-loader/blob/8f240b498bb24ef89f7b306f5ac806e84b813b0d/README.md#usage) that only transpiles `.js` files. Changing the regular expression in your config from `/\.js$/` to `/\.m?js$/` should fix your issue.
 * Older webpack versions [don't create a sourcemap](https://github.com/webpack/webpack/issues/7927) for `.mjs` files, but [since webpack 4.19.1](https://github.com/webpack/webpack/releases/tag/v4.19.1) this has been fixed.
-
-</aside>
+{% endCallout %}
 
 ### Important considerations
 
@@ -139,11 +139,9 @@ For the most part, this technique "just works", but there are a few details abou
 2. Modules always run code in [strict mode](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Strict_mode), so if for whatever reason any of your code needs to be run outside of strict mode, it'll have to be loaded separately.
 3. Modules treat top-level `var` and `function` declarations differently from scripts. For example, in a script `var foo = 'bar'` and `function foo() {…}` can be accessed from `window.foo`, but in a module this is not the case. Make sure you're not depending on this behavior in your code.
 
-<aside class="Info Info--warning">
-
+{% Callout 'warning' %}
 **Warning!** Safari 10 doesn't support the `nomodule` attribute, but you can solve this by [inlining a JavaScript snippet](https://gist.github.com/samthor/64b114e4a4f539915a95b91ffd340acc) in your HTML prior to using any `<script nomodule>` tags. *(Note: this has been fixed in Safari 11).*
-
-</aside>
+{% endCallout %}
 
 ## A working example
 
@@ -211,8 +209,9 @@ A quick [query of the HTTPArchive dataset](https://bigquery.cloud.google.com/sav
 
 The reality is transpiling and including polyfills is quickly becoming the new norm. What's unfortunate is this means billions of users are getting trillions of bytes sent over the wire unnecessarily to browsers that would have been perfectly capable of running the untranspiled code natively.
 
-<aside class="Info" id="double-download-issue">
+<a id="double-download-issue"></a>
 
+{% Callout 'info' %}
 **Note:** a few developers have commented that, when using this technique, [some desktop browsers will download both the module and `nomodule` versions of the script](https://github.com/philipwalton/webpack-esnext-boilerplate/issues/1#issuecomment-445280691). As a result they prefer not to use it until browsers fix these bugs.
 
 I strongly disagree with this. Here's why:
@@ -220,8 +219,7 @@ I strongly disagree with this. Here's why:
 The [cost of shipping lots of unneeded JavaScript to low-end mobile browsers](https://v8.dev/blog/cost-of-javascript-2019) can be significant! We (on the Chrome team) have seen numerous occurrences of polyfill bloat adding **seconds** to the total startup time of websites on low-end mobile devices. On the other hand, a user on desktop IE or Edge having to download something twice is likely to have **zero effect** on startup time since the incorrectly downloaded bundle isn't executed and is only downloaded optimistically and off the main thread (by the preload scanner).
 
 In addition to performance cost, there's also a literal monetary cost. Most users affected by the double-download bug are on WiFi with an unlimited data plan. Downloading an extra file doesn't cost them anything&mdash;this is often not the case for mobile web users.
-
-</aside>
+{% endCallout %}
 
 ## It's time we start publishing our modules as ES2015
 

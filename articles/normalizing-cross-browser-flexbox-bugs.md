@@ -1,8 +1,7 @@
-<div class="Info">
+{% Callout 'info' %}
 
 **Update:** as a follow-up to this article, I've created the Github repo [Flexbugs](https://github.com/philipwalton/flexbugs): a community curated list of cross-browser flexbox issues and their known workarounds. The goal is if you're building a website using flexbox, and something isn't working as you'd expect, you can find the solution there.
-
-</div>
+{% endCallout %}
 
 Way back in September of 2013, while testing my [Solved by Flexbox](//philipwalton.github.io/solved-by-flexbox/) project, I discovered a [bug](https://connect.microsoft.com/IE/feedback/details/802625/min-height-and-flexbox-flex-direction-column-dont-work-together-in-ie-10-11-preview) in Internet Explorer 10 and 11 that was preventing my sticky footer from actually *sticking* to the bottom of the page. I spent some time trying to work around the issue, but all my attempts failed.
 

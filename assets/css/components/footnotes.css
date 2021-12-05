@@ -1,7 +1,7 @@
 .Footnotes {
   border-top: 1px solid var(--border-color);
   color: #555;
-  padding-top: var(--vgap);
+  padding-top: var(--gap);
 }
 
 .Footnotes-title {

@@ -1,23 +1,15 @@
 .Share {
-  align-items: center;
-  background: var(--bg-color);
-  border-radius: var(--border-radius);
   display: flex;
-  margin-top: 3em;
-  padding: 1.25em;
+  align-items: center;
+  gap: var(--gap);
 }
 
 .Share-figure {
-  align-items: center;
-  color: var(--twitter-color);
-  display: flex;
+  color: #5ac;
   font-size: 1.5em;
 }
 
 .Share-pitch {
   color: #666;
-  flex: 1;
   font-size: .9em;
-  margin: 0;
-  padding-left: 1em;
 }

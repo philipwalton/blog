@@ -36,6 +36,14 @@ Here's what the HTML and basic CSS look like. I've also included a visual demo (
 }
 ```
 
+<style>
+.CodepenContainer {
+  border: 1px solid #ccc;
+  margin: 0 0 var(--gap);
+  padding: 2px;
+}
+</style>
+
 <div class="CodepenContainer">
   <iframe
     allowtransparency="true"
@@ -111,9 +119,9 @@ The first and second ways to form stacking context make a lot of sense and are g
 
 The third way (opacity) is almost never mentioned outside of w3c specification documents.
 
-<p class="Info">
-  <strong>Update:</strong> In addition to opacity, several newer CSS properties also create stacking contexts. These include: <a href="http://www.w3.org/TR/css3-transforms/">transforms</a>, <a href="http://www.w3.org/TR/filter-effects/">filters</a>, <a href="http://www.w3.org/TR/css3-regions/">css-regions</a>, <a href="http://www.w3.org/TR/css3-page/">paged media</a>, and possibly others. As a general rule, it seems that if a CSS property requires rendering in an offscreen context, it must create a new stacking context.
-</p>
+{% Callout 'info' %}
+**Update:** In addition to opacity, several newer CSS properties also create stacking contexts. These include: [transforms](http://www.w3.org/TR/css3-transforms/), [filters](http://www.w3.org/TR/filter-effects/), [css-regions](http://www.w3.org/TR/css3-regions/), [paged media](http://www.w3.org/TR/css3-page/), and possibly others. As a general rule, it seems that if a CSS property requires rendering in an offscreen context, it must create a new stacking context.
+{% endCallout %}
 
 ## Determining an Element's Position in the Stacking Order
 

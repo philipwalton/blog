@@ -46,11 +46,9 @@ In fact, modules is the format we all *should* be bundling to because browsers a
 
 Fortunately, at least one popular bundler today ([Rollup](https://rollupjs.org)) supports [modules as an output format](https://rollupjs.org/guide/en/#outputformat), which means it's possible to both bundle your code *and* deploy modules in production (without all the loader boilerplate). And since Rollup has fantastic tree-shaking (the best of any bundler in my experience), bundling to modules with Rollup produces the smallest final code size of any option currently available.
 
-<aside class="Info">
-
+{% Callout 'info' %}
 **Update:** Parcel [plans to add module support](https://twitter.com/devongovett/status/1163792519764877312) in the next version. Webpack does not currently support a module output format, but here are a few issues to follow the discussion ([#2933](https://github.com/webpack/webpack/issues/2933), [#8895](https://github.com/webpack/webpack/issues/8895), [#8896](https://github.com/webpack/webpack/issues/8896)).
-
-</aside>
+{% endCallout %}
 
 Another misconception is that you can't use modules unless 100% of your dependencies use modules, and unfortunately (very unfortunate in my opinion), most npm packages are still published as CommonJS (some actually even author as ES2015 but then transpile to CommonJS before publishing to npm)!
 
@@ -221,13 +219,11 @@ While some `modulepreload` plugins do exist on npm, generating a `modulepreload`
 For example, here's [how I generate the `modulepreload` list](https://github.com/philipwalton/blog/blob/90e914731c77296dccf2ed315599326c6014a080/tasks/javascript.js#L18-L43) for this site as well as [for my demo app](https://github.com/philipwalton/rollup-native-modules-boilerplate/blob/78c687bf757374b5e685508e3afc9560a86a3c96/rollup.config.js#L57-L84) (introduced below).
 
 
-<aside class="Info">
-
+{% Callout 'info' %}
 **Note:** while `modulepreload` is definitely better than classic `preload` for module scripts, it does have worse browser support (it's Chrome-only at the moment). If a sizable portion of your traffic is non-Chrome traffic, it may make sense to use classic preload instead.
 
 One caution when using preload though is that, unlike `modulepreload`, `preload`-ed scripts don't get put in the browser's module map, which means it's possible that a `preload`-ed request gets processed more than once (e.g. if a module imports the file before the browser is done preloading it).
-
-</aside>
+{% endCallout %}
 
 ## Why deploy real modules?
 

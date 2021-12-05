@@ -1,0 +1,24 @@
+.Callout {
+  background: var(--bg-color);
+  margin: var(--gap) calc(-1 * var(--gap));
+  padding: var(--gap);
+}
+
+@media (--break-lg) {
+  .Callout {
+    border-radius: 3px;
+    margin: var(--gap) 0;
+  }
+}
+
+.Callout--info {
+  background: hsla(120, 100%, 50%, .1);
+}
+
+.Callout--warning {
+  background: hsla(20, 100%, 50%, .15)
+}
+
+.Callout :last-child {
+  margin-bottom: 0;
+}

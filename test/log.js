@@ -23,23 +23,23 @@ describe('log', function() {
 
   describe('experiments', () => {
     it('should load the proper experiment', async () => {
-      // await setExperimentCookie('.234');
-      // await browser.url(`/?test_id=${++testID}`);
+      await setExperimentCookie('.234');
+      await browser.url(`/?test_id=${++testID}`);
 
-      // await browser.waitUntil(async () => await beaconsContain({
-      //   'v': '2',
-      //   'dl': new RegExp(`test_id=${testID}`),
-      //   'en': 'page_view',
-      //   'ep.page_path': '/',
-      //   'up.experiment': 'exp_name',
-      // }));
-      // await browser.waitUntil(async () => await beaconsContain({
-      //   v: '1',
-      //   t: 'pageview',
-      //   dl: new RegExp(`test_id=${testID}`),
-      //   dp: '/',
-      //   cd19: 'exp_name',
-      // }));
+      await browser.waitUntil(async () => await beaconsContain({
+        'v': '2',
+        'dl': new RegExp(`test_id=${testID}`),
+        'en': 'page_view',
+        'ep.page_path': '/',
+        'up.experiment': 'modern_css',
+      }));
+      await browser.waitUntil(async () => await beaconsContain({
+        v: '1',
+        t: 'pageview',
+        dl: new RegExp(`test_id=${testID}`),
+        dp: '/',
+        cd19: 'modern_css',
+      }));
 
       await browser.url('/__reset__');
       await setExperimentCookie('.789');

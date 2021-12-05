@@ -157,10 +157,9 @@ if ('ResizeObserver' in self) {
 }
 ```
 
-<aside class="Info">
-  <strong>Note:</strong>
-  this example uses ES5 syntax because (as I explain later) I recommend inlining this code directly in your HTML rather than including it in an external JavaScript file. Older syntax is used for wider browser support.
-</aside>
+{% Callout 'info' %}
+**Note:** this example uses ES5 syntax because (as I explain later) I recommend inlining this code directly in your HTML rather than including it in an external JavaScript file. Older syntax is used for wider browser support.
+{% endCallout %}
 
 This code creates a single `ResizeObserver` instance with a callback function. It then queries the DOM for elements with the `data-observe-resizes` attribute and starts observing them.  The callback function, which is invoked initially upon observation and then again after any change, checks the size of each element and adds (or removes) the corresponding breakpoint classes.
 
@@ -226,10 +225,9 @@ class ResponsiveContainer extends HTMLElement {
 self.customElements.define('responsive-container', ResponsiveContainer);
 ```
 
-<aside class="Info">
-  <strong>Note:</strong>
-  while it may be tempting to create a new ResizeObserver for every container element, it's actually much better to create a single ResizeObserver that observes many elements. To learn more, see <a href="https://groups.google.com/a/chromium.org/d/msg/blink-dev/z6ienONUb5A/F5-VcUZtBAAJ">Aleks Totic's findings on ResizeObserver performance</a> in the <a href="https://groups.google.com/a/chromium.org/forum/#!forum/blink-dev">blink-dev</a> mailing list.
-</aside>
+{% Callout 'info' %}
+**Note:** while it may be tempting to create a new ResizeObserver for every container element, it's actually much better to create a single ResizeObserver that observes many elements. To learn more, see <a href="https://groups.google.com/a/chromium.org/d/msg/blink-dev/z6ienONUb5A/F5-VcUZtBAAJ">Aleks Totic's findings on ResizeObserver performance</a> in the <a href="https://groups.google.com/a/chromium.org/forum/#!forum/blink-dev">blink-dev</a> mailing list.
+{% endCallout %}
 
 ### Nested components
 
@@ -263,10 +261,9 @@ Note that when using my recommended strategy for additive matching, you can stil
 
 At the end of the day, you can pick whichever convention makes the most sense for you and works best for your situation.
 
-<aside class="Info">
-  <strong>Note:</strong>
-  the <code>:matches()</code> selector isn't well supported in current browsers. However, you can use tools like <a href="https://www.npmjs.com/package/postcss-selector-matches">postcss-selector-matches</a> to transpile <code>:matches()</code> into something the works cross-browser.
-</aside>
+{% Callout 'info' %}
+**Note:** the `:matches()` selector isn't well supported in current browsers. However, you can use tools like [postcss-selector-matches](https://www.npmjs.com/package/postcss-selector-matches) to transpile `:matches()` into something the works cross-browser.
+{% endCallout %}
 
 ### Height-based breakpoints
 

@@ -153,7 +153,9 @@ export const init = () => {
   history2 = new History2(async (state) => {
     try {
       await loadPage(state.pathname);
-      drawer.close();
+      if (self.__x !== 'modern_css') {
+        drawer.close();
+      }
       setScroll(state.hash);
       trackPageview(state.pathname);
     } catch (err) {

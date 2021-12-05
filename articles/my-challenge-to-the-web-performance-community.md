@@ -81,6 +81,50 @@ My hope with this post is that I've convinced you that how we talk about perform
 
 So, in the spirit of helping raise awareness of the complexities of performance in the web development community, I want to offer this challenge to anyone speaking, writing, vlogging, or bragging about performance publicly:
 
+<style>
+.Checklist {
+  margin: 0;
+  padding: 0;
+}
+.Checklist li {
+  border-bottom: 1px solid hsl(30, 15%, 90%);
+  margin-bottom: var(--gap);
+  list-style: none;
+  padding: 0 0 var(--gap) 2.25em;
+  position: relative;
+}
+.Checklist li::before {
+  content: "✓";
+  font-size: 1.5em;
+  left: 0em;
+  position: absolute;
+  top: -0.25em;
+}
+.Checklist li strong {
+  display: block;
+  font-size: 1.1em;
+  font-weight: 600;
+  line-height: 1.4;
+}
+.Checklist li p {
+  margin: 0.5em 0 0;
+  font-style: italic;
+}
+
+@media (min-width: 32em) {
+  .Checklist li {
+    padding-left: 3em;
+  }
+  .Checklist li::before {
+    font-size: 1.667em;
+    left: 0.3em;
+  }
+  .Checklist li p {
+    margin-top: 1em;
+  }
+}
+</style>
+
 <ul class="Checklist">
   <li>
     <strong>If you're going to talk about the performance of a production site, use real-user data.</strong>

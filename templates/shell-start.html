@@ -3,33 +3,65 @@
 <head>
   {% include '_head.html' %}
 </head>
-<body class="Site">
-  <div class="Site-header">
+
+{% if EXPERIMENT === 'modern_css' %}
+  <body>
     <header class="Header" id="header">
       <a class="Header-info" href="/" title="Home">
         <h1 class="Header-title">Philip Walton</h1>
-        <p class="Header-tagline">Engineer @ Google</p>
+        <div class="Header-tagline">Engineer @ Google</div>
       </a>
-      <button class="Header-drawerToggle UnstyledButton" id="drawer-toggle">
-        <span class="VisuallyHidden">Menu</span>
-        <svg class="Icon" viewBox="0 0 24 24">
-          <use xlink:href="#icon-menu"></use>
-        </svg>
-      </button>
-      <div class="Header-drawer">
-        <div class="Drawer Drawer--closed" id="drawer">
-          <div class="Drawer-content">
-            <nav class="Drawer-social">
-              {% include '_social-nav.html' %}
-            </nav>
-            <nav class="Drawer-site">
-              {% include '_site-nav.html' %}
-            </nav>
+      <nav class="Header-social">
+        <a class="Header-socialLink" href="https://twitter.com/philwalton" title="Twitter" style="--fill:#5ac">
+          <svg class="Icon" viewBox="0 0 32 32">
+            <use xlink:href="#icon-twitter"></use>
+          </svg>
+        </a>
+        <a class="Header-socialLink" href="https://github.com/philipwalton" title="Github" style="--fill:#111">
+          <svg class="Icon" viewBox="0 0 32 32">
+            <use xlink:href="#icon-github"></use>
+          </svg>
+        </a>
+        <a class="Header-socialLink" href="http://feeds.feedburner.com/philipwalton" title="RSS" style="--fill:#f93">
+          <svg class="Icon" viewBox="0 0 32 32">
+            <use xlink:href="#icon-rss"></use>
+          </svg>
+        </a>
+      </nav>
+      <nav class="Header-nav">
+        <a class="Header-navLink" href="/articles/" title="Articles">Articles</a>
+        <a class="Header-navLink" href="/about/" title="About">About</a>
+      </nav>
+    </header>
+    <main id="content" class="Content">
+{% else %}
+  <body class="Site">
+    <div class="Site-header">
+      <header class="Header" id="header">
+        <a class="Header-info" href="/" title="Home">
+          <h1 class="Header-title">Philip Walton</h1>
+          <p class="Header-tagline">Engineer @ Google</p>
+        </a>
+        <button class="Header-drawerToggle UnstyledButton" id="drawer-toggle">
+          <span class="VisuallyHidden">Menu</span>
+          <svg class="Icon" viewBox="0 0 24 24">
+            <use xlink:href="#icon-menu"></use>
+          </svg>
+        </button>
+        <div class="Header-drawer">
+          <div class="Drawer Drawer--closed" id="drawer">
+            <div class="Drawer-content">
+              <nav class="Drawer-social">
+                {% include '_social-nav.html' %}
+              </nav>
+              <nav class="Drawer-site">
+                {% include '_site-nav.html' %}
+              </nav>
+            </div>
           </div>
         </div>
-      </div>
-    </header>
-  </div>
-
-  <div class="Site-contentContainer">
-    <main id="content" class="Site-content">
+      </header>
+    </div>
+    <div class="Site-contentContainer">
+      <main id="content" class="Site-content">
+{% endif %}

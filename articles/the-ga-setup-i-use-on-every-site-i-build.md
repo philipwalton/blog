@@ -300,20 +300,16 @@ const trackErrors = () => {
 };
 ```
 
-<div class="Info">
-
+{% Callout 'info' %}
 **Note:** the `nonInteraction` field is set to true to prevent this event from influencing bounce rate calculations. If you're curious as to why this is important you should read more about [non-interaction events](https://support.google.com/analytics/answer/1033068#NonInteractionEvents).
-
-</div>
+{% endCallout %}
 
 The above logic loops through each stored error on the error event listener and reports it. It then adds a new listener to immediately send uncaught errors to Google Analytics as they occur.
 
 
-<div class="Info">
-
+{% Callout 'info' %}
 **Note:** you can use a similar strategy to track unhandled Promise rejections via the [unhandledrejection](https://googlechrome.github.io/samples/promise-rejection-events/) event, but that gets a bit more complicated since a Promise rejection can be initially unhandled but then handled later. For simplicity, it's not included it in this post, but you'll probably want to add it to your error tracking implementation if you want full coverage.
-
-</div>
+{% endCallout %}
 
 ### Exception hits vs events
 
@@ -544,11 +540,9 @@ As an example of why distribution data is useful, consider the max scroll report
 
 The histogram below shows a distribution of max scroll percentage (per session) across all users who scrolled over the past few days. The median value was **80%**.
 
-<div class="Info">
-
+{% Callout 'info' %}
 **Tip:** to get median values in Google Analytics, all you have to do is add the *Hit ID* dimension to your report, sort the metric values in ascending order, and then read the middle value.
-
-</div>
+{% endCallout %}
 
 <figure>
   <a href="{{ 'max-scroll-percentage-histogram-1400w.png' | revision }}">

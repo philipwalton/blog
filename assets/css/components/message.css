@@ -14,8 +14,8 @@
 
 .Message--isTransitioning {
   transition:
-      opacity .2s var(--quantum-easing),
-      transform .2s var(--quantum-easing);
+      opacity .2s var(--easing),
+      transform .2s var(--easing);
 
 }
 

@@ -10,7 +10,43 @@ So the best way I can think of to answer this question&mdash;and explain why I'm
 
 And the best way to do that is to write a polyfill ourselves.
 
-<div class="Info Info--subtle">
+<style>
+.Media {
+  display: flex;
+  flex-direction: column;
+}
+.Media-subject {
+  margin: 0 0 1em;
+}
+@media (--break-md) {
+  .Media {
+    flex-direction: row;
+  }
+  .Media-subject {
+    flex: 0 1 0%;
+    min-width: 240px;
+    margin: 0 1.5em 0 0;
+    order: -1;
+  }
+  .Media-body {
+    flex: 1 0 0%;
+  }
+}
+.VideoContainer {
+  position: relative;
+  padding-bottom: 56.25%; /* 16:9 */
+  height: 0;
+}
+.VideoContainer-frame {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+</style>
+
+{% Callout %}
   <div class="Media">
     <div class="Media-subject">
       <div class="VideoContainer">
@@ -21,7 +57,7 @@ And the best way to do that is to write a polyfill ourselves.
       <strong>Note:</strong> this article is a written version of a talk I gave at <a href="http://www.thedotpost.com/2016/12/philip-walton-the-dark-side-of-polyfilling-css">dotCSS on December 2, 2016</a>. The article goes into quite a bit more detail, but if you'd rather watch the video (23 minutes), I've included it as well.
     </div>
   </div>
-</div>
+{% endCallout %}
 
 ## The `random` keyword
 
@@ -126,11 +162,9 @@ for (const stylesheet of document.styleSheets) {
 }
 ```
 
-<div class="Info">
-
+{% Callout 'info' %}
 **Note:** in a real polyfill you wouldn't just do a simple find and replace for the word `random`, as it could be present in many forms outside of its keyword form (e.g. in a URL, in a custom property name, in quoted text in the `content` property, etc.). The actual code in the final demo uses a more robust replacement mechanism, but for the sake of simplicity I'm using the simple version here.
-
-</div>
+{% endCallout %}
 
 If you load [demo #2](https://philipwalton.github.io/talks/2016-12-02/demos/2/) and paste the above code into the JavaScript console and run it, it'll actually do what it's supposed to do, but you won't see any random-width progress bars when it's done.
 

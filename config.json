@@ -9,5 +9,7 @@
   "publicModulesPath": "/modules",
   "templatesDir": "templates",
   "timezone": "America/Los_Angeles",
-  "experiments": []
+  "experiments": [
+    "modern_css"
+  ]
 }

@@ -1,0 +1,93 @@
+.Header {
+  align-items: center;
+  background: var(--dark-bg-color);
+  box-shadow: none;
+  display: flex;
+  letter-spacing: 0.025em;
+  padding: var(--vgap) var(--hgap);
+  position: relative;
+}
+.Header--isTransitioning {
+  transition: border-color .5s var(--quantum-easing),
+              box-shadow .5s var(--quantum-easing);
+}
+.Header--isDrawerOpen {
+  box-shadow: var(--shadow);
+}
+
+
+.Header-info {
+  color: var(--text-color-dark-bg);
+  display: block;
+  flex: 1 0 0%;
+  text-decoration: none;
+}
+.Header-title {
+  color: inherit;
+  font-size: 1.2em;
+  line-height: 1;
+  margin: 0;
+  text-transform: uppercase;
+  word-spacing: 0.25em;
+}
+.Header-tagline {
+  font-size: .8em;
+  margin: .15em 0 0;
+  opacity: .8;
+}
+
+.Header-drawer {
+  bottom: 0;
+  left: 0;
+  position: absolute;
+  right: 0;
+  z-index: -1;
+}
+
+.Header-drawerToggle {
+  color: var(--text-color-dark-bg);
+  cursor: pointer;
+  display: flex;
+  font-size: 1.5em;
+}
+
+@media (--break-md) {
+  .Header {
+    padding: var(--vgap-md) var(--hgap-md);
+  }
+}
+
+@media (--break-lg) {
+  .Header {
+    background: var(--bg-color);
+    padding: var(--vgap-lg) var(--hgap-lg);
+  }
+  .Header--isTransitioning {
+    transition: transform .25s var(--quantum-easing),
+                opacity .25s var(--quantum-easing);
+  }
+  .Header--isDrawerOpen {
+    box-shadow: none;
+  }
+
+  .Header-info {
+    color: var(--link-color);
+  }
+  .Header-info:hover .Header-title {
+    color: var(--accent-color);
+  }
+  .Header-title {
+    transition: color .25s var(--quantum-easing);
+  }
+  .Header-drawerToggle {
+    display: none;
+  }
+  .Header-drawerToggle svg {
+    color: var(--link-color);
+  }
+  .Header-drawer {
+    flex: 2 0 0%;
+    position: static;
+    z-index: 0;
+  }
+}

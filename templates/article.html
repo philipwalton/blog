@@ -29,7 +29,7 @@
   </div>
 
   <footer class="entry-unrelated">
-    <div id="share" class="Share">
+    <div id="share" class="Share Callout">
       <span class="Share-figure">
         <svg class="Icon" viewBox="0 0 39 32">
           <use xlink:href="#icon-twitter-bird"></use>
@@ -44,12 +44,7 @@
            'url': shareUrl,
            'via': 'philwalton' } | urlencode %}
 
-        <a ga-on="click"
-           ga-hit-type="social"
-           ga-social-network="Twitter"
-           ga-social-action="tweet"
-           ga-social-target="{{ shareUrl }}"
-           href="http://twitter.com/intent/tweet?{{ shareParams }}">
+        <a href="http://twitter.com/intent/tweet?{{ shareParams }}">
            share it on Twitter</a>.
 
       </p>

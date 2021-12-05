@@ -1,0 +1,18 @@
+.Footnotes {
+  border-top: 1px solid var(--border-color);
+  color: #555;
+  padding-top: var(--vgap);
+}
+
+.Footnotes-title {
+  font-size: 1em;
+  margin: 0 0 .8em;
+}
+
+.Footnotes-items {
+  font-size: .9em;
+}
+
+.Footnotes-items li {
+  margin-bottom: .4em;
+}

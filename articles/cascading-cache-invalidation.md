@@ -156,11 +156,9 @@ import {...} from '/vendor.mjs';
 
 This means the source code of your modules can safely reference the un-revisioned module names and the browser will always load the revisioned files. And since the revision hashes don't appear in the module's source code (they only appear in the import map) changes to those hashes won't ever invalidate any modules other than the one that changed.
 
-<aside class="Info">
-
+{% Callout 'info' %}
 **Note:** you might be wondering why I made a copy of each file instead of just renaming it. This is necessary in order to support browsers that don't support Import Maps. Those browsers will see a request for `/vendor.mjs` and just load that URL as normal, so both files need to exist on your server.
-
-</aside>
+{% endCallout %}
 
 If you want to see Import Maps in action, I've created a [set of demos](https://github.com/philipwalton/import-maps-caching-demos) showcasing all of the techniques outlined in this article. Also check out the [build configuration](https://github.com/philipwalton/import-maps-caching-demos/blob/master/demos/import-maps-native/rollup.config.js) if you want to see how I generate the import map and revision hashes for each file.
 

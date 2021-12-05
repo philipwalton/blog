@@ -2,7 +2,7 @@
 
 pre {
   background: var(--bg-color);
-  margin: var(--vgap) -var(--hgap);
+  margin: var(--vgap) calc(-1 * var(--hgap));
   overflow: auto;
   padding: var(--vgap) var(--hgap);
   -webkit-text-size-adjust: none;
@@ -18,7 +18,7 @@ pre mark {
 
 @media (--break-md) {
   pre {
-    margin: var(--vgap-md) -var(--hgap-md);
+    margin: var(--vgap-md) calc(-1 * var(--hgap-md));
     padding: var(--vgap-md) var(--hgap-md);
   }
 }

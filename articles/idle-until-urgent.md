@@ -159,13 +159,11 @@ Both of these options are usually better than eager or lazy evaluation because t
 
 To put that another way: if you ensure all your code is run in short, distinct tasks (preferably [less than 50ms](https://developers.google.com/web/fundamentals/performance/user-centric-performance-metrics#long_tasks)), your code will never block user input.
 
-<aside class="Info Info--warning">
-
+{% Callout 'warning' %}
 **Important!** While browsers can run input callbacks ahead of queued tasks, they _cannot_ run input callbacks ahead of queued microtasks. And since promises and `async` functions run as microtasks, converting your sync code to promise-based code will not prevent it from blocking user input!
 
 If you're not familiar with the difference between tasks and microtasks, I highly recommend watching my colleague Jake's excellent [talk on the event loop](https://youtu.be/cCOL7MC4Pl0).
-
-</aside>
+{% endCallout %}
 
 Given what I just said, I could refactor my `main()` function to use `setTimeout()` and `requestIdleCallback()` to break up my initialization code into separate tasks:
 
@@ -355,11 +353,9 @@ queue.pushTask(() => {
 });
 ```
 
-<aside class="Info">
-
+{% Callout 'info' %}
 **Note:** breaking up your synchronous JavaScript code into separate tasks that can run asynchronously as part of a task queue is different from [code splitting](https://developers.google.com/web/fundamentals/performance/optimizing-javascript/code-splitting/), which is about breaking up large JavaScript bundles into smaller files (and is also important for improving performance).
-
-</aside>
+{% endCallout %}
 
 As with the idly-initialized property strategy shown above, idle tasks queues also have a way to run immediately in cases where the result of their execution is needed right away (the "urgent" case).
 
@@ -388,17 +384,13 @@ const queue = new IdleQueue(**{ensureTasksRun: true}**);
 
 For tasks like rendering, there's no need to ensure tasks run before the page unloads, but for tasks like saving user state and sending end-of-session analytics, you'll likely want to set this option to true.
 
-<aside class="Info">
-
+{% Callout 'info' %}
 **Note:** listening for the `visibilitychange` event should be sufficient to ensure tasks run before the page is unloaded, but due to Safari bugs where [the pagehide and visibilitychange events don't always fire](https://github.com/GoogleChromeLabs/page-lifecycle/issues/2) when users close a tab, you have to implement a small workaround just for Safari. This workaround [is implemented for you](https://github.com/GoogleChromeLabs/idlize/blob/master/IdleQueue.mjs#L60-L69) in the `IdleQueue` class, but if you're implementing this yourself, you'll need to be aware of it.
+{% endCallout %}
 
-</aside>
-
-<aside class="Info Info--warning">
-
+{% Callout 'warning' %}
 **Warning!** Do not listen for the `unload` event as a way to run the queue before the page is unloaded. The unload event is not reliable and it can hurt performance in some cases. See my [Page Lifecycle API article](https://developers.google.com/web/updates/2018/07/page-lifecycle-api#the-unload-event) for more details.
-
-</aside>
+{% endCallout %}
 
 ## Use cases for idle-until-urgent
 
@@ -410,13 +402,12 @@ For other bits of logic that are essential but not necessarily critical to immed
 
 Two specific examples that are particularly amenable to this technique (and are relevant to a large percentage of websites out there) are persisting application state (e.g. with something like Redux) and analytics.
 
-<aside class="Info">
+{% Callout 'info' %}
 
 **Note:** these are all use cases where the _intention_ is that  tasks should run during idle periods, so it's not a problem if they don't run right away. If you need to handle high-priority tasks where the _intention_ is they should run as soon as possible (yet still yielding to input), then `requestIdleCallback()` may not solve your problem.
 
 Fortunately, some of my colleagues have proposals for new web platform APIs ([`shouldYield()`](https://discourse.wicg.io/t/shouldyield-enabling-script-to-yield-to-user-input/2881/17), and a native [Scheduling API](https://github.com/spanicker/main-thread-scheduling/blob/master/README.md)) that should help.
-
-</aside>
+{% endCallout %}
 
 ### Persisting application state
 

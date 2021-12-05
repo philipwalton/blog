@@ -5,7 +5,9 @@ import moment from 'moment-timezone';
 import nunjucks from 'nunjucks';
 import path from 'path';
 import resolve from 'resolve';
+import {promisify} from 'util';
 import {getRevisionedAssetUrl} from './assets.js';
+import {renderMarkdown} from './markdown.js';
 
 
 const config = fs.readJSONSync('./config.json');
@@ -27,7 +29,6 @@ const catchAndLogErrors = (fn) => {
     }
   };
 };
-
 
 export const initTemplates = () => {
   const modulepreload = fs.readJsonSync(
@@ -75,4 +76,63 @@ export const initTemplates = () => {
     }
     return inlineCache[fileURL];
   }));
+
+  env.addExtension('Callout', new Shortcode('Callout', (content, type) => {
+    const classes = ['Callout'];
+    if (type) {
+      classes.push(`Callout--${type}`);
+    }
+    return `<div class="${classes.join(' ')}">${
+      renderMarkdown(content.trim(), {highlight: false})
+    }</div>`;
+  }));
 };
+
+/**
+ * Class to create new Nunjucks shortcode blocks.
+ */
+class Shortcode {
+  /**
+   * @param {string} shortcodeName
+   * @param {Function} shortcodeFn
+   */
+  constructor(shortcodeName, shortcodeFn) {
+    this._shortcodeFn = shortcodeFn;
+    this._shortcodeName = shortcodeName;
+
+    this.tags = [shortcodeName];
+  }
+
+  /**
+   * @param {Object} parser Nunjucks object
+   * @param {Object} nodes Nunjucks object
+   * @returns {any}
+   */
+  parse(parser, nodes) {
+    const tok = parser.nextToken();
+
+    const args = parser.parseSignature(true, true);
+    parser.advanceAfterBlockEnd(tok.value);
+
+    const body = parser.parseUntilBlocks('end' + this._shortcodeName);
+    parser.advanceAfterBlockEnd();
+
+    return new nodes.CallExtensionAsync(this, 'run', args, [body]);
+  }
+
+  /**
+   * @param  {...any} args Parser params
+   */
+  async run(...args) {
+    const done = args.pop();
+    const body = args.pop();
+    const [ctx, ...argArray] = args;
+
+    const content = this._shortcodeFn.call(ctx, body(), ...argArray);
+
+    done(null, new nunjucks.runtime.SafeString(content));
+  }
+}
+
+export const renderTemplate = promisify(nunjucks.render);
+export const renderTemplateString = promisify(nunjucks.renderString);

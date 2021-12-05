@@ -159,11 +159,9 @@ In the above code I'm using a [cache-first](https://developers.google.com/web/to
 
 If you prefer to always get fresh content from the network, you can use a [network-first](https://developers.google.com/web/tools/workbox/modules/workbox-strategies#network_first_network_falling_back_to_cache) strategy instead.
 
-<aside class="Info">
-
+{% Callout 'info' %}
 **Note:** A nice benefit of using `workbox-streams` is that it'll automatically fallback to a full text response in browsers that don't support Readable Streams (though at this point [all modern browsers support streams](https://caniuse.com/#feat=mdn-api_readablestream)).
-
-</aside>
+{% endCallout %}
 
 ### 5) Set the correct title
 
@@ -270,11 +268,9 @@ Comparing the performance results between the "No Service Worker" case and the "
 
 And if you look at the performance results for visitors who already had the content partial in their cache, you can see the responses are near instant for the majority of users!
 
-<aside class="Info">
-
+{% Callout 'info' %}
 **Note:** if you're not familiar with how service worker thread startup time can affect performance, watch my talk on [Building Faster, More Resilient Apps with Service Worker](https://youtu.be/25aCD5XL1Jk) from Chrome Dev Summit in 2018
-
-</aside>
+{% endCallout %}
 
 ## Key takeaways
 

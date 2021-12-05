@@ -65,11 +65,57 @@ In fact, even interactions like scrolling (which are usually handled on a separa
 
 To see a blocked main thread in action, click the button below (which will add a `wheel` and `touchstart` event listener and run the `while` loop shown above), then try to select any text, click any link, or scroll around. Also, notice how the animated GIF stops animating:
 
-<aside class="Info">
-
+{% Callout 'info' %}
 **Update:** some browsers are now able to render animated GIFs while the main thread is blocked; however, that has not historically been the case, and not all browsers currently support this feature.
+{% endCallout %}
 
-</aside>
+
+<style>
+input[type="text"] {
+  background: #fff;
+  border: 1px solid var(--border-color-input);
+  border-radius: var(--border-radius);
+  font: inherit;
+  font-size: 0.9em;
+  font-weight: 400;
+  padding: 0.5em .75em;
+  width: 100%;
+}
+label {
+  color: var(--text-color-faded);
+  display: block;
+  font-size: 0.9em;
+  margin-bottom: 0.5em;
+}
+label > input[type="checkbox"] {
+  margin-right: 0.5em;
+}
+.Button {
+  transition: background-color 0.2s;
+  display: inline-block;
+  padding: 0.75em 1.5em;
+  background: var(--accent-color);
+  color: #fff;
+  border: 0;
+  border-radius: 2px;
+  cursor: pointer;
+  font-size: 1em;
+  line-height: normal;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.Button:active,
+.Button:focus,
+.Button:hover {
+  border: 0;
+  background: var(--accent-color-active);
+  text-decoration:none;
+}
+.Demo {
+  border-top: 1px solid var(--border-color);
+  padding-top: var(--gap);
+}
+</style>
 
 <div class="Demo">
   <p>
@@ -118,11 +164,10 @@ To see a blocked main thread in action, click the button below (which will add a
   </script>
 </div>
 
-<aside class="Info">
-
+{% Callout 'info' %}
 **Warning!** You might suddenly find yourself on a new page once the main thread is unblocked!
+{% endCallout %}
 
-</aside>
 
 ### What blocks the main thread
 

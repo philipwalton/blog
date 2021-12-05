@@ -1,0 +1,22 @@
+@import "./base/custom-media.css";
+
+@import "./components/alert.css";
+@import "./components/alert-container.css";
+@import "./components/footnotes.css";
+@import "./components/message.css";
+@import "./components/message-container.css";
+
+@import "highlight.js/styles/github";
+
+/* Additional syntax highlighting styles */
+mark {
+  background-color: transparent;
+  color: inherit;
+}
+
+/* Allow for highlighting specific parts of a code block. */
+pre mark {
+  background-color: hsla(60, 100%, 50%, 0.4);
+  box-shadow: 0 0 0 .1em hsla(60, 100%, 50%, 0.4);
+  font-style: normal;
+}

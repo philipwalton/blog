@@ -26,7 +26,9 @@ const initLog = async () => {
  */
 export const main = async () => {
   contentLoader.init();
-  drawer.init();
+  if (self.__x !== 'modern_css') {
+    drawer.init();
+  }
   breakpoints.init();
 
   // Everything after this includes dynamic imports.

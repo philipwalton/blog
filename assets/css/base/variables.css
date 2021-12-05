@@ -1,35 +1,39 @@
 :root {
+  --gap: 1.25em;
   --font-family: system-ui, sans-serif;
+  --easing: cubic-bezier(.4,0,.2,1);
 
   --text-color: hsl(0, 0%, 20%);
   --text-color-faded: hsl(0, 0%, 35%);
+  --text-color-inverted: hsl(0, 0%, 90%);
+  --text-color-inverted-faded: hsl(0, 0%, 75%);
 
   --link-color: hsl(0, 0%, 40%);
+  --link-color-active: var(--link-color);
+
   --accent-color: hsl(150, 40%, 50%);
-  --accent-color-active: hsl(150, 40%, 40%);
   --border-color: hsl(30, 15%, 93%);
-  --border-color-input: hsl(30, 15%, 80%);
-  --border-radius: 3px;
 
   --bg-color: hsl(30, 15%, 95%);
-  --dark-bg-color: hsl(0, 0%, 25%);
-  --text-color-dark-bg: hsl(0, 0%, 90%);
-  --code-bg-color: hsla(30, 15%, 50%, 0.1);
+  --bg-color-inverted: hsl(0, 0%, 25%);
+
   --error-color: hsl(0, 60%, 50%);
+}
 
-  --shadow: 0 0 .5em hsla(0, 0%, 0%, .3);
+@media (--break-md) {
+  :root {
+    --gap: 1.5em;
+  }
+}
 
-  --twitter-color: #55acee;
-  --github-color: #171715;
-  --rss-color: #F93;
+@media (--break-lg) {
+  :root {
+    --gap: 1.75em;
+  }
+}
 
-  --vgap: 1.5em;
-  --vgap-md: var(--vgap);
-  --vgap-lg: 1.75em;
-
-  --hgap: 1.25em;
-  --hgap-md: 1.5em;
-  --hgap-lg: 1.75em;
-
-  --quantum-easing: cubic-bezier(.4,0,.2,1);
+@media (--break-xl) {
+  :root {
+    --gap: 2em;
+  }
 }

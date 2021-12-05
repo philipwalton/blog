@@ -1,6 +1,5 @@
 import fs from 'fs-extra';
 import gulp from 'gulp';
-import nunjucks from 'nunjucks';
 import path from 'path';
 import {generateRevisionedAsset} from './utils/assets.js';
 import {initBook} from './utils/book.js';
@@ -8,7 +7,7 @@ import {ENV} from './utils/env.js';
 import {eachExperiment, getExperiment} from './utils/experiments.js';
 import {processHtml} from './utils/html.js';
 import {renderMarkdown} from './utils/markdown.js';
-import {initTemplates} from './utils/templates.js';
+import {initTemplates, renderTemplate, renderTemplateString} from './utils/templates.js';
 
 
 const config = fs.readJSONSync('./config.json');
@@ -32,8 +31,8 @@ const renderArticleContentPartials = async () => {
     const markdown =
         await fs.readFile(`${article.path.slice(1, -1)}.md`, 'utf-8');
 
-    article.markup = renderMarkdown(nunjucks.renderString(markdown, data));
-    article.content = nunjucks.render(article.template, data);
+    article.markup = renderMarkdown(await renderTemplateString(markdown, data));
+    article.content = await renderTemplate(article.template, data);
   }
 };
 
@@ -49,7 +48,7 @@ const buildArticles = async () => {
       page: {type: 'article', ...article},
       layout: 'shell.html',
     };
-    const html = nunjucks.render(article.template, data);
+    const html = await renderTemplate(article.template, data);
 
     await fs.outputFile(
         path.join(getExperimentDir(), article.filePath), processHtml(html));
@@ -67,7 +66,7 @@ const renderPageContentPartials = async () => {
         layout: 'partial.html',
       };
 
-      page.content = nunjucks.render(page.template, data);
+      page.content = await renderTemplate(page.template, data);
     }
   }
 };
@@ -92,7 +91,7 @@ const buildPages = async () => {
       layout: 'shell.html',
     };
 
-    const html = nunjucks.render(page.template, data);
+    const html = await renderTemplate(page.template, data);
     const filePath = path.join(getExperimentDir(), page.filePath);
     await fs.outputFile(filePath, processHtml(html));
   }
@@ -104,7 +103,7 @@ const buildResources = async () => {
     articles: book.articles,
   };
   for (const resource of book.resources) {
-    const content = nunjucks.render(resource.template, data);
+    const content = await renderTemplate(resource.template, data);
     await fs.outputFile(
         path.join(config.publicDir, resource.filePath), content);
   }
@@ -129,7 +128,7 @@ const buildShell = async () => {
     layout: 'shell.html',
   };
 
-  const html = nunjucks.render('shell.html', data);
+  const html = await renderTemplate('shell.html', data);
   const processedHtml = processHtml(html);
 
   const [shellStart, shellEnd] = processedHtml.split(SHELL_SPLIT_POINT);

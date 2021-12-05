@@ -1,0 +1,252 @@
+@viewport {
+  width: device-width
+}
+
+/* From normalize.css */
+/* https://github.com/necolas/normalize.css/blob/master/normalize.css */
+
+pre {
+  font-family: monospace, monospace;
+  font-size: 1em;
+}
+
+sub,
+sup {
+  font-size: 75%;
+  line-height: 0;
+  position: relative;
+  vertical-align: baseline;
+}
+
+sub {
+  bottom: -0.25em;
+}
+
+sup {
+  top: -0.5em;
+}
+
+/* End normalize.css */
+
+*,
+*:before,
+*:after {
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+}
+
+body {
+  color: var(--text-color);
+  font: 1em/1.5 sans-serif;
+
+  /* Declare font-family separately since <=IE11 don't parse it properly */
+  font-family: var(--font-family);
+
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  margin: 0;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-weight: 500;
+  line-height: 1.2;
+  margin: 1em 0;
+}
+@media (--break-md) {
+  h1,
+  h2,
+  h3,
+  h4 {
+    margin: 1.25em 0;
+  }
+}
+
+h4 {
+    font-weight: 700;
+    line-height: inherit;
+}
+
+p {
+  margin: 0 0 var(--vgap);
+}
+
+a {
+  color: var(--link-color);
+  text-underline-offset: 1px;
+}
+
+article sup a {
+  padding: 0 0.25em;
+  text-decoration: none;
+}
+
+article strong a {
+  color: inherit;
+}
+
+tt, code {
+  font-family: Monaco, monospace;
+  font-size: 0.875em;
+}
+
+code {
+  background: var(--code-bg-color);
+  border-radius: 2px;
+  display: inline-block;
+  padding: 2px 3px 1px;
+  text-decoration: inherit;
+  word-break: break-word;
+}
+
+pre code {
+  background: inherit;
+  color: inherit;
+  display: block;
+  font-size: 0.875em;
+  padding: 0;
+}
+
+a > code {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+mark {
+  background-color: transparent;
+  color: inherit;
+}
+
+blockquote {
+  border-left: 4px solid hsl(0, 0%, 93%);
+  color: hsl(0, 0%, 50%);
+  font-style: italic;
+  margin: 0;
+  padding: .3em 0 .3em 1em;
+  line-height: 1.3;
+  font-size: 1.05em;
+  margin-bottom: 1.75em;
+}
+
+blockquote p:last-child {
+  margin-bottom: 0;
+}
+
+ol, ul {
+  margin: 0 0 var(--vgap);
+  padding-left: 1.25em;
+}
+@media (--break-md) {
+  ol, ul {
+    padding-left: 1.5em;
+  }
+}
+
+ul {
+  list-style-type: square;
+}
+
+ul ul,
+ol ol,
+ul ol,
+ol ul {
+  margin-bottom: 0;
+}
+
+ol ol {
+  list-style: lower-alpha;
+}
+
+ol ol ol {
+  list-style: lower-roman;
+}
+
+figure {
+  margin: 0 0 var(--vgap);
+}
+
+figcaption {
+  color: #666;
+  font-style: italic;
+  font-size: .8em;
+  padding: 0 .5em;
+  text-align: right;
+}
+
+figcaption a {
+  color: var(--accent-color);
+  border-bottom: 1px dotted var(--accent-color);
+  text-decoration: none;
+}
+
+figcaption a:hover {
+  border-bottom-style: solid;
+}
+
+figure img {
+  height: auto;
+  max-width: 100%;
+}
+
+figure:not([noborder]) img {
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  padding: 3px;
+}
+
+table {
+  border-collapse: collapse;
+  margin: 0 0 var(--vgap);
+  max-width: 100%;
+  width: 100%;
+}
+
+table th {
+  background-color: var(--bg-color);
+  vertical-align: bottom;
+}
+
+table th,
+table td {
+  border: 1px solid var(--border-color);
+  padding: .75em;
+  text-align: left;
+  vertical-align: top;
+}
+
+iframe {
+  display: block;
+  width: 100%;
+}
+
+video {
+  border: 1px solid var(--border-color);
+  width: 100%;
+}
+
+input[type="text"] {
+  background: #fff;
+  border: 1px solid var(--border-color-input);
+  border-radius: var(--border-radius);
+  font: inherit;
+  font-size: 0.9em;
+  font-weight: 400;
+  padding: 0.5em .75em;
+  width: 100%;
+}
+
+label {
+  color: var(--text-color-faded);
+  display: block;
+  font-size: 0.9em;
+  margin-bottom: 0.5em;
+}
+
+label > input[type="checkbox"] {
+  margin-right: 0.5em;
+}

@@ -19,7 +19,9 @@ addEventListener('fetch', (event) => {
   }
 });
 
-const experiments = {};
+const experiments = {
+  modern_css: [0, 1/2],
+};
 
 /**
  * @param {string} xid
@@ -77,6 +79,7 @@ async function handleRequest({request, url}) {
     redirect: request.redirect,
     cf: {
       cacheEverything: self.__ENV__ === 'production',
+      cacheTtlByStatus: {'200-299': 604800, '400-599': 0},
     },
   });
 

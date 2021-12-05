@@ -1,4 +1,15 @@
+{% include '_icons.html' %}
+
+{% for module in 'main-module' | modulepreload %}
+  <link rel="modulepreload" href="{{ module }}"></script>
+{%- endfor %}
+<script type="module" src="/modules/main-module.mjs"></script>
+
 {% if ENV !== 'development' %}
   {% include '_nomodule-shim.html' %}
   <script defer nomodule src="{{ 'main-nomodule.js' | revision }}"></script>
+{% endif %}
+
+{% if EXPERIMENT === 'modern_css' %}
+  <link rel="stylesheet" href="{{ 'defer.css' | revision }}">
 {% endif %}

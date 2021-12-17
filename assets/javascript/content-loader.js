@@ -1,4 +1,3 @@
-import * as drawer from './drawer';
 import History2 from './history2';
 import {now} from './utils/performance';
 
@@ -153,9 +152,6 @@ export const init = () => {
   history2 = new History2(async (state) => {
     try {
       await loadPage(state.pathname);
-      if (self.__x !== 'modern_css') {
-        drawer.close();
-      }
       setScroll(state.hash);
       trackPageview(state.pathname);
     } catch (err) {

@@ -1,6 +1,5 @@
 import * as breakpoints from './breakpoints';
 import * as contentLoader from './content-loader';
-import * as drawer from './drawer';
 import * as sw from './sw-init';
 
 
@@ -26,9 +25,6 @@ const initLog = async () => {
  */
 export const main = async () => {
   contentLoader.init();
-  if (self.__x !== 'modern_css') {
-    drawer.init();
-  }
   breakpoints.init();
 
   // Everything after this includes dynamic imports.

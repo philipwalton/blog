@@ -1,9 +1,0 @@
-.MessageContainer {
-  align-items: flex-start;
-  bottom: 0;
-  display: flex;
-  flex-direction: column-reverse;
-  left: 0;
-  position: fixed;
-  z-index: 1;
-}

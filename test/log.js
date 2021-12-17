@@ -22,7 +22,9 @@ describe('log', function() {
   });
 
   describe('experiments', () => {
-    it('should load the proper experiment', async () => {
+    // Unskip when running an experiment
+    xit('should load the proper experiment', async () => {
+      /*
       await setExperimentCookie('.234');
       await browser.url(`/?test_id=${++testID}`);
 
@@ -60,6 +62,7 @@ describe('log', function() {
         dp: '/articles/',
         cd19: '(not set)',
       }));
+      */
     });
 
     it('should handle redirects properly', async () => {

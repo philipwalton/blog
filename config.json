@@ -10,6 +10,6 @@
   "templatesDir": "templates",
   "timezone": "America/Los_Angeles",
   "experiments": [
-    "modern_css"
+
   ]
 }

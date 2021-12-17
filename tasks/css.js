@@ -20,7 +20,7 @@ const compileCss = async (srcPath, experiment) => {
       browsers: ENV === 'development' ? 'last 2 Chrome versions' : 'defaults',
       features: {
         'system-ui-font-family': false,
-        'custom-properties': experiment === 'modern_css' ? false : true,
+        'custom-properties': false,
       },
     }),
   ];
@@ -43,18 +43,13 @@ const compileCss = async (srcPath, experiment) => {
 gulp.task('css', async () => {
   await eachExperiment(async (experiment) => {
     try {
-      const mainPath = experiment === 'modern_css' ?
-          './assets/css/main.css' : './assets/css-legacy/main-legacy.css';
-
+      const mainPath = './assets/css/main.css';
       const main = await compileCss(mainPath, experiment);
       await generateRevisionedAsset(path.basename(mainPath), main);
 
-      if (experiment === 'modern_css') {
-        const deferPath = './assets/css/defer.css';
-
-        const defer = await compileCss(deferPath, experiment);
-        await generateRevisionedAsset(path.basename(deferPath), defer);
-      }
+      const deferPath = './assets/css/defer.css';
+      const defer = await compileCss(deferPath, experiment);
+      await generateRevisionedAsset(path.basename(deferPath), defer);
     } catch (err) {
       console.error(err);
     }

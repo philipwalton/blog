@@ -19,16 +19,16 @@ addEventListener('fetch', (event) => {
   }
 });
 
-const experiments = {
-  modern_css: [0, 1/2],
-};
+const experiments = [
+  // experiment_name: [lowerBound, upperBound],
+];
 
 /**
  * @param {string} xid
  * @returns {string}
  */
 function getExperimentPath(xid) {
-  for (const [key, range] of Object.entries(experiments)) {
+  for (const [key, range] of experiments) {
     if (xid >= range[0] && xid < range[1]) {
       return '/_' + key;
     }
@@ -69,10 +69,14 @@ async function handleRequest({request, url}) {
   const xid = cookie.match(/(?:^|;) *xid=(\.\d+) *(?:;|$)/) ?
       RegExp.$1 : `${Math.random()}`.slice(1, 5);
 
-  const experimentURL = new URL(
-      `${url.origin}${getExperimentPath(xid)}${url.pathname}${url.search}`);
+  const resourceURL = experiments.length ? new URL([
+    url.origin,
+    getExperimentPath(xid),
+    url.pathname,
+    url.search,
+  ].join('')) : url;
 
-  const response = await fetch(experimentURL, {
+  const response = await fetch(resourceURL, {
     body: request.body,
     headers: request.headers,
     method: request.method,
@@ -85,7 +89,7 @@ async function handleRequest({request, url}) {
 
   // If the response isn't a 2XX, fall back to the original request.
   if (response.status > 300) {
-    // TODO: figure out a way to determine how often this happens.
+    // TODO: figure out a good way to determine how often this happens.
     return fetch(request);
   }
 

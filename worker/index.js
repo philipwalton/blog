@@ -19,16 +19,17 @@ addEventListener('fetch', (event) => {
   }
 });
 
-const experiments = [
+// Uncomment to add experiments
+const experiments = null; // {
   // experiment_name: [lowerBound, upperBound],
-];
+  // };
 
 /**
  * @param {string} xid
  * @returns {string}
  */
 function getExperimentPath(xid) {
-  for (const [key, range] of experiments) {
+  for (const [key, range] of Object.entries(experiments)) {
     if (xid >= range[0] && xid < range[1]) {
       return '/_' + key;
     }
@@ -69,7 +70,7 @@ async function handleRequest({request, url}) {
   const xid = cookie.match(/(?:^|;) *xid=(\.\d+) *(?:;|$)/) ?
       RegExp.$1 : `${Math.random()}`.slice(1, 5);
 
-  const resourceURL = experiments.length ? new URL([
+  const resourceURL = experiments ? new URL([
     url.origin,
     getExperimentPath(xid),
     url.pathname,

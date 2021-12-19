@@ -291,6 +291,13 @@
          "date": "2021-10-06T07:18:38.000Z",
          "image": "lh-cwv-correlation-poster.png",
          "excerpt": "Performance optimization should be about making your users happy, not about making your tools happy. And if we really believe that, we should lead by example."
+      },
+      {
+         "title": "Performant A/B Testing with Cloudflare Workers",
+         "path": "/articles/performant-a-b-testing-with-cloudflare-workers/",
+         "date": "2021-12-20T14:01:14.000Z",
+         "image": "ab-testing-poster.png",
+         "excerpt": "Performance optimization should be about making your users happy, not about making your tools happy. And if we really believe that, we should lead by example."
       }
    ]
 }

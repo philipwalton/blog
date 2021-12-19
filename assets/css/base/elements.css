@@ -31,8 +31,12 @@ h4 {
   font-weight: 700;
 }
 
-p, ol, ul, figure, table {
+p, ol, ul {
   margin: 0 0 1.25em;
+}
+
+figure, table {
+  margin: var(--gap) 0;
 }
 
 /* https://github.com/necolas/normalize.css#sub-sup */
@@ -94,7 +98,7 @@ a > code {
 }
 
 ol, ul {
-  padding-left: var(--gap);
+  padding-left: 2em;
 }
 
 ul {
@@ -116,6 +120,11 @@ ol ol ol {
   list-style: lower-roman;
 }
 
+li {
+  line-height: 1.4;
+  margin-bottom: 0.5em;
+}
+
 figcaption {
   color: #666;
   font-style: italic;
@@ -135,6 +144,7 @@ figcaption a:hover {
 }
 
 figure img {
+  display: block;
   height: auto;
   max-width: 100%;
 }
@@ -162,6 +172,10 @@ table td {
   padding: .75em;
   text-align: left;
   vertical-align: top;
+}
+
+td.highlight {
+  background-color: hsl(45, 100%, 95%);
 }
 
 iframe {

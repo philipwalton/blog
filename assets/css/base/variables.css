@@ -17,6 +17,8 @@
   --bg-color: hsl(30, 15%, 95%);
   --bg-color-inverted: hsl(0, 0%, 25%);
 
+  --code-bg-color: hsla(30, 15%, 50%, 0.1);
+
   --error-color: hsl(0, 60%, 50%);
 }
 

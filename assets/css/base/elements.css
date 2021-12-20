@@ -78,7 +78,6 @@ pre {
 code {
   background: var(--code-bg-color);
   border-radius: 2px;
-  display: inline-block;
   font: 0.875em/1.5 Monaco, monospace;
   padding: 2px 3px 1px;
   text-decoration: inherit;

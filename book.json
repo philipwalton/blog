@@ -297,7 +297,7 @@
          "path": "/articles/performant-a-b-testing-with-cloudflare-workers/",
          "date": "2021-12-20T14:01:14.000Z",
          "image": "ab-testing-poster.png",
-         "excerpt": "Performance optimization should be about making your users happy, not about making your tools happy. And if we really believe that, we should lead by example."
+         "excerpt": "I think there’s a perception in our industry that A/B testing is super complicated and you really need a tool or service to do it right. And while I’m sure some aspects of A/B are quite complex"
       }
    ]
 }

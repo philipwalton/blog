@@ -62,6 +62,10 @@ export class Logger {
       breakpoint: getActiveBreakpoint().name,
       connection_type: getEffectiveConnectionType(),
       pixel_density: getPixelDensity(),
+      color_scheme_preference: getColorSchemePreference(),
+      constrast_preference: getContrastPreference(),
+      reduce_data_preference: getReducedDataPreference(),
+      reduce_motion_preference: getReducedMotionPref(),
       service_worker_state: initialSWState,
     };
     if (self.__x) {
@@ -349,4 +353,42 @@ function getPixelDensity() {
     }
   }
   return activeDensity;
+}
+
+/**
+ * Returns the user's `prefers-color-scheme` preference.
+ * @return {string}
+ */
+function getColorSchemePreference() {
+  return window.matchMedia('(prefers-color-scheme: light)').matches ?
+      'light' : window.matchMedia('(prefers-color-scheme: dark)').matches ?
+        'dark' : 'no-preference';
+}
+
+/**
+ * Returns the user's `prefers-reduced-data` preference.
+ * @return {string}
+ */
+function getReducedDataPreference() {
+  return window.matchMedia('(prefers-reduced-data: reduce)').matches ?
+      'reduce' : 'no-preference';
+}
+
+/**
+ * Returns the user's `prefers-reduced-motion` preference.
+ * @return {string}
+ */
+function getReducedMotionPref() {
+  return window.matchMedia('(prefers-reduced-motion: reduce)').matches ?
+      'reduce' : 'no-preference';
+}
+
+/**
+ * Returns the user's `prefers-contrast` preference.
+ * @return {string}
+ */
+function getContrastPreference() {
+  return window.matchMedia('(prefers-contrast: more)').matches ?
+      'more' : window.matchMedia('(prefers-contrast: less)').matches ?
+          'less' : 'no-preference';
 }

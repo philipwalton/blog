@@ -1,4 +1,4 @@
-import {getCLS, getFCP, getFID, getLCP, getTTFB} from 'web-vitals/base';
+import {onCLS, onFCP, onFID, onINP, onLCP, onTTFB} from 'web-vitals/base';
 import {Logger} from './Logger';
 import {initialSWState} from './sw-state';
 import {now, timeOrigin} from './utils/performance';
@@ -10,7 +10,7 @@ import {uuid} from './utils/uuid';
  * implementation. This allows you to create a segment or view filter
  * that isolates only data captured with the most recent tracking changes.
  */
-const MEASUREMENT_VERSION = 85;
+const MEASUREMENT_VERSION = 86;
 
 /**
  * A 13-digit, random identifier for the current page.
@@ -60,6 +60,7 @@ export const init = async () => {
   trackCLS();
   trackFCP();
   trackFID();
+  trackINP();
   trackLCP();
   trackTTFB();
 };
@@ -158,7 +159,7 @@ const getRating = (value, thresholds) => {
 };
 
 const trackCLS = async () => {
-  getCLS(({name, value, delta, entries, id}) => {
+  onCLS(({name, value, delta, entries, id}) => {
     const eventData = {
       value: delta,
       metric_rating: getRating(value, [0.1, 0.25]),
@@ -187,7 +188,7 @@ const trackCLS = async () => {
 };
 
 const trackFCP = async () => {
-  getFCP(({name, value, delta, id}) => {
+  onFCP(({name, value, delta, id}) => {
     log.event(name, {
       value: delta,
       metric_rating: getRating(value, [1800, 3000]),
@@ -199,7 +200,7 @@ const trackFCP = async () => {
 };
 
 const trackFID = async () => {
-  getFID(({name, value, delta, entries, id}) => {
+  onFID(({name, value, delta, entries, id}) => {
     const entry = entries[0];
 
     log.event(name, {
@@ -213,8 +214,34 @@ const trackFID = async () => {
   });
 };
 
+const trackINP = async () => {
+  onINP(({name, value, delta, entries, id}) => {
+    const longestEntry = entries.sort((a, b) => {
+      // Sort by: 1) duration (DESC), then 2) processing time (DESC)
+      return b.duration - a.duration || (b.processingEnd - b.processingStart) -
+          (a.processingEnd - a.processingStart);
+    })[0];
+
+    log.event(name, {
+      value: delta,
+      metric_rating: getRating(value, [200, 500]),
+      metric_value: value,
+      debug_target: longestEntry ?
+      getSelector(longestEntry.target) : '(not set)',
+      debug_event: longestEntry ? longestEntry.name : '(not set)',
+      debug_delay: longestEntry ?
+          longestEntry.processingStart - longestEntry.startTime : '(not set)',
+      debug_processing: longestEntry ? longestEntry.processingEnd -
+          longestEntry.processingStart : '(not set)',
+      debug_presentation: longestEntry ? (longestEntry.startTime + value) -
+          longestEntry.processingEnd : '(not set)',
+      event_id: id,
+    });
+  });
+};
+
 const trackLCP = async () => {
-  getLCP(({name, value, delta, entries, id}) => {
+  onLCP(({name, value, delta, entries, id}) => {
     const lastEntry = entries.length && entries[entries.length - 1];
     const params = {
       value: delta,
@@ -246,7 +273,7 @@ const trackLCP = async () => {
 };
 
 const trackTTFB = () => {
-  getTTFB(({name, value, entries, id}) => {
+  onTTFB(({name, value, entries, id}) => {
     const navEntry = entries[0];
     const params = {
       value: value,

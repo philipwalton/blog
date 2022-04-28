@@ -1,7 +1,7 @@
 import fs from 'fs-extra';
 import path from 'path';
 import revHash from 'rev-hash';
-import revPath from 'rev-path';
+import {revPath} from 'rev-path';
 import {getExperiment} from './experiments.js';
 
 

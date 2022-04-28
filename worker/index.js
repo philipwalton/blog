@@ -13,8 +13,8 @@ addEventListener('fetch', (event) => {
       url.pathname === '/sw.js')) {
     event.respondWith(
       handleRequest({request: event.request, url, event}).catch(
-        (err) => new Response(err.stack, {status: 500})
-      )
+        (err) => new Response(err.stack, {status: 500}),
+      ),
     );
   }
 });

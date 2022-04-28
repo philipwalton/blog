@@ -1,7 +1,7 @@
 import chalk from 'chalk';
 import fs from 'fs-extra';
 import gulp from 'gulp';
-import gzipSize from 'gzip-size';
+import {gzipSizeSync} from 'gzip-size';
 import path from 'path';
 import {rollup} from 'rollup';
 import {babel} from '@rollup/plugin-babel';
@@ -85,7 +85,7 @@ const reportBundleSizePlugin = () => {
     generateBundle: (options, bundle) => {
       let bundleSize = 0;
       for (const [filename, chunkInfo] of Object.entries(bundle)) {
-        const chunkSize = gzipSize.sync(chunkInfo.code);
+        const chunkSize = gzipSizeSync(chunkInfo.code);
         bundleSize += chunkSize;
         console.log(
             chalk.magenta(String(chunkSize).padStart(6)),

@@ -6,13 +6,13 @@ export const start = ({verbose = true} = {}) => {
   return new Promise((resolve, reject) => {
     subprocess = spawn('cloudflared', [
       'tunnel',
-      '--url=http://localhost:3000',
+      'run',
     ]);
 
-    const urlRegExp = /https:\/\/[^.]+\.trycloudflare\.com/;
+    const successLogRegExp = /Connection.+registered/;
 
     subprocess.stderr.on('data', (data) => {
-      const match = urlRegExp.exec(data);
+      const match = successLogRegExp.exec(data);
       if (match) {
         resolve(match[0]);
       }

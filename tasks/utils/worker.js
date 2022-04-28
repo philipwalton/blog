@@ -4,10 +4,14 @@ import * as tunnel from './tunnel.js';
 let subprocess;
 
 export const start = async ({verbose = true} = {}) => {
-  const tunnelURL = await tunnel.start();
+  await tunnel.start();
 
   await new Promise((resolve, reject) => {
-    const args = [`dev`, `--unauthenticated`, `--host=${tunnelURL}`];
+    const args = [
+      `dev`,
+      `--unauthenticated`,
+      `--host=https://localhost.philipwalton.dev`,
+    ];
 
     if (process.env.NODE_ENV) {
       args.push([`--env=${process.env.NODE_ENV}`]);

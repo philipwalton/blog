@@ -237,7 +237,7 @@ const trackINP = async () => {
           longestEntry.processingEnd : '(not set)',
       event_id: id,
     });
-  });
+  }, {durationThreshold: 16});
 };
 
 const trackLCP = async () => {

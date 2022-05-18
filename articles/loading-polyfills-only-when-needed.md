@@ -205,7 +205,7 @@ For larger teams, ensuring code changes always stay in sync with the polyfill lo
 
 The ultimate solution to this problem is a module loader/bundler that scans your source files, identifies all required polyfills, and manages conditionally loading them for you. It could detect every possible entry point and ensure no code was run without satisfying all missing platform dependencies first.
 
-To make this tool even more useful, it could be configurable to accept browser usage data or some sort of browser support matrix, so as usage of legacy browsers declines over time, the polyfills no longer needed are automatically removed without you having to do anything (a strategy currently usage by tools like [Autoprefixer](https://github.com/postcss/autoprefixer) for CSS).<sup>[[3]](#footnote-3)</sup>
+To make this tool even more useful, it could be configurable to accept browser usage data or some sort of browser support matrix, so as usage of legacy browsers declines over time, the polyfills no longer needed are automatically removed without you having to do anything (a strategy currently usage by tools like [Autoprefixer](https://github.com/postcss/autoprefixer) for CSS, autoprefixer has an [online version](https://goonlinetools.com/autoprefixer/) that allows you to enter your non-prefixed CSS and gives you a prefix-added CSS).<sup>[[3]](#footnote-3)</sup>
 
 I'm not aware of any tools that do this today. If anyone reading wants to build one, I'm sure the community would be eternally grateful!
 

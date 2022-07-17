@@ -1,16 +1,15 @@
-import {onCLS, onFCP, onFID, onINP, onLCP, onTTFB} from 'web-vitals/base';
+import {onCLS, onFCP, onFID, onINP, onLCP, onTTFB} from 'web-vitals/attribution';
 import {Logger} from './Logger';
 import {initialSWState} from './sw-state';
 import {now, timeOrigin} from './utils/performance';
 import {uuid} from './utils/uuid';
-
 
 /**
  * Bump this when making backwards incompatible changes to the tracking
  * implementation. This allows you to create a segment or view filter
  * that isolates only data captured with the most recent tracking changes.
  */
-const MEASUREMENT_VERSION = 86;
+const MEASUREMENT_VERSION = 87;
 
 /**
  * A 13-digit, random identifier for the current page.
@@ -22,6 +21,45 @@ const PAGE_ID = uuid(timeOrigin);
 
 const originalPathname = location.pathname;
 
+
+const longTasks = [];
+
+const clampLongTasks = (start, end) => {
+  const clampedLongTasks = [];
+  for (const task of longTasks) {
+    const taskStart = task.startTime;
+    const taskEnd = task.startTime + task.duration;
+
+    if (start <= taskEnd && end >= taskStart) {
+      clampedLongTasks.push([
+        Math.max(start, taskStart),
+        Math.min(end, taskEnd),
+      ]);
+    }
+  }
+  return clampedLongTasks;
+};
+
+const getTBT = (start, end) => {
+  let tbt = 0;
+
+  for (const task of clampLongTasks(start, end)) {
+    const taskDuration = task[1] - task[0];
+    tbt += Math.max(0, taskDuration - 50);
+  }
+  return tbt;
+};
+
+const getLTT = (start, end) => {
+  let ltt = 0;
+
+  for (const task of clampLongTasks(start, end)) {
+    ltt += task[1] - task[0];
+  }
+  return ltt;
+};
+
+
 export const log = new Logger((params) => {
   return {
     page_time: now(),
@@ -29,23 +67,6 @@ export const log = new Logger((params) => {
   };
 });
 
-const getSelector = (node, max = 100) => {
-  let sel = '';
-  try {
-    while (node && node.nodeType !== 9) {
-      const part = node.nodeName.toLowerCase() + (node.id ?
-          '#' + node.id : (node.className && node.className.length) ?
-          '.' + Array.from(node.classList.values()).join('.') : '');
-      if (sel.length + part.length > max - 1) return sel || part;
-      sel = sel ? part + '>' + sel : part;
-      if (node.id) break;
-      node = node.parentNode;
-    }
-  } catch (err) {
-    // Do nothing...
-  }
-  return sel;
-};
 
 /**
  * Initializes all the analytics setup. Creates trackers and sets initial
@@ -63,6 +84,16 @@ export const init = async () => {
   trackINP();
   trackLCP();
   trackTTFB();
+
+  try {
+    new PerformanceObserver((list) => {
+      for (const entry of list.getEntries()) {
+        longTasks.push(entry);
+      }
+    }).observe({type: 'longtask', buffered: true});
+  } catch (err) {
+    // Do nothing...
+  }
 };
 
 const setInitialParams = () => {
@@ -159,116 +190,82 @@ const getRating = (value, thresholds) => {
 };
 
 const trackCLS = async () => {
-  onCLS(({name, value, delta, entries, id}) => {
-    const eventData = {
+  onCLS(({name, value, delta, id, attribution}) => {
+    log.event(name, {
       value: delta,
       metric_rating: getRating(value, [0.1, 0.25]),
       metric_value: value,
-      debug_target: '(not set)', // May be overridden below.
+      debug_target: attribution.largestShiftTarget ?
+          attribution.largestShiftTarget : '(not set)',
       event_id: id,
-    };
-
-    if (entries.length) {
-      const largestEntry = entries.reduce((a, b) => {
-        return a && a.value > b.value ? a : b;
-      });
-      if (largestEntry && largestEntry.sources && largestEntry.sources.length) {
-        const largestSource = largestEntry.sources.reduce((a, b) => {
-          return a.node && a.previousRect.width * a.previousRect.height >
-              b.previousRect.width * b.previousRect.height ? a : b;
-        });
-        if (largestSource) {
-          eventData.debug_target = getSelector(largestSource.node);
-        }
-      }
-    }
-
-    log.event(name, eventData);
+    });
   });
 };
 
 const trackFCP = async () => {
-  onFCP(({name, value, delta, id}) => {
+  onFCP(({name, value, delta, id, attribution}) => {
     log.event(name, {
       value: delta,
       metric_rating: getRating(value, [1800, 3000]),
       metric_value: value,
       original_page_path: originalPathname,
+      debug_ttfb: attribution.timeToFirstByte,
+      debug_fb2fcp: attribution.firstByteToFCP,
       event_id: id,
     });
   });
 };
 
 const trackFID = async () => {
-  onFID(({name, value, delta, entries, id}) => {
-    const entry = entries[0];
-
+  onFID(({name, value, delta, id, attribution}) => {
     log.event(name, {
       value: delta,
       metric_rating: getRating(value, [100, 300]),
       metric_value: value,
-      debug_target: entry ? getSelector(entry.target) : '(not set)',
-      debug_event: entry ? entry.name : '(not set)',
+      debug_target: attribution.eventTarget || '(not set)',
+      debug_event: attribution.eventType,
+      debug_time: attribution.eventTime,
       event_id: id,
     });
   });
 };
 
 const trackINP = async () => {
-  onINP(({name, value, delta, entries, id}) => {
-    const longestEntry = entries.sort((a, b) => {
-      // Sort by: 1) duration (DESC), then 2) processing time (DESC)
-      return b.duration - a.duration || (b.processingEnd - b.processingStart) -
-          (a.processingEnd - a.processingStart);
-    })[0];
+  onINP(({name, value, delta, id, attribution}) => {
+    const entry = attribution.eventEntry;
 
     log.event(name, {
       value: delta,
       metric_rating: getRating(value, [200, 500]),
       metric_value: value,
-      debug_target: longestEntry ?
-      getSelector(longestEntry.target) : '(not set)',
-      debug_event: longestEntry ? longestEntry.name : '(not set)',
-      debug_delay: longestEntry ?
-          longestEntry.processingStart - longestEntry.startTime : '(not set)',
-      debug_processing: longestEntry ? longestEntry.processingEnd -
-          longestEntry.processingStart : '(not set)',
-      debug_presentation: longestEntry ? (longestEntry.startTime + value) -
-          longestEntry.processingEnd : '(not set)',
+      debug_target: attribution.eventTarget || '(not set)',
+      debug_event: attribution.eventType,
+      debug_time: attribution.eventTime,
+      debug_delay: entry && (entry.processingStart - entry.startTime),
+      debug_processing: entry && (entry.processingEnd - entry.processingStart),
+      debug_presentation: entry &&
+          ((entry.startTime + value) - entry.processingEnd),
       event_id: id,
     });
   }, {durationThreshold: 16});
 };
 
 const trackLCP = async () => {
-  onLCP(({name, value, delta, entries, id}) => {
-    const lastEntry = entries.length && entries[entries.length - 1];
-    const params = {
+  onLCP(({name, value, delta, id, attribution}) => {
+    log.event(name, {
       value: delta,
       metric_rating: getRating(value, [2500, 4000]),
       metric_value: value,
-      debug_target: lastEntry ? getSelector(lastEntry.element) : '(not set)',
+      debug_target: attribution.element || '(not set)',
+      debug_url: attribution.url,
+      debug_ttfb: attribution.timeToFirstByte,
+      debug_rld: attribution.resourceLoadDelay,
+      debug_rlt: attribution.resourceLoadTime,
+      debug_erd: attribution.elementRenderDelay,
+      debug_tbt: getTBT(0, value),
+      debug_rbt: getLTT(value - attribution.elementRenderDelay, value),
       event_id: id,
-    };
-
-    // The entry will have a URL property if it's an image.
-    // If it is then add timing params from the Resource Timing API.
-    if (lastEntry && lastEntry.url) {
-      const rtEntry = performance.getEntriesByType('resource')
-          .find((e) => e.name === lastEntry.url);
-
-      if (rtEntry) {
-        Object.assign(params, {
-          url: lastEntry.url,
-          start_time: rtEntry.startTime,
-          request_start: rtEntry.requestStart,
-          response_start: rtEntry.responseStart,
-          response_end: rtEntry.responseEnd,
-        });
-      }
-    }
-
-    log.event(name, params);
+    });
   });
 };
 

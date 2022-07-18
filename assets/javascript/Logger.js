@@ -309,7 +309,10 @@ function prefixParams(initialLetter, unprefixedParams) {
  * @return {string}
  */
 function toQueryString(params) {
-  return Object.keys(params).map((key) => {
+  return Object.keys(params).filter((key) => {
+    // Filter out, null, undefined, and empty strings, but keep zeros.
+    return params[key] || params[key] === 0;
+  }).map((key) => {
     return `${key}=${encodeURIComponent(params[key])}`;
   }).join('&');
 }

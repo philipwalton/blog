@@ -9,7 +9,7 @@ import {uuid} from './utils/uuid';
  * implementation. This allows you to create a segment or view filter
  * that isolates only data captured with the most recent tracking changes.
  */
-const MEASUREMENT_VERSION = 87;
+const MEASUREMENT_VERSION = 88;
 
 /**
  * A 13-digit, random identifier for the current page.

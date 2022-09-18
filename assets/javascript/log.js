@@ -9,7 +9,7 @@ import {uuid} from './utils/uuid';
  * implementation. This allows you to create a segment or view filter
  * that isolates only data captured with the most recent tracking changes.
  */
-const MEASUREMENT_VERSION = 88;
+const MEASUREMENT_VERSION = 89;
 
 /**
  * A 13-digit, random identifier for the current page.
@@ -107,7 +107,14 @@ const setInitialParams = () => {
 
   const navigationEntry = performance.getEntriesByType('navigation')[0];
   if (navigationEntry) {
-    log.set({navigation_type: navigationEntry.type});
+     // Use kebab case.
+    let navigationType = navigationEntry.type.replace(/_/g, '-');
+
+    if (document.prerendering || navigationEntry.activationStart > 0) {
+      navigationType = 'prerender';
+    }
+
+    log.set({navigation_type: navigationType});
   }
 };
 
@@ -120,7 +127,7 @@ const trackPageviews = () => {
       pageshowCount++;
 
       log.set({
-        navigation_type: 'bfcache_restore',
+        navigation_type: 'back-forward-cache',
         pageshow_count: pageshowCount,
       });
       log.event('page_view', {visibility_state: document.visibilityState});
@@ -178,123 +185,125 @@ const trackErrors = () => {
   window.removeEventListener('error', window.__e);
 };
 
-
-const getRating = (value, thresholds) => {
-  if (value > thresholds[1]) {
-    return 'poor';
-  }
-  if (value > thresholds[0]) {
-    return 'ni';
-  }
-  return 'good';
-};
-
 const trackCLS = async () => {
-  onCLS(({name, value, delta, id, attribution}) => {
-    log.event(name, {
-      value: delta,
-      metric_rating: getRating(value, [0.1, 0.25]),
-      metric_value: value,
-      debug_target: attribution.largestShiftTarget ?
-          attribution.largestShiftTarget : '(not set)',
-      event_id: id,
+  onCLS((metric) => {
+    log.event(metric.name, {
+      value: metric.delta,
+      metric_rating: metric.rating,
+      metric_value: metric.value,
+      debug_target: metric.attribution.largestShiftTarget ?
+          metric.attribution.largestShiftTarget : '(not set)',
+      event_id: metric.id,
     });
   });
 };
 
 const trackFCP = async () => {
-  onFCP(({name, value, delta, id, attribution}) => {
-    log.event(name, {
-      value: delta,
-      metric_rating: getRating(value, [1800, 3000]),
-      metric_value: value,
+  onFCP((metric) => {
+    log.event(metric.name, {
+      value: metric.delta,
+      metric_rating: metric.rating,
+      metric_value: metric.value,
       original_page_path: originalPathname,
-      debug_ttfb: attribution.timeToFirstByte,
-      debug_fb2fcp: attribution.firstByteToFCP,
-      event_id: id,
+      debug_ttfb: metric.attribution.timeToFirstByte,
+      debug_fb2fcp: metric.attribution.firstByteToFCP,
+      event_id: metric.id,
     });
   });
 };
 
 const trackFID = async () => {
-  onFID(({name, value, delta, id, attribution}) => {
-    log.event(name, {
-      value: delta,
-      metric_rating: getRating(value, [100, 300]),
-      metric_value: value,
-      debug_target: attribution.eventTarget || '(not set)',
-      debug_event: attribution.eventType,
-      debug_time: attribution.eventTime,
-      event_id: id,
+  onFID((metric) => {
+    log.event(metric.name, {
+      value: metric.delta,
+      metric_rating: metric.rating,
+      metric_value: metric.value,
+      debug_target: metric.attribution.eventTarget || '(not set)',
+      debug_event: metric.attribution.eventType,
+      debug_time: metric.attribution.eventTime,
+      event_id: metric.id,
     });
   });
 };
 
 const trackINP = async () => {
-  onINP(({name, value, delta, id, attribution}) => {
-    const entry = attribution.eventEntry;
+  onINP((metric) => {
+    const entry = metric.attribution.eventEntry;
 
-    log.event(name, {
-      value: delta,
-      metric_rating: getRating(value, [200, 500]),
-      metric_value: value,
-      debug_target: attribution.eventTarget || '(not set)',
-      debug_event: attribution.eventType,
-      debug_time: attribution.eventTime,
+    log.event(metric.name, {
+      value: metric.delta,
+      metric_rating: metric.rating,
+      metric_value: metric.value,
+      debug_target: metric.attribution.eventTarget || '(not set)',
+      debug_event: metric.attribution.eventType,
+      debug_time: metric.attribution.eventTime,
       debug_delay: entry && (entry.processingStart - entry.startTime),
       debug_processing: entry && (entry.processingEnd - entry.processingStart),
       debug_presentation: entry &&
-          ((entry.startTime + value) - entry.processingEnd),
-      event_id: id,
+          ((entry.startTime + metric.value) - entry.processingEnd),
+      event_id: metric.id,
     });
   }, {durationThreshold: 16});
 };
 
 const trackLCP = async () => {
-  onLCP(({name, value, delta, id, attribution}) => {
-    log.event(name, {
-      value: delta,
-      metric_rating: getRating(value, [2500, 4000]),
-      metric_value: value,
-      debug_target: attribution.element || '(not set)',
-      debug_url: attribution.url,
-      debug_ttfb: attribution.timeToFirstByte,
-      debug_rld: attribution.resourceLoadDelay,
-      debug_rlt: attribution.resourceLoadTime,
-      debug_erd: attribution.elementRenderDelay,
-      debug_tbt: getTBT(0, value),
-      debug_rbt: getLTT(value - attribution.elementRenderDelay, value),
-      event_id: id,
+  onLCP((metric) => {
+    log.event(metric.name, {
+      value: metric.delta,
+      metric_rating: metric.rating,
+      metric_value: metric.value,
+      debug_target: metric.attribution.element || '(not set)',
+      debug_url: metric.attribution.url,
+      debug_ttfb: metric.attribution.timeToFirstByte,
+      debug_rld: metric.attribution.resourceLoadDelay,
+      debug_rlt: metric.attribution.resourceLoadTime,
+      debug_erd: metric.attribution.elementRenderDelay,
+      debug_tbt: getTBT(0, metric.value),
+      debug_rbt: getLTT(metric.value - metric.attribution.elementRenderDelay,
+          metric.value),
+      event_id: metric.id,
     });
   });
 };
 
 const trackTTFB = () => {
-  onTTFB(({name, value, entries, id}) => {
-    const navEntry = entries[0];
+  onTTFB((metric) => {
     const params = {
-      value: value,
-      metric_value: value,
-      fetch_start: navEntry.fetchStart,
-      domain_lookup_start: navEntry.domainLookupStart,
-      domain_lookup_end: navEntry.domainLookupEnd,
-      connect_start: navEntry.connectStart,
-      connect_end: navEntry.connectEnd,
-      request_start: navEntry.requestStart,
-      response_start: value,
-      response_end: navEntry.responseEnd,
-      dom_load_end: navEntry.domContentLoadedEventEnd,
-      window_load_end: navEntry.loadEventEnd,
-      event_id: id,
+      value: metric.delta,
+      metric_value: metric.value,
+      metric_rating: metric.rating,
+      event_id: metric.id,
     };
-    if (initialSWState === 'controlled' && 'workerStart' in navEntry) {
-      params.worker_start = navEntry.workerStart;
+
+    const {navigationEntry} = metric.attribution;
+    if (navigationEntry) {
+      Object.assign(params, {
+        fetch_start: navigationEntry.fetchStart,
+        domain_lookup_start: navigationEntry.domainLookupStart,
+        domain_lookup_end: navigationEntry.domainLookupEnd,
+        connect_start: navigationEntry.connectStart,
+        connect_end: navigationEntry.connectEnd,
+        request_start: navigationEntry.requestStart,
+        response_start: navigationEntry.responseStart,
+        response_end: navigationEntry.responseEnd,
+        dom_load_end: navigationEntry.domContentLoadedEventEnd,
+        window_load_end: navigationEntry.loadEventEnd,
+      });
     }
-    if (Array.isArray(navEntry.serverTiming)) {
-      for (const {name, description} of navEntry.serverTiming) {
+
+    if (initialSWState === 'controlled' && 'workerStart' in navigationEntry) {
+      params.worker_start = navigationEntry.workerStart;
+    }
+
+    if (navigationEntry.activationStart > 0) {
+      params.activation_start = navigationEntry.activationStart;
+    }
+
+    if (Array.isArray(navigationEntry.serverTiming)) {
+      for (const {name, description} of navigationEntry.serverTiming) {
         params[name] = description;
       }
     }
-    log.event(name, params);
+    log.event(metric.name, params);
   });
 };

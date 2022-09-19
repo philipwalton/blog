@@ -2,9 +2,9 @@ import {parseUrl} from 'dom-utils';
 import {getActiveBreakpoint} from './breakpoints';
 import {initialSWState} from './sw-state';
 import {get, set} from './utils/kv-store';
+import {PendingPostBeacon} from './utils/PendingPostBeacon.js';
 import {now, timeOrigin} from './utils/performance';
 import {round} from './utils/round.js';
-import {onHidden, onVisible} from './utils/visibility.js';
 import {uuid} from './utils/uuid';
 
 
@@ -18,11 +18,6 @@ const SESSION_TIMEOUT = 1000 * 60 * 30; // 30 minutes.
 
 const SEND_TIMEOUT = self.__ENV__ === 'production' ? 5000 : 1000;
 
-// Managing separately is required until the following bug (currently fixed)
-// is actually released in Safari stable (currently only in STP):
-// https://bugs.webkit.org/show_bug.cgi?id=151234
-let visibilityState;
-
 /**
  * A class to manage building and sending analytics hits to the `/log` route.
  */
@@ -31,19 +26,16 @@ export class Logger {
    * @param {function(Object):void} hitFilter
    */
   constructor(hitFilter) {
-    if (!visibilityState) {
-      visibilityState = document.visibilityState;
-      onHidden(() => visibilityState = 'hidden', true);
-      onVisible(() => visibilityState = 'visible', true);
-    }
-
     this._hitFilter = hitFilter;
     this._presendDependencies = [];
     this._eventQueue = [];
-    this._requestCount = 0;
+
+    this._sendCount = -1;
     this._lastActiveTime = 0;
     this._engagedTime = 0;
     this._state = null;
+
+    this._beacon = {}; // Default to an object to allow property access.
 
     this._pageParams = {
       dl: location.href,
@@ -63,7 +55,7 @@ export class Logger {
       connection_type: getEffectiveConnectionType(),
       pixel_density: getPixelDensity(),
       color_scheme_preference: getColorSchemePreference(),
-      constrast_preference: getContrastPreference(),
+      contrast_preference: getContrastPreference(),
       reduce_data_preference: getReducedDataPreference(),
       reduce_motion_preference: getReducedMotionPref(),
       service_worker_state: initialSWState,
@@ -85,16 +77,12 @@ export class Logger {
 
     addEventListener('focus', () => this._updateState(), true);
     addEventListener('blur', () => this._updateState(), true);
-    onVisible(() => this._updateState(), true);
-    onHidden(() => {
+
+    document.addEventListener('visibilitychange', () => {
       this._updateState();
-      this._send();
-      // Queue a microtask to ensure another other queued events run first.
-      Promise.resolve().then(() => {
-        if (this._engagedTime && this._eventQueue.length === 0) {
-          this.event('user_engagement');
-        }
-      });
+      if (document.visibilityState === 'hidden') {
+        this.event('user_engagement');
+      }
     });
   }
 
@@ -173,46 +161,50 @@ export class Logger {
     };
 
     const engagedTime = this._getEngagedTime();
+
+    // Don't log `user_engagement` events less than 500 ms.
+    if (eventName === 'user_engagement' && engagedTime < 500) {
+      return;
+    }
+
     if (engagedTime) {
       prefixedParams._et = engagedTime;
     }
 
-    this._eventQueue.push(prefixedParams);
-
-    if (visibilityState === 'hidden') {
-      this._send();
-    } else {
-      this._sendTimeout = setTimeout(() => this._send(), SEND_TIMEOUT);
-    }
+    this._queue(prefixedParams);
   }
 
   /**
-   * Sends all queued event data to the log endpoint and resets the queue.
+   * Adds all queued event data to the PendingPostBeacon.
+   * @param {Object} params
    */
-  async _send() {
-    clearTimeout(this._sendTimeout);
-    if (this._eventQueue.length > 0) {
-      this._requestCount++;
-      this._pageParams._s = this._requestCount;
-
-      // Remove _ss and _fv param after the first request.
-      if (this._requestCount > 1) {
-        delete this._pageParams._ss;
-        delete this._pageParams._fv;
-      }
-
-      const path = `/log?v=${LOG_VERSION}`;
-      const body =
-          toQueryString(this._pageParams) + '&' +
-          toQueryString(this._userParams) + '\n' +
-          this._eventQueue.map((ep) => toQueryString(ep)).join('\n');
-
-      // Use `navigator.sendBeacon()` if available, with a fallback to `fetch()`
-      (navigator.sendBeacon && navigator.sendBeacon(path, body)) ||
-          fetch(path, {body, method: 'POST', keepalive: true});
-
+  async _queue(params) {
+    // If the beacon is not pending, that means it was already sent and we
+    // need to create a new beacon and reset/update all internal variables.
+    if (!this._beacon.pending) {
+      this._beacon = new PendingPostBeacon(`/log?v=${LOG_VERSION}`, {
+        timeout: SEND_TIMEOUT,
+      });
+      this._sendCount++;
       this._eventQueue = [];
     }
+
+    this._pageParams._s = this._sendCount;
+
+    // Remove _ss and _fv param after the first beacon is sent for this page.
+    if (this._sendCount > 1) {
+      delete this._pageParams._ss;
+      delete this._pageParams._fv;
+    }
+
+    this._eventQueue.push(params);
+
+    const data =
+        toQueryString(this._pageParams) + '&' +
+        toQueryString(this._userParams) + '\n' +
+        this._eventQueue.map((ep) => toQueryString(ep)).join('\n');
+
+    this._beacon.setData(data);
   }
 
   /**

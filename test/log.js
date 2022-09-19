@@ -331,6 +331,10 @@ describe('log', function() {
       // Show the page again, wait, and then dispatch pagehide again
       // to trigger a `user_engagement` event.
       await stubVisibilityChange('visible');
+
+      // Refocus the page to start restart the engagement time clock.
+      await browser.execute(() => document.body.focus());
+
       await browser.pause(1000);
       await stubVisibilityChange('hidden');
 

@@ -1,0 +1,27 @@
+name = "worker-dev"
+main = "worker/index.js"
+account_id = "833aa47653f1a867bf6f206ed576cd2f"
+
+compatibility_date = "2022-09-24"
+workers_dev = true
+
+[dev]
+host = "localhost:3001" # Origin server
+port = 3000 # Worker server
+
+[vars]
+ENV = "development"
+PENDING_BEACON_TOKEN = "As/j5gJ50BNvCX2nrZLywnV5VGVEUWwbM5er761RvSNXVPg6VmPy7xufiqm5fRyzcVtuJr4fQwbrs7jDrDyewgAAAABaeyJvcmlnaW4iOiJodHRwczovL3BoaWxpcHdhbHRvbi5jb206NDQzIiwiZmVhdHVyZSI6IlBlbmRpbmdCZWFjb25BUEkiLCJleHBpcnkiOjE2NzgyMzM1OTl9"
+
+# Override values for `--env production` usage
+[env.production]
+name = "worker"
+workers_dev = false
+routes = [
+  "philipwalton.com/",
+  "philipwalton.com/articles*",
+  "philipwalton.com/about*",
+]
+[env.production.vars]
+ENV = "production"
+PENDING_BEACON_TOKEN = "As/j5gJ50BNvCX2nrZLywnV5VGVEUWwbM5er761RvSNXVPg6VmPy7xufiqm5fRyzcVtuJr4fQwbrs7jDrDyewgAAAABaeyJvcmlnaW4iOiJodHRwczovL3BoaWxpcHdhbHRvbi5jb206NDQzIiwiZmVhdHVyZSI6IlBlbmRpbmdCZWFjb25BUEkiLCJleHBpcnkiOjE2NzgyMzM1OTl9"

@@ -8,8 +8,5 @@
   "publicModulesDir": "build/modules",
   "publicModulesPath": "/modules",
   "templatesDir": "templates",
-  "timezone": "America/Los_Angeles",
-  "experiments": [
-
-  ]
+  "timezone": "America/Los_Angeles"
 }

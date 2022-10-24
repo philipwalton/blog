@@ -93,6 +93,7 @@
     "rollup": "^2.79.0",
     "rollup-plugin-terser": "^7.0.2",
     "superstatic": "^8.0.0",
+    "vitest": "^0.23.4",
     "wdio-chromedriver-service": "^7.3.2",
     "web-vitals": "^3.0.2",
     "webdriverio": "^7.24.0",
@@ -106,6 +107,7 @@
     "workbox-routing": "^6.5.4",
     "workbox-strategies": "^6.5.4",
     "workbox-streams": "^6.5.4",
-    "workbox-window": "^6.5.4"
+    "workbox-window": "^6.5.4",
+    "wrangler": "^2.1.13"
   }
 }

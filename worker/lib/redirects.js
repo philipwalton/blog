@@ -23,7 +23,7 @@ export function getRedirectPath(path) {
   }
 
   // Add missing trailing slash.
-  if (!path.endsWith('/') && !path.endsWith('index.content.html')) {
+  if (!path.endsWith('/') && !path.endsWith('.html')) {
     path += '/';
   }
 

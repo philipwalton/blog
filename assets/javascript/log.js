@@ -9,7 +9,7 @@ import {uuid} from './utils/uuid';
  * implementation. This allows you to create a segment or view filter
  * that isolates only data captured with the most recent tracking changes.
  */
-const MEASUREMENT_VERSION = 89;
+const MEASUREMENT_VERSION = 90;
 
 /**
  * A 13-digit, random identifier for the current page.
@@ -99,6 +99,7 @@ export const init = async () => {
 const setInitialParams = () => {
   log.set({
     measurement_version: MEASUREMENT_VERSION,
+    native_beacon: 'PendingPostBeacon' in self,
     time_origin: timeOrigin,
     page_id: PAGE_ID,
     pageshow_count: 1,

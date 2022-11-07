@@ -111,22 +111,24 @@ describe('worker', () => {
       });
 
       expect(await b.text()).not.toMatch(
-        `<script>self.__x='pending_beacon'</script>`);
+          `<script>self.__x='pending_beacon'</script>`);
     });
 
     describe('pending_beacon', () => {
-      it('adds an "origin-trial" header', async () => {
+      it('adds an "origin-trial" meta tag', async () => {
         const a = await worker.fetch('/', {
           headers: {'Cookie': 'xid=.456'},
         });
 
-        expect(a.headers.get('origin-trial')).toBeDefined();
+        expect(await a.text()).toMatch(
+            /<meta http-equiv="origin-trial" content="As\/j5g/);
 
         const b = await worker.fetch('/', {
           headers: {'Cookie': 'xid=.567'},
         });
 
-        expect(b.headers.get('origin-trial')).toBeNull();
+        expect(await b.text()).not.toMatch(
+            /<meta http-equiv="origin-trial" content="As\/j5g/);
       });
     });
   });

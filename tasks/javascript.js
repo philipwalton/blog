@@ -110,8 +110,11 @@ const terserConfig = {
 
 const manualChunks = (id) => {
   if (id.includes('node_modules')) {
-    // Don't manually exclude web-vitals since its already lazy loaded
-    if (id.includes('web-vitals')) return;
+    // Don't manually exclude `web-vitals` or `pending-beacon-polyfill` since
+    // they're already lazy loaded.
+    if (id.includes('web-vitals') || id.includes('pending-beacon-polyfill')) {
+      return;
+    }
 
     // The directory name following the last `node_modules`.
     // Usually this is the package, but it could also be the scope.

@@ -23,8 +23,7 @@ describe('log', function() {
 
   describe('experiments', () => {
     // Unskip when running an experiment
-    xit('should load the proper experiment', async () => {
-      /*
+    it('should load the proper experiment', async () => {
       await setExperimentCookie('.234');
       await browser.url(`/?test_id=${++testID}`);
 
@@ -33,47 +32,83 @@ describe('log', function() {
         'dl': new RegExp(`test_id=${testID}`),
         'en': 'page_view',
         'ep.page_path': '/',
-        'up.experiment': 'modern_css',
+        'up.service_worker_state': 'supported',
+        'up.experiment': 'pending_beacon',
       }));
+
       await browser.waitUntil(async () => await beaconsContain({
         v: '1',
         t: 'pageview',
         dl: new RegExp(`test_id=${testID}`),
         dp: '/',
-        cd19: 'modern_css',
+        cd9: 'supported',
+        cd19: 'pending_beacon',
+      }));
+
+      // Reload to ensure that the experiment work with service worker.
+
+      await browser.url(`/?test_id=${++testID}`);
+
+      await browser.waitUntil(async () => await beaconsContain({
+        'v': '2',
+        'dl': new RegExp(`test_id=${testID}`),
+        'en': 'page_view',
+        'ep.page_path': '/',
+        'up.experiment': 'pending_beacon',
+        'up.service_worker_state': 'controlled',
+      }));
+
+      await browser.waitUntil(async () => await beaconsContain({
+        v: '1',
+        t: 'pageview',
+        dl: new RegExp(`test_id=${testID}`),
+        dp: '/',
+        cd9: 'controlled',
+        cd19: 'pending_beacon',
       }));
 
       await browser.url('/__reset__');
       await setExperimentCookie('.789');
       await browser.url(`/articles/?test_id=${++testID}`);
 
-      const beacon = await browser.waitUntil(async () => await beaconsContain({
+      const beacon1 = await browser.waitUntil(async () => await beaconsContain({
         'v': '2',
         'dl': new RegExp(`test_id=${testID}`),
         'en': 'page_view',
         'ep.page_path': '/articles/',
+        'up.service_worker_state': 'supported',
       }));
-      assert(!beacon.has('up.experiment'));
+      assert(!beacon1.has('up.experiment'));
 
       await browser.waitUntil(async () => await beaconsContain({
         v: '1',
         t: 'pageview',
         dl: new RegExp(`test_id=${testID}`),
         dp: '/articles/',
+        cd9: 'supported',
         cd19: '(not set)',
       }));
-      */
-    });
 
-    it('should handle redirects properly', async () => {
-      await setExperimentCookie('.234');
-      await browser.url(`/about?test_id=${++testID}`);
+      // Reload to ensure that the experiment work with service worker.
 
-      await browser.waitUntil(async () => await beaconsContain({
+      await browser.url(`/articles/?test_id=${++testID}`);
+
+      const beacon2 = await browser.waitUntil(async () => await beaconsContain({
         'v': '2',
         'dl': new RegExp(`test_id=${testID}`),
         'en': 'page_view',
-        'ep.page_path': '/about/',
+        'ep.page_path': '/articles/',
+        'up.service_worker_state': 'controlled',
+      }));
+      assert(!beacon2.has('up.experiment'));
+
+      await browser.waitUntil(async () => await beaconsContain({
+        v: '1',
+        t: 'pageview',
+        dl: new RegExp(`test_id=${testID}`),
+        dp: '/articles/',
+        cd9: 'controlled',
+        cd19: '(not set)',
       }));
     });
   });

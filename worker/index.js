@@ -81,10 +81,6 @@ async function handleRequest({request, url, startTime, vars}) {
 
   const clone = new Response(response.body, response);
 
-  if (getExperiment(xid) === 'pending_beacon') {
-    clone.headers.set('Origin-Trial', vars.PENDING_BEACON_TOKEN);
-  }
-
   setXIDToCookie(xid, clone);
   addServerTimingHeaders(clone, startTime);
 

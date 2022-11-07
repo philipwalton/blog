@@ -1,8 +1,8 @@
 import {parseUrl} from 'dom-utils';
+import {PendingPostBeacon} from 'pending-beacon-polyfill';
 import {getActiveBreakpoint} from './breakpoints';
 import {initialSWState} from './sw-state';
 import {get, set} from './utils/kv-store';
-import {PendingPostBeacon} from './utils/PendingPostBeacon.js';
 import {now, timeOrigin} from './utils/performance';
 import {round} from './utils/round.js';
 import {uuid} from './utils/uuid';

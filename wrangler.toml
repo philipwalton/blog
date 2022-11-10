@@ -18,7 +18,7 @@ name = "worker"
 workers_dev = false
 routes = [
   "philipwalton.com/",
-  "philipwalton.com/*.html",
+  "philipwalton.com/shell*",
   "philipwalton.com/articles*",
   "philipwalton.com/about*",
 ]

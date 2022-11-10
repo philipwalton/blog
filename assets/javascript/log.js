@@ -9,7 +9,7 @@ import {uuid} from './utils/uuid';
  * implementation. This allows you to create a segment or view filter
  * that isolates only data captured with the most recent tracking changes.
  */
-const MEASUREMENT_VERSION = 90;
+const MEASUREMENT_VERSION = 91;
 
 /**
  * A 13-digit, random identifier for the current page.
@@ -78,8 +78,11 @@ export const init = async () => {
   trackErrors();
   trackPageviews();
 
-  trackCLS();
+  // Start FCP monitoring first, so its the first event to be logged.
   trackFCP();
+
+  // Then start all the other metrics.
+  trackCLS();
   trackFID();
   trackINP();
   trackLCP();
@@ -113,6 +116,10 @@ const setInitialParams = () => {
 
     if (document.prerendering || navigationEntry.activationStart > 0) {
       navigationType = 'prerender';
+    }
+
+    if (document.wasDiscarded) {
+      navigationType = 'restore';
     }
 
     log.set({navigation_type: navigationType});
@@ -196,7 +203,7 @@ const trackCLS = async () => {
           metric.attribution.largestShiftTarget : '(not set)',
       event_id: metric.id,
     });
-  });
+  }, {reportAllChanges: true});
 };
 
 const trackFCP = async () => {
@@ -210,7 +217,7 @@ const trackFCP = async () => {
       debug_fb2fcp: metric.attribution.firstByteToFCP,
       event_id: metric.id,
     });
-  });
+  }, {reportAllChanges: true});
 };
 
 const trackFID = async () => {
@@ -224,7 +231,7 @@ const trackFID = async () => {
       debug_time: metric.attribution.eventTime,
       event_id: metric.id,
     });
-  });
+  }, {reportAllChanges: true});
 };
 
 const trackINP = async () => {
@@ -244,7 +251,7 @@ const trackINP = async () => {
           ((entry.startTime + metric.value) - entry.processingEnd),
       event_id: metric.id,
     });
-  }, {durationThreshold: 16});
+  }, {durationThreshold: 16, reportAllChanges: true});
 };
 
 const trackLCP = async () => {
@@ -264,7 +271,7 @@ const trackLCP = async () => {
           metric.value),
       event_id: metric.id,
     });
-  });
+  }, {reportAllChanges: true});
 };
 
 const trackTTFB = () => {
@@ -306,5 +313,5 @@ const trackTTFB = () => {
       }
     }
     log.event(metric.name, params);
-  });
+  }, {reportAllChanges: true});
 };

@@ -5,16 +5,22 @@ import fs from 'fs-extra';
 const LOG_FILE = 'beacons.log';
 
 /**
- * @param {Object} params
+ * @param {Object|Object[]} paramsList
  * @return {Promise<boolean|URLSearchParams>}
  *     A `URLSearchParams` object with the matching beacon if the params are
  *     found in any one of the beacons, false otherwise.
  */
-export async function beaconsContain(params) {
+export async function beaconsContain(paramsListOrObj) {
   const beacons = await getBeacons();
+  const matches = [];
+
+  const paramsList = Array.isArray(paramsListOrObj) ?
+      paramsListOrObj : [paramsListOrObj];
 
   for (const beacon of beacons) {
+    const params = paramsList[matches.length];
     const paramsToCheck = new Set(Object.keys(params));
+
     for (const param of paramsToCheck) {
       const value = params[param];
       if (value === beacon.get(param) ||
@@ -23,7 +29,10 @@ export async function beaconsContain(params) {
       }
     }
     if (paramsToCheck.size === 0) {
-      return beacon;
+      matches.push(beacon);
+      if (matches.length === paramsList.length) {
+        return Array.isArray(paramsListOrObj) ? matches : matches[0];
+      }
     }
   }
   return false;

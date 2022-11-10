@@ -16,7 +16,11 @@ const LOG_VERSION = 3;
 const SESSION_TIMEOUT = 1000 * 60 * 30; // 30 minutes.
 
 
-const SEND_TIMEOUT = self.__ENV__ === 'production' ? 5000 : 1000;
+// const SEND_TIMEOUT = self.__ENV__ === 'production' ? 5000 : 1000;
+// const SEND_TIMEOUT = 60 * 1000;
+
+let index = 1;
+
 
 /**
  * A class to manage building and sending analytics hits to the `/log` route.
@@ -28,7 +32,7 @@ export class Logger {
   constructor(hitFilter) {
     this._hitFilter = hitFilter;
     this._presendDependencies = [];
-    this._eventQueue = [];
+    this._eventQueue = new Map();
 
     this._sendCount = -1;
     this._lastActiveTime = 0;
@@ -162,11 +166,6 @@ export class Logger {
 
     const engagedTime = this._getEngagedTime();
 
-    // Don't log `user_engagement` events less than 500 ms.
-    if (eventName === 'user_engagement' && engagedTime < 500) {
-      return;
-    }
-
     if (engagedTime) {
       prefixedParams._et = engagedTime;
     }
@@ -183,10 +182,11 @@ export class Logger {
     // need to create a new beacon and reset/update all internal variables.
     if (!this._beacon.pending) {
       this._beacon = new PendingPostBeacon(`/log?v=${LOG_VERSION}`, {
-        timeout: SEND_TIMEOUT,
+        // Ignore the send timeout for the `pending_beacon` experiment.
+        // timeout: SEND_TIMEOUT,
       });
       this._sendCount++;
-      this._eventQueue = [];
+      this._eventQueue.clear();
     }
 
     this._pageParams._s = this._sendCount;
@@ -197,15 +197,38 @@ export class Logger {
       delete this._pageParams._fv;
     }
 
-    this._eventQueue.push(params);
+    this._eventQueue.set(params['ep.event_id'] || ++index, params);
+    // this._dedupeEvents(eventID, params);
 
     const data =
         toQueryString(this._pageParams) + '&' +
         toQueryString(this._userParams) + '\n' +
-        this._eventQueue.map((ep) => toQueryString(ep)).join('\n');
+        [...this._eventQueue.values()].map(
+              (ep) => toQueryString(ep)).join('\n');
 
     this._beacon.setData(data);
+
+    // To better measure the `pending_beacon` experiment, send FCP data right
+    // away so we can compare the rate of received FCP metrics with the rate
+    // of received CLS metrics.
+    if (params.en === 'FCP') {
+      this._beacon.sendNow();
+    }
   }
+
+  // _dedupeEvents(params) {
+  //   // If an event with the same ID already exists, replace it,
+  //   // but merge the `_et` param values first.
+  //   const eventID = params['ep.event_id'];
+  //   const existingEvent = eventID && this._eventQueue.get(eventID);
+
+  //   if (existingEvent) {
+  //     if (params._et || existingEvent._et) {
+  //       params._et = Number(params._et) + Number(existingEvent._et);
+  //     }
+  //     this._eventQueue.delete(eventID);
+  //   }
+  // }
 
   /**
    * @return {Promise<void>}

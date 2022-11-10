@@ -45,7 +45,7 @@ describe('log', function() {
         cd19: 'pending_beacon',
       }));
 
-      // Reload to ensure that the experiment work with service worker.
+      // Reload to ensure that the experiment works with service worker.
 
       await browser.url(`/?test_id=${++testID}`);
 
@@ -227,12 +227,6 @@ describe('log', function() {
         'ep.page_path': '/',
       }));
 
-      const ttfb1 = await browser.waitUntil(async () => await beaconsContain({
-        'v': '2',
-        'dl': new RegExp(`test_id=${testID}`),
-        'en': 'TTFB',
-        'ep.page_path': '/',
-      }));
       const fcp1 = await browser.waitUntil(async () => await beaconsContain({
         'v': '2',
         'dl': new RegExp(`test_id=${testID}`),
@@ -241,9 +235,8 @@ describe('log', function() {
       }));
 
       // Assert that the pageview was sent as a separate request from the
-      // web vitals metric events (since it has session start data).
-      assert(beacon1.get('__idx') < ttfb1.get('__idx'));
-      assert.equal(ttfb1.get('__idx'), fcp1.get('__idx'));
+      // FCP metric events (since it has session start data).
+      assert(beacon1.get('__idx') < fcp1.get('__idx'));
 
       await clearBeacons();
       await browser.url(`/about/?test_id=${testID}`);
@@ -261,12 +254,6 @@ describe('log', function() {
       assert(!beacon2.has('_ss'));
       assert(!beacon2.has('_fv'));
 
-      const ttfb2 = await browser.waitUntil(async () => await beaconsContain({
-        'v': '2',
-        'dl': new RegExp(`test_id=${testID}`),
-        'en': 'TTFB',
-        'ep.page_path': '/about/',
-      }));
       const fcp2 = await browser.waitUntil(async () => await beaconsContain({
         'v': '2',
         'dl': new RegExp(`test_id=${testID}`),
@@ -274,10 +261,9 @@ describe('log', function() {
         'ep.page_path': '/about/',
       }));
 
-      // This time all three events should be in the same request
+      // This time both events should be in the same request
       // because no new session was started.
-      assert.equal(beacon2.get('__idx'), ttfb2.get('__idx'));
-      assert.equal(ttfb2.get('__idx'), fcp2.get('__idx'));
+      assert.equal(beacon2.get('__idx'), fcp2.get('__idx'));
 
       // Update the data in IndexedDB to expire the session.
       await browser.executeAsync(async (done) => {
@@ -311,12 +297,6 @@ describe('log', function() {
       assert(!beacon3.has('_fv'));
       assert(beacon3.get('sid') > beacon1.get('sid'));
 
-      const ttfb3 = await browser.waitUntil(async () => await beaconsContain({
-        'v': '2',
-        'dl': new RegExp(`test_id=${testID}`),
-        'en': 'TTFB',
-        'ep.page_path': '/articles/',
-      }));
       const fcp3 = await browser.waitUntil(async () => await beaconsContain({
         'v': '2',
         'dl': new RegExp(`test_id=${testID}`),
@@ -326,8 +306,7 @@ describe('log', function() {
 
       // A new session was started so the pageview should have been sent
       // as a separate request (similar to the first part of this test).
-      assert(beacon3.get('__idx') < ttfb3.get('__idx'));
-      assert.equal(ttfb3.get('__idx'), fcp3.get('__idx'));
+      assert(beacon3.get('__idx') < fcp3.get('__idx'));
     });
 
     it('should track engagement time', async () => {
@@ -340,46 +319,28 @@ describe('log', function() {
         'ep.page_path': '/',
       }));
 
-      // Ensure the page has focus and trigger FID.
-      const header = await $('.ContentHeader');
-      await header.click();
-
-      await browser.waitUntil(async () => await beaconsContain({
-        'v': '2',
-        'dl': new RegExp(`test_id=${testID}`),
-        'en': 'FID',
-        'ep.page_path': '/',
-      }));
-
-      // Wait a bit and then dispatch a pagehide event to trigger CLS.
-      await browser.pause(100);
-
-      await stubVisibilityChange('hidden');
-      await browser.waitUntil(async () => await beaconsContain({
-        'v': '2',
-        'dl': new RegExp(`test_id=${testID}`),
-        'en': 'CLS',
-        'ep.page_path': '/',
-        '_et': /\d\d+/, // 2-digit or more ms engagement
-      }));
-
-      // Show the page again, wait, and then dispatch pagehide again
-      // to trigger a `user_engagement` event.
-      await stubVisibilityChange('visible');
-
-      // Refocus the page to start restart the engagement time clock.
-      await browser.execute(() => document.body.focus());
-
+      // Wait a bit then navigate away to trigger a `user_engagement` event.
       await browser.pause(1000);
-      await stubVisibilityChange('hidden');
+      await browser.url('about:blank');
 
       await browser.waitUntil(async () => await beaconsContain({
         'v': '2',
         'dl': new RegExp(`test_id=${testID}`),
         'en': 'user_engagement',
         'ep.page_path': '/',
-        '_et': /\d\d\d+/, // 3-digit or more ms engagement
       }));
+
+      const beacons = await getBeacons((b) => b.get('v') === '2');
+
+      let totalEngagementTime = 0;
+      let beaconsWithEngagementTime = 0;
+      for (const beacon of beacons) {
+        totalEngagementTime += Number(beacon.get('_et')) || 0;
+        beaconsWithEngagementTime += Number(beacon.has('_et')) || 0;
+      }
+
+      assert(totalEngagementTime > 1000);
+      assert(beaconsWithEngagementTime > 1);
     });
 
     it('should send pageview hits on SPA pageloads', async () => {
@@ -400,6 +361,15 @@ describe('log', function() {
 
       const articleLink = await $(`a[href="${articles[0].path}"]`);
       await articleLink.click();
+
+      // Wait a bit to allow the page to load and send a pageview.
+      await browser.waitUntil(async () => {
+        const title = await browser.getTitle();
+        return title.includes(articles[0].title);
+      });
+
+      // Navigate away to trigger sending log data.
+      await browser.url('about:blank');
 
       await browser.waitUntil(async () => await beaconsContain({
         'v': '2',
@@ -434,52 +404,72 @@ describe('log', function() {
 
       const articleLink = await $(`a[href="${pages[1].path}"]`);
       await articleLink.click();
-
-      await browser.waitUntil(async () => await beaconsContain({
-        'v': '2',
-        'en': 'page_view',
-        'ep.page_path': pages[1].path,
-        'ep.original_page_path': '/',
-      }));
-      await browser.waitUntil(async () => await beaconsContain({
-        v: '1',
-        t: 'pageview',
-        dp: pages[1].path,
-      }));
+      // await browser.pause(1000);
+      await browser.waitUntil(async () => {
+        const title = await browser.getTitle();
+        return title.includes(pages[1].title);
+      });
 
       // Click 'back' to the home page
 
       await clearBeacons();
       await browser.back();
-
-      await browser.waitUntil(async () => await beaconsContain({
-        'v': '2',
-        'en': 'page_view',
-        'ep.page_path': pages[0].path,
-        'ep.original_page_path': '/',
-      }));
-      await browser.waitUntil(async () => await beaconsContain({
-        v: '1',
-        t: 'pageview',
-        dp: pages[0].path,
-      }));
+      // await browser.pause(1000);
+      await browser.waitUntil(async () => {
+        const title = await browser.getTitle();
+        return title.includes(pages[0].title);
+      });
 
       // Click 'forward' to the articles page
 
       await clearBeacons();
       await browser.forward();
+      // await browser.pause(1000);
+      await browser.waitUntil(async () => {
+        const title = await browser.getTitle();
+        return title.includes(pages[1].title);
+      });
 
-      await browser.waitUntil(async () => await beaconsContain({
-        'v': '2',
-        'en': 'page_view',
-        'ep.page_path': pages[1].path,
-        'ep.original_page_path': '/',
-      }));
-      await browser.waitUntil(async () => await beaconsContain({
-        v: '1',
-        t: 'pageview',
-        dp: pages[1].path,
-      }));
+      await browser.url('about:blank');
+
+      await browser.waitUntil(async () => await beaconsContain([
+        {
+          'v': '2',
+          'en': 'page_view',
+          'ep.page_path': pages[1].path,
+          'ep.original_page_path': '/',
+        },
+        {
+          'v': '2',
+          'en': 'page_view',
+          'ep.page_path': pages[0].path,
+          'ep.original_page_path': '/',
+        },
+        {
+          'v': '2',
+          'en': 'page_view',
+          'ep.page_path': pages[1].path,
+          'ep.original_page_path': '/',
+        },
+      ]));
+
+      await browser.waitUntil(async () => await beaconsContain([
+        {
+          v: '1',
+          t: 'pageview',
+          dp: pages[1].path,
+        },
+        {
+          v: '1',
+          t: 'pageview',
+          dp: pages[0].path,
+        },
+        {
+          v: '1',
+          t: 'pageview',
+          dp: pages[1].path,
+        },
+      ]));
     });
   });
 
@@ -650,28 +640,3 @@ describe('log', function() {
     });
   });
 });
-
-/**
- * @param {string} visibilityState
- */
-function stubVisibilityChange(visibilityState) {
-  return browser.execute((visibilityState) => {
-    if (visibilityState === 'hidden') {
-      Object.defineProperty(document, 'visibilityState', {
-        value: visibilityState,
-        configurable: true,
-      });
-      Object.defineProperty(document, 'hasFocus', {
-        value: () => false,
-        configurable: true,
-      });
-      document.body.hidden = true;
-    } else {
-      delete document.visibilityState;
-      delete document.hasFocus;
-      document.body.hidden = false;
-    }
-    console.log(document.visibilityState);
-    document.dispatchEvent(new Event('visibilitychange'));
-  }, visibilityState);
-}

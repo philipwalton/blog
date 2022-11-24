@@ -6,8 +6,3 @@
   <link rel="modulepreload" href="{{ module }}">
 {%- endfor %}
 <script type="module" src="/modules/main-module.mjs"></script>
-
-{% if ENV !== 'development' %}
-  {% include '_nomodule-shim.html' %}
-  <script defer nomodule src="{{ 'main-nomodule.js' | revision }}"></script>
-{% endif %}

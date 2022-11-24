@@ -36,7 +36,7 @@ const app = express()
     })
     // All other requests will use superstatic
     // https://github.com/firebase/superstatic#superstaticoptions
-    .use(superstatic());
+    .use(superstatic.default());
 
 export const start = async ({verbose = true} = {}) => {
   await new Promise((resolve, reject) => {

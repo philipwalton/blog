@@ -8,7 +8,7 @@ import revHash from 'rev-hash';
 import {rollup} from 'rollup';
 import replace from '@rollup/plugin-replace';
 import {nodeResolve} from '@rollup/plugin-node-resolve';
-import {terser} from 'rollup-plugin-terser';
+import terser from '@rollup/plugin-terser';
 import {checkDuplicatesPlugin} from './utils/check-duplicates-plugin.js';
 import {ENV} from './utils/env.js';
 

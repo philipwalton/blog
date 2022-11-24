@@ -4,12 +4,9 @@ import gulp from 'gulp';
 import {gzipSizeSync} from 'gzip-size';
 import path from 'path';
 import {rollup} from 'rollup';
-import {babel} from '@rollup/plugin-babel';
-import commonjs from '@rollup/plugin-commonjs';
 import {nodeResolve} from '@rollup/plugin-node-resolve';
 import replace from '@rollup/plugin-replace';
-import {terser as terserRollupPlugin} from 'rollup-plugin-terser';
-import {addAsset} from './utils/assets.js';
+import terser from '@rollup/plugin-terser';
 import {checkDuplicatesPlugin} from './utils/check-duplicates-plugin.js';
 import {ENV} from './utils/env.js';
 import {dimensions, metrics} from '../functions/constants.js';
@@ -55,25 +52,6 @@ const modulepreloadPlugin = () => {
     },
   };
 };
-
-/**
- * A Rollup plugin that adds each chunk to the asset manifest, keyed by
- * the chunk name and the output extension, mapping to the file name.
- * @return {Object}
- */
-const manifestPlugin = () => {
-  return {
-    name: 'manifest',
-    generateBundle(options, bundle) {
-      const ext = path.extname(options.entryFileNames);
-
-      for (const [fileName, chunkInfo] of Object.entries(bundle)) {
-        addAsset(chunkInfo.name + ext, fileName);
-      }
-    },
-  };
-};
-
 
 const reportBundleSizePlugin = () => {
   let entryNames;
@@ -128,12 +106,11 @@ const manualChunks = (id) => {
   }
 };
 
-let moduleBundleCache;
+let bundleCache;
 
-const compileModuleBundle = async () => {
+const compileBundle = async () => {
   const plugins = [
     nodeResolve(),
-    commonjs(),
     replace({
       values: globals,
       preventAssignment: true,
@@ -143,16 +120,15 @@ const compileModuleBundle = async () => {
     reportBundleSizePlugin(),
   ];
   if (ENV !== 'development') {
-    plugins.push(terserRollupPlugin(terserConfig));
+    plugins.push(terser(terserConfig));
   }
 
   const bundle = await rollup({
     input: {
       'main-module': 'assets/javascript/main-module.js',
     },
-    cache: moduleBundleCache,
+    cache: bundleCache,
     plugins,
-    manualChunks,
     preserveSymlinks: true, // Needed for `file:` entries in package.json.
     preserveEntrySignatures: false,
     treeshake: {
@@ -160,79 +136,21 @@ const compileModuleBundle = async () => {
     },
   });
 
-  moduleBundleCache = bundle.cache;
+  bundleCache = bundle.cache;
 
   await bundle.write({
-    dir: config.publicModulesDir,
     format: 'esm',
+    dir: config.publicModulesDir,
+    manualChunks,
     chunkFileNames: '[name].mjs',
     entryFileNames: '[name].mjs',
-
-    // Don't rewrite dynamic import when developing (for easier debugging).
-    dynamicImportFunction: ENV === 'development' ? undefined : '__import__',
-  });
-};
-
-let nomoduleBundleCache;
-
-const compileClassicBundle = async () => {
-  const plugins = [
-    nodeResolve(),
-    commonjs(),
-    replace({
-      values: globals,
-      preventAssignment: true,
-    }),
-    babel({
-      exclude: [
-        /core-js/,
-        /regenerator-runtime/,
-      ],
-      babelHelpers: 'bundled',
-      presets: [['@babel/preset-env', {
-        targets: {browsers: ['ie 11']},
-        useBuiltIns: 'usage',
-        // debug: true,
-        loose: true,
-        corejs: 3,
-      }]],
-      plugins: ['@babel/plugin-syntax-dynamic-import'],
-    }),
-    checkDuplicatesPlugin(),
-    reportBundleSizePlugin(),
-    manifestPlugin(),
-  ];
-  if (ENV !== 'development') {
-    plugins.push(terserRollupPlugin(terserConfig));
-  }
-
-  const bundle = await rollup({
-    input: {
-      'main-nomodule': 'assets/javascript/main-nomodule.js',
-    },
-    cache: nomoduleBundleCache,
-    plugins,
-    inlineDynamicImports: true, // Need for a single output bundle.
-    preserveSymlinks: true, // Needed for `file:` entries in package.json.
-  });
-
-  nomoduleBundleCache = bundle.cache;
-
-  await bundle.write({
-    dir: config.publicStaticDir,
-    format: 'iife',
-    entryFileNames: '[name]-[hash].js',
   });
 };
 
 gulp.task('javascript', async () => {
   try {
     await fs.remove(config.publicModulesDir);
-    await compileModuleBundle();
-
-    if (ENV !== 'development') {
-      await compileClassicBundle();
-    }
+    await compileBundle();
   } catch (err) {
     // Beep!
     process.stdout.write('\x07');

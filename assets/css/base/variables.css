@@ -12,7 +12,10 @@
   --link-color-active: var(--link-color);
 
   --accent-color: hsl(150, 40%, 50%);
+  --accent-color-active:hsl(150, 40%, 40%);
   --border-color: hsl(30, 15%, 93%);
+  --border-color-input: hsl(30, 15%, 80%);
+  --border-radius: 3px;
 
   --bg-color: hsl(30, 15%, 95%);
   --bg-color-inverted: hsl(0, 0%, 25%);

@@ -2,6 +2,10 @@ import fs from 'fs-extra';
 import path from 'path';
 import revHash from 'rev-hash';
 import {revPath} from 'rev-path';
+import {memoize} from './memoize.js';
+
+const getHash = memoize(revHash);
+const revisionFile = memoize(revPath);
 
 const config = fs.readJSONSync('./config.json');
 let manifest;
@@ -56,8 +60,12 @@ export const getRevisionedAssetUrl = (filename) => {
 };
 
 export const generateRevisionedAsset = (filename, content, extra) => {
-  const hash = revHash(content + extra);
-  const revisionedFilename = revPath(filename, hash);
+  if (extra) {
+    throw new Error(extra);
+  }
+
+  const hash = getHash(content);
+  const revisionedFilename = revisionFile(filename, hash);
 
   // Updates the internal revision map so it can be referenced later.
   addAsset(filename, revisionedFilename);
@@ -66,4 +74,6 @@ export const generateRevisionedAsset = (filename, content, extra) => {
     path.join(config.publicStaticDir, revisionedFilename),
     content
   );
+
+  return getRevisionedAssetUrl(filename);
 };

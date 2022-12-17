@@ -13,7 +13,7 @@ The strategy I'm going to propose in this article can be used today, and it's de
 To see some examples of this strategy in action, I've built a [Responsive Components](https://philipwalton.github.io/responsive-components/) demo site. Each demo links to its CSS source code, so you can see how it works.
 
 <figure>
-  <video loop autoplay muted src="https://philipwalton.github.io/responsive-components/responsive-components-demo.mp4" type="video/mp4"></video>
+  <video loop autoplay muted src="https://philipwalton.github.io/responsive-components/responsive-components-demo.mp4" type="video/mp4" width="1280" height="720"></video>
   <figcaption>
     <a href="https://philipwalton.github.io/responsive-components/">Visit the demo site &#8594;</a>
   </figcaption>
@@ -62,7 +62,7 @@ Of course, these breakpoints use media queries, so they apply to the size of the
 
 Unfortunately, the above syntax doesn't work in any browser today and probably won't anytime soon.
 
-However, what *does work* today is something like this:
+However, what _does work_ today is something like this:
 
 ```css
 .MyComponent {
@@ -82,7 +82,7 @@ Of course, this code assumes the component containers have the correct classes a
 
 Whether you're writing your container query as an explicit length comparison query (the first syntax) or whether you're using named breakpoint classes (the second syntax), your styles are still declarative and functionally the same. As long as you can define your named breakpoints however you want, I don't see a clear benefit to one over the other.
 
-And to clarify the rest of this article, let me define the named breakpoint classes I'm using with the following mapping (where `min-width` applies to the *container*, not the viewport):
+And to clarify the rest of this article, let me define the named breakpoint classes I'm using with the following mapping (where `min-width` applies to the _container_, not the viewport):
 
 <table>
   <tr>
@@ -124,20 +124,20 @@ if ('ResizeObserver' in self) {
   // container elements. The instance is created with a callback,
   // which is invoked as soon as an element is observed as well
   // as any time that element's size changes.
-  var ro = new ResizeObserver(function(entries) {
+  var ro = new ResizeObserver(function (entries) {
     // Default breakpoints that should apply to all observed
     // elements that don't define their own custom breakpoints.
     var defaultBreakpoints = {SM: 384, MD: 576, LG: 768, XL: 960};
 
-    entries.forEach(function(entry) {
+    entries.forEach(function (entry) {
       // If breakpoints are defined on the observed element,
       // use them. Otherwise use the defaults.
-      var breakpoints = entry.target.dataset.breakpoints ?
-          JSON.parse(entry.target.dataset.breakpoints) :
-          defaultBreakpoints;
+      var breakpoints = entry.target.dataset.breakpoints
+        ? JSON.parse(entry.target.dataset.breakpoints)
+        : defaultBreakpoints;
 
       // Update the matching breakpoints on the observed element.
-      Object.keys(breakpoints).forEach(function(breakpoint) {
+      Object.keys(breakpoints).forEach(function (breakpoint) {
         var minWidth = breakpoints[breakpoint];
         if (entry.contentRect.width >= minWidth) {
           entry.target.classList.add(breakpoint);
@@ -151,7 +151,7 @@ if ('ResizeObserver' in self) {
   // Find all elements with the `data-observe-resizes` attribute
   // and start observing them.
   var elements = document.querySelectorAll('[data-observe-resizes]');
-  for (var element, i = 0; element = elements[i]; i++) {
+  for (var element, i = 0; (element = elements[i]); i++) {
     ro.observe(element);
   }
 }
@@ -161,7 +161,7 @@ if ('ResizeObserver' in self) {
 **Note:** this example uses ES5 syntax because (as I explain later) I recommend inlining this code directly in your HTML rather than including it in an external JavaScript file. Older syntax is used for wider browser support.
 {% endCallout %}
 
-This code creates a single `ResizeObserver` instance with a callback function. It then queries the DOM for elements with the `data-observe-resizes` attribute and starts observing them.  The callback function, which is invoked initially upon observation and then again after any change, checks the size of each element and adds (or removes) the corresponding breakpoint classes.
+This code creates a single `ResizeObserver` instance with a callback function. It then queries the DOM for elements with the `data-observe-resizes` attribute and starts observing them. The callback function, which is invoked initially upon observation and then again after any change, checks the size of each element and adds (or removes) the corresponding breakpoint classes.
 
 In other words, this code will turn a container element that's 600 pixels wide from this:
 
@@ -182,7 +182,6 @@ Into this:
 And these classes will automatically and instantly get updated anytime the container's size changes.
 
 With this in place, now all the `.SM` and `.MD` selectors in the previous section will match (but not the `.LG` or `.XL` selectors), and that code will just work!
-
 
 ### Customizing your breakpoints
 
@@ -239,7 +238,7 @@ After building a few non-trivial demos, it became clear that a direct child/pare
 
 ### Advanced selectors and alternate approaches
 
-The strategy I've outlined in this article takes an additive approach to styling component. In other words, you start with base styles and then add more styles on top. However, this isn't the only way to approach styling components. In some cases, you want to define styles that match exclusively and *only* apply at a particular breakpoint (i.e. instead of `(min-width: 48em)` you'd want something like `(min-width: 48em) and (max-width: 60em)`).
+The strategy I've outlined in this article takes an additive approach to styling component. In other words, you start with base styles and then add more styles on top. However, this isn't the only way to approach styling components. In some cases, you want to define styles that match exclusively and _only_ apply at a particular breakpoint (i.e. instead of `(min-width: 48em)` you'd want something like `(min-width: 48em) and (max-width: 60em)`).
 
 If this is your preferred approach, you'd need to tweak the ResizeObserver callback code slightly to only apply the class name of the currently-matching breakpoint. So if the component were at its "large" size, rather than setting the class name `SM MD LG`, you'd just set `LG`.
 
@@ -270,7 +269,6 @@ At the end of the day, you can pick whichever convention makes the most sense fo
 So far all of my examples have focused on width-based breakpoints. This is because, in my experience, the overwhelming majority of responsive design implementations use width and nothing else (at least when it comes to viewport dimensions).
 
 However, nothing in this strategy would prevent a component from responding to its container's height. ResizeObserver reports both width and height dimensions, so if you wanted to observe height changes you could define a separate set of breakpoint classes&mdash;perhaps with a `W-` prefix for width-based breakpoints and an `H-` prefix for height-based breakpoints.
-
 
 ## Browser support
 
@@ -324,11 +322,11 @@ While previous attempts to build responsive components were valuable in explorin
 
 Fortunately, we now have browser APIs that allow us to build efficient and performant solutions. The strategy outlined in this article:
 
-* Will work, today, on any website
-* Is easy to implement (copy/paste-able)
-* Performs just as well as a CSS-based solution
-* Doesn't require any specific libraries, frameworks, or build tools.
-* Leverages progressive enhancement, so users on browser that lack the required APIs or have JavaScript disabled can still use the site.
+- Will work, today, on any website
+- Is easy to implement (copy/paste-able)
+- Performs just as well as a CSS-based solution
+- Doesn't require any specific libraries, frameworks, or build tools.
+- Leverages progressive enhancement, so users on browser that lack the required APIs or have JavaScript disabled can still use the site.
 
 While the strategy I outline in this post is production-ready, I see us as being still very much in the early stages of this space. As the web development community starts shifting its component design from viewport or device-oriented to container-oriented, I'm excited to see what possibilities and best practices emerge.
 

@@ -1,12 +1,12 @@
 For several years now, pretty much every article published on caching best practices has recommended the following two things for deploying JavaScript code in production:
 
-* Add revision information to the filenames of your assets (usually content hashes)
-* Set far-future expiry or max-age caching headers (so they don't have to be revalidated for returning visitors)
+- Add revision information to the filenames of your assets (usually content hashes)
+- Set far-future expiry or max-age caching headers (so they don't have to be revalidated for returning visitors)
 
 Every bundling tool I know of supports adding content hashes with a simple configuration rule (like the following), and as a result this practice has now become ubiquitous:
 
 ```js
-filename: '[name]-[contenthash].js'
+filename: '[name]-[contenthash].js';
 ```
 
 The other thing most performance experts recommend is [code splitting](https://web.dev/reduce-javascript-payloads-with-code-splitting), which allows you to split your JavaScript code into several separate bundles that can be loaded in parallel or even on demand.
@@ -15,7 +15,7 @@ Specifically in regards to caching best practices, one of the many claimed benef
 
 The problem is, when you combine all of these things, it rarely results in effective long-term caching.
 
-In practice, changes to one of your source files almost always invalidates more than one of your output files&mdash;and this happens *because* you've added revision hashes to your filenames.
+In practice, changes to one of your source files almost always invalidates more than one of your output files&mdash;and this happens _because_ you've added revision hashes to your filenames.
 
 ## The problem with revisioning filenames
 
@@ -23,14 +23,15 @@ Imagine you've built and deployed a website, and you've used code splitting so m
 
 In the following dependency graph, there's a _main_ entry chunk, three asynchronously-loaded dependency chunks (_dep1_, _dep2_ and _dep3_), and then a _vendor_ chunk that includes all the site's `node_module` dependencies. And in following with caching best practices, all filenames include revision hashes.
 
-<figure>
-  <img
-    src="{{ 'caching-module-dependency-graph-before.svg' | revision }}"
-    alt="A typical JavaScript module dependency tree">
-  <figcaption>A typical JavaScript module dependency tree</figcaption>
-</figure>
+{% Img
+  border=true,
+  src="caching-module-dependency-graph-before.svg",
+  alt="A typical JavaScript module dependency tree",
+  figcaption="A typical JavaScript module dependency tree"
+%}
 
 Since the _dep2_ and _dep3_ chunks import modules from the _vendor_ chunk, at the top of their generated output code you'll likely see import statements that looks like this:
+
 ```js
 import {...} from '/vendor-5e6f.mjs';
 ```
@@ -44,7 +45,7 @@ If the contents of the _vendor_ chunk change, then the hash in the filename will
 +import {...} from '/vendor-d4a1.mjs';
 ```
 
-But since those import statements are part of the contents of the _dep2_ and _dep3_ chunks, changing them means _their_ content hash will change, and thus their filenames must *also* change.
+But since those import statements are part of the contents of the _dep2_ and _dep3_ chunks, changing them means _their_ content hash will change, and thus their filenames must _also_ change.
 
 But it doesn't stop there. Since the _main_ chunk imports the _dep2_ and _dep3_ chunks and their filenames have changed, the import statements in _main_ will have to change too:
 
@@ -59,12 +60,12 @@ Finally, since the contents of _main_ have changed, its filename must change alo
 
 After all these changes, here's what the new graph looks like:
 
-<figure>
-  <img
-    src="{{ 'caching-module-dependency-graph-after.svg' | revision }}"
-    alt="A JavaScript module dependency tree (after rename)">
-  <figcaption>The modules in the tree affected by a single code change in a leaf node</figcaption>
-</figure>
+{% Img
+  border=true,
+  src="caching-module-dependency-graph-after.svg",
+  alt="A JavaScript module dependency tree (after rename)",
+  figcaption="The modules in the tree affected by a single code change in a leaf node"
+%}
 
 As you can see from this example, a tiny code change made to just one source file actually invalidated 80% of the chunks in the bundle.
 
@@ -133,15 +134,15 @@ This JSON object is the import map, and it will look something like this:
 
 ```html
 <script type="importmap">
-{
-  "imports": {
-    "/main.mjs": "/main-1a2b.mjs",
-    "/dep1.mjs": "/dep1-b2c3.mjs",
-    "/dep2.mjs": "/dep2-3c4d.mjs",
-    "/dep3.mjs": "/dep3-d4e5.mjs",
-    "/vendor.mjs": "/vendor-5e6f.mjs",
+  {
+    "imports": {
+      "/main.mjs": "/main-1a2b.mjs",
+      "/dep1.mjs": "/dep1-b2c3.mjs",
+      "/dep2.mjs": "/dep2-3c4d.mjs",
+      "/dep3.mjs": "/dep3-d4e5.mjs",
+      "/vendor.mjs": "/vendor-5e6f.mjs"
+    }
   }
-}
 </script>
 ```
 
@@ -186,7 +187,7 @@ addEventListener('fetch', (event) => {
 });
 ```
 
-But given that this is service worker code, it will only take effect *after* the service worker has installed and activated&mdash;which means the un-revisioned files will be requested on the first load, and the revisioned files will be requested every load thereafter. In other words, two downloads for the same file.
+But given that this is service worker code, it will only take effect _after_ the service worker has installed and activated&mdash;which means the un-revisioned files will be requested on the first load, and the revisioned files will be requested every load thereafter. In other words, two downloads for the same file.
 
 Given this, it may seem like service worker is not a viable solution to cascading cache invalidation.
 
@@ -236,7 +237,7 @@ So the good news for webpack users is, as long as you've configured your webpack
 
 The bad news for webpack users is that webpack's internal mapping is non-standard, so it can't integrate with any other tools, and you also can't customize how the mapping is made. For example, you can't hash webpack's output files yourself (as described in [technique #1](#technique-1%3A-import-maps) above) and put your own hashes in the mapping. And this is unfortunate because the content hashes webpack uses [are not actually based on the contents of the output files](https://github.com/webpack/webpack/issues/7787), they're based on the contents of the source files and build configurations, which can lead to subtle and hard to catch bugs ([#1315](https://github.com/webpack/webpack/issues/1315), [#1479](https://github.com/webpack/webpack/issues/1479), [#7787](https://github.com/webpack/webpack/issues/7787#issuecomment-424905647)).
 
-If you're using webpack to build an app that also uses service worker, I'd recommend using [workbox-webpack-plugin](https://developers.google.com/web/tools/workbox/modules/workbox-webpack-plugin) and the caching strategy I described in the previous section. The plugin will generate revision hashes based on the contents of webpack's output chunks, which means you don't have to worry about these bugs. Plus, *not* dealing with hashed filenames is generally simpler than dealing with hashed filenames.
+If you're using webpack to build an app that also uses service worker, I'd recommend using [workbox-webpack-plugin](https://developers.google.com/web/tools/workbox/modules/workbox-webpack-plugin) and the caching strategy I described in the previous section. The plugin will generate revision hashes based on the contents of webpack's output chunks, which means you don't have to worry about these bugs. Plus, _not_ dealing with hashed filenames is generally simpler than dealing with hashed filenames.
 
 ## What about other assets?
 

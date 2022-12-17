@@ -1,4 +1,3 @@
-
 A few weeks ago I was looking at some of the performance metrics for my site. Specifically, I wanted to see how I was doing on our newest metric, [first input delay](https://developers.google.com/web/updates/2018/05/first-input-delay) (FID). My site is just a blog (and doesn't run much JavaScript), so I expected to see pretty good results.
 
 Input delay that's less than 100 milliseconds is typically [perceived as instant](https://developers.google.com/web/fundamentals/performance/rail#ux) by users, so the performance goal we recommend (and the numbers I was hoping to see in my analytics) is FID < 100ms for 99% of page loads.
@@ -7,13 +6,12 @@ To my surprise, my site's FID was 254ms at the 99th percentile. And while that's
 
 To make a long story short, without removing any functionality from my site, I was able to get my FID under 100ms at the 99th percentile. But what I'm sure is more interesting to you readers is:
 
-* _How_ I approached diagnosing the problem.
-* _What_ specific strategies and techniques I used to fix it.
+- _How_ I approached diagnosing the problem.
+- _What_ specific strategies and techniques I used to fix it.
 
 To that second point above, while I was trying to solve my issue I stumbled upon a pretty interesting performance strategy that I want to share (it's the primary reason I'm writing this article).
 
 I'm calling the strategy: _idle until urgent_.
-
 
 ## My performance problem
 
@@ -23,51 +21,32 @@ The reason there might be a delay is if the browser's main thread is busy doing 
 
 Here's what I found when doing a performance trace of my site:
 
-<figure>
-  <a href="{{ 'idle-until-urget-before-1400w.png' | revision }}">
-    <img srcset="
-      {{ 'idle-until-urget-before-1400w.png' | revision }},
-      {{ 'idle-until-urget-before.png' | revision }} 700w"
-      src="{{ 'idle-until-urget-before.png' | revision }}"
-      alt="A performance trace of my site's JavaScript while loading (with network/CPU throttling enabled)">
-  </a>
-  <figcaption>
-    A performance trace of my site's JavaScript while loading (with network/CPU throttling enabled).
-  </figcaption>
-</figure>
+{% Img
+  border=true,
+  src="idle-until-urgent-before.png",
+  alt="A performance trace of my site's JavaScript while loading (with network/CPU throttling enabled)",
+  figcaption="A performance trace of my site's JavaScript while loading (with network/CPU throttling enabled)"
+%}
 
 Notice, when the main script bundle is evaluated, it's run as a single task that takes 233 milliseconds to complete.
 
-<figure>
-  <a href="{{ 'idle-until-urget-before-eval-1400w.png' | revision }}">
-    <img srcset="
-      {{ 'idle-until-urget-before-eval-1400w.png' | revision }},
-      {{ 'idle-until-urget-before-eval.png' | revision }} 700w"
-      src="{{ 'idle-until-urget-before-eval.png' | revision }}"
-      alt="Evaluating my site's main bundle takes 233ms">
-  </a>
-  <figcaption>
-    Evaluating my site's main bundle takes 233ms.
-  </figcaption>
-</figure>
+{% Img
+  border=true,
+  src="idle-until-urgent-before-eval.png",
+  alt="Evaluating my site's main bundle takes 233ms",
+  figcaption="Evaluating my site's main bundle takes 233ms"
+%}
 
 Some of this code is webpack boilerplate and babel polyfills, but the majority of it is from my script's `main()` entry function, which itself takes 183ms to complete:
 
-<figure>
-  <a href="{{ 'idle-until-urget-before-main-1400w.png' | revision }}">
-    <img srcset="
-      {{ 'idle-until-urget-before-main-1400w.png' | revision }},
-      {{ 'idle-until-urget-before-main.png' | revision }} 700w"
-      src="{{ 'idle-until-urget-before-main.png' | revision }}"
-      alt="Executing my site's main() entry function takes 183ms.">
-  </a>
-  <figcaption>
-    Executing my site's <code>main()</code> entry function takes 183ms.
-  </figcaption>
-</figure>
+{% Img
+  border=true,
+  src="idle-until-urgent-before-main.png",
+  alt="Executing my site's main() entry function takes 183ms.",
+  figcaption="Executing my site's main() entry function takes 183ms."
+%}
 
 And it's not like I'm doing anything ridiculous in my `main()` function. I'm initializing my UI components and then running my analytics:
-
 
 ```js
 const main = () => {
@@ -94,9 +73,9 @@ At first glance, it might seem like the obvious solution is to prioritize each o
 
 While this may help some, it's not a solution that everyone could implement, nor does it scale well to a really large site. Here's why:
 
-* Deferring UI component initialization only helps if the component isn't yet rendered. If it's already rendered than deferring initialization runs the risk that the user tries to interact with it and it's not yet ready.
-* In many cases all UI components are either equally important or they depend on each other, so they all need to be initialized at the same time.
-* Sometimes individual components take long enough to initialize that they'll block the main thread even if they're run in their own tasks.
+- Deferring UI component initialization only helps if the component isn't yet rendered. If it's already rendered than deferring initialization runs the risk that the user tries to interact with it and it's not yet ready.
+- In many cases all UI components are either equally important or they depend on each other, so they all need to be initialized at the same time.
+- Sometimes individual components take long enough to initialize that they'll block the main thread even if they're run in their own tasks.
 
 The reality is that initializing each component in its own task is usually not sufficient and oftentimes not even possible. What's usually needed is breaking up tasks _within_ each component being initialized.
 
@@ -104,22 +83,16 @@ The reality is that initializing each component in its own task is usually not s
 
 A perfect example of a component that really needs to have its initialization code broken up can be illustrated by zooming closer down into this performance trace. Mid-way through the `main()` function, you'll see one of my components uses the [Intl.DateTimeFormat](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/DateTimeFormat) API:
 
-<figure>
-  <a href="{{ 'idle-until-urget-before-date-time-format-1400w.png' | revision }}">
-    <img srcset="
-      {{ 'idle-until-urget-before-date-time-format-1400w.png' | revision }},
-      {{ 'idle-until-urget-before-date-time-format.png' | revision }} 700w"
-      src="{{ 'idle-until-urget-before-date-time-format.png' | revision }}"
-      alt="Creating an Intl.DateTimeFormat instance took 13.47ms!">
-  </a>
-  <figcaption>
-    Creating an <code>Intl.DateTimeFormat</code> instance took 13.47ms!
-  </figcaption>
-</figure>
+{% Img
+  border=true,
+  src="idle-until-urgent-before-date-time-format.png",
+  alt="Creating an Intl.DateTimeFormat instance took 13.47ms!",
+  figcaption="Creating an Intl.DateTimeFormat instance took 13.47ms!"
+%}
 
 Creating this object took 13.47 milliseconds!
 
-The thing is, the <code>Intl.DateTimeFormat</code> instance is created in the component's constructor, but it's *not actually used* until it's needed by other components that reference it to format dates. However, this component doesn't know when it's going to be referenced, so it's playing it safe and instantiating the `Int.DateTimeFormat` object right away.
+The thing is, the <code>Intl.DateTimeFormat</code> instance is created in the component's constructor, but it's _not actually used_ until it's needed by other components that reference it to format dates. However, this component doesn't know when it's going to be referenced, so it's playing it safe and instantiating the `Int.DateTimeFormat` object right away.
 
 But is this the right code evaluation strategy? And if not, what is?
 
@@ -127,8 +100,8 @@ But is this the right code evaluation strategy? And if not, what is?
 
 When choosing an [evaluation strategy](https://en.wikibooks.org/wiki/Introduction_to_Programming_Languages/Evaluation_Strategies) for potentially expensive code, most developers select one of the following:
 
-* **[Eager evaluation](https://en.wikipedia.org/wiki/Eager_evaluation):** where you run your expensive code right away.
-* **[Lazy evaluation](https://en.wikipedia.org/wiki/Lazy_evaluation):** where you wait until another part of your program needs the result of that expensive code, and you run it then.
+- **[Eager evaluation](https://en.wikipedia.org/wiki/Eager_evaluation):** where you run your expensive code right away.
+- **[Lazy evaluation](https://en.wikipedia.org/wiki/Lazy_evaluation):** where you wait until another part of your program needs the result of that expensive code, and you run it then.
 
 These are probably the two most popular evaluation strategies, but after my experience refactoring my site, I now think these are probably your two worst options.
 
@@ -136,7 +109,7 @@ These are probably the two most popular evaluation strategies, but after my expe
 
 As the performance problem on my site illustrates pretty well, eager evaluation has the downside that, if a user tries to interact with your page while the code is evaluating, the browser must wait until the code is done evaluating to respond.
 
-This is especially problematic if your page *looks* like it's ready to respond to user input, but then it can't. Users will perceive your page as sluggish or maybe even completely broken.
+This is especially problematic if your page _looks_ like it's ready to respond to user input, but then it can't. Users will perceive your page as sluggish or maybe even completely broken.
 
 The more code you evaluate up front, the longer it will take for your page to become interactive.
 
@@ -146,14 +119,14 @@ If it's bad to run all your code right away, the next most obvious solution is t
 
 Of course, the problem with waiting until the user needs the result of running that code is now you're _guaranteeing_ that your expensive code will block user input.
 
-For some things (like loading additional content from the network), it makes sense to defer it until it's requested by the user. But for most code you're evaluating (e.g. reading from localStorage, processing large datasets, etc.) you definitely want it to happen *before* the user interaction that needs it.
+For some things (like loading additional content from the network), it makes sense to defer it until it's requested by the user. But for most code you're evaluating (e.g. reading from localStorage, processing large datasets, etc.) you definitely want it to happen _before_ the user interaction that needs it.
 
 ### Other options
 
 The other evaluation strategies you can choose from all take an approach somewhere in between eager and lazy. I'm not sure if the following two strategies have official names, but I'm going to call them deferred evaluation and idle evaluation:
 
-* __Deferred evaluation:__ where you schedule your code to be run in a future task, using something like `setTimeout`.
-* __Idle evaluation:__ a type of deferred evaluation where you use an API like [requestIdleCallback](https://developers.google.com/web/updates/2015/08/using-requestidlecallback) to schedule your code to run.
+- **Deferred evaluation:** where you schedule your code to be run in a future task, using something like `setTimeout`.
+- **Idle evaluation:** a type of deferred evaluation where you use an API like [requestIdleCallback](https://developers.google.com/web/updates/2015/08/using-requestidlecallback) to schedule your code to run.
 
 Both of these options are usually better than eager or lazy evaluation because they're far less likely to lead to individual long tasks that block input. This is because, while browsers cannot interrupt any single task to respond to user input (doing so would very likely break sites), they _can_ run a task in between a queue of scheduled tasks, and most browsers _do_ when that task is caused by user input. This is known as [input prioritization](https://blogs.windows.com/msedgedev/2017/06/01/input-responsiveness-event-loop-microsoft-edge/).
 
@@ -186,7 +159,6 @@ And while delaying my analytics with `requestIdleCallback()` is probably a good 
 
 So if all evaluations strategies have downsides, which one should you pick?
 
-
 ## Idle Until Urgent
 
 After spending a lot of time thinking about this problem, I realized that the evaluation strategy I _really_ wanted was one where my code would initially be deferred to idle periods but then run immediately as soon as it's needed. In other words: _idle-until-urgent_.
@@ -194,7 +166,6 @@ After spending a lot of time thinking about this problem, I realized that the ev
 _Idle-until-urgent_ sidesteps most of the downsides I described in the previous section. In the worst case, it has the exact same performance characteristics as lazy evaluation, and in the best case it doesn't block interactivity at all because execution happens during idle periods.
 
 I should also mention that this strategy works both for single tasks (computing values idly) as well as multiple tasks (an ordered queue of tasks to be run idly). I'll explain the single-task (idle value) variant first because it's a bit easier to understand.
-
 
 ### Idle values
 
@@ -220,8 +191,8 @@ class MyComponent {
 
 Instances of `MyComponent` above do two things in their constructor:
 
-* Add an event listener for user interactions.
-* Create an `Intl.DateTimeFormat` object.
+- Add an event listener for user interactions.
+- Create an `Intl.DateTimeFormat` object.
 
 This component perfectly illustrates why you often need to split up tasks _within_ an individual component (rather than just at the component level).
 
@@ -249,7 +220,7 @@ class MyComponent {
 }
 ```
 
-As you can see, this code doesn't look much different from the previous version, but instead of assigning `this.formatter` to a new `Intl.DateTimeFormat` object, I'm assigning  `this.formatter` to an `IdleValue` object, which I pass an initialization function.
+As you can see, this code doesn't look much different from the previous version, but instead of assigning `this.formatter` to a new `Intl.DateTimeFormat` object, I'm assigning `this.formatter` to an `IdleValue` object, which I pass an initialization function.
 
 The way this `IdleValue` class works is it schedules the initialization function to be run during the next idle period. If the idle period occurs before the IdleValue instance is referenced, then no blocking occurs and the value can be returned immediately when requested. But if, on the other hand, the value is referenced _before_ the next idle period, then the scheduled idle callback is canceled and the initialization function is run immediately.
 
@@ -325,9 +296,9 @@ For individual property values that may be expensive to compute, there's really 
 
 While this example used the `Intl.DateTimeFormat` object, it's also probably a good candidate for any of the following:
 
-* Processing large sets of values.
-* Getting a value from localStorage (or a cookie).
-* Running `getComputedStyle()`, `getBoundingClientRect()`, or any other API that may require recalculating style or layout on the main thread.
+- Processing large sets of values.
+- Getting a value from localStorage (or a cookie).
+- Running `getComputedStyle()`, `getBoundingClientRect()`, or any other API that may require recalculating style or layout on the main thread.
 
 ### Idle task queues
 
@@ -336,7 +307,6 @@ The above technique works pretty well for individual properties whose values can
 In such cases what you really need is a queue where you can schedule multiple tasks (functions) to run when the browser has idle time. The queue will run tasks when it can, and it will pause execution of tasks when it needs to yield back to the browser (e.g. if the user is interacting).
 
 To handle this, I built an [`IdleQueue`](https://github.com/GoogleChromeLabs/idlize) class, and you can use it like this:
-
 
 ```js
 import {IdleQueue} from './path/to/IdleQueue.mjs';
@@ -364,7 +334,6 @@ Again, this last bit is really important; not just because sometimes you need to
 In a perfect world, all JavaScript APIs would be non-blocking, asynchronous, and composed of small chunks of code that can yield at will back to the main thread. But in the real world, we often have no choice but to be synchronous due to a legacy codebase or integrations with third-party libraries we don't control.
 
 As I said before, this is one of the great strengths of the _idle-until-urgent_ pattern. It can be easily applied to most programs without requiring a large-scale rewrite of the architecture.
-
 
 ### Guaranteeing the urgent
 
@@ -404,7 +373,7 @@ Two specific examples that are particularly amenable to this technique (and are 
 
 {% Callout 'info' %}
 
-**Note:** these are all use cases where the _intention_ is that  tasks should run during idle periods, so it's not a problem if they don't run right away. If you need to handle high-priority tasks where the _intention_ is they should run as soon as possible (yet still yielding to input), then `requestIdleCallback()` may not solve your problem.
+**Note:** these are all use cases where the _intention_ is that tasks should run during idle periods, so it's not a problem if they don't run right away. If you need to handle high-priority tasks where the _intention_ is they should run as soon as possible (yet still yielding to input), then `requestIdleCallback()` may not solve your problem.
 
 Fortunately, some of my colleagues have proposals for new web platform APIs ([`shouldYield()`](https://discourse.wicg.io/t/shouldyield-enabling-script-to-yield-to-user-input/2881/17), and a native [Scheduling API](https://github.com/spanicker/main-thread-scheduling/blob/master/README.md)) that should help.
 {% endCallout %}
@@ -414,7 +383,6 @@ Fortunately, some of my colleagues have proposals for new web platform APIs ([`s
 Consider a Redux app that stores application state in memory but also needs to store it in persistent storage (like localStorage) so it can be reloaded the next time the user visits the page.
 
 Most Redux apps that store state in localStorage use a debounce technique roughly equivalent to this:
-
 
 ```js
 let debounceTimeout;
@@ -455,7 +423,6 @@ store.subscribe(() => {
 ```
 
 And note that this strategy is definitely better than using debounce because it guarantees the state gets saved even if the user is navigating away from the page. With the debounce example, the write would likely fail in such a situation.
-
 
 ### Analytics
 
@@ -506,42 +473,29 @@ As of this writing, only Chrome and Firefox support `requestIdleCallback()`. And
 
 And even in browsers that don't support `requestIdleCallback()` natively, the fallback to `setTimeout` is definitely still better than not using this strategy because browsers can still do input prioritization ahead of tasks queued via `setTimeout()`.
 
-
 ## How much does this actually improve performance?
 
 At the beginning of this article I mentioned I came up with this strategy as I was trying to improve my website's FID value. I was trying to split up all the code that ran as soon as my main bundle was loaded, but I also needed to ensure my site continued to work with some third-party libraries that only have synchronous APIs (e.g. analytics.js).
 
 The trace I showed before implementing _idle-until-urgent_ had a single, 233ms task that contained all my initialization code. After implementing the techniques I described here, you can see I have multiple, much shorter tasks. In fact, the longest one is now only 37ms!
 
-<figure>
-  <a href="{{ 'idle-until-urget-after-1400w.png' | revision }}">
-    <img srcset="
-      {{ 'idle-until-urget-after-1400w.png' | revision }},
-      {{ 'idle-until-urget-after.png' | revision }} 700w"
-      src="{{ 'idle-until-urget-after.png' | revision }}"
-      alt="A performance trace of my site's JavaScript showing many short tasks">
-  </a>
-  <figcaption>
-    A performance trace of my site's JavaScript showing many short tasks.
-  </figcaption>
-</figure>
+{% Img
+  border=true,
+  src="idle-until-urgent-after.png",
+  alt="A performance trace of my site's JavaScript showing many short tasks",
+  figcaption="A performance trace of my site's JavaScript showing many short tasks"
+%}
 
 A really important point to emphasize here is that the same amount of work is being done as before, it's just now spread out over multiple tasks and run during idle periods.
 
 And since no single task is greater than 50ms, none of them affect my time to interactive (TTI), which is great for my lighthouse score:
 
-<figure>
-  <a href="{{ 'lighthouse-report-1400w.png' | revision }}">
-    <img srcset="
-      {{ 'lighthouse-report-1400w.png' | revision }},
-      {{ 'lighthouse-report.png' | revision }} 700w"
-      src="{{ 'lighthouse-report.png' | revision }}"
-      alt="My lighthouse report after implementing idle-until-urget - 100s across the board!">
-  </a>
-  <figcaption>
-    My lighthouse report after implementing <em>idle-until-urget</em>.
-  </figcaption>
-</figure>
+{% Img
+  border=true,
+  src="lighthouse-report.png",
+  alt="My lighthouse report after implementing idle-until-urget - 100s across the board!",
+  figcaption="My lighthouse report after implementing idle-until-urget - 100s across the board!"
+%}
 
 Lastly, since the point of all this work was to improve my FID, after releasing these changes to production and looking at the results, I was thrilled to discover _a 67% reduction in FID values at the 99th percentile!_
 
@@ -573,6 +527,3 @@ In a perfect world, none of our sites would ever block the main thread unnecessa
 But in our current world, we web developers often have no choice but to run non-UI code on the main thread, which leads to unresponsiveness and jank.
 
 Hopefully this article has convinced you of the need to break up our long-running JavaScript tasks. And since _idle-until-urgent_ can turn a synchronous-looking API into something that actually evaluates code in idle periods, it's a great solution that works with the libraries we all know and use today.
-
-
-

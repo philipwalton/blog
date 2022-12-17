@@ -14,7 +14,7 @@ This is bad enough on its own, but it often doesn't end there. Here's what usual
 
 If this sounds familiar, then you've experienced the opposite of interactivity on the web. But what exactly does the term "interactivity" mean?
 
-I think most people reading this article probably know what the *word* "interactivity" means in general. The problem is, in recent years the word has been given a technical meaning (e.g. in the metric "Time to Interactive" or TTI), and unfortunately the specifics of that meaning are rarely explained.
+I think most people reading this article probably know what the _word_ "interactivity" means in general. The problem is, in recent years the word has been given a technical meaning (e.g. in the metric "Time to Interactive" or TTI), and unfortunately the specifics of that meaning are rarely explained.
 
 So in this article I want to dig into the meaning of interactivity on the web. After all, I think it's one of the most important things developers need to care about.
 
@@ -53,11 +53,11 @@ blockMainThreadUntil(performance.now() + 10000);
 
 While this code runs, **nothing else can happen on the main thread**. That means a user can't:
 
-* Click a link
-* Select any text
-* Check a checkbox
-* Watch an animated GIF
-* Type into an `<input>` or `<textarea>`
+- Click a link
+- Select any text
+- Check a checkbox
+- Watch an animated GIF
+- Type into an `<input>` or `<textarea>`
 
 Before showing the demo, I want to take a moment to emphasize just how bad this experience is. When the above code is running, it's not just blocking other JavaScript code, it's blocking all other tasks on the main thread, and that includes so-called native interactions you might not expect could be affected by user code.
 
@@ -68,7 +68,6 @@ To see a blocked main thread in action, click the button below (which will add a
 {% Callout 'info' %}
 **Update:** some browsers are now able to render animated GIFs while the main thread is blocked; however, that has not historically been the case, and not all browsers currently support this feature.
 {% endCallout %}
-
 
 <style>
 input[type="text"] {
@@ -130,8 +129,14 @@ label > input[type="checkbox"] {
     </tr>
     <tr>
       <td><code>&lt;img&gt;</code></td>
-      <td><img src="{{ 'animated-loading-spinner.gif' | revision }}"
-    alt="Loading spinner"></td>
+      <td>
+        {% Img
+          figure=false,
+          href=false,
+          src="animated-loading-spinner.gif",
+          alt="Loading spinner"
+        %}
+      </td>
     </tr>
     <tr>
       <td><code>&lt;a&gt;</code></td>
@@ -167,7 +172,6 @@ label > input[type="checkbox"] {
 {% Callout 'info' %}
 **Warning!** You might suddenly find yourself on a new page once the main thread is unblocked!
 {% endCallout %}
-
 
 ### What blocks the main thread
 
@@ -227,27 +231,19 @@ In other words, we should care about all of the above.
 
 For lab testing, I highly recommend tools like [Lighthouse](https://developers.google.com/web/tools/lighthouse/), and [WebPageTest](https://www.webpagetest.org/), both of which measure TTI and also give additional interactivity information. For example, WebPageTest's waterfall view has a ["Page is Interactive"](https://calendar.perfplanet.com/2017/time-to-interactive-measuring-more-of-the-user-experience/) bar along the bottom. This is great for visualizing when these bad experiences would likely happen.
 
-<figure>
-  <a href="{{ 'interactivity-web-page-test-1400w.png' | revision }}">
-    <img srcset="
-      {{ 'interactivity-web-page-test-1400w.png' | revision }},
-      {{ 'interactivity-web-page-test.png' | revision }} 700w"
-      src="{{ 'interactivity-web-page-test.png' | revision }}"
-      alt="WebPageTest's interactivity report">
-  </a>
-</figure>
+{% Img
+  border=true,
+  src="interactivity-web-page-test.png",
+  alt="WebPageTest's interactivity report"
+%}
 
 And Lighthouse gives you a score for your [estimated input latency](https://developers.google.com/web/tools/lighthouse/audits/estimated-input-latency):
 
-<figure>
-  <a href="{{ 'input-latency-lighthouse-1400w.png' | revision }}">
-    <img srcset="
-      {{ 'input-latency-lighthouse-1400w.png' | revision }},
-      {{ 'input-latency-lighthouse.png' | revision }} 700w"
-      src="{{ 'input-latency-lighthouse.png' | revision }}"
-      alt="Input latency in a Lighthouse performance report">
-  </a>
-</figure>
+{% Img
+  border=true,
+  src="input-latency-lighthouse.png",
+  alt="Input latency in a Lighthouse performance report"
+%}
 
 Note that this is "estimated input latency" because it's a lab simulation; no users are actually interacting with this page so it's a measure of probability.
 

@@ -10,15 +10,10 @@ On this site, after a user visits once and the service worker is installed, **th
 
 By only requesting the contents of a page, the networks payloads become substantially smaller, and the pages can load quite a bit faster. For example, on this site over the past 30 days, page loads from a service worker had a **47.6% smaller network payloads**, and a median [First Contentful Paint (FCP)](https://web.dev/fcp/) that was **52.3% faster** than page loads without a service worker (416ms vs. 851ms). In the graph below, you can clearly see the entire distribution shifted to the left:
 
-<figure noborder>
-  <a href="{{ 'fcp-histogram-by-sw-status-1400w.png' | revision }}">
-    <img srcset="
-      {{ 'fcp-histogram-by-sw-status-1400w.png' | revision }},
-      {{ 'fcp-histogram-by-sw-status.png' | revision }} 700w"
-      src="{{ 'fcp-histogram-by-sw-status.png' | revision }}"
-      alt="First Contentful Paint (FCP) distribution by service worker status">
-  </a>
-</figure>
+{% Img
+  src="fcp-histogram-by-sw-status.png",
+  alt="First Contentful Paint (FCP) distribution by service worker status"
+%}
 
 ## How it works
 
@@ -72,7 +67,7 @@ I never request these files from the main page, but I do precache them in the se
 
 When a user first visits my site and the service worker installs, as part of the install event I fetch the contents of `shell-start.html` and `shell-end.html`, and put them in the cache storage.
 
-I use [Workbox](https://developers.google.com/web/tools/workbox/) (specifically  the [workbox-precaching](https://developers.google.com/web/tools/workbox/modules/workbox-precaching) package) to do this, which makes it easy to handle asset versioning and cache invalidation whenever I update either of these partials.
+I use [Workbox](https://developers.google.com/web/tools/workbox/) (specifically the [workbox-precaching](https://developers.google.com/web/tools/workbox/modules/workbox-precaching) package) to do this, which makes it easy to handle asset versioning and cache invalidation whenever I update either of these partials.
 
 ```js
 import {precache} from 'workbox-precaching';

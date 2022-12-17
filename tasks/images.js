@@ -1,60 +1,41 @@
 import fs from 'fs-extra';
 import {globby} from 'globby';
-import gm from 'gm';
 import gulp from 'gulp';
-import imagemin from 'imagemin';
-import imageminPngquant from 'imagemin-pngquant';
 import path from 'path';
 import {generateRevisionedAsset} from './utils/assets.js';
+import {optimizeImage} from './utils/images.js';
 
-const resizeImage = (filepath, width) => {
-  return new Promise((resolve, reject) => {
-    const imgType = path.extname(filepath).slice(1).toUpperCase();
+// const generateLowResArticleImages = (filenames) => {
+//   return Promise.all(
+//     filenames.map(async (filename) => {
+//       const minified = await optimizeImage(filename, {width: 700}, 'webp');
+//       const basename = path.basename(filename, path.extname(filename));
 
-    gm(filepath)
-      .resize(width)
-      .toBuffer(imgType, (err, buffer) => {
-        if (err) reject(err);
-        resolve(buffer);
-      });
-  });
-};
+//       return generateRevisionedAsset(`${basename}.webp`, minified);
+//     })
+//   );
+// };
 
-const minifyImageBuffer = (buffer) => {
-  return imagemin.buffer(buffer, {plugins: [imageminPngquant()]});
-};
+// const generateHighResArticleImages = (filenames) => {
+//   return Promise.all(
+//     filenames.map(async (filename) => {
+//       const minified = await optimizeImage(filename, {width: 1400}, 'webp');
+//       const basename = path.basename(filename, path.extname(filename));
 
-const generateLowResArticleImages = (filenames) => {
-  return Promise.all(
-    filenames.map(async (filename) => {
-      const resized = await resizeImage(filename, 700);
-      const minified = await minifyImageBuffer(resized);
-
-      return generateRevisionedAsset(path.basename(filename), minified);
-    })
-  );
-};
-
-const generateHighResArticleImages = (filenames) => {
-  return Promise.all(
-    filenames.map(async (filename) => {
-      const resized = await resizeImage(filename, 1400);
-      const minified = await minifyImageBuffer(resized);
-
-      const extname = path.extname(filename);
-      const basename = path.basename(filename, extname);
-      const highResBasename = `${basename}-1400w${extname}`;
-
-      return generateRevisionedAsset(highResBasename, minified);
-    })
-  );
-};
+//       return generateRevisionedAsset(`${basename}-1400w.webp`, minified);
+//     })
+//   );
+// };
 
 const optimizeManifestImages = (filenames) => {
   return Promise.all(
     filenames.map(async (filename) => {
-      const buffer = await fs.readFile(filename);
-      const minified = await minifyImageBuffer(buffer);
+      const minified = await optimizeImage(
+        filename,
+        {quality: 50, colors: 128},
+        'png'
+      );
+
       return generateRevisionedAsset(path.basename(filename), minified);
     })
   );
@@ -72,9 +53,9 @@ const generateRevisionedAssets = (filenames) => {
 gulp.task('images', async () => {
   try {
     // Article screenshots.
-    const articlePngFilenames = await globby('assets/images/articles/*.png');
-    await generateLowResArticleImages(articlePngFilenames);
-    await generateHighResArticleImages(articlePngFilenames);
+    // const articleFilenames = await globby('assets/images/articles/*.png');
+    // await generateLowResArticleImages(articleFilenames);
+    // await generateHighResArticleImages(articleFilenames);
 
     // Poster images
     const posterFilenames = await globby('assets/images/poster/*.png');

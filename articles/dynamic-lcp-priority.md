@@ -55,16 +55,10 @@ In the above code the `attribution.element` value is a CSS selector that can be 
 
 Note that I said this payload will _usually_ be sent, but not always. Depending on the user's screen size, the largest element on this page is not always an image. For example, the following visualization shows what the most common LCP element is for this page across typical desktop and mobile viewport sizes.
 
-<figure noborder>
-  <a href="{{ 'lcp-desktop-mobile-1400w.png' | revision }}">
-    <img srcset="
-      {{ 'lcp-desktop-mobile-1400w.png' | revision }},
-      {{ 'lcp-desktop-mobile.png' | revision }} 700w"
-      src="{{ 'lcp-desktop-mobile.png' | revision }}"
-      width="1400" height="810"
-      alt="An example showing how the LCP element for a page can differ across desktop and mobile screen sizes">
-  </a>
-</figure>
+{% Img
+  src="lcp-desktop-mobile.png",
+  alt="An example showing how the LCP element for a page can differ across desktop and mobile screen sizes"
+%}
 
 And as you can see, the largest element on desktop is usually an image, but on mobile it's often the first paragraph of text.
 

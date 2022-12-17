@@ -4,23 +4,22 @@ When Chrome engineer [Addy Osmani](https://twitter.com/addyosmani) first tweeted
 
 After a quick scan of the responses, it was clear that 99% of the complaints focused on these two things:
 
-* The syntax is "ugly" and "verbose".
-* Sass already has variables, so why should I care?
+- The syntax is "ugly" and "verbose".
+- Sass already has variables, so why should I care?
 
-While I admit I *do* get the dislike of the syntax, it's important to understand it wasn't just arbitrarily chosen. Members of the CSS working group discussed syntax at length, and they [had to pick something](http://www.xanthir.com/blog/b4KT0) that was compatible with the grammar of CSS and wouldn't conflict with future additions to the language.
+While I admit I _do_ get the dislike of the syntax, it's important to understand it wasn't just arbitrarily chosen. Members of the CSS working group discussed syntax at length, and they [had to pick something](http://www.xanthir.com/blog/b4KT0) that was compatible with the grammar of CSS and wouldn't conflict with future additions to the language.
 
 In regards to CSS variables vs. Sass variables, this is where I think the biggest misunderstanding lies:
 
-Native CSS variables weren't just an attempt to copy what CSS preprocessors could already do. In fact, if you read some of the [initial design discussions](https://www.google.com/#q=syntax+%22css-variables%22+site:lists.w3.org%2FArchives%2FPublic%2Fwww-style), you'll see that most of the motivation for native CSS variables was to make it possible to do things you *can't* do with preprocessors!
+Native CSS variables weren't just an attempt to copy what CSS preprocessors could already do. In fact, if you read some of the [initial design discussions](https://www.google.com/#q=syntax+%22css-variables%22+site:lists.w3.org%2FArchives%2FPublic%2Fwww-style), you'll see that most of the motivation for native CSS variables was to make it possible to do things you _can't_ do with preprocessors!
 
 CSS preprocessors are fantastic tools, but their variables are static and lexically scoped. Native CSS variables, on the other hand, are an entirely different kind of variable: they're dynamic, and they're scoped to the DOM. In fact, I think it's confusing to call them variables at all. They're actually CSS properties, which gives them an entirely different set of capabilities and allows them to solve an entirely different set of problems.
 
 In this article I'm going to discuss some of the things you can do with CSS custom properties that you can't do with preprocessor variables. I'll also demo some of the new design patterns that custom properties enable. Finally, I'll discuss why I think in the future we'll most likely use preprocessor variables and custom properties together, to leverage the best of both worlds.
 
 {% Callout 'info' %}
-**Note:** this article is *not* an introduction to CSS custom properties. If you've never heard of them or are unfamiliar with how they work, I'd recommend [getting yourself acquainted](https://developer.mozilla.org/en-US/docs/Web/CSS/Using_CSS_variables) first.
+**Note:** this article is _not_ an introduction to CSS custom properties. If you've never heard of them or are unfamiliar with how they work, I'd recommend [getting yourself acquainted](https://developer.mozilla.org/en-US/docs/Web/CSS/Using_CSS_variables) first.
 {% endCallout %}
-
 
 ## The limitations of preprocessor variables
 
@@ -92,7 +91,6 @@ Though inheritance is technically part of the cascade, I want to call it out sep
 
 Consider a situation where you have DOM elements that you want to style based on whatever colors happen to be applied to their parent:
 
-
 ```scss
 .alert { background-color: lightyellow; }
 .alert.info { background-color: lightblue; }
@@ -121,7 +119,7 @@ Native CSS custom properties will work with any CSS preprocessor or plain CSS fi
 
 ## How custom properties are different
 
-As you've probably guessed, none of the limitations I listed above apply to CSS custom properties. But perhaps what's more important than *that* they don't apply is *why* they don't apply.
+As you've probably guessed, none of the limitations I listed above apply to CSS custom properties. But perhaps what's more important than _that_ they don't apply is _why_ they don't apply.
 
 CSS custom properties are just like regular CSS properties, and they operate in exactly the same way (with the obvious exception that they don't style anything).
 
@@ -239,13 +237,12 @@ Even with the extra verbosity of the custom property syntax, the amount of code 
 The following demo uses the above code to build a basic site layout that automatically redefines the gutter value as the viewport width changes. Check it out in a browser that supports custom properties to see it in action!
 
 <figure>
-  <a href="http://codepen.io/philipwalton/pen/epLWNO/?editors=110">
-    <img srcset="
-      {{ 'custom-properties-responsive-1400w.png' | revision }} 1400w,
-      {{ 'custom-properties-responsive.png' | revision }} 700w"
-      src="{{ 'custom-properties-responsive.png' | revision }}"
-      alt="Responsive Properties Demo">
-  </a>
+  {% Img
+    figure=false,
+    href="http://codepen.io/philipwalton/pen/epLWNO/?editors=110",
+    src="custom-properties-responsive.png",
+    alt="Responsive Properties Demo"
+  %}
   <figcaption>
     View the demo on CodePen: <a href="http://codepen.io/philipwalton/pen/epLWNO/?editors=110">editor view</a> / <a href="http://codepen.io/philipwalton/full/epLWNO/">full page</a>
   </figcaption>
@@ -294,21 +291,21 @@ Custom properties change the paradigm of defining components in an interesting w
 
 The difference between this and the descendant combinator example is subtle but important.
 
-When using descendant combinators we're declaring that buttons inside the header *will look this way*, and that way is different from how the button component defines itself. Such a declaration is dictatorial (to borrow Harry's word) and hard to undo in the case of an exception where a button in the header *doesn't* need to look this way.
+When using descendant combinators we're declaring that buttons inside the header _will look this way_, and that way is different from how the button component defines itself. Such a declaration is dictatorial (to borrow Harry's word) and hard to undo in the case of an exception where a button in the header _doesn't_ need to look this way.
 
-With custom properties, on the other hand, the button component is still ignorant of its context and completely decoupled from the header component. Its declaration simply says: *I'm going to style myself based on these custom properties, whatever they happen to be in my current situation*. And the header component simply says: *I'm going to set these property values; it's up to my descendants to determine if and how to use them*.
+With custom properties, on the other hand, the button component is still ignorant of its context and completely decoupled from the header component. Its declaration simply says: _I'm going to style myself based on these custom properties, whatever they happen to be in my current situation_. And the header component simply says: _I'm going to set these property values; it's up to my descendants to determine if and how to use them_.
 
 The main difference is that the extension is opt-in by the button component, and it's easily undone in the case of an exception.
 
 The following demo illustrates contextual styling of both links and buttons in the header of a site as well as the content area.
 
 <figure>
-  <a href="http://codepen.io/philipwalton/pen/KdxmWL/?editors=110">
-    <img srcset="
-      {{ 'custom-properties-contextual-styling-1400w.png' | revision }} 1400w,
-      {{ 'custom-properties-contextual-styling.png' | revision }} 700w"
-      src="{{ 'custom-properties-contextual-styling.png' | revision }}">
-  </a>
+  {% Img
+    figure=false,
+    href="http://codepen.io/philipwalton/pen/KdxmWL/?editors=110",
+    src="custom-properties-contextual-styling.png",
+    alt="Responsive Properties Demo"
+  %}
   <figcaption>
     View the demo on CodePen: <a href="http://codepen.io/philipwalton/pen/KdxmWL/?editors=110">editor view</a> / <a href="http://codepen.io/philipwalton/full/KdxmWL/">full page</a>
   </figcaption>
@@ -318,7 +315,7 @@ The following demo illustrates contextual styling of both links and buttons in t
 
 To further illustrate how making exceptions is easier in this paradigm, imagine if a `.Promo` component were added to the header, and buttons inside the `.Promo` component needed to look like normal buttons, not header buttons.
 
-If you were using descendant combinators, you'd have to write a bunch of styles for the header buttons and then *undo* those styles for the promo buttons; which is messy and error prone, and easily gets out of hand as the number of combinations increases:
+If you were using descendant combinators, you'd have to write a bunch of styles for the header buttons and then _undo_ those styles for the promo buttons; which is messy and error prone, and easily gets out of hand as the number of combinations increases:
 
 ```css
 /* Regular button styles. */

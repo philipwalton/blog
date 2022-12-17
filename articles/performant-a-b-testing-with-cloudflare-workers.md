@@ -20,7 +20,7 @@ At its core, A/B testing consists of just three basic steps:
 
 There are a number of ways to do this step, but the easiest way is to randomly generate a number between 0 and 1 and store that value in a cookie so when the user returns or visits another page on your site, they'll remain in the same group.
 
-Then, based on the value of that random number, assign them to an experiment group.  For example, if you want to deploy an experiment to 5% of your users, then users with a cookie value of less than `0.05` would get that version of the experiment.
+Then, based on the value of that random number, assign them to an experiment group. For example, if you want to deploy an experiment to 5% of your users, then users with a cookie value of less than `0.05` would get that version of the experiment.
 
 The benefit of storing a number in the cookie rather than something like the experiment name is that if you want to gradually roll out an experiment to more users, it's much easier to do so.
 
@@ -123,8 +123,9 @@ async function handleRequest(request) {
   const cookie = request.headers.get('cookie') || '';
 
   // Read the existing `xid` cookie value or randomly generate a new one.
-  const xid = cookie.match(/(?:^|;) *xid=(\.\d+) *(?:;|$)/) ?
-      RegExp.$1 : `${Math.random()}`.slice(1, 5);
+  const xid = cookie.match(/(?:^|;) *xid=(\.\d+) *(?:;|$)/)
+    ? RegExp.$1
+    : `${Math.random()}`.slice(1, 5);
 
   // ...
 }
@@ -134,8 +135,8 @@ The next step is to map the experiment ID and the request URL to the correct loc
 
 ```js
 const experiments = {
-  inline_css: [0, .33], // Match `xid` values between [0 and .33)
-  preload_hero_image: [.33, .67], // Match `xid` values between [.33 and .67)
+  inline_css: [0, 0.33], // Match `xid` values between [0 and .33)
+  preload_hero_image: [0.33, 0.67], // Match `xid` values between [.33 and .67)
 };
 
 function getExperimentPath(xid) {
@@ -156,17 +157,20 @@ async function handleRequest(request) {
   const cookie = request.headers.get('cookie') || '';
 
   // Read the existing `xid` cookie value or randomly generate a new one.
-  const xid = cookie.match(/(?:^|;) *xid=(\.\d+) *(?:;|$)/) ?
-      RegExp.$1 : `${Math.random()}`.slice(1, 5);
+  const xid = cookie.match(/(?:^|;) *xid=(\.\d+) *(?:;|$)/)
+    ? RegExp.$1
+    : `${Math.random()}`.slice(1, 5);
 
   // Update the URL to include the experiment subdirectory, if applicable.
   const requestURL = new URL(request.url);
-  const resourceURL = new URL([
-    requestURL.origin,
-    getExperimentPath(xid),
-    requestURL.pathname,
-    requestURL.search,
-  ].join(''));
+  const resourceURL = new URL(
+    [
+      requestURL.origin,
+      getExperimentPath(xid),
+      requestURL.pathname,
+      requestURL.search,
+    ].join('')
+  );
 
   // Fetch the response from either Cloudflare's cache or the origin server.
   const response = await fetch(resourceURL, request);
@@ -174,26 +178,29 @@ async function handleRequest(request) {
   // Add the `xid` cookie to the response so future requests from
   // this user will remain in the current experiment group.
   const clone = new Response(response.body, response);
-  clone.headers.set('Set-Cookie', [
-    'xid=' + xid,
-    'Path=/',
-    'Max-Age=31536000',
-    'SameSite=Strict',
-    'HttpOnly',
-    'Secure',
-  ].join('; '));
+  clone.headers.set(
+    'Set-Cookie',
+    [
+      'xid=' + xid,
+      'Path=/',
+      'Max-Age=31536000',
+      'SameSite=Strict',
+      'HttpOnly',
+      'Secure',
+    ].join('; ')
+  );
 }
 ```
 
 The code in this last example is where the main magic happens. To make sure it's clear what's going on, let me walk you through it using an example:
 
-* Imagine a new user navigates to the post `/articles/my-post-slug/` on my site. Since they're a new user, they won't have any cookies set.
-* The logic above generates a random `xid` value for them, say: `.12345`.
-* Since `.12345` is less than `.33`, this user will be in the `inline_css` experiment group.
-* The request URL received by the Cloudflare worker's `handleRequest` function is `/articles/my-post-slug/`, but it will request the resource at `/_inline_css/articles/my-post-slug/` on my origin server.
-* Once the Cloudflare worker receives the response from my origin server, it will forward that response on to the user but with the `Set-Cookie: xid=.12345` header added.
-* The user will receive the `inline_css` version of this page, but the URL they see in their address bar will still show as the URL they originally requested (`/articles/my-post-slug/`. The fact that the worker requested a URL prefixed with `/_inline_css/` from my origin server is invisible to them.
-* All subsequent requests from this user will include the `xid=.12345` cookie, so they'll remain in the `inline_css` experiment for as long as I continue running it.
+- Imagine a new user navigates to the post `/articles/my-post-slug/` on my site. Since they're a new user, they won't have any cookies set.
+- The logic above generates a random `xid` value for them, say: `.12345`.
+- Since `.12345` is less than `.33`, this user will be in the `inline_css` experiment group.
+- The request URL received by the Cloudflare worker's `handleRequest` function is `/articles/my-post-slug/`, but it will request the resource at `/_inline_css/articles/my-post-slug/` on my origin server.
+- Once the Cloudflare worker receives the response from my origin server, it will forward that response on to the user but with the `Set-Cookie: xid=.12345` header added.
+- The user will receive the `inline_css` version of this page, but the URL they see in their address bar will still show as the URL they originally requested (`/articles/my-post-slug/`. The fact that the worker requested a URL prefixed with `/_inline_css/` from my origin server is invisible to them.
+- All subsequent requests from this user will include the `xid=.12345` cookie, so they'll remain in the `inline_css` experiment for as long as I continue running it.
 
 {% Callout 'info' %}
 **Note:** this code is a slight simplification from the code I'm actually using on my blog. If you're curious to see the full logic (which includes some unrelated things), check out my [worker source on GitHub](https://github.com/philipwalton/blog/blob/c82ea9fbc1d6be3ea317a312e5bde17d69dd53d7/worker/index.js).
@@ -226,8 +233,8 @@ To do that, I decided to create three experiment groups where I knew ahead of ti
 
 Given these three experiments, the results I expected to see were:
 
-* No noticeable performance differences between `control` and `unchanged`
-* Slower FCP times for `blocking_css` due to the added network latency that blocks rendering.
+- No noticeable performance differences between `control` and `unchanged`
+- Slower FCP times for `blocking_css` due to the added network latency that blocks rendering.
 
 So I started the experiment and let it run for a few days. Here were the results:
 
@@ -258,17 +265,10 @@ To be honest, I was a little unsure of what to make of those results. While the 
 
 To try to understand whether this was just random variance, I created a visualization of the distribution curve for each of the three variants to see if that would provide any insight:
 
-<figure noborder>
-  <a href="{{ 'ab-exp1-fcp-dist-1400w.png' | revision }}">
-    <img srcset="
-      {{ 'ab-exp1-fcp-dist-1400w.png' | revision }},
-      {{ 'ab-exp1-fcp-dist.png' | revision }} 700w"
-      src="{{ 'ab-exp1-fcp-dist.png' | revision }}"
-      width="1400" height="732"
-      loading="lazy"
-      alt="A distribution of FCP values broken down by experiment group">
-  </a>
-</figure>
+{% Img
+  src="ab-exp1-fcp-dist.png",
+  alt="A distribution of FCP values broken down by experiment group"
+%}
 
 Once again, though, these distributions weren't what I was expecting. The curves all have roughly the same shape, which didn't make sense given that the use of blocking CSS should negatively impact paint times.
 
@@ -307,17 +307,10 @@ I assumed the explanation must be due to differences in the make-up of the group
 
 Looking at the distribution of TTFB values reassured me a bit. The curves were more similar in shape than the FCP distributions, but I was still surprised to see so much variance at the 75th percentile.
 
-<figure noborder>
-  <a href="{{ 'ab-exp1-ttfb-dist-1400w.png' | revision }}">
-    <img srcset="
-      {{ 'ab-exp1-ttfb-dist-1400w.png' | revision }},
-      {{ 'ab-exp1-ttfb-dist.png' | revision }} 700w"
-      src="{{ 'ab-exp1-ttfb-dist.png' | revision }}"
-      width="1400" height="732"
-      loading="lazy"
-      alt="A distribution of TTFB values broken down by experiment group">
-  </a>
-</figure>
+{% Img
+  src="ab-exp1-ttfb-dist.png",
+  alt="A distribution of TTFB values broken down by experiment group"
+%}
 
 After thinking about it for a bit longer and looking deeper into the data, I realized the variance was most likely due to differences in cache hit rates across the three experiment variants. And this makes sense given that Cloudflare workers run in [250 different edge nodes](https://www.cloudflare.com/learning/serverless/glossary/what-is-edge-computing/#:~:text=Cloudflare%E2%80%99s%20network%20of%20250%20geographically%20distributed%20edge%20locations), so a sample count of ~600 was probably not sufficiently large to get an evenly distributed cache hit rate across all three experiment groups.
 
@@ -358,17 +351,10 @@ A CDN's cache hit rate affects how quickly the browser receives content, but it 
 
 Here's what the Render Time distribution looked like:
 
-<figure noborder>
-  <a href="{{ 'ab-exp1-rt-dist-1400w.png' | revision }}">
-    <img srcset="
-      {{ 'ab-exp1-rt-dist-1400w.png' | revision }},
-      {{ 'ab-exp1-rt-dist.png' | revision }} 700w"
-      src="{{ 'ab-exp1-rt-dist.png' | revision }}"
-      width="1400" height="732"
-      loading="lazy"
-      alt="A distribution of Render Time values broken down by experiment group">
-  </a>
-</figure>
+{% Img
+  src="ab-exp1-rt-dist.png",
+  alt="A distribution of Render Time values broken down by experiment group"
+%}
 
 And the corresponding 75th percentile values:
 
@@ -401,7 +387,7 @@ Ahh, much better! And much more inline with what I was expecting. The `control` 
 **Note:** you might be wondering why the Render Time values and TTFB values don't add up to the FCP value in the table above. The reason is that p75 Render Time equals `p75(FCP - TTFB)`, which is not the same as `p75(FCP) - p75(TTFB)`.
 {% endCallout %}
 
-After looking at these results and being happy with what I saw, I showed  them to a colleague with a statistics background because I wanted to ensure I wasn't misinterpreting the data. He recommended I calculate confidence intervals for the 75th percentile values in each experiment group to see if there was overlap.
+After looking at these results and being happy with what I saw, I showed them to a colleague with a statistics background because I wanted to ensure I wasn't misinterpreting the data. He recommended I calculate confidence intervals for the 75th percentile values in each experiment group to see if there was overlap.
 
 Here were those results for both the Render Time and FCP metrics:
 
@@ -434,17 +420,10 @@ Here were those results for both the Render Time and FCP metrics:
 
 And visualized, so it's easier to see the overlap:
 
-<figure noborder>
-  <a href="{{ 'ab-exp1-ci-1400w.png' | revision }}">
-    <img srcset="
-      {{ 'ab-exp1-ci-1400w.png' | revision }},
-      {{ 'ab-exp1-ci.png' | revision }} 700w"
-      src="{{ 'ab-exp1-ci.png' | revision }}"
-      width="1400" height="297"
-      loading="lazy"
-      alt="75th percentile Render Time with their 95% confidence intervals, broken down by experiment group">
-  </a>
-</figure>
+{% Img
+  src="ab-exp1-ci.png",
+  alt="75th percentile Render Time with their 95% confidence intervals, broken down by experiment group"
+%}
 
 The chart above shows a small overlap in confidence intervals for FCP but no overlap at all for Render Time at the 75th percentile. This suggests that the use of blocking CSS in the document `<head>` was in fact the cause of the regression in Render Time, which confirmed my original hypothesis.
 
@@ -462,17 +441,10 @@ After a few hours modernizing my CSS, I was able to reduce the size from about 1
 
 I set up an experiment to compare the current site to the version with the modernized CSS, and here were the results:
 
-<figure noborder>
-  <a href="{{ 'ab-exp2-rt-dist-1400w.png' | revision }}">
-    <img srcset="
-      {{ 'ab-exp2-rt-dist-1400w.png' | revision }},
-      {{ 'ab-exp2-rt-dist.png' | revision }} 700w"
-      src="{{ 'ab-exp2-rt-dist.png' | revision }}"
-      width="1400" height="732"
-      loading="lazy"
-      alt="A distribution of Render Time values broken down by experiment group">
-  </a>
-</figure>
+{% Img
+  src="ab-exp2-rt-dist.png",
+  alt="A distribution of Render Time values broken down by experiment group"
+%}
 
 And the confidence intervals at the 75th percentile:
 
@@ -494,17 +466,10 @@ And the confidence intervals at the 75th percentile:
   </tr>
 </table>
 
-<figure noborder>
-  <a href="{{ 'ab-exp2-ci-1400w.png' | revision }}">
-    <img srcset="
-      {{ 'ab-exp2-ci-1400w.png' | revision }},
-      {{ 'ab-exp2-ci.png' | revision }} 700w"
-      src="{{ 'ab-exp2-ci.png' | revision }}"
-      width="1400" height="233"
-      loading="lazy"
-      alt="75th percentile Render Time with their 95% confidence intervals, broken down by experiment group">
-  </a>
-</figure>
+{% Img
+  src="ab-exp2-ci.png",
+  alt="75th percentile Render Time with their 95% confidence intervals, broken down by experiment group"
+%}
 
 Whelp, turns out my efforts and hand-optimizations didn't have a noticeable impact. These results show that there was no significant difference in Render Time between the `control` and `modern_css` experiment groups. The distribution curves are almost identical, and there's a large overlap in the confidence intervals at the 75th percentile.
 

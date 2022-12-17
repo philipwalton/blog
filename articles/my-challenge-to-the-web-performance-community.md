@@ -1,15 +1,9 @@
-I've noticed a trend in recent years—a trend that I've [admittedly been part of myself](https://twitter.com/philwalton/status/910036089137590273)—where performance-minded developers will rebuild a site and then post a screenshot of their [Lighthouse](https://developers.google.com/web/tools/lighthouse) score on social media to show off how fast it is.
+I have noticed a trend in recent years—a trend that I've [admittedly been part of myself](https://twitter.com/philwalton/status/910036089137590273)—where performance-minded developers will rebuild a site and then post a screenshot of their [Lighthouse](https://developers.google.com/web/tools/lighthouse) score on social media to show off how fast it is.
 
-<figure noborder>
-  <a href="{{ 'perfect-lighthouse-score-1400w.png' | revision }}">
-    <img srcset="
-      {{ 'perfect-lighthouse-score-1400w.png' | revision }},
-      {{ 'perfect-lighthouse-score.png' | revision }} 700w"
-      src="{{ 'perfect-lighthouse-score.png' | revision }}"
-      width="1400" height="525"
-      alt="A Lighthouse report with perfect scores">
-  </a>
-</figure>
+{% Img
+  src="perfect-lighthouse-score.png",
+  alt="A Lighthouse report with perfect scores"
+%}
 
 What might come as a surprise to many of the people reading this post is that I kinda want this trend to stop—or at least, I want it to change.
 
@@ -23,17 +17,10 @@ In fact, my colleague Brendan Kenny [just published some research](https://discu
 
 **Almost half of all pages that scored 100 on Lighthouse didn't meet the recommended Core Web Vitals thresholds.**
 
-<figure noborder>
-  <a href="{{ 'lh-cwv-correlation-1400w.png' | revision }}">
-    <img srcset="
-      {{ 'lh-cwv-correlation-1400w.png' | revision }},
-      {{ 'lh-cwv-correlation.png' | revision }} 700w"
-      src="{{ 'lh-cwv-correlation.png' | revision }}"
-      width="1400" height="1283"
-      loading="lazy"
-      alt="A visualization of how Lighthouse scores correlate with Core Web Vitals">
-  </a>
-</figure>
+{% Img
+  src="lh-cwv-correlation.png",
+  alt="A visualization of how Lighthouse scores correlate with Core Web Vitals"
+%}
 
 I've always known it was possible to get a 100 on Lighthouse yet still have real-world issues, but I wouldn't have guessed it was _this_ common. Incidentally, the data also shows that the reverse is common too: many pages that fully meet all the Core Web Vitals thresholds actually have very poor Lighthouse scores.
 
@@ -49,9 +36,9 @@ Of course, performance is a complex topic, and it's perfectly understandable tha
 
 If you've spent much time in the web performance space, either at conferences, reading case studies, or just browsing Twitter, you've probably heard some variation of the following claims over and over again:
 
-* _My site loads in less than 1 second!_
-* _Our home page gets interactive in under 5 seconds on 3G!_
-* _We switched from technology A to technology B, and our LCP improved by 40%!_
+- _My site loads in less than 1 second!_
+- _Our home page gets interactive in under 5 seconds on 3G!_
+- _We switched from technology A to technology B, and our LCP improved by 40%!_
 
 People make these kinds of claims because they're short, sweet, and they sound really impressive. But unfortunately they're also essentially meaningless without additional context.
 
@@ -160,18 +147,18 @@ So when you say you don't need field data because your performance is already re
 
 The following companies all offer RUM analytics services. While I haven't used all of these tools personally, I have met with all of these teams, and I've worked with companies that use their services.
 
-* [Cloudflare Insights](https://www.cloudflare.com/web-analytics/)
-* [Akamai mPulse](https://www.akamai.com/products/mpulse-real-user-monitoring)
-* [SpeedCurve](https://www.speedcurve.com/)
-* [Blue Triangle](https://bluetriangle.com/products/real-user-monitoring/)
-* [Datadog](https://www.datadoghq.com/product/real-user-monitoring/)
-* [Catchpoint Real User Monitoring](https://www.catchpoint.com/real-user-monitoring)
-* [Sentry Performance Monitoring](https://sentry.io/for/performance/)
+- [Cloudflare Insights](https://www.cloudflare.com/web-analytics/)
+- [Akamai mPulse](https://www.akamai.com/products/mpulse-real-user-monitoring)
+- [SpeedCurve](https://www.speedcurve.com/)
+- [Blue Triangle](https://bluetriangle.com/products/real-user-monitoring/)
+- [Datadog](https://www.datadoghq.com/product/real-user-monitoring/)
+- [Catchpoint Real User Monitoring](https://www.catchpoint.com/real-user-monitoring)
+- [Sentry Performance Monitoring](https://sentry.io/for/performance/)
 
 ### General guidance for measuring performance in the field
 
 A list of resources I've written recently geared toward helping people measure performance using a general-purpose analytics tool or a tool they built themselves. While these all primarily discuss Web Vitals, the concepts do apply to general performance measurement as well.
 
-* [Best practices for measuring Web Vitals in the field](https://web.dev/vitals-field-measurement-best-practices/)
-* [Debug web vitals in the field](https://web.dev/debug-web-vitals-in-the-field/)
-* [Measure and debug performance with Google Analytics 4 and BigQuery](https://web.dev/vitals-ga4/)
+- [Best practices for measuring Web Vitals in the field](https://web.dev/vitals-field-measurement-best-practices/)
+- [Debug web vitals in the field](https://web.dev/debug-web-vitals-in-the-field/)
+- [Measure and debug performance with Google Analytics 4 and BigQuery](https://web.dev/vitals-ga4/)

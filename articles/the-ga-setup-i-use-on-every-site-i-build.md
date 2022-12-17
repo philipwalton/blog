@@ -33,10 +33,10 @@ Here's what the modified snippet looks like when using the beacon transport mech
 
 ```html
 <script>
-window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};
-ga('create', 'UA-XXXXX-Y', 'auto');
-**ga('set', 'transport', 'beacon');**
-ga('send', 'pageview');
+  window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};
+  ga('create', 'UA-XXXXX-Y', 'auto');
+  **ga('set', 'transport', 'beacon');**
+  ga('send', 'pageview');
 </script>
 <script async src="https://www.google-analytics.com/analytics.js"></script>
 ```
@@ -65,7 +65,6 @@ main();
 
 Your custom tracking code will then live in its own module and can be initialized via its exported `init()` function:
 
-
 ```js
 // analytics/base.js
 
@@ -89,7 +88,7 @@ Now your template files only includes the `<script async>` tag to load analytics
 <script async src="https://www.google-analytics.com/analytics.js"></script>
 ```
 
-Note that if you're *not* using a build system with code splitting features, you can get the same effect by compiling your tracking code separately and loading it via `<script async>` just like you do with analytics.js.<sup>[[1]](#footnote-1)</sup> Also note that you don't have to worry about load order; analytics.js is specifically designed to handle cases where it loads first, last, or not at all (e.g. in cases where its blocked by an extension):
+Note that if you're _not_ using a build system with code splitting features, you can get the same effect by compiling your tracking code separately and loading it via `<script async>` just like you do with analytics.js.<sup>[[1]](#footnote-1)</sup> Also note that you don't have to worry about load order; analytics.js is specifically designed to handle cases where it loads first, last, or not at all (e.g. in cases where its blocked by an extension):
 
 ```html
 <!-- Loads the site's main script -->
@@ -102,7 +101,7 @@ Note that if you're *not* using a build system with code splitting features, you
 
 ## Tracking custom data
 
-A [dimension](https://support.google.com/analytics/answer/1033861) in Google Analytics is a way to subdivide your usage data into categories. For example, some built-in dimensions available to you in reports are [*Browser*](https://developers.google.com/analytics/devguides/reporting/core/dimsmets#view=detail&group=platform_or_device&jump=ga_browser), [*Device Category*](https://developers.google.com/analytics/devguides/reporting/core/dimsmets#view=detail&group=platform_or_device&jump=ga_devicecategory), [*Language*](https://developers.google.com/analytics/devguides/reporting/core/dimsmets#view=detail&group=system&jump=ga_language), [*Page*](https://developers.google.com/analytics/devguides/reporting/core/dimsmets#view=detail&group=page_tracking&jump=ga_pagepath), etc.
+A [dimension](https://support.google.com/analytics/answer/1033861) in Google Analytics is a way to subdivide your usage data into categories. For example, some built-in dimensions available to you in reports are [_Browser_](https://developers.google.com/analytics/devguides/reporting/core/dimsmets#view=detail&group=platform_or_device&jump=ga_browser), [_Device Category_](https://developers.google.com/analytics/devguides/reporting/core/dimsmets#view=detail&group=platform_or_device&jump=ga_devicecategory), [_Language_](https://developers.google.com/analytics/devguides/reporting/core/dimsmets#view=detail&group=system&jump=ga_language), [_Page_](https://developers.google.com/analytics/devguides/reporting/core/dimsmets#view=detail&group=page_tracking&jump=ga_pagepath), etc.
 
 While the built-in dimensions are great, there are many dimensions that would be incredibly useful that are not tracked by analytics.js. Luckily, Google Analytics has a feature called [custom dimensions](https://support.google.com/analytics/answer/2709828), so you can implement and track whatever dimensions you want.
 
@@ -114,7 +113,7 @@ Any time you make changes to software it's important to version your changes so 
 
 If you update your analytics implementation to start tracking a bunch of new dimensions, or if you change the format of the data you're collecting (for whatever reason), you probably only want to report on data from the subset of users who are running your latest changes.
 
-The easiest way to do this in Google Analytics is to [create a custom dimension](https://support.google.com/analytics/answer/2709829) called *Tracking Version*, and set its [scope](https://support.google.com/analytics/answer/2709828#processing) to "Hit" (since it will apply to all hits).
+The easiest way to do this in Google Analytics is to [create a custom dimension](https://support.google.com/analytics/answer/2709829) called _Tracking Version_, and set its [scope](https://support.google.com/analytics/answer/2709828#processing) to "Hit" (since it will apply to all hits).
 
 In analytics.js you refer to a custom dimension by its index, but I think that gets confusing pretty quickly after you've created a few custom dimensions (which we will), so I always create an object that maps custom dimension names to their index.
 
@@ -139,18 +138,12 @@ With this new dimension, any time you make a breaking change to your tracking im
 
 Here's what the segment definition I use looks like (as you can see, I'm on version 13):
 
-<figure>
-  <a href="{{ 'segment-tracking-version-1400w.png' | revision }}">
-    <img srcset="
-      {{ 'segment-tracking-version-1400w.png' | revision }},
-      {{ 'segment-tracking-version.png' | revision }} 700w"
-      src="{{ 'segment-tracking-version.png' | revision }}"
-      alt="Time to first paint distribution for the Google I/O WebApp (Mobile)">
-  </a>
-  <figcaption>
-    A segment definition to only include sessions for the current tracking version
-  </figcaption>
-</figure>
+{% Img
+  border=true,
+  src="segment-tracking-version.png",
+  alt="A segment definition to only include sessions for the current tracking version",
+  figcaption="A segment definition to only include sessions for the current tracking version"
+%}
 
 ### Client ID
 
@@ -158,13 +151,13 @@ Google Analytics uses a [client ID](https://developers.google.com/analytics/devg
 
 Google Analytics uses this client ID internally, but doesn't make it available to you in reports.
 
-Luckily, (as you've probably guessed) you can work around this limitation by creating a custom dimension called *Client ID*, setting its scope to "User", and assigning it the same value as the native client ID created by analytics.js.
+Luckily, (as you've probably guessed) you can work around this limitation by creating a custom dimension called _Client ID_, setting its scope to "User", and assigning it the same value as the native client ID created by analytics.js.
 
-To understand why this is useful, consider the following scenario: let's say you notice some click events in your reports on a page where the button being clicked isn't supposed to be visible. So you ask yourself: *how is it possible my site got into this broken state?*
+To understand why this is useful, consider the following scenario: let's say you notice some click events in your reports on a page where the button being clicked isn't supposed to be visible. So you ask yourself: _how is it possible my site got into this broken state?_
 
-With access to the *Client ID* dimension, you can debug this problem by picking any of the users who got into that bad state and then creating a report to see only the interactions of that user (by filtering to only include hits matching that user's client ID).
+With access to the _Client ID_ dimension, you can debug this problem by picking any of the users who got into that bad state and then creating a report to see only the interactions of that user (by filtering to only include hits matching that user's client ID).
 
-Without this *Client ID* dimension you can only report on users in aggregate, which has obvious limitations.
+Without this _Client ID_ dimension you can only report on users in aggregate, which has obvious limitations.
 
 To get the client ID value created by analytics.js in your tracking code, you invoke the [`get()`](https://developers.google.com/analytics/devguides/collection/analyticsjs/accessing-trackers#getting_data_stored_on_a_tracker) method to read the value stored on the tracker. Then you can invoke the [`set()`](https://developers.google.com/analytics/devguides/collection/analyticsjs/accessing-trackers#updating_tracker_data) method to assign that value to your newly created custom dimension:
 
@@ -186,7 +179,7 @@ This code works by passing a function to the [`ga()` command queue](https://deve
 
 ### Window ID
 
-Sometimes users interact with your site with more than one window or tab open at a time. Google Analytics doesn't currently collect window/tab-specific data, but you can if you create another custom dimension called *Window ID*, set its scope to "Hit", and assign it a random value at page load time. That way every hit sent from the current window context can be later associated with that window context through the *Window ID* dimension.
+Sometimes users interact with your site with more than one window or tab open at a time. Google Analytics doesn't currently collect window/tab-specific data, but you can if you create another custom dimension called _Window ID_, set its scope to "Hit", and assign it a random value at page load time. That way every hit sent from the current window context can be later associated with that window context through the _Window ID_ dimension.
 
 This is particularly useful for single page apps where a user can have many pageviews without ever doing a full page reload.
 
@@ -194,12 +187,13 @@ To create a unique value, you'll have to include a function to generate it. I li
 
 ```js
 const uuid = function b(a) {
-  return a ? (a ^ Math.random() * 16 >> a / 4).toString(16) :
-      ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, b);
+  return a
+    ? (a ^ ((Math.random() * 16) >> (a / 4))).toString(16)
+    : ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, b);
 };
 ```
 
-Then set the *Window ID* value on your tracker object before you send any data to Google Analytics:
+Then set the _Window ID_ value on your tracker object before you send any data to Google Analytics:
 
 ```js
 const dimensions = {
@@ -219,14 +213,13 @@ export const init = () => {
 
 The Google Analytics interface lets you easily report on aggregate data, but if you want to get access to individual user, session, or hit-level data, you're mostly out of luck.
 
-There is a feature called [BigQuery Export](https://support.google.com/analytics/answer/3437618) that allows you to export *all* your data (which gives you hit-level granularity), but it's only available to premium customers, so the vast majority of users won't have access to it.
+There is a feature called [BigQuery Export](https://support.google.com/analytics/answer/3437618) that allows you to export _all_ your data (which gives you hit-level granularity), but it's only available to premium customers, so the vast majority of users won't have access to it.
 
-Luckily, with a few more custom dimensions you can get most of the way there. The trick is to add unique, hit-specific metadata to every hit that gets sent to Google. Then, at reporting time, you just specify these hit-level dimensions and *voila!* You can isolate individual hits in your reports.
+Luckily, with a few more custom dimensions you can get most of the way there. The trick is to add unique, hit-specific metadata to every hit that gets sent to Google. Then, at reporting time, you just specify these hit-level dimensions and _voila!_ You can isolate individual hits in your reports.
 
-I mentioned previously that tracking *Client ID* via a custom dimension is immensely useful when debugging unexpected user-interaction data. These hit-level custom dimensions make that even easier as they allow you to drill down into individual user interactions (anonymously of course), and see everything these users are doing, when, and in what order they're doing it. Ultimately allowing you to make your site better for everyone.
+I mentioned previously that tracking _Client ID_ via a custom dimension is immensely useful when debugging unexpected user-interaction data. These hit-level custom dimensions make that even easier as they allow you to drill down into individual user interactions (anonymously of course), and see everything these users are doing, when, and in what order they're doing it. Ultimately allowing you to make your site better for everyone.
 
-To track the *Hit ID*, *Hit Time*, and *Hit Type* custom dimensions, first create them in Google Analytics and set their scope to "Hit". Then, in your tracking code, [override](https://developers.google.com/analytics/devguides/collection/analyticsjs/tasks#adding_to_a_task) the [buildHitTask](https://developers.google.com/analytics/devguides/collection/analyticsjs/tasks) and set these values on the [model](https://developers.google.com/analytics/devguides/collection/analyticsjs/model-object-reference), thus ensuring they're applied to every hit:
-
+To track the _Hit ID_, _Hit Time_, and _Hit Type_ custom dimensions, first create them in Google Analytics and set their scope to "Hit". Then, in your tracking code, [override](https://developers.google.com/analytics/devguides/collection/analyticsjs/tasks#adding_to_a_task) the [buildHitTask](https://developers.google.com/analytics/devguides/collection/analyticsjs/tasks) and set these values on the [model](https://developers.google.com/analytics/devguides/collection/analyticsjs/model-object-reference), thus ensuring they're applied to every hit:
 
 ```js
 const dimensions = {
@@ -252,7 +245,7 @@ export const init = () => {
 };
 ```
 
-The *Hit ID* dimension is set to the result of calling our `uuid()` function (like we did with *Window ID)*, the *Hit Time* dimension is set to the current timestamp, and the *Hit Type* dimension is set to the value already stored on the tracker (which, like with client ID, is tracked by GA but not made available in reports):
+The _Hit ID_ dimension is set to the result of calling our `uuid()` function (like we did with _Window ID)_, the _Hit Time_ dimension is set to the current timestamp, and the _Hit Type_ dimension is set to the value already stored on the tracker (which, like with client ID, is tracked by GA but not made available in reports):
 
 ## Error tracking
 
@@ -260,7 +253,7 @@ Do you know for sure if your code is running as intended (and without error) for
 
 There are paid services like [Track:js](https://trackjs.com/) and [Rollbar](https://rollbar.com/) that do this for you, but you can get a lot of the way there for free with just Google Analytics.
 
-I track unhandled errors by adding a global `error` event listener as the very first `<script>` in the `<head>` of the page. It's important to add this first, so it catches *all* errors:
+I track unhandled errors by adding a global `error` event listener as the very first `<script>` in the `<head>` of the page. It's important to add this first, so it catches _all_ errors:
 
 ```html
 <script>addEventListener('error', window.__e=function f(e){f.q=f.q||[];f.q.push(e)});</script>
@@ -306,7 +299,6 @@ const trackErrors = () => {
 
 The above logic loops through each stored error on the error event listener and reports it. It then adds a new listener to immediately send uncaught errors to Google Analytics as they occur.
 
-
 {% Callout 'info' %}
 **Note:** you can use a similar strategy to track unhandled Promise rejections via the [unhandledrejection](https://googlechrome.github.io/samples/promise-rejection-events/) event, but that gets a bit more complicated since a Promise rejection can be initially unhandled but then handled later. For simplicity, it's not included it in this post, but you'll probably want to add it to your error tracking implementation if you want full coverage.
 {% endCallout %}
@@ -319,7 +311,7 @@ The simple reason is that exceptions hits do not show up in the [Real Time repor
 
 ## Performance Tracking
 
-Several years ago Google Analytics introduced [Site Speed](https://support.google.com/analytics/answer/1205784) tracking, allowing you to report on most of the metrics in the [Navigation Timing API](https://developer.mozilla.org/en-US/docs/Web/API/Navigation_timing_API). This was a great initial step, but unfortunately (as with the exception hit type)  it has too many limitations to be useful. If you really care about these metrics, you'll probably want to track them yourself.
+Several years ago Google Analytics introduced [Site Speed](https://support.google.com/analytics/answer/1205784) tracking, allowing you to report on most of the metrics in the [Navigation Timing API](https://developer.mozilla.org/en-US/docs/Web/API/Navigation_timing_API). This was a great initial step, but unfortunately (as with the exception hit type) it has too many limitations to be useful. If you really care about these metrics, you'll probably want to track them yourself.
 
 The Site Speed feature works because analytics.js automatically sends a [timing hit](https://developers.google.com/analytics/devguides/collection/analyticsjs/user-timings) on page load for 1% of your users. The problem is 1% is not a particularly representative sample for most sites, and there's no way to increase this limit because the sampling is enforced on both the client and the server at processing time.
 
@@ -347,7 +339,7 @@ const metrics = {
 export const init = () => {
   // …
   sendNavigationTimingMetrics();
-}
+};
 
 const sendNavigationTimingMetrics = () => {
   // Only track performance in supporting browsers.
@@ -385,11 +377,11 @@ const sendNavigationTimingMetrics = () => {
 };
 ```
 
-Now you can get the average load time values by dividing the totals for *Response End Time,* *DOM Load Time*, and *Window Load Time* by the metric [*Total Events*](https://developers.google.com/analytics/devguides/reporting/core/dimsmets#view=detail&group=event_tracking&jump=ga_totalevents).
+Now you can get the average load time values by dividing the totals for _Response End Time,_ _DOM Load Time_, and _Window Load Time_ by the metric [_Total Events_](https://developers.google.com/analytics/devguides/reporting/core/dimsmets#view=detail&group=event_tracking&jump=ga_totalevents).
 
 ### Median vs. average
 
-I'm sure many of you read that last sentence and thought: *I don't want to know the average, I want to know the median!*
+I'm sure many of you read that last sentence and thought: _I don't want to know the average, I want to know the median!_
 
 Not having median values is a common criticism of Google Analytics, and for good reason. But if you've implemented the hit-level custom dimensions I suggested above, you'll be able to calculate median values yourself because you'll have hit-level granularity. More on this in the reporting section below.
 
@@ -448,9 +440,9 @@ However, sometimes the bad data being sent is your own fault&mdash;perhaps you r
 There's a simple solution to both of these problems, and that's to use [View Filters](https://support.google.com/analytics/answer/1033162). I use the following two filters on all my sites:
 
 - A hostname filter (e.g. only URL hostnames matching `philipwalton.com`)
-- A RegExp match filter for a custom dimension value specific to my site (e.g. *Tracking Version* or *Hit ID*)
+- A RegExp match filter for a custom dimension value specific to my site (e.g. _Tracking Version_ or _Hit ID_)
 
-In order for a hit to be processed by Google Analytics, it has to pass all view filters. Since hits sent while running your site locally (or on a staging server) won't match the hostname, they won't show up. And even if a spammer were savvy enough to send  hits matching the hostname, it's incredibly unlikely that they'd *also* match one of your custom dimensions.
+In order for a hit to be processed by Google Analytics, it has to pass all view filters. Since hits sent while running your site locally (or on a staging server) won't match the hostname, they won't show up. And even if a spammer were savvy enough to send hits matching the hostname, it's incredibly unlikely that they'd _also_ match one of your custom dimensions.
 
 In my experience these two filters have been 100% effective at keeping unwanted data out.
 
@@ -462,37 +454,25 @@ If you've followed all the techniques in this post or implemented analyticsjs-bo
 
 The standard reports in Google Analytics are useful, but if you've done anything custom (e.g. created custom dimensions or custom metrics), then you need to use custom reports to access and visualize that data.
 
-For example, in the section on tracking custom data I mentioned isolating individual users with the *Client ID* dimension and individual page loads with the *Window ID* dimension. Here's a report listing all the pageviews (in *Hit Time* order) from a particular user's first session, showing both *Page* and *Window ID*.
+For example, in the section on tracking custom data I mentioned isolating individual users with the _Client ID_ dimension and individual page loads with the _Window ID_ dimension. Here's a report listing all the pageviews (in _Hit Time_ order) from a particular user's first session, showing both _Page_ and _Window ID_.
 
-<figure>
-  <a href="{{ 'custom-report-user-session-1400w.png' | revision }}">
-    <img srcset="
-      {{ 'custom-report-user-session-1400w.png' | revision }} 1400w,
-      {{ 'custom-report-user-session.png' | revision }} 700w"
-      src="{{ 'custom-report-user-session.png' | revision }}"
-      alt="A Google Analytics custom report">
-  </a>
-  <figcaption>
-    A Google Analytics custom report showing pageviews from a single user's session
-  </figcaption>
-</figure>
+{% Img
+  border=true,
+  src="custom-report-user-session.png",
+  alt="A Google Analytics custom report showing pageviews from a single user's session",
+  figcaption="A Google Analytics custom report showing pageviews from a single user's session"
+%}
 
 As you can see from the above report, this user started their session by reading an article and then navigated to the home page (in the same window). They then opened up four new articles, all in different windows. While this data isn't particularly interesting, it should give you an idea of just how much more detail you can get by implementing the custom dimensions above.
 
-To create this report I picked a random client ID and session from one of my other reports (I chose a session that contained multiple unique pageviews to make it more interesting). Then I created a custom report that filtered only hits matching that *Client ID* and *Session Count* dimension:
+To create this report I picked a random client ID and session from one of my other reports (I chose a session that contained multiple unique pageviews to make it more interesting). Then I created a custom report that filtered only hits matching that _Client ID_ and _Session Count_ dimension:
 
-<figure>
-  <a href="{{ 'custom-report-config-user-session-1400w.png' | revision }}">
-    <img srcset="
-      {{ 'custom-report-config-user-session-1400w.png' | revision }} 1400w,
-      {{ 'custom-report-config-user-session.png' | revision }} 700w"
-      src="{{ 'custom-report-config-user-session.png' | revision }}"
-      alt="The configuration for above custom report">
-  </a>
-  <figcaption>
-    The configuration for above custom report
-  </figcaption>
-</figure>
+{% Img
+  border=true,
+  src="custom-report-config-user-session.png",
+  alt="The configuration for above custom report",
+  figcaption="The configuration for above custom report"
+%}
 
 ### Calculated metrics
 
@@ -500,37 +480,25 @@ Calculated metrics allow you to define new metrics that can be derived from exis
 
 For example, the autotrack `maxScrollTracker` plugin tracks the maximum scroll percentage for each page in a given session. However, since Google Analytics only reports metric totals across all sessions in a report's date range, this value isn't particularly useful on its own.
 
-However, when you create a calculated metric to compute the average Max Scroll Depth value per unique pageviews in a session, you suddenly have a *very* useful metric.
+However, when you create a calculated metric to compute the average Max Scroll Depth value per unique pageviews in a session, you suddenly have a _very_ useful metric.
 
 Here's a screenshot of a custom report I created showing pages with the highest average max scroll percentage on this site over the past 7 days.
 
-<figure>
-  <a href="{{ 'max-scroll-report-1400w.png' | revision }}">
-    <img srcset="
-      {{ 'max-scroll-report-1400w.png' | revision }} 1400w,
-      {{ 'max-scroll-report.png' | revision }} 700w"
-      src="{{ 'max-scroll-report.png' | revision }}"
-      alt="A Google Analytics custom report">
-  </a>
-  <figcaption>
-    Top pages by average max scroll percentage
-  </figcaption>
-</figure>
+{% Img
+  border=true,
+  src="max-scroll-report.png",
+  alt="Top pages by average max scroll percentage",
+  figcaption="Top pages by average max scroll percentage"
+%}
 
 And the following screenshot shows how this calculated metric is configured:
 
-<figure>
-  <a href="{{ 'calculated-metric-definition-1400w.png' | revision }}">
-    <img srcset="
-      {{ 'calculated-metric-definition-1400w.png' | revision }} 1400w,
-      {{ 'calculated-metric-definition.png' | revision }} 700w"
-      src="{{ 'calculated-metric-definition.png' | revision }}"
-      alt="A Google Analytics custom report">
-  </a>
-  <figcaption>
-    The Avg. Max Scroll Percentage / Page calculated metric definition
-  </figcaption>
-</figure>
+{% Img
+  border=true,
+  src="calculated-metric-definition.png",
+  alt="The Avg. Max Scroll Percentage / Page calculated metric definition",
+  figcaption="The Avg. Max Scroll Percentage / Page calculated metric definition"
+%}
 
 ### Medians, histograms, and distributions
 
@@ -541,19 +509,15 @@ As an example of why distribution data is useful, consider the max scroll report
 The histogram below shows a distribution of max scroll percentage (per session) across all users who scrolled over the past few days. The median value was **80%**.
 
 {% Callout 'info' %}
-**Tip:** to get median values in Google Analytics, all you have to do is add the *Hit ID* dimension to your report, sort the metric values in ascending order, and then read the middle value.
+**Tip:** to get median values in Google Analytics, all you have to do is add the _Hit ID_ dimension to your report, sort the metric values in ascending order, and then read the middle value.
 {% endCallout %}
 
-<figure>
-  <a href="{{ 'max-scroll-percentage-histogram-1400w.png' | revision }}">
-    <img srcset="
-      {{ 'max-scroll-percentage-histogram-1400w.png' | revision }} 1400w,
-      {{ 'max-scroll-percentage-histogram.png' | revision }} 700w"
-      src="{{ 'max-scroll-percentage-histogram.png' | revision }}"
-      alt="Max Scroll Percentage distribution">
-  </a>
-  <figcaption>Max Scroll Percentage distribution.</figcaption>
-</figure>
+{% Img
+  border=true,
+  src="max-scroll-percentage-histogram.png",
+  alt="Max Scroll Percentage distribution",
+  figcaption="Max Scroll Percentage distribution"
+%}
 
 As you can see from this chart, the largest bucket by far is users who scrolled all the way to the bottom of the page. This chart tells a vastly different story from the **44.60%** average number in the previous report, and it emphasizes the value in having hit-level reporting granularity.
 
@@ -563,33 +527,21 @@ Another good example of visualizing hit-level metric distribution is the perform
 
 On desktop the median time to first paint was **583 ms** when controlled by a service worker vs. **912 ms** when not controlled.
 
-<figure>
-  <a href="{{ 'fp-histogram-desktop-1400w.png' | revision }}">
-    <img srcset="
-      {{ 'fp-histogram-desktop-1400w.png' | revision }} 1400w,
-      {{ 'fp-histogram-desktop.png' | revision }} 700w"
-      src="{{ 'fp-histogram-desktop.png' | revision }}"
-      alt="Time to first paint distribution for the Google I/O WebApp (Desktop)">
-  </a>
-  <figcaption>
-    Time to first paint distribution for the Google I/O WebApp (Desktop).
-  </figcaption>
-</figure>
+{% Img
+  border=true,
+  src="fp-histogram-desktop.png",
+  alt="Time to first paint distribution for the Google I/O WebApp (Desktop)",
+  figcaption="Time to first paint distribution for the Google I/O WebApp (Desktop)"
+%}
 
 On mobile the median was **1634 ms** when controlled by a service worker vs. **1933 ms** when not controlled.
 
-<figure>
-  <a href="{{ 'fp-histogram-mobile-1400w.png' | revision }}">
-    <img srcset="
-      {{ 'fp-histogram-mobile-1400w.png' | revision }} 1400w,
-      {{ 'fp-histogram-mobile.png' | revision }} 700w"
-      src="{{ 'fp-histogram-mobile.png' | revision }}"
-      alt="Time to first paint distribution for the Google I/O WebApp (Mobile)">
-  </a>
-  <figcaption>
-    Time to first paint distribution for the Google I/O WebApp (Mobile).
-  </figcaption>
-</figure>
+{% Img
+  border=true,
+  src="fp-histogram-mobile.png",
+  alt="Time to first paint distribution for the Google I/O WebApp (Mobile)",
+  figcaption="Time to first paint distribution for the Google I/O WebApp (Mobile)"
+%}
 
 ## Conclusions
 

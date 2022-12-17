@@ -47,6 +47,7 @@ And the best way to do that is to write a polyfill ourselves.
 </style>
 
 {% Callout %}
+
   <div class="Media">
     <div class="Media-subject">
       <div class="VideoContainer">
@@ -72,18 +73,18 @@ Here's an example showing how random might be used:
   width: calc(random * 100%);
 }
 ```
+
 As you can see, since `random` returns a unitless number, it can be used with `calc()` to essentially become any value. And since it can be any value, it can be applied to any property (e.g. `color`, `opacity`, `width`, etc).
 
 For the rest of this post, we're going to be working with the [demo page](https://philipwalton.github.io/talks/2016-12-02/demos/1/) I used in my talk. Here's what it looks like:
 
 <figure>
-  <a href="https://philipwalton.github.io/talks/2016-12-02/demos/1/">
-    <img srcset="
-      {{ 'random-polyfill-demo-page-1400w.png' | revision }} 1400w,
-      {{ 'random-polyfill-demo-page.png' | revision }} 700w"
-      src="{{ 'random-polyfill-demo-page.png' | revision }}"
-      alt="Random keywork polyfill demo page">
-  </a>
+  {% Img
+    figure=false,
+    href="https://philipwalton.github.io/talks/2016-12-02/demos/1/",
+    src="random-polyfill-demo-page.png",
+    alt="Random keywork polyfill demo page"
+  %}
   <figcaption>
     An <a href="https://philipwalton.github.io/talks/2016-12-02/demos/1/">example </a> of what a site using the <code>random</code> keyword might look like.
   </figcaption>
@@ -109,7 +110,7 @@ For example, if you wanted to polyfill `Math.random()`, you'd do something like 
 
 ```js
 if (typeof Math.random != 'function') {
-  Math.random = function() {
+  Math.random = function () {
     // Implement polyfill here...
   };
 }
@@ -117,7 +118,7 @@ if (typeof Math.random != 'function') {
 
 CSS, on the other hand, is not dynamic in this way. It's not possible (at least not yet) to modify the runtime to tell the browser about a new feature it doesn't natively understand.
 
-This means that to polyfill a CSS feature that the browser *doesn't* understand, you have to dynamically modify the CSS to fake the feature's behavior using CSS the browser *does* understand.
+This means that to polyfill a CSS feature that the browser _doesn't_ understand, you have to dynamically modify the CSS to fake the feature's behavior using CSS the browser _does_ understand.
 
 In other words, you have to turn this:
 
@@ -168,7 +169,7 @@ for (const stylesheet of document.styleSheets) {
 
 If you load [demo #2](https://philipwalton.github.io/talks/2016-12-02/demos/2/) and paste the above code into the JavaScript console and run it, it'll actually do what it's supposed to do, but you won't see any random-width progress bars when it's done.
 
-The reason is because *none* of the rules containing the `random` keyword are in the CSSOM!
+The reason is because _none_ of the rules containing the `random` keyword are in the CSSOM!
 
 As you're probably aware, when a browser encounters a CSS rule it doesn't understand, it simply ignores it. In most situations that's a good thing because it means you can load CSS in an old browser and the page won't complete break. Unfortunately, it also means if you need access to the raw, unaltered CSS, you have to fetch it yourself.
 
@@ -301,8 +302,9 @@ To replace the page styles we can write a utility function (similar to `getPageS
 ```js
 const replacePageStyles = (css) => {
   // Get a reference to all existing style elements.
-  const existingStyles =
-      [...document.querySelectorAll('style, link[rel="stylesheet"]')];
+  const existingStyles = [
+    ...document.querySelectorAll('style, link[rel="stylesheet"]'),
+  ];
 
   // Create a new <style> tag with all the polyfilled styles.
   const polyfillStyles = document.createElement('style');
@@ -341,7 +343,7 @@ This makes perfect sense when we think about what we've done&mdash;we've just re
 
 The truth is all but the simplest CSS polyfills require more than just rewriting individual property values. Most of them require knowledge of the DOM as well as specific details (size, contents, order, etc.) of the individual matching elements. This is why preprocessors and server-side solutions to this problem will never be sufficient alone.
 
-But that brings up an important question: *how do we update the polyfill to target individual elements?*
+But that brings up an important question: _how do we update the polyfill to target individual elements?_
 
 ## Targeting individual, matching elements
 
@@ -383,7 +385,7 @@ At first it seems to work great, unfortunately, it's easy to break. Consider if 
 }
 ```
 
-The above codes states that all progress bar elements should have a random width except progress bar elements that are descendants of an element with the ID `#some-container`, in which case the width should *not* be random.
+The above codes states that all progress bar elements should have a random width except progress bar elements that are descendants of an element with the ID `#some-container`, in which case the width should _not_ be random.
 
 Of course this won't work, because we're applying inline styles directly to the element, which means those styles will be more specific than the styles defined on `#some-container .progress-bar`.
 
@@ -402,7 +404,7 @@ The second option accepts that lots of normal CSS use-cases will fail with the f
 
 Yeah, if you couldn't tell, I've just describe the cascade, which is something we're supposed to be depending on the browser to do for us.
 
-While it's definitely *possible* to re-implement the cascade in JavaScript, it would be a lot of work, and I'd rather just see what option #3 is.
+While it's definitely _possible_ to re-implement the cascade in JavaScript, it would be a lot of work, and I'd rather just see what option #3 is.
 
 ### Option #3: Rewrite the CSS to target individual, matching elements while maintaining cascade order.
 
@@ -414,7 +416,8 @@ Since that last sentence probably didn't make a whole lot of sense, let me clari
 * {
   box-sizing: border-box;
 }
-p { /* Will match 3 paragraphs on the page. */
+p {
+  /* Will match 3 paragraphs on the page. */
   opacity: random;
 }
 .foo {
@@ -428,34 +431,34 @@ If we were to add a unique data attribute to each paragraph in the DOM, we could
 * {
   box-sizing: border-box;
 }
-p**[data-pid="1"]** {
-  opacity: .23421;
+p**[data-pid='1']** {
+  opacity: 0.23421;
 }
-p**[data-pid="2"]** {
-  opacity: .82305;
+p**[data-pid='2']** {
+  opacity: 0.82305;
 }
-p**[data-pid="3"]** {
-  opacity: .31178;
+p**[data-pid='3']** {
+  opacity: 0.31178;
 }
 .foo {
   opacity: initial;
 }
 ```
 
-Of course, if you're paying attention, this still doesn't quite work because it alters the specificity of these selectors, which will likely lead to unintended side-effects. *However*, we can ensure the proper cascade order is maintained by increasing *every other selector* on the page by the same specificity amount with some clever hackery:
+Of course, if you're paying attention, this still doesn't quite work because it alters the specificity of these selectors, which will likely lead to unintended side-effects. _However_, we can ensure the proper cascade order is maintained by increasing _every other selector_ on the page by the same specificity amount with some clever hackery:
 
 ```css
 *​**:not(.z)** {
   box-sizing: border-box;
 }
-p[data-pid="1"] {
-  opacity: .23421;
+p[data-pid='1'] {
+  opacity: 0.23421;
 }
-p[data-pid="2"] {
-  opacity: .82305;
+p[data-pid='2'] {
+  opacity: 0.82305;
 }
-p[data-pid="3"] {
-  opacity: .31178;
+p[data-pid='3'] {
+  opacity: 0.31178;
 }
 .foo**:not(.z)** {
   opacity: initial;
@@ -464,8 +467,7 @@ p[data-pid="3"] {
 
 The changes above apply the `:not()` functional, pseudo-class selector and pass it the name of a class we know isn't found in the DOM (in this case I've chosen `.z`; which means if you use the class `.z` in the DOM you'd have to pick a different name). And since `:not()` will always match an element that doesn't exist, it can be used to increase the specificity of a selector without changing what it matches.
 
-[Demo #7](https://philipwalton.github.io/talks/2016-12-02/demos/7/), shows the result of implementing this strategy, and you can refer to the [demo source code](https://github.com/philipwalton/talks/blob/b0a2b9a3de509dd39368516e7e304a4159b41b08/2016-12-02/demos/src/random-keyword-plugin.js
-) to see the full set of changes to the `random-keyword` plugin.
+[Demo #7](https://philipwalton.github.io/talks/2016-12-02/demos/7/), shows the result of implementing this strategy, and you can refer to the [demo source code](https://github.com/philipwalton/talks/blob/b0a2b9a3de509dd39368516e7e304a4159b41b08/2016-12-02/demos/src/random-keyword-plugin.js) to see the full set of changes to the `random-keyword` plugin.
 
 The best part about option #3 is it continues to let the browser handle the cascade, which the browser is already really good at. This means you can use media queries, `!important` declarations, custom properties, `@support` rules, or any CSS feature, and it will still just work.
 
@@ -480,7 +482,7 @@ For one thing, I've intentionally skipped over a few places CSS might live on th
 - Inline styles
 - Shadow DOM
 
-We *could* update our polyfill to account for these cases, but it would be way more work than I'd want to discuss in a blog post.
+We _could_ update our polyfill to account for these cases, but it would be way more work than I'd want to discuss in a blog post.
 
 We also haven't even considered the possibility of what happens when the DOM changes. After all, we're rewriting our CSS based on the contents of the DOM, which means we'll have to re-rewrite it any time the DOM changes.
 
@@ -488,11 +490,11 @@ We also haven't even considered the possibility of what happens when the DOM cha
 
 In addition to the problems I've just described (which are hard, but doable), there are some problems that just can't be avoided:
 
-- It requires *a ton* of extra code.
+- It requires _a ton_ of extra code.
 - It doesn't work with cross-origin (non-CORS) stylesheets.
 - It performs horribly if/when changes are needed (e.g. DOM changes, scroll/resize handlers, etc.)
 
-Our `random` keyword polyfill is a rather simple case, but I'm sure you can easily imagine a polyfill for something like `position: sticky`, in which all the logic I've described here would have to be re-run every time the user scrolled, which would be absolutely *horrible* for performance.
+Our `random` keyword polyfill is a rather simple case, but I'm sure you can easily imagine a polyfill for something like `position: sticky`, in which all the logic I've described here would have to be re-run every time the user scrolled, which would be absolutely _horrible_ for performance.
 
 #### Possibilities for improvement
 
@@ -521,27 +523,25 @@ No matter what you try, you'll always have to rewrite the CSS whenever a change 
 
 In order to understand why the performance of CSS polyfills is so bad, you really have to understand the browser rendering pipeline&mdash;specifically the steps in the pipeline that you as a developer have access to.
 
-<figure>
-  <img
-    src="{{ 'browser-rendering-pipeline.svg' | revision }}"
-    alt="JavaScript access to the browser rendering pipeline">
-  <figcaption>
-    JavaScript access to the browser rendering pipeline
-  </figcaption>
-</figure>
+{% Img
+  border=true,
+  href=false,
+  src="browser-rendering-pipeline.svg",
+  alt="JavaScript access to the browser rendering pipeline",
+  figcaption="JavaScript access to the browser rendering pipeline"
+%}
 
 As you can see, the only real point of entry is the DOM, which our polyfill made use of through querying for elements matching the CSS selector as well as through updating the CSS text of the `<style>` tag.
 
 But given the current state of JavaScript access to the browser's rendering pipeline, this is the path our polyfill is forced to take.
 
-<figure>
-  <img
-    src="{{ 'browser-rendering-pipeline-polyfill.svg' | revision }}"
-    alt="Polyfill entry points to the browser rendering pipeline">
-  <figcaption>
-    Polyfill entry points to the browser rendering pipeline
-  </figcaption>
-</figure>
+{% Img
+  border=true,
+  href=false,
+  src="browser-rendering-pipeline-polyfill.svg",
+  alt="Polyfill entry points to the browser rendering pipeline",
+  figcaption="Polyfill entry points to the browser rendering pipeline"
+%}
 
 As you can see, JavaScript is not able to intervene in the initial rendering pipeline after the DOM is constructed, which means any changes our polyfill makes will force the entire rendering process to start over.
 
@@ -575,8 +575,3 @@ Without low-level styling primitives, innovation will move at the pace of the sl
 Developers complain about the pace of innovation in the JavaScript community. But you never hear about that in CSS. And part of that is due to the limitations I've described in this article
 
 I think we need to change that. I think we need to [#makecssfatigueathing](https://twitter.com/hashtag/makecssfatigueathing).
-
-
-
-
-

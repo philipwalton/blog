@@ -1,15 +1,35 @@
+import {oneLine} from 'common-tags';
 import fs from 'fs-extra';
 import he from 'he';
+import imgSizePkg from 'image-size';
 import jsesc from 'jsesc';
 import moment from 'moment-timezone';
 import nunjucks from 'nunjucks';
 import path from 'path';
 import resolve from 'resolve';
 import {promisify} from 'util';
-import {getRevisionedAssetUrl} from './assets.js';
+import {generateRevisionedAsset, getRevisionedAssetUrl} from './assets.js';
+import {optimizeImage} from './images.js';
 import {renderMarkdown} from './markdown.js';
+import {memoize} from './memoize.js';
+
+const imgSize = memoize(promisify(imgSizePkg));
 
 const config = fs.readJSONSync('./config.json');
+
+const generateLowResArticleImage = async (filename) => {
+  const minified = await optimizeImage(filename, {width: 700}, 'webp');
+  const basename = path.basename(filename, path.extname(filename));
+
+  return generateRevisionedAsset(`${basename}.webp`, minified);
+};
+
+const generateHighResArticleImage = async (filename) => {
+  const minified = await optimizeImage(filename, {width: 1400}, 'webp');
+  const basename = path.basename(filename, path.extname(filename));
+
+  return generateRevisionedAsset(`${basename}-1400w.webp`, minified);
+};
 
 /**
  * Nunjucks silently catches errors, which can make debugging incredibly hard.
@@ -97,7 +117,7 @@ export const initTemplates = () => {
 
   env.addExtension(
     'Callout',
-    new Shortcode('Callout', (content, type) => {
+    new BlockShortcode('Callout', (content, type) => {
       const classes = ['Callout'];
       if (type) {
         classes.push(`Callout--${type}`);
@@ -108,12 +128,115 @@ export const initTemplates = () => {
       )}</div>`;
     })
   );
+
+  env.addExtension(
+    'Img',
+    new InlineShortcode('Img', async (props) => {
+      let {alt, border, href, figcaption, src} = props;
+
+      const filename = `assets/images/articles/${props.src}`;
+
+      const dimensions = await imgSize(filename);
+      const width = Math.min(1400, dimensions.width);
+      const height = Math.round(dimensions.height * (width / dimensions.width));
+
+      const attrs = {src, width, height, alt};
+
+      if (filename.match(/\.(png|jpg)$/)) {
+        const [highResSrc, lowResSrc] = await Promise.all([
+          generateHighResArticleImage(filename),
+          generateLowResArticleImage(filename),
+        ]);
+
+        href = href ?? highResSrc;
+        attrs.srcset = `${highResSrc}, ${lowResSrc} 700w`;
+        attrs.src = lowResSrc;
+      } else {
+        attrs.src = generateRevisionedAsset(
+          path.basename(filename),
+          await fs.readFile(filename)
+        );
+        href = href ?? attrs.src;
+      }
+
+      let html = `<img ${attrify(attrs)}>`;
+
+      if (props.href !== false) {
+        html = `<a href="${href}">${html}</a>`;
+      }
+
+      if (props.figure !== false) {
+        html = `<figure ${border ? '' : 'noborder'}>
+          ${html}
+          ${figcaption ? `<figcaption>${figcaption}</figcaption>` : ''}
+        </figure>`;
+      }
+
+      return oneLine(html);
+    })
+  );
 };
+
+function attrify(obj) {
+  let attrs = [];
+  for (const [attr, value] of Object.entries(obj)) {
+    if (value && !attr.startsWith('_')) {
+      attrs.push(`${attr}="${value}"`);
+    }
+  }
+  return attrs.join(' ');
+}
 
 /**
  * Class to create new Nunjucks shortcode blocks.
  */
-class Shortcode {
+class InlineShortcode {
+  /**
+   * @param {string} shortcodeName
+   * @param {Function} shortcodeFn
+   */
+  constructor(shortcodeName, shortcodeFn) {
+    this._shortcodeFn = shortcodeFn;
+    this._shortcodeName = shortcodeName;
+
+    this.tags = [shortcodeName];
+  }
+
+  /**
+   * @param {Object} parser Nunjucks object
+   * @param {Object} nodes Nunjucks object
+   * @returns {any}
+   */
+  parse(parser, nodes) {
+    const tok = parser.nextToken();
+
+    const args = parser.parseSignature(true, true);
+    parser.advanceAfterBlockEnd(tok.value);
+
+    // const body = parser.parseUntilBlocks('end' + this._shortcodeName);
+    // parser.advanceAfterBlockEnd();
+
+    return new nodes.CallExtensionAsync(this, 'run', args);
+  }
+
+  /**
+   * @param  {...any} args Parser params
+   */
+  async run(...args) {
+    const done = args.pop();
+    // const body = args.pop();
+    const [ctx, ...argArray] = args;
+
+    const content = await this._shortcodeFn.call(ctx, ...argArray);
+
+    done(null, new nunjucks.runtime.SafeString(content));
+  }
+}
+
+/**
+ * Class to create new Nunjucks shortcode blocks.
+ */
+class BlockShortcode {
   /**
    * @param {string} shortcodeName
    * @param {Function} shortcodeFn

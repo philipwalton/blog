@@ -145,7 +145,7 @@ figcaption a:hover {
 figure img {
   display: block;
   height: auto;
-  max-width: 100%;
+  width: 100%;
 }
 
 figure:not([noborder]) img {
@@ -185,4 +185,5 @@ iframe {
 video {
   border: 1px solid var(--border-color);
   width: 100%;
+  height: auto;
 }

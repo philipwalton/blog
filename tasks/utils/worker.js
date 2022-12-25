@@ -38,4 +38,3 @@ export const start = async ({verbose = true} = {}) => {
 export const stop = () => {
   subprocess.kill();
 };
-

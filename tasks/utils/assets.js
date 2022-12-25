@@ -3,37 +3,35 @@ import path from 'path';
 import revHash from 'rev-hash';
 import {revPath} from 'rev-path';
 
-
 const config = fs.readJSONSync('./config.json');
 let manifest;
 
 const ensureManifest = () => {
   if (!manifest) {
-    manifest = fs.readJsonSync(
-        path.join(config.publicDir, config.manifestFileName),
-        {throws: false}) || {};
+    manifest =
+      fs.readJsonSync(path.join(config.publicDir, config.manifestFileName), {
+        throws: false,
+      }) || {};
   }
 };
-
 
 export const getManifest = () => {
   ensureManifest();
   return manifest;
 };
 
-
 export const saveManifest = () => {
   fs.outputJsonSync(
-      path.join(config.publicDir, config.manifestFileName),
-      manifest, {spaces: 2});
+    path.join(config.publicDir, config.manifestFileName),
+    manifest,
+    {spaces: 2}
+  );
 };
-
 
 export const resetManifest = () => {
   manifest = {};
   saveManifest();
 };
-
 
 export const getAsset = (filename) => {
   ensureManifest();
@@ -45,7 +43,6 @@ export const getAsset = (filename) => {
   return manifest[filename];
 };
 
-
 export const addAsset = (filename, revisionedFilename) => {
   ensureManifest();
 
@@ -54,11 +51,9 @@ export const addAsset = (filename, revisionedFilename) => {
   saveManifest();
 };
 
-
 export const getRevisionedAssetUrl = (filename) => {
   return path.join(config.publicStaticPath, getAsset(filename) || filename);
 };
-
 
 export const generateRevisionedAsset = (filename, content, extra) => {
   const hash = revHash(content + extra);
@@ -68,5 +63,7 @@ export const generateRevisionedAsset = (filename, content, extra) => {
   addAsset(filename, revisionedFilename);
 
   fs.outputFileSync(
-      path.join(config.publicStaticDir, revisionedFilename), content);
+    path.join(config.publicStaticDir, revisionedFilename),
+    content
+  );
 };

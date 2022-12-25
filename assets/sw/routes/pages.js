@@ -3,11 +3,12 @@ import {strategy as streamsStrategy} from 'workbox-streams/strategy.js';
 import {contentStrategy} from './content.js';
 import {precacheHandler} from '../precache.js';
 
-
 const pagesMatcher = ({url}) => {
-  return url.hostname === location.hostname &&
-      (url.pathname === '/' ||
-      url.pathname.match(/^\/(?:about|articles)\/([\w-]+\/)?$/));
+  return (
+    url.hostname === location.hostname &&
+    (url.pathname === '/' ||
+      url.pathname.match(/^\/(?:about|articles)\/([\w-]+\/)?$/))
+  );
 };
 
 const contentHandler = ({event, url}) => {
@@ -18,15 +19,17 @@ const contentHandler = ({event, url}) => {
 };
 
 const streamHandler = streamsStrategy([
-  ({event}) => precacheHandler({
-    request: new Request('/shell-start.html'),
-    event,
-  }),
+  ({event}) =>
+    precacheHandler({
+      request: new Request('/shell-start.html'),
+      event,
+    }),
   contentHandler,
-  ({event}) => precacheHandler({
-    request: new Request('/shell-end.html'),
-    event,
-  }),
+  ({event}) =>
+    precacheHandler({
+      request: new Request('/shell-end.html'),
+      event,
+    }),
 ]);
 
 const pagesHandler = (opts) => {

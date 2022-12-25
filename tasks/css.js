@@ -8,7 +8,6 @@ import postcssPresetEnv from 'postcss-preset-env';
 import {generateRevisionedAsset} from './utils/assets.js';
 import {ENV} from './utils/env.js';
 
-
 const compileCss = async (srcPath) => {
   const css = await fs.readFile(srcPath, 'utf-8');
 
@@ -24,14 +23,19 @@ const compileCss = async (srcPath) => {
     }),
   ];
   if (ENV === 'production') {
-    plugins.push(cssnano({preset: [
-      'default', {
-        discardComments: {removeAll: true},
-        // This must be disabled because it breaks postcss-custom-properties:
-        // https://github.com/ben-eb/cssnano/issues/448
-        mergeLonghand: false,
-      },
-    ]}));
+    plugins.push(
+      cssnano({
+        preset: [
+          'default',
+          {
+            discardComments: {removeAll: true},
+            // Disable this because it breaks postcss-custom-properties:
+            // https://github.com/ben-eb/cssnano/issues/448
+            mergeLonghand: false,
+          },
+        ],
+      })
+    );
   }
 
   const result = await postcss(plugins).process(css, {from: srcPath});

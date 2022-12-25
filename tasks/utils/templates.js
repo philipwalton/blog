@@ -9,7 +9,6 @@ import {promisify} from 'util';
 import {getRevisionedAssetUrl} from './assets.js';
 import {renderMarkdown} from './markdown.js';
 
-
 const config = fs.readJSONSync('./config.json');
 
 /**
@@ -32,7 +31,8 @@ const catchAndLogErrors = (fn) => {
 
 export const initTemplates = () => {
   const modulepreload = fs.readJsonSync(
-      path.join(config.publicDir, 'modulepreload.json'));
+    path.join(config.publicDir, 'modulepreload.json')
+  );
 
   const env = nunjucks.configure('templates', {
     autoescape: false,
@@ -41,51 +41,73 @@ export const initTemplates = () => {
     throwOnUndefined: true,
   });
 
-  env.addFilter('htmlescape', catchAndLogErrors((content) => {
-    return he.encode(content, {useNamedReferences: true});
-  }));
+  env.addFilter(
+    'htmlescape',
+    catchAndLogErrors((content) => {
+      return he.encode(content, {useNamedReferences: true});
+    })
+  );
 
-  env.addFilter('jsescape', catchAndLogErrors((content) => {
-    return jsesc(content);
-  }));
+  env.addFilter(
+    'jsescape',
+    catchAndLogErrors((content) => {
+      return jsesc(content);
+    })
+  );
 
-  env.addFilter('format', catchAndLogErrors((str, formatString) => {
-    return moment.tz(str, config.timezone).format(formatString);
-  }));
+  env.addFilter(
+    'format',
+    catchAndLogErrors((str, formatString) => {
+      return moment.tz(str, config.timezone).format(formatString);
+    })
+  );
 
-  env.addFilter('revision', catchAndLogErrors((filename) => {
-    return getRevisionedAssetUrl(filename);
-  }));
+  env.addFilter(
+    'revision',
+    catchAndLogErrors((filename) => {
+      return getRevisionedAssetUrl(filename);
+    })
+  );
 
-  env.addFilter('modulepreload', catchAndLogErrors((entryModule) => {
-    return modulepreload[entryModule].map((importedModule) => {
-      return path.join(config.publicModulesPath, importedModule);
-    });
-  }));
+  env.addFilter(
+    'modulepreload',
+    catchAndLogErrors((entryModule) => {
+      return modulepreload[entryModule].map((importedModule) => {
+        return path.join(config.publicModulesPath, importedModule);
+      });
+    })
+  );
 
   const inlineCache = {};
-  env.addFilter('inline', catchAndLogErrors((fileURL) => {
-    if (!inlineCache[fileURL]) {
-      // Inline from node_modules with the `npm:` prefix,
-      // otherwise inline from the build directory.
-      const assetPath = fileURL.startsWith('npm:') ?
-          resolve.sync(fileURL.slice(4)) :
-          path.join(config.publicDir, fileURL.slice(1));
+  env.addFilter(
+    'inline',
+    catchAndLogErrors((fileURL) => {
+      if (!inlineCache[fileURL]) {
+        // Inline from node_modules with the `npm:` prefix,
+        // otherwise inline from the build directory.
+        const assetPath = fileURL.startsWith('npm:')
+          ? resolve.sync(fileURL.slice(4))
+          : path.join(config.publicDir, fileURL.slice(1));
 
-      inlineCache[fileURL] = fs.readFileSync(assetPath, 'utf-8');
-    }
-    return inlineCache[fileURL];
-  }));
+        inlineCache[fileURL] = fs.readFileSync(assetPath, 'utf-8');
+      }
+      return inlineCache[fileURL];
+    })
+  );
 
-  env.addExtension('Callout', new Shortcode('Callout', (content, type) => {
-    const classes = ['Callout'];
-    if (type) {
-      classes.push(`Callout--${type}`);
-    }
-    return `<div class="${classes.join(' ')}">${
-      renderMarkdown(content.trim(), {highlight: false})
-    }</div>`;
-  }));
+  env.addExtension(
+    'Callout',
+    new Shortcode('Callout', (content, type) => {
+      const classes = ['Callout'];
+      if (type) {
+        classes.push(`Callout--${type}`);
+      }
+      return `<div class="${classes.join(' ')}">${renderMarkdown(
+        content.trim(),
+        {highlight: false}
+      )}</div>`;
+    })
+  );
 };
 
 /**

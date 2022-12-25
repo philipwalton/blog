@@ -2,7 +2,6 @@ import {Route} from 'workbox-routing/Route.js';
 import {NetworkOnly} from 'workbox-strategies/NetworkOnly.js';
 import {BackgroundSyncPlugin} from 'workbox-background-sync/BackgroundSyncPlugin.js';
 
-
 const logMatcher = ({url}) => {
   return url.hostname === location.hostname && url.pathname === '/log';
 };
@@ -13,22 +12,25 @@ const logStrategy = new NetworkOnly({
       maxRetentionTime: 60 * 24 * 4, // Retry for 4 days.
       async onSync({queue}) {
         let entry;
-        while (entry = await queue.shiftRequest()) {
+        while ((entry = await queue.shiftRequest())) {
           const {request} = entry;
           try {
             let firstEventTime;
             const originalBody = await request.clone().text();
-            const body = originalBody.split(/\n/).map((event) => {
-              const params = new URLSearchParams(event);
-              if (!firstEventTime) {
-                const timeOrigin = Number(params.get('epn.time_origin'));
-                const pageTime = Number(params.get('epn.page_time'));
-                firstEventTime = timeOrigin && pageTime &&
-                    Math.round(timeOrigin + pageTime);
-              }
-              params.set('ep.sw_replay', true);
-              return params.toString();
-            }).join('\n');
+            const body = originalBody
+              .split(/\n/)
+              .map((event) => {
+                const params = new URLSearchParams(event);
+                if (!firstEventTime) {
+                  const timeOrigin = Number(params.get('epn.time_origin'));
+                  const pageTime = Number(params.get('epn.page_time'));
+                  firstEventTime =
+                    timeOrigin && pageTime && Math.round(timeOrigin + pageTime);
+                }
+                params.set('ep.sw_replay', true);
+                return params.toString();
+              })
+              .join('\n');
 
             const url = new URL(request.url);
             if (firstEventTime) {

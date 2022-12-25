@@ -1,7 +1,6 @@
 import fs from 'fs-extra';
 import path from 'path';
 
-
 const config = fs.readJSONSync('./config.json');
 
 const getTemplate = (pathname) => {
@@ -18,7 +17,6 @@ const getTemplate = (pathname) => {
   return path.basename(templateFile);
 };
 
-
 export const getOutputFile = (pathname) => {
   if (pathname.endsWith('/')) {
     pathname += 'index.html';
@@ -27,13 +25,13 @@ export const getOutputFile = (pathname) => {
   return path.resolve(path.join(config.publicDir, pathname));
 };
 
-
 const getPartialOutputFile = (outputFile) => {
   const basename = path.basename(outputFile, '.html');
   return path.join(
-      path.dirname(outputFile), `${basename}${config.contentPartialsSuffix}`);
+    path.dirname(outputFile),
+    `${basename}${config.contentPartialsSuffix}`
+  );
 };
-
 
 const getPartialPath = (pathname) => {
   if (pathname.endsWith('/')) {
@@ -45,7 +43,6 @@ const getPartialPath = (pathname) => {
 
   return path.join(dirname, basename + config.contentPartialsSuffix);
 };
-
 
 export const initBook = async () => {
   const book = await fs.readJSON('./book.json');

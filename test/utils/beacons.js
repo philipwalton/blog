@@ -1,7 +1,6 @@
 import {strict as assert} from 'assert';
 import fs from 'fs-extra';
 
-
 const LOG_FILE = 'beacons.log';
 
 /**
@@ -14,8 +13,9 @@ export async function beaconsContain(paramsListOrObj) {
   const beacons = await getBeacons();
   const matches = [];
 
-  const paramsList = Array.isArray(paramsListOrObj) ?
-      paramsListOrObj : [paramsListOrObj];
+  const paramsList = Array.isArray(paramsListOrObj)
+    ? paramsListOrObj
+    : [paramsListOrObj];
 
   for (const beacon of beacons) {
     const params = paramsList[matches.length];
@@ -23,8 +23,10 @@ export async function beaconsContain(paramsListOrObj) {
 
     for (const param of paramsToCheck) {
       const value = params[param];
-      if (value === beacon.get(param) ||
-          value instanceof RegExp && value.test(beacon.get(param))) {
+      if (
+        value === beacon.get(param) ||
+        (value instanceof RegExp && value.test(beacon.get(param)))
+      ) {
         paramsToCheck.delete(param);
       }
     }
@@ -47,39 +49,45 @@ export async function getBeacons(paramsFilter) {
   const log = await fs.readFile(LOG_FILE, 'utf-8');
   let idx = 0;
 
-  const beacons = log.trim().split('\n\n').filter(Boolean).map((payload) => {
-    let [url, ...events] = payload.split('\n');
-    url = new URL(url);
+  const beacons = log
+    .trim()
+    .split('\n\n')
+    .filter(Boolean)
+    .map((payload) => {
+      let [url, ...events] = payload.split('\n');
+      url = new URL(url);
 
-    idx++;
+      idx++;
 
-    if (events.length) {
-      events = events.map((e) => {
-        return new URLSearchParams(url.search + `&${e}&__idx=${idx}`);
-      });
-    } else {
-      events = [new URLSearchParams(url.search + `&__idx=${idx}`)];
-    }
-
-    // Since this function only returns the beacon data,
-    // assert the correct URL is used here.
-    assert.strictEqual(url.origin, 'https://www.google-analytics.com');
-
-    if (url.pathname === '/g/collect') {
-      for (const event of events) {
-        assert.strictEqual(event.get('v'), '2');
+      if (events.length) {
+        events = events.map((e) => {
+          return new URLSearchParams(url.search + `&${e}&__idx=${idx}`);
+        });
+      } else {
+        events = [new URLSearchParams(url.search + `&__idx=${idx}`)];
       }
-    } else if (url.pathname === '/batch' || url.pathname === '/collect') {
-      for (const event of events) {
-        assert.strictEqual(event.get('v'), '1');
-      }
-    } else {
-      throw new Error(
-          `Incorrect Measurement Protocol pathname: ${url.pathname}`);
-    }
 
-    return events;
-  }).flat();
+      // Since this function only returns the beacon data,
+      // assert the correct URL is used here.
+      assert.strictEqual(url.origin, 'https://www.google-analytics.com');
+
+      if (url.pathname === '/g/collect') {
+        for (const event of events) {
+          assert.strictEqual(event.get('v'), '2');
+        }
+      } else if (url.pathname === '/batch' || url.pathname === '/collect') {
+        for (const event of events) {
+          assert.strictEqual(event.get('v'), '1');
+        }
+      } else {
+        throw new Error(
+          `Incorrect Measurement Protocol pathname: ${url.pathname}`
+        );
+      }
+
+      return events;
+    })
+    .flat();
 
   return paramsFilter ? beacons.filter(paramsFilter) : beacons;
 }

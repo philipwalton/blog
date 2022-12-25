@@ -9,7 +9,7 @@ describe('worker', () => {
     worker = await unstable_dev(
       './worker/index.js',
       {},
-      {disableExperimentalWarning: true},
+      {disableExperimentalWarning: true}
     );
   });
 
@@ -47,7 +47,8 @@ describe('worker', () => {
     };
 
     const response = await worker.fetch(
-        '/?h=' + encodeURIComponent(JSON.stringify(mockHeaders)));
+      '/?h=' + encodeURIComponent(JSON.stringify(mockHeaders))
+    );
 
     const serverTiming = response.headers.get('server-timing');
 
@@ -64,27 +65,34 @@ describe('worker', () => {
 
   it('applies redirects for changed URLs', async () => {
     const response = await worker.fetch(
-        '/articles/the-google-analytics-setup-i-use-on-every-site-i-build/');
+      '/articles/the-google-analytics-setup-i-use-on-every-site-i-build/'
+    );
 
     expect(response.redirected).toEqual(true);
     expect(new URL(response.url).pathname).toEqual(
-        '/articles/the-ga-setup-i-use-on-every-site-i-build/');
+      '/articles/the-ga-setup-i-use-on-every-site-i-build/'
+    );
   });
 
   it('applies multiple redirects if needed', async () => {
     const response1 = await worker.fetch(
-        '/articles/the-google-analytics-setup-i-use-on-every-site-i-build');
+      '/articles/the-google-analytics-setup-i-use-on-every-site-i-build'
+    );
 
     expect(response1.redirected).toEqual(true);
     expect(new URL(response1.url).pathname).toEqual(
-        '/articles/the-ga-setup-i-use-on-every-site-i-build/');
+      '/articles/the-ga-setup-i-use-on-every-site-i-build/'
+    );
 
-    const response2 = await worker.fetch('/articles/' +
-        'the-google-analytics-setup-i-use-on-every-site-i-build/index.html');
+    const response2 = await worker.fetch(
+      '/articles/' +
+        'the-google-analytics-setup-i-use-on-every-site-i-build/index.html'
+    );
 
     expect(response2.redirected).toEqual(true);
     expect(new URL(response2.url).pathname).toEqual(
-        '/articles/the-ga-setup-i-use-on-every-site-i-build/');
+      '/articles/the-ga-setup-i-use-on-every-site-i-build/'
+    );
   });
 
   it('preserves the query string while doing redirects', async () => {
@@ -94,7 +102,8 @@ describe('worker', () => {
 
     const redirectedURL = new URL(response.url);
     expect(redirectedURL.href).toEqual(
-        redirectedURL.origin + '/about/?a=1&b=2');
+      redirectedURL.origin + '/about/?a=1&b=2'
+    );
   });
 
   describe('experiments', () => {
@@ -104,14 +113,16 @@ describe('worker', () => {
       });
 
       expect(await a.text()).toMatch(
-          `<script>self.__x='pending_beacon'</script>`);
+        `<script>self.__x='pending_beacon'</script>`
+      );
 
       const b = await worker.fetch('/', {
         headers: {'Cookie': 'xid=.567'},
       });
 
       expect(await b.text()).not.toMatch(
-          `<script>self.__x='pending_beacon'</script>`);
+        `<script>self.__x='pending_beacon'</script>`
+      );
     });
 
     describe('pending_beacon', () => {
@@ -121,14 +132,16 @@ describe('worker', () => {
         });
 
         expect(await a.text()).toMatch(
-            /<meta http-equiv="origin-trial" content="As\/j5g/);
+          /<meta http-equiv="origin-trial" content="As\/j5g/
+        );
 
         const b = await worker.fetch('/', {
           headers: {'Cookie': 'xid=.567'},
         });
 
         expect(await b.text()).not.toMatch(
-            /<meta http-equiv="origin-trial" content="As\/j5g/);
+          /<meta http-equiv="origin-trial" content="As\/j5g/
+        );
       });
     });
   });

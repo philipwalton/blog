@@ -16,8 +16,9 @@ function highlight(code, language) {
     language = language.replace(':no-mark', '');
   }
 
-  code = language ? hljs.highlight(code, {language}).value :
-      // Since we're not using highlight.js here, we need to
+  code = language
+    ? hljs.highlight(code, {language}).value
+    : // Since we're not using highlight.js here, we need to
       // escape the html, but we have to unescape first in order
       // to avoid double escaping.
       he.escape(he.unescape(code));
@@ -28,8 +29,10 @@ function highlight(code, language) {
     code = code.replace(/\*\*(.+)?\*\*/g, '<mark>$1</mark>');
   }
 
-  return `<pre class="Callout">` +
-      `<code class="language-${language}">${code}</code></pre>`;
+  return (
+    `<pre class="Callout">` +
+    `<code class="language-${language}">${code}</code></pre>`
+  );
 }
 
 /**

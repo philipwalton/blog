@@ -11,12 +11,16 @@ function getDB() {
       req.onerror = () => reject(req.error);
       req.onsuccess = () => {
         // Close the connection to make the page eligible for bfcache.
-        addEventListener('pagehide', () => {
-          if (req.result) {
-            req.result.close();
-          }
-          dbPromise = null;
-        }, {once: true, capture: true});
+        addEventListener(
+          'pagehide',
+          () => {
+            if (req.result) {
+              req.result.close();
+            }
+            dbPromise = null;
+          },
+          {once: true, capture: true}
+        );
         resolve(req.result);
       };
     });
@@ -33,7 +37,7 @@ export async function get(key, def) {
   return new Promise((resolve, reject) => {
     const txn = db.transaction('kv-store', 'readonly');
     const req = txn.objectStore('kv-store').get(key);
-    txn.onabort = () => def === undefined ? reject(txn.error) : resolve(def);
+    txn.onabort = () => (def === undefined ? reject(txn.error) : resolve(def));
     txn.oncomplete = () => resolve(req.result !== undefined ? req.result : def);
   });
 }

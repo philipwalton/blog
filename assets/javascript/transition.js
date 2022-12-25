@@ -1,15 +1,19 @@
-export const transition = ($el, timeout,
-    {to, using, from, useTransitions = true} = {}) => {
+export const transition = (
+  $el,
+  timeout,
+  {to, using, from, useTransitions = true} = {}
+) => {
   return new Promise((resolve) => {
-    const change = () => new Promise((resolve) => {
-      requestAnimationFrame(() => {
-        if (to) {
-          $el.classList.add(to);
-        } else if (from) {
-          $el.classList.remove(from);
-        }
+    const change = () =>
+      new Promise(() => {
+        requestAnimationFrame(() => {
+          if (to) {
+            $el.classList.add(to);
+          } else if (from) {
+            $el.classList.remove(from);
+          }
+        });
       });
-    });
 
     if (useTransitions) {
       requestAnimationFrame(() => {

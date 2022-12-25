@@ -5,13 +5,14 @@ export const streamErrorPlugin = {
       // complete. Otherwise the user will see an incomplete response will
       // will look very broken.
 
-      return new Response([
-        `<h3>Error:</h3>`,
-        `<p>There was an error requesting URL: <em>${request.url}</em>.</p>`,
-        `<p>Ensure you're still connected to the internet and not using any `,
-        `plugins (e.g. adblock, ublock) that might block this request.</p>`,
-        `<pre>${error.stack || error}</pre>`,
-        `<script type="module">
+      return new Response(
+        [
+          `<h3>Error:</h3>`,
+          `<p>There was an error requesting URL: <em>${request.url}</em>.</p>`,
+          `<p>Ensure you're still connected to the internet and not using any `,
+          `plugins (e.g. adblock, ublock) that might block this request.</p>`,
+          `<pre>${error.stack || error}</pre>`,
+          `<script type="module">
           if (self.__e) {
             (self.__e.q = self.__e.q || []).push({
               type: 'error',
@@ -27,7 +28,9 @@ export const streamErrorPlugin = {
           }
           updateSW();
         </script>`,
-      ].join(''), {status: 404});
+        ].join(''),
+        {status: 404}
+      );
     }
   },
 };

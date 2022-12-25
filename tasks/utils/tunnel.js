@@ -4,10 +4,7 @@ let subprocess;
 
 export const start = ({verbose = true} = {}) => {
   return new Promise((resolve, reject) => {
-    subprocess = spawn('cloudflared', [
-      'tunnel',
-      'run',
-    ]);
+    subprocess = spawn('cloudflared', ['tunnel', 'run']);
 
     const successLogRegExp = /Connection.+registered/;
 

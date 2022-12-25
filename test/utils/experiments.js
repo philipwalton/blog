@@ -7,7 +7,7 @@ export async function setExperimentCookie(value) {
     name: 'xid',
     value: value,
     path: '/',
-    expiry: Math.floor((Date.now()/1000) + (60 * 60 * 24 * 365)),
+    expiry: Math.floor(Date.now() / 1000 + 60 * 60 * 24 * 365),
     secure: true,
     httpOnly: true,
     sameSite: 'Strict',

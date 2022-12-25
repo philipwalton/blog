@@ -1,6 +1,5 @@
 import {initBook} from '../tasks/utils/book.js';
 
-
 let site;
 let articles;
 

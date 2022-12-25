@@ -4,7 +4,6 @@ import {getStoredMetadata, getAndUpdateMetadata} from './metadata.js';
 import * as precache from './precache.js';
 import * as router from './router.js';
 
-
 let metadataChanges;
 
 precache.init();
@@ -37,10 +36,7 @@ addEventListener('activate', (event) => {
 
     // Run these in parallel so any one of them erroring won't prevent the
     // other ones from finishing.
-    await Promise.all([
-      precache.activate(event),
-      deleteUnusedCaches(),
-    ]);
+    await Promise.all([precache.activate(event), deleteUnusedCaches()]);
   };
   event.waitUntil(activateComplete());
 });

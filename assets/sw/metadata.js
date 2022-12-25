@@ -2,7 +2,6 @@
 
 import {cacheNames} from './caches.js';
 
-
 const META_PATH = '/metadata.json';
 const DEFAULT_VERSION = '0.0.0';
 
@@ -14,16 +13,17 @@ const metadata = {
 export const getStoredMetadata = async () => {
   const cache = await caches.open(cacheNames.META);
   const response = await cache.match(META_PATH);
-  return response ? await response.json() : {
-    version: DEFAULT_VERSION,
-    buildTime: 0,
-  };
+  return response
+    ? await response.json()
+    : {
+        version: DEFAULT_VERSION,
+        buildTime: 0,
+      };
 };
 
 // TODO(philipwalton): at some point it might make sense to expose a route
 // for `/metadata.json` and make it accessible to the window, but until we
 // have a use case lets leave it out.
-
 
 /**
  * Stores the current metadata in the cache.

@@ -7,7 +7,6 @@ import {cacheNames} from '../caches.js';
 import {messageWindows} from '../messenger.js';
 import {streamErrorPlugin} from '../plugins/streamErrorPlugin.js';
 
-
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const broadcastUpdatePlugin = new BroadcastUpdatePlugin({
@@ -20,7 +19,7 @@ const broadcastUpdatePlugin = new BroadcastUpdatePlugin({
 });
 
 const navigationReportPlugin = {
-  async cachedResponseWillBeUsed({cachedResponse, event, request}) {
+  async cachedResponseWillBeUsed({cachedResponse, event}) {
     // Check `event.request` instead of `request` since the latter is a
     // code-generated request for the content partial and is not a
     // navigation request.
@@ -52,9 +51,7 @@ const navigationReportPlugin = {
 const addCacheHeadersPlugin = {
   // Add the `X-Cache-Date` header for requests going to the cache
   async cacheWillUpdate({response}) {
-    if (response.url &&
-        response.ok &&
-        response.status < 400) {
+    if (response.url && response.ok && response.status < 400) {
       return copyResponse(response, (responseInit) => {
         responseInit.headers.set('X-Cache-Date', new Date().toUTCString());
         return responseInit;
@@ -64,8 +61,10 @@ const addCacheHeadersPlugin = {
 };
 
 const contentMatcher = ({url}) => {
-  return url.hostname === location.hostname &&
-      url.pathname.endsWith('index.content.html');
+  return (
+    url.hostname === location.hostname &&
+    url.pathname.endsWith('index.content.html')
+  );
 };
 
 export const contentStrategy = new StaleWhileRevalidate({

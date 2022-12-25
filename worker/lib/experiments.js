@@ -1,15 +1,12 @@
-/* global HTMLRewriter */
-
-// eslint-disable-next-line max-len
-const PENDING_BEACON_TOKEN = 'As/j5gJ50BNvCX2nrZLywnV5VGVEUWwbM5er761RvSNXVPg6VmPy7xufiqm5fRyzcVtuJr4fQwbrs7jDrDyewgAAAABaeyJvcmlnaW4iOiJodHRwczovL3BoaWxpcHdhbHRvbi5jb206NDQzIiwiZmVhdHVyZSI6IlBlbmRpbmdCZWFjb25BUEkiLCJleHBpcnkiOjE2NzgyMzM1OTl9';
+const PENDING_BEACON_TOKEN =
+  // eslint-disable-next-line max-len
+  'As/j5gJ50BNvCX2nrZLywnV5VGVEUWwbM5er761RvSNXVPg6VmPy7xufiqm5fRyzcVtuJr4fQwbrs7jDrDyewgAAAABaeyJvcmlnaW4iOiJodHRwczovL3BoaWxpcHdhbHRvbi5jb206NDQzIiwiZmVhdHVyZSI6IlBlbmRpbmdCZWFjb25BUEkiLCJleHBpcnkiOjE2NzgyMzM1OTl9';
 
 const experiments = {
   pending_beacon: {
     range: [0, 0.5],
-    transform: (res) => {
-      return new HTMLRewriter()
-        .on('head>script:first-of-type', new ExperimentScriptHandler())
-        .transform(res);
+    init: (rewriter) => {
+      rewriter.on('head>script:first-of-type', new ExperimentScriptHandler());
     },
   },
 };
@@ -23,10 +20,13 @@ class ExperimentScriptHandler {
    * @param {Object} element
    */
   element(element) {
-    // eslint-disable-next-line max-len
-    element.before(`<meta http-equiv="origin-trial" content="${PENDING_BEACON_TOKEN}"><script>self.__x='pending_beacon'</script>`, {
-      html: true,
-    });
+    element.before(
+      // eslint-disable-next-line max-len
+      `<meta http-equiv="origin-trial" content="${PENDING_BEACON_TOKEN}"><script>self.__x='pending_beacon'</script>`,
+      {
+        html: true,
+      }
+    );
   }
 }
 
@@ -46,9 +46,9 @@ export function getExperiment(xid) {
 /**
  *
  * @param {string} experiment
- * @param {Response} response
- * @returns {Response}
+ * @param {HTMLRewriter} rewriter
+ * @returns {HTMLRewriter}
  */
-export function applyExperiment(experiment, response) {
-  return experiments[experiment].transform(response);
+export function applyExperiment(experiment, rewriter) {
+  return experiments[experiment].init(rewriter);
 }

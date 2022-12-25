@@ -1,7 +1,6 @@
 import assert from 'assert';
 import fs from 'fs-extra';
 
-
 describe('Service Worker', () => {
   beforeEach(async () => {
     restoreSWVersion();
@@ -27,7 +26,6 @@ describe('Service Worker', () => {
 
     await browser.url('/?v=1');
     await waitUntilControlling();
-
 
     await updateSWVersion('2.0.0');
 
@@ -75,21 +73,22 @@ describe('Service Worker', () => {
   });
 });
 
-
 const originalSWContents = fs.readFileSync('./build/sw.js', 'utf-8');
-const originalSWVersion =
-    JSON.stringify(fs.readJSONSync('./package.json').version);
+const originalSWVersion = JSON.stringify(
+  fs.readJSONSync('./package.json').version
+);
 
 /**
  * @param {string} newVersion
  * @return {Promise<void>}
  */
 async function updateSWVersion(newVersion) {
-  const oldVersion =
-      new RegExp(originalSWVersion.replace(/\./g, '\\.'), ['g']);
+  const oldVersion = new RegExp(originalSWVersion.replace(/\./g, '\\.'), ['g']);
 
-  await fs.outputFile('./build/sw.js',
-      originalSWContents.replace(oldVersion, JSON.stringify(newVersion)));
+  await fs.outputFile(
+    './build/sw.js',
+    originalSWContents.replace(oldVersion, JSON.stringify(newVersion))
+  );
 
   await browser.waitUntil(async () => {
     const match = await browser.executeAsync(async (done) => {
@@ -115,8 +114,9 @@ async function waitUntilControlling() {
   await browser.waitUntil(async () => {
     return await browser.executeAsync(async (done) => {
       const reg = await navigator.serviceWorker.getRegistration();
-      done(reg && reg.active &&
-          reg.active === navigator.serviceWorker.controller);
+      done(
+        reg && reg.active && reg.active === navigator.serviceWorker.controller
+      );
     });
   });
 }

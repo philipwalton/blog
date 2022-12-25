@@ -5,7 +5,7 @@ import {matchesRoute} from './lib/router.js';
 /**
  * @returns {string}
  */
- function createXID() {
+function createXID() {
   return `${Math.random()}`.slice(1, 5) || '.000';
 }
 
@@ -22,14 +22,17 @@ function getXIDFromCookie(cookie) {
  * @param {Response} response
  */
 function setXIDToCookie(xid, response) {
-  response.headers.set('Set-Cookie', [
-    'xid=' + xid,
-    'Path=/',
-    'Max-Age=31536000',
-    'SameSite=Strict',
-    'HttpOnly',
-    'Secure',
-  ].join('; '));
+  response.headers.set(
+    'Set-Cookie',
+    [
+      'xid=' + xid,
+      'Path=/',
+      'Max-Age=31536000',
+      'SameSite=Strict',
+      'HttpOnly',
+      'Secure',
+    ].join('; ')
+  );
 }
 
 /**
@@ -84,10 +87,11 @@ async function handleRequest({request, url, startTime, vars}) {
   setXIDToCookie(xid, clone);
   addServerTimingHeaders(clone, startTime);
 
+  const rewriter = new HTMLRewriter();
   if (experiment) {
-    return applyExperiment(experiment, clone);
+    applyExperiment(experiment, rewriter);
   }
-  return clone;
+  return rewriter.transform(clone);
 }
 
 export default {

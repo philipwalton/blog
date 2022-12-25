@@ -6,7 +6,6 @@ const ALERT_TRANSITION_TIME = 200;
 let alertContainer = null;
 let alertShowing = false;
 
-
 /**
  * Removes all shown alerts.
  */
@@ -24,7 +23,6 @@ const remove = async () => {
 
   alertContainer.removeChild(alert);
 };
-
 
 /**
  * Creates an alert with the passed title and body.
@@ -46,7 +44,6 @@ const createAlert = ({title, body}) => {
   return alert;
 };
 
-
 /**
  * Returns the markup to generate an SVG icon.
  * @param {string} id The icon id from the main icons file.
@@ -57,7 +54,6 @@ const renderIcon = (id) => {
     <use xmlns:xlink="http://www.w3.org/1999/xlink"
          xlink:href="#icon-${id}"></use></svg>`;
 };
-
 
 /**
  * Initializes the alert DOM containers and event handlers to remove
@@ -70,7 +66,9 @@ const init = () => {
   delegate(alertContainer, 'click', '.Alert-close', remove);
   document.body.addEventListener('click', (e) => {
     const insideAlertContainer = !!closest(
-        /** @type {!Element} */ (e.target), '.AlertContainer');
+      /** @type {!Element} */ (e.target),
+      '.AlertContainer'
+    );
     if (!insideAlertContainer) remove();
   });
 

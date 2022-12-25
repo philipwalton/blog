@@ -4,11 +4,9 @@ export const breakpoints = [
   {name: 'lg', media: '(min-width: 48em)'},
 ];
 
-
 // Set a default initially, which will be overridden at `init()` time
 // if anything matches.
 let activeBreakpoint = breakpoints[0];
-
 
 /**
  * A callback for each MediaQueryList that handles detecting the active
@@ -21,7 +19,6 @@ function handleChanges() {
     }
   }
 }
-
 
 /**
  * Initializes listening for changes to breakpoints as well as determining the
@@ -36,7 +33,6 @@ export function init() {
     }
   }
 }
-
 
 /**
  * @return {!Object} The currently active breakpoint.

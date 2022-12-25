@@ -6,7 +6,6 @@ const MESSAGE_TRANSITION_TIME = 200;
 const messages = new Map();
 let messageContainer = null;
 
-
 /**
  * Runs a message's action callback
  * @param {!Event} evt
@@ -42,7 +41,6 @@ const remove = async (evt, delegateTarget) => {
   message.parentNode.removeChild(message);
 };
 
-
 /**
  * Creates an message with the passed title and body.
  * @param {{title: (string), body: (string)}} arg1
@@ -60,7 +58,6 @@ const createMessage = ({body, action}) => {
   return message;
 };
 
-
 /**
  * Returns the markup to generate an SVG icon.
  * @param {string} id The icon id from the main icons file.
@@ -71,7 +68,6 @@ const renderIcon = (id) => {
     <use xmlns:xlink="http://www.w3.org/1999/xlink"
          xlink:href="#icon-${id}"></use></svg>`;
 };
-
 
 /**
  * Initializes the message DOM containers and event handlers to remove
@@ -115,7 +111,6 @@ export const add = async ({body, action, onAction, onDismiss}) => {
     useTransitions: true,
   });
 };
-
 
 export const isShowing = () => {
   return messages.size > 0;

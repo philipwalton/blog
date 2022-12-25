@@ -5,8 +5,11 @@ import {initBook} from './utils/book.js';
 import {ENV} from './utils/env.js';
 import {processHtml} from './utils/html.js';
 import {renderMarkdown} from './utils/markdown.js';
-import {initTemplates, renderTemplate, renderTemplateString} from './utils/templates.js';
-
+import {
+  initTemplates,
+  renderTemplate,
+  renderTemplateString,
+} from './utils/templates.js';
 
 const config = fs.readJSONSync('./config.json');
 let book;
@@ -20,8 +23,10 @@ const renderArticleContentPartials = async () => {
       layout: 'partial.html',
     };
 
-    const markdown =
-        await fs.readFile(`${article.path.slice(1, -1)}.md`, 'utf-8');
+    const markdown = await fs.readFile(
+      `${article.path.slice(1, -1)}.md`,
+      'utf-8'
+    );
 
     article.markup = renderMarkdown(await renderTemplateString(markdown, data));
     article.content = await renderTemplate(article.template, data);
@@ -114,12 +119,12 @@ const buildShell = async () => {
   const [shellStart, shellEnd] = processedHtml.split(SHELL_SPLIT_POINT);
 
   await fs.outputFile(
-      path.join(config.publicDir, 'shell-start.html'), shellStart);
+    path.join(config.publicDir, 'shell-start.html'),
+    shellStart
+  );
 
-  await fs.outputFile(
-      path.join(config.publicDir, 'shell-end.html'), shellEnd);
+  await fs.outputFile(path.join(config.publicDir, 'shell-end.html'), shellEnd);
 };
-
 
 gulp.task('content', async () => {
   try {
@@ -131,7 +136,6 @@ gulp.task('content', async () => {
 
     await renderPageContentPartials();
     await buildPages();
-
 
     await buildShell();
     await buildResources();

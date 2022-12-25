@@ -1,7 +1,6 @@
 import History2 from './history2';
 import {now} from './utils/performance';
 
-
 let history2;
 
 const CONTENT_SUFFIX = '.content.html';
@@ -49,9 +48,10 @@ const fetchPageContent = async (pathname) => {
 
     return content;
   } catch (err) {
-    const message = (err instanceof TypeError) ?
-        `Check your network connection to ensure you're still online.` :
-        err.message;
+    const message =
+      err instanceof TypeError
+        ? `Check your network connection to ensure you're still online.`
+        : err.message;
 
     const alerts = await import('./alerts');
     alerts.add({
@@ -63,7 +63,6 @@ const fetchPageContent = async (pathname) => {
     throw err;
   }
 };
-
 
 /**
  * Update the <main> element with the new content and set the new title.
@@ -93,7 +92,6 @@ const executeContainerScripts = () => {
   }
 };
 
-
 /**
  * Sets the scroll position of the main document to the top of the page or
  * to the position of an element if a hash fragment is passed.
@@ -109,7 +107,6 @@ const setScroll = (hash) => {
   window.scrollTo(0, scrollPos);
 };
 
-
 /**
  * Updates log to reflect the current page.
  * @param {string} pathname
@@ -123,7 +120,6 @@ const trackPageview = async (pathname) => {
     visibility_state: document.visibilityState,
   });
 };
-
 
 /**
  * Loads a page partial for the passed pathname and updates the content.

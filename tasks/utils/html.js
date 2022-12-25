@@ -1,7 +1,6 @@
 import htmlMinifier from 'html-minifier';
 import {ENV} from './env.js';
 
-
 const minifyHtml = (html) => {
   const opts = {
     removeComments: true,
@@ -17,7 +16,6 @@ const minifyHtml = (html) => {
 
   return htmlMinifier.minify(html, opts);
 };
-
 
 export const processHtml = (html) => {
   return ENV === 'development' ? html : minifyHtml(html);

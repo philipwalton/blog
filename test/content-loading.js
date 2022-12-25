@@ -5,7 +5,6 @@ let site;
 let articles;
 let pages;
 
-
 describe('The content loader', async () => {
   before(async () => {
     const book = await initBook();
@@ -33,8 +32,8 @@ describe('The content loader', async () => {
     });
 
     // Don't use an arrow function since this is eval'ed in test browsers.
-    await browser.execute(function() {
-      return window.__INITIAL_PAGE_LOAD__ = true;
+    await browser.execute(function () {
+      return (window.__INITIAL_PAGE_LOAD__ = true);
     });
   });
 
@@ -45,8 +44,10 @@ describe('The content loader', async () => {
     await browser.waitUntil(async () => {
       const title = await browser.getTitle();
       const urlPath = await getUrlPath();
-      return title == articles[0].title + site.titleSuffix &&
-          urlPath == articles[0].path;
+      return (
+        title == articles[0].title + site.titleSuffix &&
+        urlPath == articles[0].path
+      );
     });
 
     await assertIsInitialPageLoad();
@@ -77,8 +78,10 @@ describe('The content loader', async () => {
     await browser.waitUntil(async () => {
       const title = await browser.getTitle();
       const urlPath = await getUrlPath();
-      return title == articles[0].title + site.titleSuffix &&
-          urlPath == articles[0].path;
+      return (
+        title == articles[0].title + site.titleSuffix &&
+        urlPath == articles[0].path
+      );
     });
 
     // Navigates to a page.
@@ -87,8 +90,9 @@ describe('The content loader', async () => {
     await browser.waitUntil(async () => {
       const title = await browser.getTitle();
       const urlPath = await getUrlPath();
-      return title == pages[2].title + site.titleSuffix &&
-          urlPath == pages[2].path;
+      return (
+        title == pages[2].title + site.titleSuffix && urlPath == pages[2].path
+      );
     });
 
     // Navigates back to the article.
@@ -96,8 +100,10 @@ describe('The content loader', async () => {
     await browser.waitUntil(async () => {
       const title = await browser.getTitle();
       const urlPath = await getUrlPath();
-      return title == articles[0].title + site.titleSuffix &&
-          urlPath == articles[0].path;
+      return (
+        title == articles[0].title + site.titleSuffix &&
+        urlPath == articles[0].path
+      );
     });
 
     // Navigates back home.
@@ -105,8 +111,9 @@ describe('The content loader', async () => {
     await browser.waitUntil(async () => {
       const title = await browser.getTitle();
       const urlPath = await getUrlPath();
-      return title == pages[0].title + site.titleSuffix &&
-          urlPath == pages[0].path;
+      return (
+        title == pages[0].title + site.titleSuffix && urlPath == pages[0].path
+      );
     });
 
     // Navigates forward to the article.
@@ -114,8 +121,10 @@ describe('The content loader', async () => {
     await browser.waitUntil(async () => {
       const title = await browser.getTitle();
       const urlPath = await getUrlPath();
-      return title == articles[0].title + site.titleSuffix &&
-          urlPath == articles[0].path;
+      return (
+        title == articles[0].title + site.titleSuffix &&
+        urlPath == articles[0].path
+      );
     });
 
     // Navigates forward to the page.
@@ -123,8 +132,9 @@ describe('The content loader', async () => {
     await browser.waitUntil(async () => {
       const title = await browser.getTitle();
       const urlPath = await getUrlPath();
-      return title == pages[2].title + site.titleSuffix &&
-          urlPath == pages[2].path;
+      return (
+        title == pages[2].title + site.titleSuffix && urlPath == pages[2].path
+      );
     });
 
     await assertIsInitialPageLoad();
@@ -143,7 +153,7 @@ describe('The content loader', async () => {
   it('should jump to an anchor for URLs with hash fragments', async () => {
     // Adds a hash fragments to an article URL.
     // Don't use an arrow function since this is eval'ed in test browsers.
-    await browser.execute(function() {
+    await browser.execute(function () {
       document.querySelector('.ArticleList-item:last-child a').href += '#share';
     });
 
@@ -157,19 +167,17 @@ describe('The content loader', async () => {
   });
 });
 
-
 /**
  * Asserts that the browser hasn't reloaded the page since the test started.
  */
 async function assertIsInitialPageLoad() {
   // Don't use an arrow function since this is eval'ed in test browsers.
-  const isInitialPageLoad = await browser.execute(function() {
+  const isInitialPageLoad = await browser.execute(function () {
     return window.__INITIAL_PAGE_LOAD__;
   });
 
   assert(isInitialPageLoad);
 }
-
 
 /**
  * Gets the URL path for the given page.

@@ -7,20 +7,16 @@ import {now, timeOrigin} from './utils/performance';
 import {round} from './utils/round.js';
 import {uuid} from './utils/uuid';
 
-
 // Bump this version any time the cloud function logic changes
 // in a backward-incompatible way.
 const LOG_VERSION = 3;
 
-
 const SESSION_TIMEOUT = 1000 * 60 * 30; // 30 minutes.
-
 
 // const SEND_TIMEOUT = self.__ENV__ === 'production' ? 5000 : 1000;
 // const SEND_TIMEOUT = 60 * 1000;
 
 let index = 1;
-
 
 /**
  * A class to manage building and sending analytics hits to the `/log` route.
@@ -123,7 +119,7 @@ export class Logger {
 
     if (this._state === 'active') {
       const time = Math.round(now());
-      engagedTime += (time - this._lastActiveTime);
+      engagedTime += time - this._lastActiveTime;
       this._lastActiveTime = time;
     }
     return engagedTime;
@@ -201,10 +197,11 @@ export class Logger {
     // this._dedupeEvents(eventID, params);
 
     const data =
-        toQueryString(this._pageParams) + '&' +
-        toQueryString(this._userParams) + '\n' +
-        [...this._eventQueue.values()].map(
-              (ep) => toQueryString(ep)).join('\n');
+      toQueryString(this._pageParams) +
+      '&' +
+      toQueryString(this._userParams) +
+      '\n' +
+      [...this._eventQueue.values()].map((ep) => toQueryString(ep)).join('\n');
 
     this._beacon.setData(data);
 
@@ -252,7 +249,7 @@ export class Logger {
   /**
    * @return {Promise<void>}
    */
-  async _updateSessionInfo(isInitialLoad) {
+  async _updateSessionInfo() {
     const time = Date.now();
 
     let seg = 0;
@@ -311,11 +308,10 @@ function prefixParams(initialLetter, unprefixedParams) {
   for (const [key, value] of Object.entries(unprefixedParams)) {
     const prefix = initialLetter + (typeof value === 'number' ? 'pn.' : 'p.');
     prefixedParams[prefix + key] =
-        typeof value === 'number' ? round(value, 3) : value;
+      typeof value === 'number' ? round(value, 3) : value;
   }
   return prefixedParams;
 }
-
 
 /**
  * Accepts and object of param/value pairs and returns a query string
@@ -324,14 +320,16 @@ function prefixParams(initialLetter, unprefixedParams) {
  * @return {string}
  */
 function toQueryString(params) {
-  return Object.keys(params).filter((key) => {
-    // Filter out, null, undefined, and empty strings, but keep zeros.
-    return params[key] || params[key] === 0;
-  }).map((key) => {
-    return `${key}=${encodeURIComponent(params[key])}`;
-  }).join('&');
+  return Object.keys(params)
+    .filter((key) => {
+      // Filter out, null, undefined, and empty strings, but keep zeros.
+      return params[key] || params[key] === 0;
+    })
+    .map((key) => {
+      return `${key}=${encodeURIComponent(params[key])}`;
+    })
+    .join('&');
 }
-
 
 /**
  * @return {Promise<string>}
@@ -350,8 +348,9 @@ function getReferrer() {
  * @return {string}
  */
 function getEffectiveConnectionType() {
-  return navigator.connection &&
-      navigator.connection.effectiveType || '(unknown)';
+  return (
+    (navigator.connection && navigator.connection.effectiveType) || '(unknown)'
+  );
 }
 
 /**
@@ -378,9 +377,11 @@ function getPixelDensity() {
  * @return {string}
  */
 function getColorSchemePreference() {
-  return window.matchMedia('(prefers-color-scheme: light)').matches ?
-      'light' : window.matchMedia('(prefers-color-scheme: dark)').matches ?
-        'dark' : 'no-preference';
+  return window.matchMedia('(prefers-color-scheme: light)').matches
+    ? 'light'
+    : window.matchMedia('(prefers-color-scheme: dark)').matches
+    ? 'dark'
+    : 'no-preference';
 }
 
 /**
@@ -388,8 +389,9 @@ function getColorSchemePreference() {
  * @return {string}
  */
 function getReducedDataPreference() {
-  return window.matchMedia('(prefers-reduced-data: reduce)').matches ?
-      'reduce' : 'no-preference';
+  return window.matchMedia('(prefers-reduced-data: reduce)').matches
+    ? 'reduce'
+    : 'no-preference';
 }
 
 /**
@@ -397,8 +399,9 @@ function getReducedDataPreference() {
  * @return {string}
  */
 function getReducedMotionPref() {
-  return window.matchMedia('(prefers-reduced-motion: reduce)').matches ?
-      'reduce' : 'no-preference';
+  return window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    ? 'reduce'
+    : 'no-preference';
 }
 
 /**
@@ -406,7 +409,9 @@ function getReducedMotionPref() {
  * @return {string}
  */
 function getContrastPreference() {
-  return window.matchMedia('(prefers-contrast: more)').matches ?
-      'more' : window.matchMedia('(prefers-contrast: less)').matches ?
-          'less' : 'no-preference';
+  return window.matchMedia('(prefers-contrast: more)').matches
+    ? 'more'
+    : window.matchMedia('(prefers-contrast: less)').matches
+    ? 'less'
+    : 'no-preference';
 }

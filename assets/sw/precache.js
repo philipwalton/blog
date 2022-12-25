@@ -6,7 +6,6 @@ import {CacheFirst} from 'workbox-strategies/CacheFirst.js';
 import {cacheNames} from './caches.js';
 import {streamErrorPlugin} from './plugins/streamErrorPlugin.js';
 
-
 const pc = new PrecacheController({
   cacheName: cacheNames.SHELL,
 });
@@ -19,7 +18,6 @@ const cacheFirst = new CacheFirst({
   cacheName: cacheNames.SHELL,
   plugins: [streamErrorPlugin],
 });
-
 
 export const precacheHandler = ({request, event}) => {
   const cacheKey = pc.getCacheKeyForURL(request.url);

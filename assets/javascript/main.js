@@ -2,7 +2,6 @@ import * as breakpoints from './breakpoints';
 import * as contentLoader from './content-loader';
 import * as sw from './sw-init';
 
-
 const initServiceWorker = async () => {
   if ('serviceWorker' in navigator) {
     try {

@@ -3,13 +3,11 @@ import {loadPage} from './content-loader';
 import {initialSWState} from './sw-state';
 import {disableLoader} from './content-loader';
 
-
 // Defining a Workbox instance has no side effects, so it's OK to do it
 // here in the top-level scope.
 let wb;
 
 const MESSAGE_TIMEOUT = 5000;
-
 
 // A promise that resolves when the navigation report is received.
 // NOTE: this needs to be here because the `message` event listener needs
@@ -24,7 +22,6 @@ const addNavigationReportListener = () => {
     });
   });
 };
-
 
 const setSiteVersionOrTimeout = async () => {
   const {log} = await import('./log');
@@ -44,7 +41,6 @@ const setSiteVersionOrTimeout = async () => {
     log.set({site_version: version});
   }
 };
-
 
 const setContentSourceOrTimeout = async () => {
   const {log} = await import('./log');
@@ -68,7 +64,6 @@ const setContentSourceOrTimeout = async () => {
     log.set({content_source: cacheHit ? 'cache' : 'network'});
   }
 };
-
 
 /**
  * Accepts a payload of data from the SW, processes the data, and returns
@@ -104,7 +99,6 @@ const processMetadata = (payload = {}) => {
   }
 };
 
-
 const addInstallListener = () => {
   wb.addEventListener('installed', (event) => {
     // `isUpdate` means this is not the first install.
@@ -127,7 +121,6 @@ const addInstallListener = () => {
   });
 };
 
-
 const addCacheUpdateListener = () => {
   // Listen for cache update messages and swap out the content.
   // TODO(philipwalton): consider whether this is the best UX.
@@ -147,7 +140,6 @@ const addCacheUpdateListener = () => {
     }
   });
 };
-
 
 const addSWUpdateListener = () => {
   wb.addEventListener('message', async ({data}) => {
@@ -208,7 +200,6 @@ const addSWUpdateListener = () => {
     }
   });
 };
-
 
 export const init = async () => {
   // Instantiating the Workbox instance adds an event listener to

@@ -5,7 +5,6 @@ import {createPagesRoute} from './routes/pages.js';
 import {createStaticAssetsRoute} from './routes/static-assets.js';
 import {createLogRoute} from './routes/log.js';
 
-
 // Order matters. Earlier routes are tried first.
 const precacheRoutes = {
   createPrecacheRoute,

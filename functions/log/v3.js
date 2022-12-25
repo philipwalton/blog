@@ -10,11 +10,9 @@ import {GA4_MEASUREMENT_ID} from '../constants.js';
 export async function v3(request) {
   const [paramsLine, ...eventsLines] = request.body.split('\n');
 
-  const queryParams = new URLSearchParams([
-    `v=2`,
-    `tid=${GA4_MEASUREMENT_ID}`,
-    paramsLine,
-  ].join('&'));
+  const queryParams = new URLSearchParams(
+    [`v=2`, `tid=${GA4_MEASUREMENT_ID}`, paramsLine].join('&')
+  );
 
   // Set the `_uip` param to the IP address of the user.
   if (request.ip) {
@@ -22,20 +20,23 @@ export async function v3(request) {
   }
 
   const uaURL = 'https://www.google-analytics.com/batch';
-  const uaBody = eventsLines.map((eventParams) => {
-    const params = new URLSearchParams(queryParams + '&' + eventParams);
-    convertGA4ParamsToUA(params);
-    return params.toString();
-  }).join('\n');
+  const uaBody = eventsLines
+    .map((eventParams) => {
+      const params = new URLSearchParams(queryParams + '&' + eventParams);
+      convertGA4ParamsToUA(params);
+      return params.toString();
+    })
+    .join('\n');
 
   // If the query params contain _ss or _fv and one of the events is a
   // page view, split it out into two separate requests.
   const newSessionPageviewEvent =
-      (queryParams.has('_ss') || queryParams.has('_fv')) &&
-      eventsLines.find((line) => line.trim().startsWith('en=page_view'));
+    (queryParams.has('_ss') || queryParams.has('_fv')) &&
+    eventsLines.find((line) => line.trim().startsWith('en=page_view'));
 
-  const newSessionParams = newSessionPageviewEvent &&
-      new URLSearchParams(`${queryParams}&${newSessionPageviewEvent}`);
+  const newSessionParams =
+    newSessionPageviewEvent &&
+    new URLSearchParams(`${queryParams}&${newSessionPageviewEvent}`);
 
   if (newSessionPageviewEvent) {
     queryParams.delete('_fv');
@@ -43,12 +44,12 @@ export async function v3(request) {
     eventsLines.splice(eventsLines.indexOf(newSessionPageviewEvent), 1);
   }
 
-  const ga4SessionURL = newSessionParams &&
-      'https://www.google-analytics.com/g/collect?' + newSessionParams;
+  const ga4SessionURL =
+    newSessionParams &&
+    'https://www.google-analytics.com/g/collect?' + newSessionParams;
 
   const ga4URL = 'https://www.google-analytics.com/g/collect?' + queryParams;
   const ga4Body = eventsLines.join('\n');
-
 
   /**
    * @param {string} url

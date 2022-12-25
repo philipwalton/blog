@@ -4,8 +4,9 @@ import {CacheFirst} from 'workbox-strategies/CacheFirst.js';
 import {cacheNames} from '../caches.js';
 
 const staticAssetsMatcher = ({url}) => {
-  return url.hostname === location.hostname &&
-      url.pathname.startsWith('/static/');
+  return (
+    url.hostname === location.hostname && url.pathname.startsWith('/static/')
+  );
 };
 
 const staticAssetsStrategy = new CacheFirst({

@@ -8,11 +8,7 @@ import './images.js';
 import './javascript.js';
 import './sw.js';
 
-
-gulp.task('build', gulp.series(
-    'clean',
-    'images',
-    'css',
-    'javascript',
-    'content',
-    'sw'));
+gulp.task(
+  'build',
+  gulp.series('clean', 'images', 'css', 'javascript', 'content', 'sw')
+);

@@ -1,4 +1,11 @@
-import {onCLS, onFCP, onFID, onINP, onLCP, onTTFB} from 'web-vitals/attribution';
+import {
+  onCLS,
+  onFCP,
+  onFID,
+  onINP,
+  onLCP,
+  onTTFB,
+} from 'web-vitals/attribution';
 import {Logger} from './Logger';
 import {initialSWState} from './sw-state';
 import {now, timeOrigin} from './utils/performance';
@@ -20,7 +27,6 @@ const MEASUREMENT_VERSION = 91;
 const PAGE_ID = uuid(timeOrigin);
 
 const originalPathname = location.pathname;
-
 
 const longTasks = [];
 
@@ -59,14 +65,12 @@ const getLTT = (start, end) => {
   return ltt;
 };
 
-
 export const log = new Logger((params) => {
   return {
     page_time: now(),
     event_id: params.event_id || uuid(),
   };
 });
-
 
 /**
  * Initializes all the analytics setup. Creates trackers and sets initial
@@ -111,7 +115,7 @@ const setInitialParams = () => {
 
   const navigationEntry = performance.getEntriesByType('navigation')[0];
   if (navigationEntry) {
-     // Use kebab case.
+    // Use kebab case.
     let navigationType = navigationEntry.type.replace(/_/g, '-');
 
     if (document.prerendering || navigationEntry.activationStart > 0) {
@@ -130,19 +134,22 @@ let pageshowCount = 1;
 const trackPageviews = () => {
   log.event('page_view', {visibility_state: document.visibilityState});
 
-  addEventListener('pageshow', (event) => {
-    if (event.persisted) {
-      pageshowCount++;
+  addEventListener(
+    'pageshow',
+    (event) => {
+      if (event.persisted) {
+        pageshowCount++;
 
-      log.set({
-        navigation_type: 'back-forward-cache',
-        pageshow_count: pageshowCount,
-      });
-      log.event('page_view', {visibility_state: document.visibilityState});
-    }
-  }, true);
+        log.set({
+          navigation_type: 'back-forward-cache',
+          pageshow_count: pageshowCount,
+        });
+        log.event('page_view', {visibility_state: document.visibilityState});
+      }
+    },
+    true
+  );
 };
-
 
 /**
  * Tracks a JavaScript error with optional fields object overrides.
@@ -155,12 +162,17 @@ const trackPageviews = () => {
  * @param {ParamOverrides=} paramOverrides
  */
 export const trackError = (err = {}, paramOverrides = {}) => {
-  log.event('error', Object.assign({
-    error_name: err.name || '(no error name)',
-    error_message: `${err.stack || err.message || '(no stack trace)'}`,
-  }, paramOverrides));
+  log.event(
+    'error',
+    Object.assign(
+      {
+        error_name: err.name || '(no error name)',
+        error_message: `${err.stack || err.message || '(no stack trace)'}`,
+      },
+      paramOverrides
+    )
+  );
 };
-
 
 /**
  * Tracks any errors that may have occurred on the page prior to analytics being
@@ -169,7 +181,7 @@ export const trackError = (err = {}, paramOverrides = {}) => {
 const trackErrors = () => {
   // Errors that have occurred prior to this script running are stored on
   // `window.__e.q`, as specified in `index.html`.
-  const loadErrorEvents = window.__e && window.__e.q || [];
+  const loadErrorEvents = (window.__e && window.__e.q) || [];
 
   const trackErrorEvent = (event) => {
     // Some browsers don't have an error property, so we fake it.
@@ -194,124 +206,145 @@ const trackErrors = () => {
 };
 
 const trackCLS = async () => {
-  onCLS((metric) => {
-    log.event(metric.name, {
-      value: metric.delta,
-      metric_rating: metric.rating,
-      metric_value: metric.value,
-      debug_target: metric.attribution.largestShiftTarget ?
-          metric.attribution.largestShiftTarget : '(not set)',
-      event_id: metric.id,
-    });
-  }, {reportAllChanges: true});
+  onCLS(
+    (metric) => {
+      log.event(metric.name, {
+        value: metric.delta,
+        metric_rating: metric.rating,
+        metric_value: metric.value,
+        debug_target: metric.attribution.largestShiftTarget
+          ? metric.attribution.largestShiftTarget
+          : '(not set)',
+        event_id: metric.id,
+      });
+    },
+    {reportAllChanges: true}
+  );
 };
 
 const trackFCP = async () => {
-  onFCP((metric) => {
-    log.event(metric.name, {
-      value: metric.delta,
-      metric_rating: metric.rating,
-      metric_value: metric.value,
-      original_page_path: originalPathname,
-      debug_ttfb: metric.attribution.timeToFirstByte,
-      debug_fb2fcp: metric.attribution.firstByteToFCP,
-      event_id: metric.id,
-    });
-  }, {reportAllChanges: true});
+  onFCP(
+    (metric) => {
+      log.event(metric.name, {
+        value: metric.delta,
+        metric_rating: metric.rating,
+        metric_value: metric.value,
+        original_page_path: originalPathname,
+        debug_ttfb: metric.attribution.timeToFirstByte,
+        debug_fb2fcp: metric.attribution.firstByteToFCP,
+        event_id: metric.id,
+      });
+    },
+    {reportAllChanges: true}
+  );
 };
 
 const trackFID = async () => {
-  onFID((metric) => {
-    log.event(metric.name, {
-      value: metric.delta,
-      metric_rating: metric.rating,
-      metric_value: metric.value,
-      debug_target: metric.attribution.eventTarget || '(not set)',
-      debug_event: metric.attribution.eventType,
-      debug_time: metric.attribution.eventTime,
-      event_id: metric.id,
-    });
-  }, {reportAllChanges: true});
+  onFID(
+    (metric) => {
+      log.event(metric.name, {
+        value: metric.delta,
+        metric_rating: metric.rating,
+        metric_value: metric.value,
+        debug_target: metric.attribution.eventTarget || '(not set)',
+        debug_event: metric.attribution.eventType,
+        debug_time: metric.attribution.eventTime,
+        event_id: metric.id,
+      });
+    },
+    {reportAllChanges: true}
+  );
 };
 
 const trackINP = async () => {
-  onINP((metric) => {
-    const entry = metric.attribution.eventEntry;
+  onINP(
+    (metric) => {
+      const entry = metric.attribution.eventEntry;
 
-    log.event(metric.name, {
-      value: metric.delta,
-      metric_rating: metric.rating,
-      metric_value: metric.value,
-      debug_target: metric.attribution.eventTarget || '(not set)',
-      debug_event: metric.attribution.eventType,
-      debug_time: metric.attribution.eventTime,
-      debug_delay: entry && (entry.processingStart - entry.startTime),
-      debug_processing: entry && (entry.processingEnd - entry.processingStart),
-      debug_presentation: entry &&
-          ((entry.startTime + metric.value) - entry.processingEnd),
-      event_id: metric.id,
-    });
-  }, {durationThreshold: 16, reportAllChanges: true});
+      log.event(metric.name, {
+        value: metric.delta,
+        metric_rating: metric.rating,
+        metric_value: metric.value,
+        debug_target: metric.attribution.eventTarget || '(not set)',
+        debug_event: metric.attribution.eventType,
+        debug_time: metric.attribution.eventTime,
+        debug_delay: entry && entry.processingStart - entry.startTime,
+        debug_processing: entry && entry.processingEnd - entry.processingStart,
+        debug_presentation:
+          entry && entry.startTime + metric.value - entry.processingEnd,
+        event_id: metric.id,
+      });
+    },
+    {durationThreshold: 16, reportAllChanges: true}
+  );
 };
 
 const trackLCP = async () => {
-  onLCP((metric) => {
-    log.event(metric.name, {
-      value: metric.delta,
-      metric_rating: metric.rating,
-      metric_value: metric.value,
-      debug_target: metric.attribution.element || '(not set)',
-      debug_url: metric.attribution.url,
-      debug_ttfb: metric.attribution.timeToFirstByte,
-      debug_rld: metric.attribution.resourceLoadDelay,
-      debug_rlt: metric.attribution.resourceLoadTime,
-      debug_erd: metric.attribution.elementRenderDelay,
-      debug_tbt: getTBT(0, metric.value),
-      debug_rbt: getLTT(metric.value - metric.attribution.elementRenderDelay,
-          metric.value),
-      event_id: metric.id,
-    });
-  }, {reportAllChanges: true});
+  onLCP(
+    (metric) => {
+      log.event(metric.name, {
+        value: metric.delta,
+        metric_rating: metric.rating,
+        metric_value: metric.value,
+        debug_target: metric.attribution.element || '(not set)',
+        debug_url: metric.attribution.url,
+        debug_ttfb: metric.attribution.timeToFirstByte,
+        debug_rld: metric.attribution.resourceLoadDelay,
+        debug_rlt: metric.attribution.resourceLoadTime,
+        debug_erd: metric.attribution.elementRenderDelay,
+        debug_tbt: getTBT(0, metric.value),
+        debug_rbt: getLTT(
+          metric.value - metric.attribution.elementRenderDelay,
+          metric.value
+        ),
+        event_id: metric.id,
+      });
+    },
+    {reportAllChanges: true}
+  );
 };
 
 const trackTTFB = () => {
-  onTTFB((metric) => {
-    const params = {
-      value: metric.delta,
-      metric_value: metric.value,
-      metric_rating: metric.rating,
-      event_id: metric.id,
-    };
+  onTTFB(
+    (metric) => {
+      const params = {
+        value: metric.delta,
+        metric_value: metric.value,
+        metric_rating: metric.rating,
+        event_id: metric.id,
+      };
 
-    const {navigationEntry} = metric.attribution;
-    if (navigationEntry) {
-      Object.assign(params, {
-        fetch_start: navigationEntry.fetchStart,
-        domain_lookup_start: navigationEntry.domainLookupStart,
-        domain_lookup_end: navigationEntry.domainLookupEnd,
-        connect_start: navigationEntry.connectStart,
-        connect_end: navigationEntry.connectEnd,
-        request_start: navigationEntry.requestStart,
-        response_start: navigationEntry.responseStart,
-        response_end: navigationEntry.responseEnd,
-        dom_load_end: navigationEntry.domContentLoadedEventEnd,
-        window_load_end: navigationEntry.loadEventEnd,
-      });
-    }
-
-    if (initialSWState === 'controlled' && 'workerStart' in navigationEntry) {
-      params.worker_start = navigationEntry.workerStart;
-    }
-
-    if (navigationEntry.activationStart > 0) {
-      params.activation_start = navigationEntry.activationStart;
-    }
-
-    if (Array.isArray(navigationEntry.serverTiming)) {
-      for (const {name, description} of navigationEntry.serverTiming) {
-        params[name] = description;
+      const {navigationEntry} = metric.attribution;
+      if (navigationEntry) {
+        Object.assign(params, {
+          fetch_start: navigationEntry.fetchStart,
+          domain_lookup_start: navigationEntry.domainLookupStart,
+          domain_lookup_end: navigationEntry.domainLookupEnd,
+          connect_start: navigationEntry.connectStart,
+          connect_end: navigationEntry.connectEnd,
+          request_start: navigationEntry.requestStart,
+          response_start: navigationEntry.responseStart,
+          response_end: navigationEntry.responseEnd,
+          dom_load_end: navigationEntry.domContentLoadedEventEnd,
+          window_load_end: navigationEntry.loadEventEnd,
+        });
       }
-    }
-    log.event(metric.name, params);
-  }, {reportAllChanges: true});
+
+      if (initialSWState === 'controlled' && 'workerStart' in navigationEntry) {
+        params.worker_start = navigationEntry.workerStart;
+      }
+
+      if (navigationEntry.activationStart > 0) {
+        params.activation_start = navigationEntry.activationStart;
+      }
+
+      if (Array.isArray(navigationEntry.serverTiming)) {
+        for (const {name, description} of navigationEntry.serverTiming) {
+          params[name] = description;
+        }
+      }
+      log.event(metric.name, params);
+    },
+    {reportAllChanges: true}
+  );
 };

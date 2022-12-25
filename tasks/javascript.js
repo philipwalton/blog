@@ -11,7 +11,6 @@ import {checkDuplicatesPlugin} from './utils/check-duplicates-plugin.js';
 import {ENV} from './utils/env.js';
 import {dimensions, metrics} from '../functions/constants.js';
 
-
 const config = fs.readJSONSync('./config.json');
 
 // Set global variables to be replaced in the source files.
@@ -47,8 +46,10 @@ const modulepreloadPlugin = () => {
       }
 
       fs.outputJsonSync(
-          path.join(config.publicDir, 'modulepreload.json'),
-          modulepreloadMap, {spaces: 2});
+        path.join(config.publicDir, 'modulepreload.json'),
+        modulepreloadMap,
+        {spaces: 2}
+      );
     },
   };
 };
@@ -66,12 +67,14 @@ const reportBundleSizePlugin = () => {
         const chunkSize = gzipSizeSync(chunkInfo.code);
         bundleSize += chunkSize;
         console.log(
-            chalk.magenta(String(chunkSize).padStart(6)),
-            chalk.gray(filename));
+          chalk.magenta(String(chunkSize).padStart(6)),
+          chalk.gray(filename)
+        );
       }
       console.log(
-          chalk.yellow(String(bundleSize).padStart(6)),
-          chalk.white(`(total '${entryNames.join('/')}' bundle size)`));
+        chalk.yellow(String(bundleSize).padStart(6)),
+        chalk.white(`(total '${entryNames.join('/')}' bundle size)`)
+      );
     },
   };
 };

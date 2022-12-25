@@ -14,25 +14,8 @@
     "browser": false,
     "clients": false,
     "FetchEvent": false,
-    "skipWaiting": false
+    "skipWaiting": false,
+    "HTMLRewriter": false
   },
-  "extends": [
-    "eslint:recommended", "google"
-  ],
-  "rules": {
-    // Enough cases fail with this that we have to disable it.
-    "indent": 0,
-    "max-len": [2, {
-      "ignorePattern": "^\\s*import|^\\s*it\\(|^\\s*describe\\(",
-      "ignoreUrls": true
-    }],
-    "require-atomic-updates": 0,
-    "valid-jsdoc": 0,
-  },
-  "overrides": [{
-    "files": ["tasks/**/*.{js,mjs}"],
-    "rules": {
-      "no-console": 0
-    }
-  }]
+  "extends": ["eslint:recommended"]
 }

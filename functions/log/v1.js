@@ -3,7 +3,6 @@ import {v4 as uuid} from 'uuid';
 import fetch from 'node-fetch';
 import {dimensions, UA_MEASUREMENT_ID} from '../constants.js';
 
-
 /**
  * @param {Object} request
  */
@@ -65,11 +64,7 @@ export async function v1(request) {
     });
   } else {
     try {
-      fs.appendFileSync('beacons.log', [
-        url,
-        body,
-        '\n',
-      ].join('\n'));
+      fs.appendFileSync('beacons.log', [url, body, '\n'].join('\n'));
     } catch (err) {
       console.error('Could not write to file `beacons.log`', err);
     }

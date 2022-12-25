@@ -12,7 +12,6 @@ import terser from '@rollup/plugin-terser';
 import {checkDuplicatesPlugin} from './utils/check-duplicates-plugin.js';
 import {ENV} from './utils/env.js';
 
-
 const config = fs.readJSONSync('./config.json');
 
 gulp.task('sw', async () => {
@@ -20,15 +19,20 @@ gulp.task('sw', async () => {
     const version = fs.readJSONSync('package.json').version;
     const buildTime = new Date();
 
-    const criticalAssets = [{
-      url: '/shell-start.html',
-      revision: revHash(
-          await fs.readFile(path.join(config.publicDir, 'shell-start.html'))),
-    }, {
-      url: '/shell-end.html',
-      revision: revHash(
-          await fs.readFile(path.join(config.publicDir, 'shell-end.html'))),
-    }];
+    const criticalAssets = [
+      {
+        url: '/shell-start.html',
+        revision: revHash(
+          await fs.readFile(path.join(config.publicDir, 'shell-start.html'))
+        ),
+      },
+      {
+        url: '/shell-end.html',
+        revision: revHash(
+          await fs.readFile(path.join(config.publicDir, 'shell-end.html'))
+        ),
+      },
+    ];
 
     const moduleFilePaths = await globby(`${config.publicModulesDir}/*.mjs`);
     for (const moduleFilePath of moduleFilePaths) {
@@ -52,14 +56,16 @@ gulp.task('sw', async () => {
       checkDuplicatesPlugin(),
     ];
     if (ENV !== 'development') {
-      plugins.push(terser({
-        mangle: {
-          toplevel: true,
-          properties: {
-            regex: /(^_|_$)/,
+      plugins.push(
+        terser({
+          mangle: {
+            toplevel: true,
+            properties: {
+              regex: /(^_|_$)/,
+            },
           },
-        },
-      }));
+        })
+      );
     }
 
     const bundle = await rollup({

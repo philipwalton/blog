@@ -28,13 +28,18 @@ export default class History2 {
       this.update({url, title, isPopState: true});
     });
 
-    this._delegate = delegate(document, 'click', 'a[href]',
-        (event, delegateTarget) => {
-      // Don't load content if the user is doing anything other than a normal
-      // left click to open a page in the same window.
-      if (// On mac, cmd+click will open a link in a new tab.
+    this._delegate = delegate(
+      document,
+      'click',
+      'a[href]',
+      (event, delegateTarget) => {
+        // Don't load content if the user is doing anything other than a normal
+        // left click to open a page in the same window.
+        if (
+          // On mac, cmd+click will open a link in a new tab.
           // Ctrl+click does this on windows.
-          event.metaKey || event.ctrlKey ||
+          event.metaKey ||
+          event.ctrlKey ||
           // Shift+click in Chrome/Firefox opens the link in a new window
           // In Safari it adds the URL to a favorites list.
           event.shiftKey ||
@@ -43,25 +48,29 @@ export default class History2 {
           // Middle mouse button clicks (which == 2) are used to open a link
           // in a new tab, and right clicks (which == 3) on Firefox triggers
           // a click event.
-          event.which > 1) return;
+          event.which > 1
+        ) {
+          return;
+        }
 
-      const page = parseUrl(location.href);
-      const link = parseUrl(delegateTarget.href);
+        const page = parseUrl(location.href);
+        const link = parseUrl(delegateTarget.href);
 
-      if (/\.(png|svg)$/.test(link.href)) return;
+        if (/\.(png|svg)$/.test(link.href)) return;
 
-      // Don't do anything when clicking on links to the current URL.
-      if (link.href == page.href) event.preventDefault();
+        // Don't do anything when clicking on links to the current URL.
+        if (link.href == page.href) event.preventDefault();
 
-      // If the clicked link is on the same site but has a different path,
-      // prevent the browser from navigating there and load the page manually.
-      if ((link.origin == page.origin) && (link.pathname != page.pathname)) {
-        event.preventDefault();
-        this.update({
-          url: link.href,
-        });
+        // If the clicked link is on the same site but has a different path,
+        // prevent the browser from navigating there and load the page manually.
+        if (link.origin == page.origin && link.pathname != page.pathname) {
+          event.preventDefault();
+          this.update({
+            url: link.href,
+          });
+        }
       }
-    });
+    );
   }
 
   /**
@@ -101,7 +110,6 @@ export default class History2 {
     }
   }
 }
-
 
 /**
  * Gets a state object from a URL and title. The state object is the parsed

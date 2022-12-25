@@ -1,7 +1,6 @@
 import assert from 'assert';
 import {initBook} from '../tasks/utils/book.js';
 
-
 let site;
 let articles;
 let pages;
@@ -44,7 +43,7 @@ describe('The home page', () => {
   it('should contain working links to all published articles', async () => {
     const lastArticle = articles[articles.length - 1];
 
-    for (let i = 1, article; article = articles[i - 1]; i++) {
+    for (let i = 1, article; (article = articles[i - 1]); i++) {
       const heading = await $(`.ArticleList-item:nth-last-child(${i}) h2`);
       const link = await $(`.ArticleList-item:nth-last-child(${i}) a`);
 
@@ -53,7 +52,9 @@ describe('The home page', () => {
 
       const linkHref = await link.getAttribute('href');
       assert.strictEqual(
-          new URL(linkHref, site.baseUrl).pathname, article.path);
+        new URL(linkHref, site.baseUrl).pathname,
+        article.path
+      );
 
       await link.click();
       await browser.waitUntil(urlMatches(article.path));
@@ -71,16 +72,19 @@ describe('The home page', () => {
   it('should contain working links to pages', async () => {
     const contentPages = pages.filter((page) => {
       return !(
-          page.path == '/404.html' ||
-          page.path == '/atom.xml' ||
-          page.path == '/manifest.json');
+        page.path == '/404.html' ||
+        page.path == '/atom.xml' ||
+        page.path == '/manifest.json'
+      );
     });
 
-    for (let i = 1, page; page = contentPages[i-1]; i++) {
+    for (let i = 1, page; (page = contentPages[i - 1]); i++) {
       const pageLink = await $(`.Header a[title="${page.title}"]`);
       const pageLinkHref = await pageLink.getAttribute('href');
       assert.strictEqual(
-          new URL(pageLinkHref, site.baseUrl).pathname, page.path);
+        new URL(pageLinkHref, site.baseUrl).pathname,
+        page.path
+      );
 
       await pageLink.click();
       await browser.waitUntil(urlMatches(page.path));
@@ -90,7 +94,6 @@ describe('The home page', () => {
     }
   });
 });
-
 
 /**
  * Returns whether the passed URL matches the URL for the current page.

@@ -4,8 +4,7 @@
  * is supported back to IE9.
  */
 export const timeOrigin =
-    performance.timeOrigin || performance.timing.navigationStart;
-
+  performance.timeOrigin || performance.timing.navigationStart;
 
 /**
  * Returns the result of performance.now() if the browser supports it, or
@@ -13,5 +12,5 @@ export const timeOrigin =
  * @return {number}
  */
 export const now = () => {
-  return performance.now ? performance.now() : (new Date - timeOrigin);
+  return performance.now ? performance.now() : new Date() - timeOrigin;
 };

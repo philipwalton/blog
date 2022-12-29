@@ -2,6 +2,7 @@
   display: flex;
   align-items: center;
   gap: var(--gap);
+  margin-top: calc(1.5 * var(--gap));
 }
 
 .Share-figure {
@@ -12,4 +13,10 @@
 .Share-pitch {
   color: #666;
   font-size: .9em;
+}
+
+@media (--break-lg) {
+  .Share {
+    margin-top: calc(2 * var(--gap));
+  }
 }

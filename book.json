@@ -297,7 +297,14 @@
       "path": "/articles/performant-a-b-testing-with-cloudflare-workers/",
       "date": "2021-12-20T14:01:14.000Z",
       "image": "ab-testing-poster.png",
-      "excerpt": "I think there’s a perception in our industry that A/B testing is super complicated and you really need a tool or service to do it right. And while I’m sure some aspects of A/B are quite complex"
+      "excerpt": "I think there's a perception in our industry that A/B testing is super complicated and you really need a tool or service to do it right. And while I'm sure some aspects of A/B are quite complex"
+    },
+    {
+      "title": "Dynamic LCP Priority: Learning from Past Visits",
+      "path": "/articles/dynamic-lcp-priority/",
+      "date": "2022-12-28T20:43:44.000Z",
+      "image": "dynamic-lcp-priority-poster.png",
+      "excerpt": "Earlier this year, Chrome shipped the new Priority Hints API, which lets developers inform the browser which resources are the most important, such as the LCP image. There's just one small problem"
     }
   ]
 }

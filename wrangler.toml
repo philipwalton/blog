@@ -1,12 +1,12 @@
-name = "worker-dev"
-main = "worker/index.js"
 account_id = "833aa47653f1a867bf6f206ed576cd2f"
+main = "worker/index.js"
+name = "worker-dev"
 
 compatibility_date = "2022-09-24"
 workers_dev = true
 
 kv_namespaces = [
-  { binding = "PRIORITY_HINTS", id = "7fdf8d6f35d042a5b21b77ab6a56028e", preview_id = "40156d62dc48468aa5e21fe01ed5b01e" }
+  {binding = "PRIORITY_HINTS", id = "7fdf8d6f35d042a5b21b77ab6a56028e", preview_id = "40156d62dc48468aa5e21fe01ed5b01e"},
 ]
 
 [dev]
@@ -19,7 +19,6 @@ ENV = "development"
 # Override values for `--env production` usage
 [env.production]
 name = "worker"
-workers_dev = false
 routes = [
   "philipwalton.com/",
   "philipwalton.com/shell*",
@@ -27,5 +26,11 @@ routes = [
   "philipwalton.com/about*",
   "philipwalton.com/hint",
 ]
+
+kv_namespaces = [
+  {binding = "PRIORITY_HINTS", id = "7fdf8d6f35d042a5b21b77ab6a56028e", preview_id = "40156d62dc48468aa5e21fe01ed5b01e"},
+]
+
+workers_dev = false
 [env.production.vars]
 ENV = "production"

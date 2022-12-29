@@ -5,6 +5,10 @@ account_id = "833aa47653f1a867bf6f206ed576cd2f"
 compatibility_date = "2022-09-24"
 workers_dev = true
 
+kv_namespaces = [
+  { binding = "PRIORITY_HINTS", id = "7fdf8d6f35d042a5b21b77ab6a56028e", preview_id = "40156d62dc48468aa5e21fe01ed5b01e" }
+]
+
 [dev]
 host = "localhost:3001" # Origin server
 port = 3000 # Worker server
@@ -21,6 +25,7 @@ routes = [
   "philipwalton.com/shell*",
   "philipwalton.com/articles*",
   "philipwalton.com/about*",
+  "philipwalton.com/hint",
 ]
 [env.production.vars]
 ENV = "production"

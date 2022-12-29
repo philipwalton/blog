@@ -1,4 +1,9 @@
 import {applyExperiment, getExperiment} from './lib/experiments.js';
+import {
+  addPriorityHints,
+  getPriorityHintKey,
+  logPriorityHint,
+} from './lib/performance.js';
 import {getRedirectPath} from './lib/redirects.js';
 import {matchesRoute} from './lib/router.js';
 
@@ -15,6 +20,18 @@ function createXID() {
  */
 function getXIDFromCookie(cookie) {
   return cookie.match(/(?:^|;) *xid=(\.\d+) *(?:;|$)/) && RegExp.$1;
+}
+
+/**
+ * Removes a trailing `index.content.html` from a URL path.
+ * @param {string} path
+ * @returns {string}
+ */
+function normalizePath(path) {
+  if (path.endsWith('index.content.html')) {
+    return path.slice(0, -18);
+  }
+  return path;
 }
 
 /**
@@ -71,16 +88,21 @@ async function handleRequest({request, url, startTime, vars}) {
 
   const experiment = getExperiment(xid);
 
-  const response = await fetch(url.href, {
-    body: request.body,
-    headers: request.headers,
-    method: request.method,
-    redirect: request.redirect,
-    cf: {
-      cacheEverything: vars.ENV === 'production',
-      cacheTtlByStatus: {'200-299': 604800, '400-599': 0},
-    },
-  });
+  const [response, priorityHintsSelector] = await Promise.all([
+    fetch(url.href, {
+      body: request.body,
+      headers: request.headers,
+      method: request.method,
+      redirect: request.redirect,
+      cf: {
+        cacheEverything: vars.ENV === 'production',
+        cacheTtlByStatus: {'200-299': 604800, '400-599': 0},
+      },
+    }),
+    vars.PRIORITY_HINTS.get(
+      getPriorityHintKey(request, normalizePath(url.pathname))
+    ),
+  ]);
 
   const clone = new Response(response.body, response);
 
@@ -88,6 +110,9 @@ async function handleRequest({request, url, startTime, vars}) {
   addServerTimingHeaders(clone, startTime);
 
   const rewriter = new HTMLRewriter();
+  if (priorityHintsSelector) {
+    addPriorityHints(rewriter, priorityHintsSelector);
+  }
   if (experiment) {
     applyExperiment(experiment, rewriter);
   }
@@ -103,6 +128,10 @@ export default {
   async fetch(request, vars) {
     const startTime = Date.now();
     const url = new URL(request.url);
+
+    if (url.pathname === '/hint' && request.method === 'POST') {
+      return logPriorityHint(request, vars.PRIORITY_HINTS);
+    }
 
     // Return early if no route matches.
     // Note: this should never happen in production.

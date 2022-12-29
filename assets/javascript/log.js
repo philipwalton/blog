@@ -16,7 +16,7 @@ import {uuid} from './utils/uuid';
  * implementation. This allows you to create a segment or view filter
  * that isolates only data captured with the most recent tracking changes.
  */
-const MEASUREMENT_VERSION = 91;
+const MEASUREMENT_VERSION = 92;
 
 /**
  * A 13-digit, random identifier for the current page.
@@ -282,12 +282,32 @@ const trackINP = async () => {
 const trackLCP = async () => {
   onLCP(
     (metric) => {
+      let dynamicFetchPriority;
+
+      // If the LCP element is an image, send a hint for the next visitor.
+      const {element, lcpEntry} = metric.attribution;
+      if (lcpEntry?.url && lcpEntry.element?.tagName.toLowerCase() === 'img') {
+        const elementWithPriority = document.querySelector('[fetchpriority]');
+        if (elementWithPriority) {
+          dynamicFetchPriority =
+            elementWithPriority === lcpEntry.element ? 'hit' : 'miss';
+        }
+        navigator.sendBeacon(
+          '/hint',
+          JSON.stringify({
+            path: originalPathname,
+            selector: element,
+          })
+        );
+      }
+
       log.event(metric.name, {
         value: metric.delta,
         metric_rating: metric.rating,
         metric_value: metric.value,
-        debug_target: metric.attribution.element || '(not set)',
+        debug_target: element || '(not set)',
         debug_url: metric.attribution.url,
+        debug_dfp: dynamicFetchPriority,
         debug_ttfb: metric.attribution.timeToFirstByte,
         debug_rld: metric.attribution.resourceLoadDelay,
         debug_rlt: metric.attribution.resourceLoadTime,

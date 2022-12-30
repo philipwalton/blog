@@ -193,7 +193,7 @@ describe('log', function () {
         // MPv2
         if (v === '2') {
           assert.strictEqual(beacon.get('v'), '2');
-          assert.strictEqual(beacon.get('tid'), 'G-GVKBFZ3VDY');
+          assert.strictEqual(beacon.get('tid'), 'G-0DN98LQF0S');
           assert.match(beacon.get('cid'), /^\d{13}-\d{13}$/);
 
           assert.match(beacon.get('sid'), /^\d{13}$/);
@@ -621,7 +621,7 @@ describe('log', function () {
             'up.effective_connection_type': '4g',
             'up.pixel_density': '2x',
             'up.service_worker_state': 'controlled',
-            'tid': 'G-GVKBFZ3VDY',
+            'tid': 'G-0DN98LQF0S',
             'en': 'page_view',
             'ep.page_path': '/',
             'ep.content_source': 'cache',

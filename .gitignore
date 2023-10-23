@@ -4,18 +4,14 @@
 # Node stuff
 node_modules
 
-# VSCode
+# Package temp/cache
+.firebase
+.husky
 .vscode
+.wrangler
 
 # Static site output
 build
 
-# Firebase files
-.firebase
-fireperf.js
-
 # Log files
 *.log
-
-# Shell scripts
-*.sh

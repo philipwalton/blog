@@ -81,7 +81,7 @@ export async function getBeacons(paramsFilter) {
         }
       } else {
         throw new Error(
-          `Incorrect Measurement Protocol pathname: ${url.pathname}`
+          `Incorrect Measurement Protocol pathname: ${url.pathname}`,
         );
       }
 

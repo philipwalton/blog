@@ -11,7 +11,7 @@ export async function v3(request) {
   const [paramsLine, ...eventsLines] = request.body.split('\n');
 
   const queryParams = new URLSearchParams(
-    [`v=2`, `tid=${GA4_MEASUREMENT_ID}`, paramsLine].join('&')
+    [`v=2`, `tid=${GA4_MEASUREMENT_ID}`, paramsLine].join('&'),
   );
 
   // Set the `_uip` param to the IP address of the user.

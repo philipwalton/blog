@@ -51,7 +51,7 @@ export async function v2(request) {
     try {
       fs.appendFileSync(
         'beacons.log',
-        [ga4URL, ga4Body, '', uaURL, uaBody, '\n'].join('\n')
+        [ga4URL, ga4Body, '', uaURL, uaBody, '\n'].join('\n'),
       );
     } catch (err) {
       console.error('Could not write to file `beacons.log`', err);

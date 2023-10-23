@@ -29,7 +29,7 @@ export const streamErrorPlugin = {
           updateSW();
         </script>`,
         ].join(''),
-        {status: 404}
+        {status: 404},
       );
     }
   },

@@ -67,7 +67,7 @@ const init = () => {
   document.body.addEventListener('click', (e) => {
     const insideAlertContainer = !!closest(
       /** @type {!Element} */ (e.target),
-      '.AlertContainer'
+      '.AlertContainer',
     );
     if (!insideAlertContainer) remove();
   });

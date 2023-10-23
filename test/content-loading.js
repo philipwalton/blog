@@ -65,7 +65,7 @@ describe('The content loader', async () => {
     const img = await $('figure img');
     await img.click();
 
-    await browser.waitUntil(async () => /\.png$/.test(await getUrlPath()));
+    await browser.waitUntil(async () => /\.webp$/.test(await getUrlPath()));
   });
 
   it('should work with the back and forward buttons', async () => {

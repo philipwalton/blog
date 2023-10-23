@@ -39,7 +39,7 @@ describe('log', function () {
             'ep.page_path': '/',
             'up.service_worker_state': 'supported',
             'up.experiment': 'pending_beacon',
-          })
+          }),
       );
 
       await browser.waitUntil(
@@ -51,7 +51,7 @@ describe('log', function () {
             dp: '/',
             cd9: 'supported',
             cd19: 'pending_beacon',
-          })
+          }),
       );
 
       // Reload to ensure that the experiment works with service worker.
@@ -67,7 +67,7 @@ describe('log', function () {
             'ep.page_path': '/',
             'up.experiment': 'pending_beacon',
             'up.service_worker_state': 'controlled',
-          })
+          }),
       );
 
       await browser.waitUntil(
@@ -79,7 +79,7 @@ describe('log', function () {
             dp: '/',
             cd9: 'controlled',
             cd19: 'pending_beacon',
-          })
+          }),
       );
 
       await browser.url('/__reset__');
@@ -94,7 +94,7 @@ describe('log', function () {
             'en': 'page_view',
             'ep.page_path': '/articles/',
             'up.service_worker_state': 'supported',
-          })
+          }),
       );
       assert(!beacon1.has('up.experiment'));
 
@@ -107,10 +107,10 @@ describe('log', function () {
             dp: '/articles/',
             cd9: 'supported',
             cd19: '(not set)',
-          })
+          }),
       );
 
-      // Reload to ensure that the experiment work with service worker.
+      // Reload to ensure that the experiment works with service worker.
 
       await browser.url(`/articles/?test_id=${++testID}`);
 
@@ -122,7 +122,7 @@ describe('log', function () {
             'en': 'page_view',
             'ep.page_path': '/articles/',
             'up.service_worker_state': 'controlled',
-          })
+          }),
       );
       assert(!beacon2.has('up.experiment'));
 
@@ -135,7 +135,7 @@ describe('log', function () {
             dp: '/articles/',
             cd9: 'controlled',
             cd19: '(not set)',
-          })
+          }),
       );
     });
   });
@@ -151,7 +151,7 @@ describe('log', function () {
             'dl': new RegExp(`test_id=${testID}`),
             'en': 'page_view',
             'ep.page_path': '/',
-          })
+          }),
       );
       await browser.waitUntil(
         async () =>
@@ -160,7 +160,7 @@ describe('log', function () {
             t: 'pageview',
             dl: new RegExp(`test_id=${testID}`),
             dp: '/',
-          })
+          }),
       );
     });
 
@@ -172,14 +172,14 @@ describe('log', function () {
           await beaconsContain({
             'v': '1',
             'dl': new RegExp(`test_id=${testID}`),
-          })
+          }),
       );
       await browser.waitUntil(
         async () =>
           await beaconsContain({
             'v': '2',
             'dl': new RegExp(`test_id=${testID}`),
-          })
+          }),
       );
 
       const beacons = await getBeacons((beacons) => {
@@ -205,7 +205,7 @@ describe('log', function () {
           assert.match(beacon.get('epn.measurement_version'), /\d+/);
           assert.match(
             beacon.get('ep.navigation_type'),
-            /(navigate|reload|route_change)/
+            /(navigate|reload|route_change)/,
           );
 
           assert(beacon.get('epn.time_origin') <= Date.now());
@@ -222,7 +222,7 @@ describe('log', function () {
 
           assert.match(
             beacon.get(dimensions.CD_HIT_ID),
-            /\w{8}-\w{4}-4\w{3}-[89aAbB]\w{3}-\w{12}/
+            /\w{8}-\w{4}-4\w{3}-[89aAbB]\w{3}-\w{12}/,
           );
 
           assert.match(beacon.get(dimensions.CD_WINDOW_ID), /\d{13}-\d{13}/);
@@ -239,7 +239,7 @@ describe('log', function () {
 
           assert.strictEqual(
             beacon.get(dimensions.CD_HIT_TYPE),
-            beacon.get('t')
+            beacon.get('t'),
           );
 
           // // Ensure all custom dimensions have a value
@@ -272,7 +272,7 @@ describe('log', function () {
             '_fv': '1',
             'en': 'page_view',
             'ep.page_path': '/',
-          })
+          }),
       );
 
       const fcp1 = await browser.waitUntil(
@@ -282,7 +282,7 @@ describe('log', function () {
             'dl': new RegExp(`test_id=${testID}`),
             'en': 'FCP',
             'ep.page_path': '/',
-          })
+          }),
       );
 
       // Assert that the pageview was sent as a separate request from the
@@ -302,7 +302,7 @@ describe('log', function () {
             'en': 'page_view',
             'dl': new RegExp(`test_id=${testID}`),
             'ep.page_path': '/about/',
-          })
+          }),
       );
 
       assert(!beacon2.has('_ss'));
@@ -315,7 +315,7 @@ describe('log', function () {
             'dl': new RegExp(`test_id=${testID}`),
             'en': 'FCP',
             'ep.page_path': '/about/',
-          })
+          }),
       );
 
       // This time both events should be in the same request
@@ -351,7 +351,7 @@ describe('log', function () {
             'dl': new RegExp(`test_id=${testID}`),
             'en': 'page_view',
             'ep.page_path': '/articles/',
-          })
+          }),
       );
 
       assert(!beacon3.has('_fv'));
@@ -364,7 +364,7 @@ describe('log', function () {
             'dl': new RegExp(`test_id=${testID}`),
             'en': 'FCP',
             'ep.page_path': '/articles/',
-          })
+          }),
       );
 
       // A new session was started so the pageview should have been sent
@@ -382,7 +382,7 @@ describe('log', function () {
             'dl': new RegExp(`test_id=${testID}`),
             'en': 'page_view',
             'ep.page_path': '/',
-          })
+          }),
       );
 
       // Wait a bit then navigate away to trigger a `user_engagement` event.
@@ -396,7 +396,7 @@ describe('log', function () {
             'dl': new RegExp(`test_id=${testID}`),
             'en': 'user_engagement',
             'ep.page_path': '/',
-          })
+          }),
       );
 
       const beacons = await getBeacons((b) => b.get('v') === '2');
@@ -422,7 +422,7 @@ describe('log', function () {
             'dl': new RegExp(`test_id=${testID}`),
             'en': 'page_view',
             'ep.original_page_path': '/',
-          })
+          }),
       );
       await browser.waitUntil(
         async () =>
@@ -431,7 +431,7 @@ describe('log', function () {
             t: 'pageview',
             dl: new RegExp(`test_id=${testID}`),
             dp: '/',
-          })
+          }),
       );
 
       const articleLink = await $(`a[href="${articles[0].path}"]`);
@@ -453,7 +453,7 @@ describe('log', function () {
             'en': 'page_view',
             'ep.page_path': articles[0].path,
             'ep.original_page_path': '/',
-          })
+          }),
       );
       await browser.waitUntil(
         async () =>
@@ -461,7 +461,7 @@ describe('log', function () {
             v: '1',
             t: 'pageview',
             dp: articles[0].path,
-          })
+          }),
       );
     });
 
@@ -475,7 +475,7 @@ describe('log', function () {
             'dl': new RegExp(`test_id=${testID}`),
             'en': 'page_view',
             'ep.page_path': '/',
-          })
+          }),
       );
       await browser.waitUntil(
         async () =>
@@ -484,7 +484,7 @@ describe('log', function () {
             dl: new RegExp(`test_id=${testID}`),
             t: 'pageview',
             dp: '/',
-          })
+          }),
       );
 
       // Load a page.
@@ -540,7 +540,7 @@ describe('log', function () {
               'ep.page_path': pages[1].path,
               'ep.original_page_path': '/',
             },
-          ])
+          ]),
       );
 
       await browser.waitUntil(
@@ -561,7 +561,7 @@ describe('log', function () {
               t: 'pageview',
               dp: pages[1].path,
             },
-          ])
+          ]),
       );
     });
   });
@@ -635,7 +635,7 @@ describe('log', function () {
             'epn.page_time': '221.9',
             'ep.visibility_state': 'hidden',
             '_uip': /[.:\w]+/,
-          })
+          }),
       );
       await browser.waitUntil(
         async () =>
@@ -672,7 +672,7 @@ describe('log', function () {
             'cd16': '71',
             'cd17': '1633061440539-3930979708627-1',
             'cd18': 'reload',
-          })
+          }),
       );
     });
   });
@@ -708,7 +708,7 @@ describe('log', function () {
             'cd4=navigation',
             'cd15=1614466715909',
             'cd12=visible',
-          ].join('&')
+          ].join('&'),
         );
       });
 
@@ -740,7 +740,7 @@ describe('log', function () {
             'cd4': 'navigation',
             'cd15': '1614466715909',
             'cd12': 'visible',
-          })
+          }),
       );
     });
   });

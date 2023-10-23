@@ -48,7 +48,7 @@ function setXIDToCookie(xid, response) {
       'SameSite=Strict',
       'HttpOnly',
       'Secure',
-    ].join('; ')
+    ].join('; '),
   );
 }
 
@@ -100,7 +100,7 @@ async function handleRequest({request, url, startTime, vars}) {
       },
     }),
     vars.PRIORITY_HINTS.get(
-      getPriorityHintKey(request, normalizePath(url.pathname))
+      getPriorityHintKey(request, normalizePath(url.pathname)),
     ),
   ]);
 

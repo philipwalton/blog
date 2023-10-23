@@ -25,7 +25,7 @@ const renderArticleContentPartials = async () => {
 
     const markdown = await fs.readFile(
       `${article.path.slice(1, -1)}.md`,
-      'utf-8'
+      'utf-8',
     );
 
     article.markup = renderMarkdown(await renderTemplateString(markdown, data));
@@ -120,7 +120,7 @@ const buildShell = async () => {
 
   await fs.outputFile(
     path.join(config.publicDir, 'shell-start.html'),
-    shellStart
+    shellStart,
   );
 
   await fs.outputFile(path.join(config.publicDir, 'shell-end.html'), shellEnd);

@@ -15,7 +15,7 @@ export const checkModuleDuplicates = (modulePaths) => {
   for (const modulePath of modulePaths) {
     if (modulePath.includes(NODE_MODULES)) {
       const id = modulePath.slice(
-        modulePath.lastIndexOf(NODE_MODULES) + NODE_MODULES.length + 1
+        modulePath.lastIndexOf(NODE_MODULES) + NODE_MODULES.length + 1,
       );
 
       if (!moduleIds[id]) moduleIds[id] = [];
@@ -49,14 +49,14 @@ export const checkDuplicatesPlugin = () => {
     load(id) {
       if (id.includes(NODE_MODULES)) {
         const nodeModuleId = id.slice(
-          id.lastIndexOf(NODE_MODULES) + NODE_MODULES.length + 1
+          id.lastIndexOf(NODE_MODULES) + NODE_MODULES.length + 1,
         );
 
         if (nodeModuleIds.has(nodeModuleId)) {
           throw new Error(
             `Duplicate node module detected:` +
               `\n\t- '${nodeModuleIds.get(nodeModuleId)}'` +
-              `\n\t- '${id}'`
+              `\n\t- '${id}'`,
           );
         }
 

@@ -147,7 +147,7 @@ const trackPageviews = () => {
         log.event('page_view', {visibility_state: document.visibilityState});
       }
     },
-    true
+    true,
   );
 };
 
@@ -169,8 +169,8 @@ export const trackError = (err = {}, paramOverrides = {}) => {
         error_name: err.name || '(no error name)',
         error_message: `${err.stack || err.message || '(no stack trace)'}`,
       },
-      paramOverrides
-    )
+      paramOverrides,
+    ),
   );
 };
 
@@ -218,7 +218,7 @@ const trackCLS = async () => {
         event_id: metric.id,
       });
     },
-    {reportAllChanges: true}
+    {reportAllChanges: true},
   );
 };
 
@@ -235,7 +235,7 @@ const trackFCP = async () => {
         event_id: metric.id,
       });
     },
-    {reportAllChanges: true}
+    {reportAllChanges: true},
   );
 };
 
@@ -252,7 +252,7 @@ const trackFID = async () => {
         event_id: metric.id,
       });
     },
-    {reportAllChanges: true}
+    {reportAllChanges: true},
   );
 };
 
@@ -275,7 +275,7 @@ const trackINP = async () => {
         event_id: metric.id,
       });
     },
-    {durationThreshold: 16, reportAllChanges: true}
+    {durationThreshold: 16, reportAllChanges: true},
   );
 };
 
@@ -297,7 +297,7 @@ const trackLCP = async () => {
           JSON.stringify({
             path: originalPathname,
             selector: element,
-          })
+          }),
         );
       }
 
@@ -315,12 +315,12 @@ const trackLCP = async () => {
         debug_tbt: getTBT(0, metric.value),
         debug_rbt: getLTT(
           metric.value - metric.attribution.elementRenderDelay,
-          metric.value
+          metric.value,
         ),
         event_id: metric.id,
       });
     },
-    {reportAllChanges: true}
+    {reportAllChanges: true},
   );
 };
 
@@ -365,6 +365,6 @@ const trackTTFB = () => {
       }
       log.event(metric.name, params);
     },
-    {reportAllChanges: true}
+    {reportAllChanges: true},
   );
 };

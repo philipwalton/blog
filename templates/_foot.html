@@ -1,8 +1,4 @@
 {% include '_icons.html' %}
 
-<link rel="stylesheet" href="{{ 'defer.css' | revision }}">
-
-{% for module in 'main-module' | modulepreload %}
-  <link rel="modulepreload" href="{{ module }}">
-{%- endfor %}
-<script type="module" src="/modules/main-module.mjs"></script>
+{% Style entry="defer.css" %}
+{% Script entry="main.js" %}

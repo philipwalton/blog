@@ -1,14 +1,11 @@
 import cssnano from 'cssnano';
 import fs from 'fs-extra';
-import gulp from 'gulp';
-import path from 'path';
 import postcss from 'postcss';
 import atImport from 'postcss-import';
 import postcssPresetEnv from 'postcss-preset-env';
-import {generateRevisionedAsset} from './utils/assets.js';
 import {ENV} from './utils/env.js';
 
-const compileCss = async (srcPath) => {
+export const bundleCSS = async (srcPath) => {
   const css = await fs.readFile(srcPath, 'utf-8');
 
   const plugins = [
@@ -34,7 +31,7 @@ const compileCss = async (srcPath) => {
             mergeLonghand: false,
           },
         ],
-      })
+      }),
     );
   }
 
@@ -42,17 +39,3 @@ const compileCss = async (srcPath) => {
 
   return result.css;
 };
-
-gulp.task('css', async () => {
-  try {
-    const mainPath = './assets/css/main.css';
-    const main = await compileCss(mainPath);
-    await generateRevisionedAsset(path.basename(mainPath), main);
-
-    const deferPath = './assets/css/defer.css';
-    const defer = await compileCss(deferPath);
-    await generateRevisionedAsset(path.basename(deferPath), defer);
-  } catch (err) {
-    console.error(err);
-  }
-});

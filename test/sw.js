@@ -75,7 +75,7 @@ describe('Service Worker', () => {
 
 const originalSWContents = fs.readFileSync('./build/sw.js', 'utf-8');
 const originalSWVersion = JSON.stringify(
-  fs.readJSONSync('./package.json').version
+  fs.readJSONSync('./package.json').version,
 );
 
 /**
@@ -87,7 +87,7 @@ async function updateSWVersion(newVersion) {
 
   await fs.outputFile(
     './build/sw.js',
-    originalSWContents.replace(oldVersion, JSON.stringify(newVersion))
+    originalSWContents.replace(oldVersion, JSON.stringify(newVersion)),
   );
 
   await browser.waitUntil(async () => {
@@ -115,7 +115,7 @@ async function waitUntilControlling() {
     return await browser.executeAsync(async (done) => {
       const reg = await navigator.serviceWorker.getRegistration();
       done(
-        reg && reg.active && reg.active === navigator.serviceWorker.controller
+        reg && reg.active && reg.active === navigator.serviceWorker.controller,
       );
     });
   });

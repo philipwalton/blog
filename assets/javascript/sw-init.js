@@ -1,7 +1,9 @@
 import {Workbox} from 'workbox-window/Workbox.mjs';
 import {loadPage} from './content-loader';
-import {initialSWState} from './sw-state';
 import {disableLoader} from './content-loader';
+import {initialSWState} from './sw-state';
+import {log} from './log';
+import * as messages from './messages';
 
 // Defining a Workbox instance has no side effects, so it's OK to do it
 // here in the top-level scope.
@@ -24,8 +26,6 @@ const addNavigationReportListener = () => {
 };
 
 const setSiteVersionOrTimeout = async () => {
-  const {log} = await import('./log');
-
   // Set the site version, if available.
   const {version} = await new Promise((resolve) => {
     // Uncontrolled pages won't have a version.
@@ -43,8 +43,6 @@ const setSiteVersionOrTimeout = async () => {
 };
 
 const setContentSourceOrTimeout = async () => {
-  const {log} = await import('./log');
-
   // Before sending any perf data, determine whether the page was served
   // entirely cache-first.
   const {cacheHit} = await new Promise((resolve) => {
@@ -133,7 +131,6 @@ const addCacheUpdateListener = () => {
       // it occurs to get a bit more insight into any UX concerns.
       loadPage(updatedURL);
 
-      const {log} = await import('./log');
       log.event('sw_cache_update', {
         updated_url: updatedURL,
       });
@@ -144,8 +141,6 @@ const addCacheUpdateListener = () => {
 const addSWUpdateListener = () => {
   wb.addEventListener('message', async ({data}) => {
     if (data && data.type === 'UPDATE_AVAILABLE') {
-      const {log} = await import('./log');
-
       // Default to showing an update message. This is helpful in the event
       // a future version causes an error parsing the message data, the
       // default will be to still show an update notification.
@@ -183,7 +178,6 @@ const addSWUpdateListener = () => {
       }
 
       if (shouldNotifyUser) {
-        const messages = await import('./messages');
         messages.add({
           body: 'A newer version of this site is available.',
           action: 'Reload',
@@ -212,7 +206,6 @@ export const init = async () => {
   addSWUpdateListener();
 
   try {
-    const {log} = await import('./log');
     log.awaitBeforeSending(setSiteVersionOrTimeout());
     log.awaitBeforeSending(setContentSourceOrTimeout());
   } catch (err) {

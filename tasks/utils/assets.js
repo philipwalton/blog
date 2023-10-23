@@ -28,7 +28,7 @@ export const saveManifest = () => {
   fs.outputJsonSync(
     path.join(config.publicDir, config.manifestFileName),
     manifest,
-    {spaces: 2}
+    {spaces: 2},
   );
 };
 
@@ -40,17 +40,28 @@ export const resetManifest = () => {
 export const getAsset = (filename) => {
   ensureManifest();
 
-  if (!manifest[filename]) {
+  const basename = path.basename(filename);
+
+  if (!manifest[basename]) {
     console.error(`Revisioned file for '${filename}' doesn't exist`);
   }
 
-  return manifest[filename];
+  return manifest[basename];
 };
 
-export const addAsset = (filename, revisionedFilename) => {
+export const addAsset = (filename, revisionedFilename, content) => {
   ensureManifest();
 
-  manifest[filename] = revisionedFilename;
+  // Revisioned assets always have unique filenames, so they
+  // can safely be added to the same public directory.
+  const basename = path.basename(filename);
+
+  manifest[basename] = revisionedFilename;
+
+  fs.outputFileSync(
+    path.join(config.publicStaticDir, revisionedFilename),
+    content,
+  );
 
   saveManifest();
 };
@@ -59,21 +70,17 @@ export const getRevisionedAssetUrl = (filename) => {
   return path.join(config.publicStaticPath, getAsset(filename) || filename);
 };
 
-export const generateRevisionedAsset = (filename, content, extra) => {
-  if (extra) {
-    throw new Error(extra);
+export const generateRevisionedAsset = (filename, content) => {
+  if (!content) {
+    content = fs.readFileSync(filename);
   }
 
+  const basename = path.basename(filename);
   const hash = getHash(content);
-  const revisionedFilename = revisionFile(filename, hash);
+  const revisionedFilename = revisionFile(basename, hash);
 
   // Updates the internal revision map so it can be referenced later.
-  addAsset(filename, revisionedFilename);
+  addAsset(basename, revisionedFilename, content);
 
-  fs.outputFileSync(
-    path.join(config.publicStaticDir, revisionedFilename),
-    content
-  );
-
-  return getRevisionedAssetUrl(filename);
+  return getRevisionedAssetUrl(basename);
 };

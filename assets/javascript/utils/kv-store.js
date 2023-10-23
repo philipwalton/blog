@@ -19,7 +19,7 @@ function getDB() {
             }
             dbPromise = null;
           },
-          {once: true, capture: true}
+          {once: true, capture: true},
         );
         resolve(req.result);
       };

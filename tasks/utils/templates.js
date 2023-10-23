@@ -8,12 +8,17 @@ import nunjucks from 'nunjucks';
 import path from 'path';
 import resolve from 'resolve';
 import {promisify} from 'util';
-import {generateRevisionedAsset, getRevisionedAssetUrl} from './assets.js';
+import {addAsset, generateRevisionedAsset} from './assets.js';
 import {optimizeImage} from './images.js';
 import {renderMarkdown} from './markdown.js';
 import {memoize} from './memoize.js';
+import {bundleJS} from '../javascript.js';
+import {bundleCSS} from '../css.js';
 
-const imgSize = memoize(promisify(imgSizePkg));
+const memoImgSize = memoize(promisify(imgSizePkg));
+const memoBundleJS = memoize(bundleJS);
+const memoBundleCSS = memoize(bundleCSS);
+const memoGenerateRevisionedAsset = memoize(generateRevisionedAsset);
 
 const config = fs.readJSONSync('./config.json');
 
@@ -50,10 +55,6 @@ const catchAndLogErrors = (fn) => {
 };
 
 export const initTemplates = () => {
-  const modulepreload = fs.readJsonSync(
-    path.join(config.publicDir, 'modulepreload.json')
-  );
-
   const env = nunjucks.configure('templates', {
     autoescape: false,
     noCache: true,
@@ -65,37 +66,28 @@ export const initTemplates = () => {
     'htmlescape',
     catchAndLogErrors((content) => {
       return he.encode(content, {useNamedReferences: true});
-    })
+    }),
   );
 
   env.addFilter(
     'jsescape',
     catchAndLogErrors((content) => {
       return jsesc(content);
-    })
+    }),
   );
 
   env.addFilter(
     'format',
     catchAndLogErrors((str, formatString) => {
       return moment.tz(str, config.timezone).format(formatString);
-    })
+    }),
   );
 
   env.addFilter(
     'revision',
     catchAndLogErrors((filename) => {
-      return getRevisionedAssetUrl(filename);
-    })
-  );
-
-  env.addFilter(
-    'modulepreload',
-    catchAndLogErrors((entryModule) => {
-      return modulepreload[entryModule].map((importedModule) => {
-        return path.join(config.publicModulesPath, importedModule);
-      });
-    })
+      return memoGenerateRevisionedAsset(filename);
+    }),
   );
 
   const inlineCache = {};
@@ -112,7 +104,7 @@ export const initTemplates = () => {
         inlineCache[fileURL] = fs.readFileSync(assetPath, 'utf-8');
       }
       return inlineCache[fileURL];
-    })
+    }),
   );
 
   env.addExtension(
@@ -124,9 +116,9 @@ export const initTemplates = () => {
       }
       return `<div class="${classes.join(' ')}">${renderMarkdown(
         content.trim(),
-        {highlight: false}
+        {highlight: false},
       )}</div>`;
-    })
+    }),
   );
 
   env.addExtension(
@@ -136,7 +128,7 @@ export const initTemplates = () => {
 
       const filename = `assets/images/articles/${props.src}`;
 
-      const dimensions = await imgSize(filename);
+      const dimensions = await memoImgSize(filename);
       const width = Math.min(1400, dimensions.width);
       const height = Math.round(dimensions.height * (width / dimensions.width));
 
@@ -154,7 +146,7 @@ export const initTemplates = () => {
       } else {
         attrs.src = generateRevisionedAsset(
           path.basename(filename),
-          await fs.readFile(filename)
+          await fs.readFile(filename),
         );
         href = href ?? attrs.src;
       }
@@ -173,7 +165,39 @@ export const initTemplates = () => {
       }
 
       return oneLine(html);
-    })
+    }),
+  );
+
+  env.addExtension(
+    'Script',
+    new InlineShortcode('Script', async (props) => {
+      const {output} = await memoBundleJS(props.entry);
+      const revisionedFilename = output[0].fileName;
+
+      addAsset(props.entry, revisionedFilename, output[0].code);
+
+      return `<script defer src="/static/${output[0].fileName}"></script>`;
+    }),
+  );
+
+  env.addExtension(
+    'Style',
+    new InlineShortcode('Style', async (props) => {
+      const {entry, inline} = props;
+      const filePath = `./assets/css/${entry}`;
+      const css = await memoBundleCSS(filePath);
+
+      if (inline) {
+        return `<style>${css}</style>`;
+      } else {
+        const revisionedFilePath = await generateRevisionedAsset(
+          path.basename(filePath),
+          css,
+        );
+
+        return `<link rel="stylesheet" href="${revisionedFilePath}">`;
+      }
+    }),
   );
 };
 

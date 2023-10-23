@@ -75,7 +75,7 @@ exports.config = {
       // maxInstances can get overwritten per capability. So if you have an in-house Selenium
       // grid with only 5 firefox instances available you can make sure that not more than
       // 5 instances get started at a time.
-      maxInstances: 5,
+      maxInstances: 1,
       //
       browserName: 'chrome',
       acceptInsecureCerts: true,
@@ -133,7 +133,8 @@ exports.config = {
   // your test setup with almost no effort. Unlike plugins, they don't add new
   // commands. Instead, they hook themselves up into the test process.
   // services: ['chromedriver','sauce','selenium-standalone'],
-  services: ['selenium-standalone'],
+  services: ['chromedriver'],
+  // services: ['selenium-standalone'],
 
   // Framework you want to run your specs with.
   // The following are supported: Mocha, Jasmine, and Cucumber

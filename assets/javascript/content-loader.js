@@ -1,4 +1,6 @@
+import * as alerts from './alerts';
 import History2 from './history2';
+import {log, trackError} from './log';
 import {now} from './utils/performance';
 
 let history2;
@@ -38,7 +40,8 @@ const fetchPageContent = async (pathname) => {
     const responseDuration = now() - responseStartTime;
     const cacheHit = Boolean(response.headers.get('X-Cache-Hit'));
 
-    import('./log').then(({log}) => {
+    // Queue the log logic to not delay returning the response.
+    queueMicrotask(() => {
       log.set({
         page_path: pathname,
         content_source: cacheHit ? 'cache' : 'network',
@@ -53,7 +56,6 @@ const fetchPageContent = async (pathname) => {
         ? `Check your network connection to ensure you're still online.`
         : err.message;
 
-    const alerts = await import('./alerts');
     alerts.add({
       title: `Oops, there was an error making your request`,
       body: message,
@@ -112,8 +114,6 @@ const setScroll = (hash) => {
  * @param {string} pathname
  */
 const trackPageview = async (pathname) => {
-  const {log} = await import('./log');
-
   log.set({page_path: pathname});
   log.event('page_view', {
     navigation_type: 'route_change',
@@ -151,8 +151,6 @@ export const init = () => {
       setScroll(state.hash);
       trackPageview(state.pathname);
     } catch (err) {
-      const {trackError} = await import('./log');
-
       trackError(/** @type {!Error} */ (err));
       throw err;
     }

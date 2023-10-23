@@ -69,7 +69,7 @@ export default class History2 {
             url: link.href,
           });
         }
-      }
+      },
     );
   }
 

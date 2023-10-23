@@ -29,7 +29,7 @@ const getPartialOutputFile = (outputFile) => {
   const basename = path.basename(outputFile, '.html');
   return path.join(
     path.dirname(outputFile),
-    `${basename}${config.contentPartialsSuffix}`
+    `${basename}${config.contentPartialsSuffix}`,
   );
 };
 

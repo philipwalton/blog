@@ -25,7 +25,7 @@ class ExperimentScriptHandler {
       `<meta http-equiv="origin-trial" content="${PENDING_BEACON_TOKEN}"><script>self.__x='pending_beacon'</script>`,
       {
         html: true,
-      }
+      },
     );
   }
 }

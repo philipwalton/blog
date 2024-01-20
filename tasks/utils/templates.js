@@ -11,13 +11,15 @@ import {promisify} from 'util';
 import {addAsset, generateRevisionedAsset} from './assets.js';
 import {optimizeImage} from './images.js';
 import {renderMarkdown} from './markdown.js';
-import {memoize} from './memoize.js';
+import {memoize, memoizeWithSrcCache} from './memoize.js';
 import {bundleJS} from '../javascript.js';
 import {bundleCSS} from '../css.js';
 
+import {cssCache, jsCache} from './cache.js';
+
 const memoImgSize = memoize(promisify(imgSizePkg));
-const memoBundleJS = memoize(bundleJS);
-const memoBundleCSS = memoize(bundleCSS);
+const memoBundleJS = memoizeWithSrcCache(jsCache, bundleJS);
+const memoBundleCSS = memoizeWithSrcCache(cssCache, bundleCSS);
 const memoGenerateRevisionedAsset = memoize(generateRevisionedAsset);
 
 const config = fs.readJSONSync('./config.json');

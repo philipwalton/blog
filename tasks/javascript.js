@@ -61,7 +61,7 @@ export const bundleJS = async (entry) => {
 
   return await bundle.write({
     format: 'esm',
-    dir: config.publicModulesDir,
+    dir: config.publicStaticDir,
     entryFileNames: '[name]-[hash].js',
     // manualChunks,
     // chunkFileNames: '[name].mjs',

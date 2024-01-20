@@ -1,7 +1,4 @@
-/* eslint-disable no-console */
-
 import fs from 'fs-extra';
-import gulp from 'gulp';
 import path from 'path';
 import revHash from 'rev-hash';
 import {rollup} from 'rollup';
@@ -12,7 +9,9 @@ import {ENV} from './utils/env.js';
 
 const config = fs.readJSONSync('./config.json');
 
-let bundleCache;
+// TODO: cache needs to be disabled because it doesn't bust when
+// the one of the plugin-replace values change.
+// let bundleCache;
 
 export const bundleSW = async () => {
   const version = fs.readJSONSync('package.json').version;
@@ -34,7 +33,6 @@ export const bundleSW = async () => {
   ];
 
   const plugins = [
-    nodeResolve(),
     replace({
       values: {
         'process.env.NODE_ENV': JSON.stringify(ENV),
@@ -44,6 +42,7 @@ export const bundleSW = async () => {
       },
       preventAssignment: true,
     }),
+    nodeResolve(),
   ];
 
   if (ENV !== 'development') {
@@ -63,7 +62,7 @@ export const bundleSW = async () => {
     input: {
       'sw': `assets/sw/sw.js`,
     },
-    cache: bundleCache,
+    // cache: bundleCache,
     plugins,
     preserveSymlinks: true, // Needed for `file:` entries in package.json.
     preserveEntrySignatures: false,
@@ -72,7 +71,7 @@ export const bundleSW = async () => {
     },
   });
 
-  bundleCache = bundle.cache;
+  // bundleCache = bundle.cache;
 
   return await bundle.write({
     format: 'esm',
@@ -80,15 +79,3 @@ export const bundleSW = async () => {
     entryFileNames: '[name].js',
   });
 };
-
-gulp.task('sw', async () => {
-  try {
-    await bundleSW();
-  } catch (err) {
-    // Beep!
-    process.stdout.write('\x07');
-
-    // Log but don't throw so watching still works.
-    console.error(err);
-  }
-});

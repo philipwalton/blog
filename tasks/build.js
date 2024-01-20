@@ -1,8 +1,11 @@
-import gulp from 'gulp';
+import {clean} from './clean.js';
+import {buildAll} from './content.js';
+import {bundleSW} from './sw.js';
 
-// Ensure referenced tasks are registered.
-import './clean.js';
-import './content.js';
-import './sw.js';
+export async function build() {
+  await buildAll();
+  await bundleSW();
+}
 
-gulp.task('build', gulp.series('clean', 'content', 'sw'));
+await clean();
+await build();

@@ -1,5 +1,4 @@
 import fs from 'fs-extra';
-import gulp from 'gulp';
 import path from 'path';
 import {initBook} from './utils/book.js';
 import {ENV} from './utils/env.js';
@@ -126,20 +125,20 @@ const buildShell = async () => {
   await fs.outputFile(path.join(config.publicDir, 'shell-end.html'), shellEnd);
 };
 
-gulp.task('content', async () => {
-  try {
-    book = await initBook();
-    initTemplates();
+export const buildAll = async () => {
+  const startTime = performance.now();
 
-    await renderArticleContentPartials();
-    await buildArticles();
+  book = await initBook();
+  initTemplates();
 
-    await renderPageContentPartials();
-    await buildPages();
+  await renderArticleContentPartials();
+  await buildArticles();
 
-    await buildShell();
-    await buildResources();
-  } catch (err) {
-    console.error(err);
-  }
-});
+  await renderPageContentPartials();
+  await buildPages();
+
+  await buildShell();
+  await buildResources();
+
+  console.log(`Built site in ${Math.round(performance.now() - startTime)}ms`);
+};

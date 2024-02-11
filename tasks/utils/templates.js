@@ -7,32 +7,34 @@ import moment from 'moment-timezone';
 import nunjucks from 'nunjucks';
 import path from 'path';
 import resolve from 'resolve';
+import sharp from 'sharp';
 import {promisify} from 'util';
 import {addAsset, generateRevisionedAsset} from './assets.js';
-import {optimizeImage} from './images.js';
+import {cssCache, jsCache} from './cache.js';
 import {renderMarkdown} from './markdown.js';
-import {memoize, memoizeWithSrcCache} from './memoize.js';
+import {memoize, memoizeWithSrc, memoizeWithSrcCache} from './memoize.js';
 import {bundleJS} from '../javascript.js';
 import {bundleCSS} from '../css.js';
-
-import {cssCache, jsCache} from './cache.js';
 
 const memoImgSize = memoize(promisify(imgSizePkg));
 const memoBundleJS = memoizeWithSrcCache(jsCache, bundleJS);
 const memoBundleCSS = memoizeWithSrcCache(cssCache, bundleCSS);
 const memoGenerateRevisionedAsset = memoize(generateRevisionedAsset);
+const memoOptimizeImage = memoizeWithSrc((src, size, format, opts) => {
+  return sharp(src).resize(size)[format](opts).toBuffer();
+});
 
 const config = fs.readJSONSync('./config.json');
 
 const generateLowResArticleImage = async (filename) => {
-  const minified = await optimizeImage(filename, {width: 700}, 'webp');
+  const minified = await memoOptimizeImage(filename, {width: 700}, 'webp');
   const basename = path.basename(filename, path.extname(filename));
 
   return generateRevisionedAsset(`${basename}.webp`, minified);
 };
 
 const generateHighResArticleImage = async (filename) => {
-  const minified = await optimizeImage(filename, {width: 1400}, 'webp');
+  const minified = await memoOptimizeImage(filename, {width: 1400}, 'webp');
   const basename = path.basename(filename, path.extname(filename));
 
   return generateRevisionedAsset(`${basename}-1400w.webp`, minified);

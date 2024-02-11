@@ -5,5 +5,5 @@
 export const initialSWState = !navigator.serviceWorker
   ? 'unsupported'
   : navigator.serviceWorker.controller
-  ? 'controlled'
-  : 'supported';
+    ? 'controlled'
+    : 'supported';

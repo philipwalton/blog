@@ -380,8 +380,8 @@ function getColorSchemePreference() {
   return window.matchMedia('(prefers-color-scheme: light)').matches
     ? 'light'
     : window.matchMedia('(prefers-color-scheme: dark)').matches
-    ? 'dark'
-    : 'no-preference';
+      ? 'dark'
+      : 'no-preference';
 }
 
 /**
@@ -412,6 +412,6 @@ function getContrastPreference() {
   return window.matchMedia('(prefers-contrast: more)').matches
     ? 'more'
     : window.matchMedia('(prefers-contrast: less)').matches
-    ? 'less'
-    : 'no-preference';
+      ? 'less'
+      : 'no-preference';
 }

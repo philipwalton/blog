@@ -1,11 +1,4 @@
-import {
-  onCLS,
-  onFCP,
-  onFID,
-  onINP,
-  onLCP,
-  onTTFB,
-} from 'web-vitals/attribution';
+import {onCLS, onFCP, onINP, onLCP, onTTFB} from 'web-vitals/attribution';
 import {Logger} from './Logger';
 import {initialSWState} from './sw-state';
 import {now, timeOrigin} from './utils/performance';
@@ -16,7 +9,7 @@ import {uuid} from './utils/uuid';
  * implementation. This allows you to create a segment or view filter
  * that isolates only data captured with the most recent tracking changes.
  */
-const MEASUREMENT_VERSION = 92;
+const MEASUREMENT_VERSION = 93;
 
 /**
  * A 13-digit, random identifier for the current page.
@@ -27,43 +20,6 @@ const MEASUREMENT_VERSION = 92;
 const PAGE_ID = uuid(timeOrigin);
 
 const originalPathname = location.pathname;
-
-const longTasks = [];
-
-const clampLongTasks = (start, end) => {
-  const clampedLongTasks = [];
-  for (const task of longTasks) {
-    const taskStart = task.startTime;
-    const taskEnd = task.startTime + task.duration;
-
-    if (start <= taskEnd && end >= taskStart) {
-      clampedLongTasks.push([
-        Math.max(start, taskStart),
-        Math.min(end, taskEnd),
-      ]);
-    }
-  }
-  return clampedLongTasks;
-};
-
-const getTBT = (start, end) => {
-  let tbt = 0;
-
-  for (const task of clampLongTasks(start, end)) {
-    const taskDuration = task[1] - task[0];
-    tbt += Math.max(0, taskDuration - 50);
-  }
-  return tbt;
-};
-
-const getLTT = (start, end) => {
-  let ltt = 0;
-
-  for (const task of clampLongTasks(start, end)) {
-    ltt += task[1] - task[0];
-  }
-  return ltt;
-};
 
 export const log = new Logger((params) => {
   return {
@@ -87,20 +43,9 @@ export const init = async () => {
 
   // Then start all the other metrics.
   trackCLS();
-  trackFID();
   trackINP();
   trackLCP();
   trackTTFB();
-
-  try {
-    new PerformanceObserver((list) => {
-      for (const entry of list.getEntries()) {
-        longTasks.push(entry);
-      }
-    }).observe({type: 'longtask', buffered: true});
-  } catch (err) {
-    // Do nothing...
-  }
 };
 
 const setInitialParams = () => {
@@ -239,39 +184,19 @@ const trackFCP = async () => {
   );
 };
 
-const trackFID = async () => {
-  onFID(
-    (metric) => {
-      log.event(metric.name, {
-        value: metric.delta,
-        metric_rating: metric.rating,
-        metric_value: metric.value,
-        debug_target: metric.attribution.eventTarget || '(not set)',
-        debug_event: metric.attribution.eventType,
-        debug_time: metric.attribution.eventTime,
-        event_id: metric.id,
-      });
-    },
-    {reportAllChanges: true},
-  );
-};
-
 const trackINP = async () => {
   onINP(
     (metric) => {
-      const entry = metric.attribution.eventEntry;
-
       log.event(metric.name, {
         value: metric.delta,
         metric_rating: metric.rating,
         metric_value: metric.value,
-        debug_target: metric.attribution.eventTarget || '(not set)',
-        debug_event: metric.attribution.eventType,
-        debug_time: metric.attribution.eventTime,
-        debug_delay: entry && entry.processingStart - entry.startTime,
-        debug_processing: entry && entry.processingEnd - entry.processingStart,
-        debug_presentation:
-          entry && entry.startTime + metric.value - entry.processingEnd,
+        debug_target: metric.attribution.interactionTarget || '(not set)',
+        debug_type: metric.attribution.interactionType,
+        debug_time: metric.attribution.interactionTime,
+        debug_delay: metric.attribution.inputDelay,
+        debug_processing: metric.attribution.processingDuration,
+        debug_presentation: metric.attribution.presentationDelay,
         event_id: metric.id,
       });
     },
@@ -310,13 +235,8 @@ const trackLCP = async () => {
         debug_dfp: dynamicFetchPriority,
         debug_ttfb: metric.attribution.timeToFirstByte,
         debug_rld: metric.attribution.resourceLoadDelay,
-        debug_rlt: metric.attribution.resourceLoadTime,
+        debug_rlt: metric.attribution.resourceLoadDuration,
         debug_erd: metric.attribution.elementRenderDelay,
-        debug_tbt: getTBT(0, metric.value),
-        debug_rbt: getLTT(
-          metric.value - metric.attribution.elementRenderDelay,
-          metric.value,
-        ),
         event_id: metric.id,
       });
     },

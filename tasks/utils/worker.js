@@ -9,6 +9,7 @@ export const start = async ({verbose = true} = {}) => {
   await new Promise((resolve, reject) => {
     const args = [
       `dev`,
+      `--local`,
       // `--unauthenticated`,
       // `--host=https://localhost.philipwalton.dev`,
     ];

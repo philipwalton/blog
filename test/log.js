@@ -38,7 +38,7 @@ describe('log', function () {
             'en': 'page_view',
             'ep.page_path': '/',
             'up.service_worker_state': 'supported',
-            'up.experiment': 'pending_beacon',
+            'up.experiment': 'fetch_later',
           }),
       );
 
@@ -50,7 +50,7 @@ describe('log', function () {
             dl: new RegExp(`test_id=${testID}`),
             dp: '/',
             cd9: 'supported',
-            cd19: 'pending_beacon',
+            cd19: 'fetch_later',
           }),
       );
 
@@ -65,7 +65,7 @@ describe('log', function () {
             'dl': new RegExp(`test_id=${testID}`),
             'en': 'page_view',
             'ep.page_path': '/',
-            'up.experiment': 'pending_beacon',
+            'up.experiment': 'fetch_later',
             'up.service_worker_state': 'controlled',
           }),
       );
@@ -78,7 +78,7 @@ describe('log', function () {
             dl: new RegExp(`test_id=${testID}`),
             dp: '/',
             cd9: 'controlled',
-            cd19: 'pending_beacon',
+            cd19: 'fetch_later',
           }),
       );
 

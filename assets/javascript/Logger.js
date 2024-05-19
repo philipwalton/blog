@@ -1,7 +1,7 @@
 import {parseUrl} from 'dom-utils';
-import {PendingPostBeacon} from 'pending-beacon-polyfill';
 import {getActiveBreakpoint} from './breakpoints';
 import {initialSWState} from './sw-state';
+import {fetchLater} from './utils/fetchLater.js';
 import {get, set} from './utils/kv-store';
 import {now, timeOrigin} from './utils/performance';
 import {round} from './utils/round.js';
@@ -13,8 +13,7 @@ const LOG_VERSION = 3;
 
 const SESSION_TIMEOUT = 1000 * 60 * 30; // 30 minutes.
 
-// const SEND_TIMEOUT = self.__ENV__ === 'production' ? 5000 : 1000;
-// const SEND_TIMEOUT = 60 * 1000;
+// const SEND_TIMEOUT = self.__ENV__ === 'production' ? SESSION_TIMEOUT : 1000;
 
 let index = 1;
 
@@ -35,7 +34,9 @@ export class Logger {
     this._engagedTime = 0;
     this._state = null;
 
-    this._beacon = {}; // Default to an object to allow property access.
+    // Default to an object to allow property access.
+    this._fetchLaterResult = {};
+    this._fetchLaterController = null;
 
     this._pageParams = {
       dl: location.href,
@@ -170,17 +171,12 @@ export class Logger {
   }
 
   /**
-   * Adds all queued event data to the PendingPostBeacon.
+   * Queue a beacon with all event data via fetchLater().
    * @param {Object} params
    */
   async _queue(params) {
-    // If the beacon is not pending, that means it was already sent and we
-    // need to create a new beacon and reset/update all internal variables.
-    if (!this._beacon.pending) {
-      this._beacon = new PendingPostBeacon(`/log?v=${LOG_VERSION}`, {
-        // Ignore the send timeout for the `pending_beacon` experiment.
-        // timeout: SEND_TIMEOUT,
-      });
+    // If the fetchLater request was already sent, reset internal event state.
+    if (this._fetchLaterResult.activated) {
       this._sendCount++;
       this._eventQueue.clear();
     }
@@ -203,13 +199,27 @@ export class Logger {
       '\n' +
       [...this._eventQueue.values()].map((ep) => toQueryString(ep)).join('\n');
 
-    this._beacon.setData(data);
+    // Abort any existing `fetchLater()` calls and schedule a new one with
+    // the latest event data.
+    if (this._fetchLaterController) {
+      this._fetchLaterController.abort();
+    }
 
-    // To better measure the `pending_beacon` experiment, send FCP data right
-    // away so we can compare the rate of received FCP metrics with the rate
-    // of received CLS metrics.
+    this._fetchLaterController = new AbortController();
+
+    // To better measure the `fetch_later` experiment, send FCP data
+    // right away so we can compare the rate of received FCP metrics with
+    // the rate of received CLS metrics.
     if (params.en === 'FCP') {
-      this._beacon.sendNow();
+      this._fetchLaterResult = {
+        activated: navigator.sendBeacon(`/log?v=${LOG_VERSION}`, data),
+      };
+    } else {
+      this._fetchLaterResult = fetchLater(`/log?v=${LOG_VERSION}`, {
+        method: 'POST',
+        body: data,
+        signal: this._fetchLaterController.signal,
+      });
     }
   }
 

@@ -6,11 +6,9 @@ describe('worker', () => {
   let worker;
 
   beforeAll(async () => {
-    worker = await unstable_dev(
-      './worker/index.js',
-      {},
-      {disableExperimentalWarning: true},
-    );
+    worker = await unstable_dev('./worker/index.js', {
+      experimental: {disableExperimentalWarning: true},
+    });
   });
 
   afterAll(async () => {
@@ -112,27 +110,25 @@ describe('worker', () => {
         headers: {'Cookie': 'xid=.456'},
       });
 
-      expect(await a.text()).toMatch(
-        `<script>self.__x='pending_beacon'</script>`,
-      );
+      expect(await a.text()).toMatch(`<script>self.__x='fetch_later'</script>`);
 
       const b = await worker.fetch('/', {
         headers: {'Cookie': 'xid=.567'},
       });
 
       expect(await b.text()).not.toMatch(
-        `<script>self.__x='pending_beacon'</script>`,
+        `<script>self.__x='fetch_later'</script>`,
       );
     });
 
-    describe('pending_beacon', () => {
+    describe('fetch_later', () => {
       it('adds an "origin-trial" meta tag', async () => {
         const a = await worker.fetch('/', {
           headers: {'Cookie': 'xid=.456'},
         });
 
         expect(await a.text()).toMatch(
-          /<meta http-equiv="origin-trial" content="As\/j5g/,
+          /<meta http-equiv="origin-trial" content="AiFbmKao6wuKvoETvcxO14nv9K/,
         );
 
         const b = await worker.fetch('/', {
@@ -140,7 +136,7 @@ describe('worker', () => {
         });
 
         expect(await b.text()).not.toMatch(
-          /<meta http-equiv="origin-trial" content="As\/j5g/,
+          /<meta http-equiv="origin-trial" content="AiFbmKao6wuKvoETvcxO14nv9K/,
         );
       });
     });

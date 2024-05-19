@@ -147,7 +147,7 @@ export default {
       // When running locally the worker and server will have
       // different ports, so we have to manually update.
       if (vars.ENV === 'development') {
-        url.port = '3000';
+        url.host = 'localhost:3000';
       }
 
       return Response.redirect(url.href, 301);

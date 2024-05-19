@@ -11,7 +11,7 @@ kv_namespaces = [
 
 [dev]
 host = "localhost:3001" # Origin server
-port = 3000 # Worker server
+port = 3000 # Worker listening locally on this port
 
 [vars]
 ENV = "development"

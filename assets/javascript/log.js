@@ -51,7 +51,7 @@ export const init = async () => {
 const setInitialParams = () => {
   log.set({
     measurement_version: MEASUREMENT_VERSION,
-    native_beacon: 'PendingPostBeacon' in self,
+    native_fetch_later: 'fetchLater' in self,
     time_origin: timeOrigin,
     page_id: PAGE_ID,
     pageshow_count: 1,

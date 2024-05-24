@@ -8,14 +8,8 @@ function fetchLaterPolyfill(url, init) {
   }
 
   function sendNow() {
-    if (init.signal && !init.signal.aborted) {
-      if ('keepalive' in Request.prototype) {
-        init.keepalive = true;
-        fetch(url, init);
-        activated = true;
-      } else {
-        activated = navigator.sendBeacon(url, init.body);
-      }
+    if (!(init.signal && init.signal.aborted)) {
+      activated = navigator.sendBeacon(url, init.body);
     }
     destroy();
   }

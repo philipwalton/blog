@@ -9,7 +9,7 @@ import {uuid} from './utils/uuid';
  * implementation. This allows you to create a segment or view filter
  * that isolates only data captured with the most recent tracking changes.
  */
-const MEASUREMENT_VERSION = 93;
+const MEASUREMENT_VERSION = 94;
 
 /**
  * A 13-digit, random identifier for the current page.
@@ -37,6 +37,9 @@ export const init = async () => {
 
   trackErrors();
   trackPageviews();
+
+  // Send a `fetch_later` event to track the reliability of the fetchLater() API
+  log.event('fetch_later', {visibility_state: document.visibilityState});
 
   // Start FCP monitoring first, so its the first event to be logged.
   trackFCP();

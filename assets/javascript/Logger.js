@@ -29,7 +29,7 @@ export class Logger {
     this._presendDependencies = [];
     this._eventQueue = new Map();
 
-    this._sendCount = -1;
+    this._sendCount = 1;
     this._lastActiveTime = 0;
     this._engagedTime = 0;
     this._state = null;
@@ -207,10 +207,10 @@ export class Logger {
 
     this._fetchLaterController = new AbortController();
 
-    // To better measure the `fetch_later` experiment, send FCP data
-    // right away so we can compare the rate of received FCP metrics with
-    // the rate of received CLS metrics.
-    if (params.en === 'FCP') {
+    // To better measure the `fetch_later` experiment, send page_view events
+    // right away so we can compare the rate of received fetch_later events
+    // with the rate of received page_view events.
+    if (params.en === 'page_view' && this._sendCount === 1) {
       this._fetchLaterResult = {
         activated: navigator.sendBeacon(`/log?v=${LOG_VERSION}`, data),
       };

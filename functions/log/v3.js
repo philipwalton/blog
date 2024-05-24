@@ -8,7 +8,7 @@ import {GA4_MEASUREMENT_ID} from '../constants.js';
  * @param {Object} request
  */
 export async function v3(request) {
-  const [paramsLine, ...eventsLines] = request.body.split('\n');
+  const [paramsLine, ...eventsLines] = request.body.trim().split('\n');
 
   const queryParams = new URLSearchParams(
     [`v=2`, `tid=${GA4_MEASUREMENT_ID}`, paramsLine].join('&'),
@@ -28,10 +28,13 @@ export async function v3(request) {
     })
     .join('\n');
 
-  // If the query params contain _ss or _fv and one of the events is a
-  // page view, split it out into two separate requests.
+  // If the query params contain _ss or _fv, and it also contains multiple
+  // events where one of those events is a page_view event, split it out into
+  // two separate requests, so the `page_view` event gets sent first
+  // along with the _ss and _fv params.
   const newSessionPageviewEvent =
     (queryParams.has('_ss') || queryParams.has('_fv')) &&
+    eventsLines.length > 1 &&
     eventsLines.find((line) => line.trim().startsWith('en=page_view'));
 
   const newSessionParams =

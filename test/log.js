@@ -275,6 +275,10 @@ describe('log', function () {
           }),
       );
 
+      // TODO: remove all navigations to __blank__ in this test once the
+      // fetch_later experiment has ended.
+      await browser.url(`/__blank__`);
+
       const fcp1 = await browser.waitUntil(
         async () =>
           await beaconsContain({
@@ -308,6 +312,8 @@ describe('log', function () {
       assert(!beacon2.has('_ss'));
       assert(!beacon2.has('_fv'));
 
+      await browser.url(`/__blank__`);
+
       const fcp2 = await browser.waitUntil(
         async () =>
           await beaconsContain({
@@ -320,7 +326,9 @@ describe('log', function () {
 
       // This time both events should be in the same request
       // because no new session was started.
-      assert.equal(beacon2.get('__idx'), fcp2.get('__idx'));
+      // TODO: change this back to `.equal()` once the fetch_later experiment
+      // is over.
+      assert.notEqual(beacon2.get('__idx'), fcp2.get('__idx'));
 
       // Update the data in IndexedDB to expire the session.
       await browser.executeAsync(async (done) => {
@@ -356,6 +364,8 @@ describe('log', function () {
 
       assert(!beacon3.has('_fv'));
       assert(beacon3.get('sid') > beacon1.get('sid'));
+
+      await browser.url(`/__blank__`);
 
       const fcp3 = await browser.waitUntil(
         async () =>

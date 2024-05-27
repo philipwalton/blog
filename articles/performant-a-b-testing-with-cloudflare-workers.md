@@ -435,7 +435,7 @@ As I mentioned above, on this blog I inline 100% of the CSS for the entire site 
 
 My question, though, was: _how much faster would my Render Time be if I reduced the total amount of CSS I was inlining?_
 
-I've never really spent much time optimizing the size of the CSS on my site, and I was pretty sure I could reduce the size substantially if I switched to CSS GRid and native CSS Custom Properties.
+I've never really spent much time optimizing the size of the CSS on my site, and I was pretty sure I could reduce the size substantially if I switched to CSS Grid and native CSS Custom Properties.
 
 After a few hours modernizing my CSS, I was able to reduce the size from about 16K to less than 6K minified (not compressed since what I care about is parse and render times, not download times).
 

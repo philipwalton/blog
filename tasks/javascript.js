@@ -5,7 +5,6 @@ import {nodeResolve} from '@rollup/plugin-node-resolve';
 import replace from '@rollup/plugin-replace';
 import terser from '@rollup/plugin-terser';
 import {ENV} from './utils/env.js';
-import {dimensions, metrics} from '../functions/constants.js';
 
 const config = fs.readJSONSync('./config.json');
 
@@ -14,12 +13,6 @@ const globals = {
   'self.__ENV__': JSON.stringify(ENV),
   'process.env.NODE_ENV': JSON.stringify(ENV),
 };
-for (const [key, value] of Object.entries(dimensions)) {
-  globals[key] = JSON.stringify(value);
-}
-for (const [key, value] of Object.entries(metrics)) {
-  globals[key] = JSON.stringify(value);
-}
 
 const terserConfig = {
   mangle: {

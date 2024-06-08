@@ -1,6 +1,5 @@
 import {strict as assert} from 'assert';
 import {initBook} from '../tasks/utils/book.js';
-import {dimensions} from '../functions/constants.js';
 import {beaconsContain, clearBeacons, getBeacons} from './utils/beacons.js';
 import {
   clearExperimentCookie,
@@ -42,18 +41,6 @@ describe('log', function () {
           }),
       );
 
-      await browser.waitUntil(
-        async () =>
-          await beaconsContain({
-            v: '1',
-            t: 'pageview',
-            dl: new RegExp(`test_id=${testID}`),
-            dp: '/',
-            cd9: 'supported',
-            cd19: 'fetch_later',
-          }),
-      );
-
       // Reload to ensure that the experiment works with service worker.
 
       await browser.url(`/?test_id=${++testID}`);
@@ -67,18 +54,6 @@ describe('log', function () {
             'ep.page_path': '/',
             'up.experiment': 'fetch_later',
             'up.service_worker_state': 'controlled',
-          }),
-      );
-
-      await browser.waitUntil(
-        async () =>
-          await beaconsContain({
-            v: '1',
-            t: 'pageview',
-            dl: new RegExp(`test_id=${testID}`),
-            dp: '/',
-            cd9: 'controlled',
-            cd19: 'fetch_later',
           }),
       );
 
@@ -98,18 +73,6 @@ describe('log', function () {
       );
       assert(!beacon1.has('up.experiment'));
 
-      await browser.waitUntil(
-        async () =>
-          await beaconsContain({
-            v: '1',
-            t: 'pageview',
-            dl: new RegExp(`test_id=${testID}`),
-            dp: '/articles/',
-            cd9: 'supported',
-            cd19: '(not set)',
-          }),
-      );
-
       // Reload to ensure that the experiment works with service worker.
 
       await browser.url(`/articles/?test_id=${++testID}`);
@@ -125,18 +88,6 @@ describe('log', function () {
           }),
       );
       assert(!beacon2.has('up.experiment'));
-
-      await browser.waitUntil(
-        async () =>
-          await beaconsContain({
-            v: '1',
-            t: 'pageview',
-            dl: new RegExp(`test_id=${testID}`),
-            dp: '/articles/',
-            cd9: 'controlled',
-            cd19: '(not set)',
-          }),
-      );
     });
   });
 
@@ -153,27 +104,11 @@ describe('log', function () {
             'ep.page_path': '/',
           }),
       );
-      await browser.waitUntil(
-        async () =>
-          await beaconsContain({
-            v: '1',
-            t: 'pageview',
-            dl: new RegExp(`test_id=${testID}`),
-            dp: '/',
-          }),
-      );
     });
 
     it('should include all relevant parameters', async () => {
       await browser.url(`/?test_id=${++testID}`);
 
-      await browser.waitUntil(
-        async () =>
-          await beaconsContain({
-            'v': '1',
-            'dl': new RegExp(`test_id=${testID}`),
-          }),
-      );
       await browser.waitUntil(
         async () =>
           await beaconsContain({
@@ -188,72 +123,28 @@ describe('log', function () {
 
       for (const beacon of beacons) {
         const v = beacon.get('v');
-        assert(v === '2' || v === '1');
+        assert.strictEqual(v, '2');
 
-        // MPv2
-        if (v === '2') {
-          assert.strictEqual(beacon.get('v'), '2');
-          assert.strictEqual(beacon.get('tid'), 'G-0DN98LQF0S');
-          assert.match(beacon.get('cid'), /^\d{13}-\d{13}$/);
+        assert.strictEqual(beacon.get('v'), '2');
+        assert.strictEqual(beacon.get('tid'), 'G-0DN98LQF0S');
+        assert.match(beacon.get('cid'), /^\d{13}-\d{13}$/);
 
-          assert.match(beacon.get('sid'), /^\d{13}$/);
-          assert.match(beacon.get('sct'), /^\d+$/);
-          assert.match(beacon.get('seg'), /^(0|1)+$/);
+        assert.match(beacon.get('sid'), /^\d{13}$/);
+        assert.match(beacon.get('sct'), /^\d+$/);
+        assert.match(beacon.get('seg'), /^(0|1)+$/);
 
-          assert.strictEqual(beacon.get('epn.pageshow_count'), '1');
-          assert.strictEqual(beacon.get('ep.original_page_path'), '/');
-          assert.match(beacon.get('epn.measurement_version'), /\d+/);
-          assert.match(
-            beacon.get('ep.navigation_type'),
-            /(navigate|reload|route_change)/,
-          );
+        assert.strictEqual(beacon.get('epn.pageshow_count'), '1');
+        assert.strictEqual(beacon.get('ep.original_page_path'), '/');
+        assert.match(beacon.get('epn.measurement_version'), /\d+/);
+        assert.match(
+          beacon.get('ep.navigation_type'),
+          /(navigate|reload|route_change)/,
+        );
 
-          assert(beacon.get('epn.time_origin') <= Date.now());
-          assert(beacon.get('epn.time_origin') > Date.now() - 60 * 1000);
-          assert(beacon.get('epn.page_time') > 0);
-          assert(beacon.get('epn.page_time') < 60 * 1000);
-        }
-
-        // MPv1
-        if (v === '1') {
-          assert.strictEqual(beacon.get('v'), '1');
-          assert.strictEqual(beacon.get('tid'), 'UA-21292978-1');
-          assert.match(beacon.get('cid'), /^\d{13}-\d{13}$/);
-
-          assert.match(
-            beacon.get(dimensions.CD_HIT_ID),
-            /\w{8}-\w{4}-4\w{3}-[89aAbB]\w{3}-\w{12}/,
-          );
-
-          assert.match(beacon.get(dimensions.CD_WINDOW_ID), /\d{13}-\d{13}/);
-          assert.match(beacon.get(dimensions.CD_VISIT_ID), /\d{13}-\d{13}-\d+/);
-
-          assert(beacon.get('uip').length > 0);
-
-          // `qt` should be used rather than `ht` in MPv1,
-          assert.strictEqual(beacon.get('ht'), null);
-          const qt = beacon.get('qt');
-          if (qt) {
-            assert.strictEqual(qt, /\d+/);
-          }
-
-          assert.strictEqual(
-            beacon.get(dimensions.CD_HIT_TYPE),
-            beacon.get('t'),
-          );
-
-          // // Ensure all custom dimensions have a value
-          for (const param of Object.values(dimensions)) {
-            assert.notStrictEqual(beacon.get(param), null);
-          }
-
-          // Ensure (for event hits), all event dimensions have a value
-          if (beacon.get('t') === 'event') {
-            for (const param of ['ec', 'ea', 'el']) {
-              assert.notStrictEqual(beacon.get(param), null);
-            }
-          }
-        }
+        assert(beacon.get('epn.time_origin') <= Date.now());
+        assert(beacon.get('epn.time_origin') > Date.now() - 60 * 1000);
+        assert(beacon.get('epn.page_time') > 0);
+        assert(beacon.get('epn.page_time') < 60 * 1000);
       }
     });
 
@@ -434,15 +325,6 @@ describe('log', function () {
             'ep.original_page_path': '/',
           }),
       );
-      await browser.waitUntil(
-        async () =>
-          await beaconsContain({
-            v: '1',
-            t: 'pageview',
-            dl: new RegExp(`test_id=${testID}`),
-            dp: '/',
-          }),
-      );
 
       const articleLink = await $(`a[href="${articles[0].path}"]`);
       await articleLink.click();
@@ -465,14 +347,6 @@ describe('log', function () {
             'ep.original_page_path': '/',
           }),
       );
-      await browser.waitUntil(
-        async () =>
-          await beaconsContain({
-            v: '1',
-            t: 'pageview',
-            dp: articles[0].path,
-          }),
-      );
     });
 
     it('should send pageview hits on back/forward navigations', async () => {
@@ -485,15 +359,6 @@ describe('log', function () {
             'dl': new RegExp(`test_id=${testID}`),
             'en': 'page_view',
             'ep.page_path': '/',
-          }),
-      );
-      await browser.waitUntil(
-        async () =>
-          await beaconsContain({
-            v: '1',
-            dl: new RegExp(`test_id=${testID}`),
-            t: 'pageview',
-            dp: '/',
           }),
       );
 
@@ -552,206 +417,31 @@ describe('log', function () {
             },
           ]),
       );
-
-      await browser.waitUntil(
-        async () =>
-          await beaconsContain([
-            {
-              v: '1',
-              t: 'pageview',
-              dp: pages[1].path,
-            },
-            {
-              v: '1',
-              t: 'pageview',
-              dp: pages[0].path,
-            },
-            {
-              v: '1',
-              t: 'pageview',
-              dp: pages[1].path,
-            },
-          ]),
-      );
     });
   });
 
-  describe('v2', () => {
-    it('should invoke the v2 log function when `v=2` is set', async () => {
-      await browser.execute(function () {
-        const queryParams = [
-          'v=2',
-          'dl=https%3A%2F%2Fphilipwalton.com%2F',
-          'dt=Home%20%E2%80%94%20Philip%20Walton',
-          'de=UTF-8',
-          'ul=en-us',
-          'vp=474x1016',
-          'sr=1792x1120',
-          'sd=30-bit',
-          'dr=',
-          'cid=1633059568188-9970492436839',
-          'up.breakpoint=sm',
-          'up.effective_connection_type=4g',
-          'up.pixel_density=2x',
-          'up.service_worker_state=controlled',
-        ].join('&');
-
-        const eventParams = [
-          'en=page_view',
-          'ep.page_path=%2F',
-          'ep.content_source=cache',
-          'epn.measurement_version=71',
-          'epn.time_origin=1633061440539.4',
-          'ep.page_id=1633061440539-3930979708627',
-          'epn.pageshow_count=1',
-          'ep.original_page_path=%2F',
-          'ep.navigation_type=reload',
-          'ep.site_version=3.6.0',
-          'epn.page_time=221.9',
-          'ep.visibility_state=hidden',
-        ].join('&');
-
-        navigator.sendBeacon('/log?' + queryParams, eventParams);
+  describe('legacy versions', () => {
+    it('should not error when fetching legacy versions', async () => {
+      const statusV2 = await browser.executeAsync(async (done) => {
+        const res = await fetch('/log?v=2');
+        done(res.status);
       });
 
-      await browser.waitUntil(
-        async () =>
-          await beaconsContain({
-            'v': '2',
-            'dl': 'https://philipwalton.com/',
-            'dt': 'Home — Philip Walton',
-            'de': 'UTF-8',
-            'ul': 'en-us',
-            'vp': '474x1016',
-            'sr': '1792x1120',
-            'sd': '30-bit',
-            'dr': '',
-            'cid': '1633059568188-9970492436839',
-            'up.breakpoint': 'sm',
-            'up.effective_connection_type': '4g',
-            'up.pixel_density': '2x',
-            'up.service_worker_state': 'controlled',
-            'tid': 'G-0DN98LQF0S',
-            'en': 'page_view',
-            'ep.page_path': '/',
-            'ep.content_source': 'cache',
-            'epn.measurement_version': '71',
-            'epn.time_origin': '1633061440539.4',
-            'ep.page_id': '1633061440539-3930979708627',
-            'epn.pageshow_count': '1',
-            'ep.original_page_path': '/',
-            'ep.navigation_type': 'reload',
-            'ep.site_version': '3.6.0',
-            'epn.page_time': '221.9',
-            'ep.visibility_state': 'hidden',
-            '_uip': /[.:\w]+/,
-          }),
-      );
-      await browser.waitUntil(
-        async () =>
-          await beaconsContain({
-            'v': '1',
-            'dl': 'https://philipwalton.com/',
-            'dt': 'Home — Philip Walton',
-            'de': 'UTF-8',
-            'ul': 'en-us',
-            'vp': '474x1016',
-            'sr': '1792x1120',
-            'sd': '30-bit',
-            'dr': '',
-            'cid': '1633059568188-9970492436839',
-            'tid': 'UA-21292978-1',
-            't': 'pageview',
-            'dp': '/',
-            'cd14': /\w{8}-\w{4}-4\w{3}-[89aAbB]\w{3}-\w{12}/,
-            'uip': /[.:\w]+/,
-            'cd13': 'pageview',
-            'cd7': '1633059568188-9970492436839',
-            'cd1': 'sm',
-            'cd2': '2x',
-            'cd3': '3.6.0',
-            'cd4': 'cache',
-            'cd5': '4g',
-            'cd6': '(not set)',
-            'cd8': '(not set)',
-            'cd9': 'controlled',
-            'cd10': '(not set)',
-            'cd11': '1633061440539-3930979708627',
-            'cd12': 'hidden',
-            'cd15': '(not set)',
-            'cd16': '71',
-            'cd17': '1633061440539-3930979708627-1',
-            'cd18': 'reload',
-          }),
-      );
-    });
-  });
+      assert.strictEqual(statusV2, 200);
 
-  describe('v1', () => {
-    it('should invoke the v1 log function when no `v` param is present', async () => {
-      await browser.execute(function () {
-        navigator.sendBeacon(
-          '/log',
-          [
-            't=pageview',
-            'ht=1614466715909',
-            'dl=https%3A%2F%2Fphilipwalton.com%2F',
-            'dp=%2F',
-            'dt=Home%20%E2%80%94%20Philip%20Walton',
-            'de=UTF-8',
-            'ul=en-us',
-            'vp=1792x414',
-            'sr=1792x1120',
-            'sd=30-bit',
-            'dr=',
-            'cd10=true',
-            'cd1=lg',
-            'cd2=2x',
-            'cd16=68',
-            'cd11=1614466715883-5755939763374',
-            'cd17=1614466715883-6197446999056',
-            'cd9=controlled',
-            'cd18=navigate',
-            'cd5=4g',
-            'cd3=3.3.0',
-            'cid=1600110148295-9925491440728',
-            'cd4=navigation',
-            'cd15=1614466715909',
-            'cd12=visible',
-          ].join('&'),
-        );
+      const statusV1 = await browser.executeAsync(async (done) => {
+        const res = await fetch('/log?v=1');
+        done(res.status);
       });
 
-      await browser.waitUntil(
-        async () =>
-          await beaconsContain({
-            'v': '1',
-            't': 'pageview',
-            'dl': 'https://philipwalton.com/',
-            'dp': '/',
-            'dt': 'Home — Philip Walton',
-            'de': 'UTF-8',
-            'ul': 'en-us',
-            'vp': '1792x414',
-            'sr': '1792x1120',
-            'sd': '30-bit',
-            'dr': '',
-            'cd10': 'true',
-            'cd1': 'lg',
-            'cd2': '2x',
-            'cd16': '68',
-            'cd11': '1614466715883-5755939763374',
-            'cd17': '1614466715883-6197446999056',
-            'cd9': 'controlled',
-            'cd18': 'navigate',
-            'cd5': '4g',
-            'cd3': '3.3.0',
-            'cid': '1600110148295-9925491440728',
-            'cd4': 'navigation',
-            'cd15': '1614466715909',
-            'cd12': 'visible',
-          }),
-      );
+      assert.strictEqual(statusV1, 200);
+
+      const statusNoVersion = await browser.executeAsync(async (done) => {
+        const res = await fetch('/log');
+        done(res.status);
+      });
+
+      assert.strictEqual(statusNoVersion, 200);
     });
   });
 });

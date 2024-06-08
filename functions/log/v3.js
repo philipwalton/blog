@@ -1,6 +1,5 @@
 import fs from 'fs';
 import fetch from 'node-fetch';
-import {convertGA4ParamsToUA} from './convertGA4ParamsToUA.js';
 import {GA4_MEASUREMENT_ID} from '../constants.js';
 
 /**
@@ -18,15 +17,6 @@ export async function v3(request) {
   if (request.ip) {
     queryParams.set('_uip', request.ip);
   }
-
-  const uaURL = 'https://www.google-analytics.com/batch';
-  const uaBody = eventsLines
-    .map((eventParams) => {
-      const params = new URLSearchParams(queryParams + '&' + eventParams);
-      convertGA4ParamsToUA(params);
-      return params.toString();
-    })
-    .join('\n');
 
   // If the query params contain _ss or _fv, and it also contains multiple
   // events where one of those events is a page_view event, split it out into
@@ -86,7 +76,6 @@ export async function v3(request) {
     requests.push(beacon(ga4SessionURL));
   }
   requests.push(beacon(ga4URL, ga4Body));
-  requests.push(beacon(uaURL, uaBody));
 
   await Promise.all(requests);
 }

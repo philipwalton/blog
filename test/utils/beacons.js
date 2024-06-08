@@ -75,10 +75,6 @@ export async function getBeacons(paramsFilter) {
         for (const event of events) {
           assert.strictEqual(event.get('v'), '2');
         }
-      } else if (url.pathname === '/batch' || url.pathname === '/collect') {
-        for (const event of events) {
-          assert.strictEqual(event.get('v'), '1');
-        }
       } else {
         throw new Error(
           `Incorrect Measurement Protocol pathname: ${url.pathname}`,

@@ -1,0 +1,17 @@
+/*
+  ! access-control-allow-origin
+
+/favicon.ico
+  cache-control: max-age=31536000, immutable
+
+/static/*
+  cache-control: max-age=31536000, immutable
+
+/
+  cache-control: max-age=300, s-max-age=604800
+
+/about/*
+  cache-control: max-age=300, s-max-age=604800
+
+/articles/*
+  cache-control: max-age=300, s-max-age=604800

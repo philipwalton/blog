@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "include": [
+    "/",
+    "/_index",
+    "/shell-start",
+    "/shell-end",
+    "/about/*",
+    "/articles/*",
+    "/hint",
+    "/log"
+  ],
+  "exclude": ["/lib/*"]
+}

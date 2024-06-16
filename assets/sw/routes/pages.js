@@ -13,7 +13,7 @@ const pagesMatcher = ({url}) => {
 
 const contentHandler = ({event, url}) => {
   return contentStrategy.handle({
-    request: new Request(`${url.pathname}index.content.html`),
+    request: new Request(`${url.pathname}${self.__PARTIAL_PATH__}`),
     event,
   });
 };
@@ -21,13 +21,13 @@ const contentHandler = ({event, url}) => {
 const streamHandler = streamsStrategy([
   ({event}) =>
     precacheHandler({
-      request: new Request('/shell-start.html'),
+      request: new Request('/shell-start'),
       event,
     }),
   contentHandler,
   ({event}) =>
     precacheHandler({
-      request: new Request('/shell-end.html'),
+      request: new Request('/shell-end'),
       event,
     }),
 ]);

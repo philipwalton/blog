@@ -19,13 +19,13 @@ export const bundleSW = async () => {
 
   const criticalAssets = [
     {
-      url: '/shell-start.html',
+      url: '/shell-start',
       revision: revHash(
         await fs.readFile(path.join(config.publicDir, 'shell-start.html')),
       ),
     },
     {
-      url: '/shell-end.html',
+      url: '/shell-end',
       revision: revHash(
         await fs.readFile(path.join(config.publicDir, 'shell-end.html')),
       ),
@@ -36,9 +36,10 @@ export const bundleSW = async () => {
     replace({
       values: {
         'process.env.NODE_ENV': JSON.stringify(ENV),
-        '__VERSION__': JSON.stringify(version),
-        '__BUILD_TIME__': JSON.stringify(buildTime),
-        '__PRECACHE_MANIFEST__': JSON.stringify(criticalAssets),
+        'self.__VERSION__': JSON.stringify(version),
+        'self.__BUILD_TIME__': JSON.stringify(buildTime),
+        'self.__PRECACHE_MANIFEST__': JSON.stringify(criticalAssets),
+        'self.__PARTIAL_PATH__': JSON.stringify(config.contentPartialPath),
       },
       preventAssignment: true,
     }),
@@ -65,16 +66,15 @@ export const bundleSW = async () => {
     // cache: bundleCache,
     plugins,
     preserveSymlinks: true, // Needed for `file:` entries in package.json.
-    preserveEntrySignatures: false,
-    treeshake: {
-      moduleSideEffects: 'no-external',
-    },
+    // preserveEntrySignatures: false,
+    preserveEntrySignatures: true,
+    treeshake: false,
   });
 
   // bundleCache = bundle.cache;
 
   return await bundle.write({
-    format: 'esm',
+    format: 'es',
     dir: config.publicDir,
     entryFileNames: '[name].js',
   });

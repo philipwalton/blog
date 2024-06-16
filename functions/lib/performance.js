@@ -34,7 +34,7 @@ export function getPriorityHintKey(request, path) {
  * @param {Request} request
  * @param {Object} store
  */
-async function storePriorityHints(request, store) {
+export async function storePriorityHints(request, store) {
   const {path, selector} = await request.json();
   const key = getPriorityHintKey(request, path);
 
@@ -42,14 +42,4 @@ async function storePriorityHints(request, store) {
   if (selector !== storedSelector) {
     await store.put(key, selector);
   }
-}
-
-/**
- * @param {Request} request
- * @param {Object} store
- * @returns {Response}
- */
-export async function logPriorityHint(request, store) {
-  await storePriorityHints(request, store);
-  return new Response(); // Empty 200.
 }

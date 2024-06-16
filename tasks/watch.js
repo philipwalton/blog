@@ -24,7 +24,7 @@ jsWatcher.on('ready', () => {
   });
 });
 
-const swWatcher = chokidar.watch('assets/sw/**/*.js');
+const swWatcher = chokidar.watch(['assets/sw/**/*.js', 'worker/**/*.js']);
 
 swWatcher.on('ready', () => {
   swWatcher.on('all', (...args) => {
@@ -47,5 +47,5 @@ contentWatcher.on('ready', () => {
   });
 });
 
-startServer();
 startWorker();
+startServer();

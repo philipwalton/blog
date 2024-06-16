@@ -5,16 +5,8 @@ import {now} from './utils/performance';
 
 let history2;
 
-const CONTENT_SUFFIX = '.content.html';
-
 const getContentPartialPath = (pagePath) => {
-  if (pagePath.endsWith('/')) {
-    pagePath += 'index.html';
-  }
-  if (!pagePath.includes(CONTENT_SUFFIX)) {
-    pagePath = pagePath.replace(/\.html$/, CONTENT_SUFFIX);
-  }
-  return pagePath;
+  return pagePath + self.__PARTIAL_PATH__;
 };
 
 /**

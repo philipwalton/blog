@@ -25,6 +25,18 @@
       "title": "Page Not Found",
       "path": "/404.html",
       "private": true
+    },
+    {
+      "title": "Page Not Found",
+      "path": "/__reset.html",
+      "private": true,
+      "devOnly": true
+    },
+    {
+      "title": "Page Not Found",
+      "path": "/__blank.html",
+      "private": true,
+      "devOnly": true
     }
   ],
   "resources": [

@@ -1,11 +1,6 @@
 import {applyExperiment, getExperiment} from './lib/experiments.js';
-import {
-  addPriorityHints,
-  getPriorityHintKey,
-  logPriorityHint,
-} from './lib/performance.js';
+import {addPriorityHints, getPriorityHintKey} from './lib/performance.js';
 import {getRedirectPath} from './lib/redirects.js';
-import {matchesRoute} from './lib/router.js';
 
 /**
  * @returns {string}
@@ -23,13 +18,13 @@ function getXIDFromCookie(cookie) {
 }
 
 /**
- * Removes a trailing `index.content.html` from a URL path.
+ * Normalizes by removing any content partial path.
  * @param {string} path
  * @returns {string}
  */
 function normalizePath(path) {
-  if (path.endsWith('index.content.html')) {
-    return path.slice(0, -18);
+  if (path.endsWith('_index')) {
+    return path.slice(0, -6);
   }
   return path;
 }
@@ -64,11 +59,6 @@ function addServerTimingHeaders(response, startTime) {
     serverTiming.push(`cf_cache;desc=${cfCache}`);
   }
 
-  const fastlyCache = response.headers.get('x-cache');
-  if (fastlyCache) {
-    serverTiming.push(`fastly_cache;desc=${fastlyCache}`);
-  }
-
   serverTiming.push(`worker;dur=${Date.now() - startTime}`);
 
   response.headers.set('Server-Timing', serverTiming.join(', '));
@@ -82,29 +72,46 @@ function addServerTimingHeaders(response, startTime) {
  * @param {Object} param.vars
  * @returns {Response}
  */
-async function handleRequest({request, url, startTime, vars}) {
+async function handleRequest({request, env}) {
+  const startTime = Date.now();
+  const url = new URL(request.url);
+
+  // Redirect if needed.
+  const redirectPath = getRedirectPath(url.pathname);
+  if (redirectPath) {
+    url.pathname = redirectPath;
+    return Response.redirect(url.href, 308);
+  }
+
   const cookie = request.headers.get('cookie') || '';
   const xid = getXIDFromCookie(cookie) || createXID();
 
   const experiment = getExperiment(xid);
 
   const [response, priorityHintsSelector] = await Promise.all([
-    fetch(url.href, {
+    env.ASSETS.fetch(url.href, {
       body: request.body,
       headers: request.headers,
       method: request.method,
       redirect: request.redirect,
       cf: {
-        cacheEverything: vars.ENV === 'production',
-        cacheTtlByStatus: {'200-299': 604800, '400-599': 0},
+        cacheEverything: true,
+        cacheTtlByStatus: {'200-299': 31536000, '400-599': -1},
       },
     }),
-    vars.PRIORITY_HINTS.get(
+    env.PRIORITY_HINTS.get(
       getPriorityHintKey(request, normalizePath(url.pathname)),
     ),
   ]);
 
   const clone = new Response(response.body, response);
+
+  // Remove `Etag` headers since the response will be modified.
+  // clone.headers.delete('etag');
+
+  // Modify headers set by Cloudflare
+  // clone.headers.set('cache-control', 'max-age=0');
+  // clone.headers.delete('access-control-allow-origin');
 
   setXIDToCookie(xid, clone);
   addServerTimingHeaders(clone, startTime);
@@ -119,41 +126,6 @@ async function handleRequest({request, url, startTime, vars}) {
   return rewriter.transform(clone);
 }
 
-export default {
-  /**
-   * @param {Request} request
-   * @param {Object} vars
-   * @returns
-   */
-  async fetch(request, vars) {
-    const startTime = Date.now();
-    const url = new URL(request.url);
-
-    if (url.pathname === '/hint' && request.method === 'POST') {
-      return logPriorityHint(request, vars.PRIORITY_HINTS);
-    }
-
-    // Return early if no route matches.
-    // Note: this should never happen in production.
-    if (!matchesRoute({request, url})) {
-      return fetch(request);
-    }
-
-    // Redirect if needed.
-    const redirectPath = getRedirectPath(url.pathname);
-    if (redirectPath) {
-      url.pathname = redirectPath;
-
-      // When running locally the worker and server will have
-      // different ports, so we have to manually update.
-      if (vars.ENV === 'development') {
-        url.host = 'localhost:3000';
-      }
-
-      return Response.redirect(url.href, 301);
-    }
-
-    // Otherwise handle the request.
-    return handleRequest({request, url, vars, startTime});
-  },
-};
+export async function onRequestGet(context) {
+  return handleRequest(context);
+}

@@ -4,7 +4,7 @@ import fs from 'fs-extra';
 describe('Service Worker', () => {
   beforeEach(async () => {
     restoreSWVersion();
-    await browser.url('/__reset__');
+    await browser.url('/__reset');
     // Set the default experiment group.
     await browser.setCookies({name: 'xid', value: '.999', path: '/'});
   });

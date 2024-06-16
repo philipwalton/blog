@@ -1,13 +1,11 @@
-/* global __VERSION__, __BUILD_TIME__ */
-
 import {cacheNames} from './caches.js';
 
 const META_PATH = '/metadata.json';
 const DEFAULT_VERSION = '0.0.0';
 
 const metadata = {
-  version: __VERSION__,
-  buildTime: __BUILD_TIME__,
+  version: self.__VERSION__,
+  buildTime: self.__BUILD_TIME__,
 };
 
 export const getStoredMetadata = async () => {
@@ -36,7 +34,7 @@ const updateStoredMetadata = async () => {
 };
 
 /**
- * Returns a object of metadata assosciated with the current version of
+ * Returns a object of metadata associated with the current version of
  * the SW as well as the previously installed version. Also updates the
  * metadata stored, which means this function should only be called once
  * per service worker lifecycle.

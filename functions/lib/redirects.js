@@ -17,13 +17,11 @@ export function getRedirectPath(path) {
   // Then, handle URL normalization after any changes.
   // -------------------------------------------------------------------------
 
-  // Remove trailing index.html
-  if (path.endsWith('index.html')) {
-    path = path.slice(0, -10);
-  }
-
   // Add missing trailing slash.
-  if (!path.endsWith('/') && !path.endsWith('.html')) {
+  if (
+    !path.endsWith('/') &&
+    !(path.startsWith('/shell-') || path.endsWith('_index'))
+  ) {
     path += '/';
   }
 

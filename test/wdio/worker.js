@@ -1,19 +1,18 @@
 import {strict as assert} from 'assert';
-import fetch from 'node-fetch';
-
-const urlWithLCPImage =
-  '/articles/my-challenge-to-the-web-performance-community/';
-
-const urlWithoutLCPImage = '/articles/cascading-cache-invalidation/';
 
 describe('worker', function () {
   describe('priority hints', function () {
+    const urlWithLCPImage =
+      '/articles/my-challenge-to-the-web-performance-community/';
+
+    const urlWithoutLCPImage = '/articles/cascading-cache-invalidation/';
+
     beforeEach(async () => {
       // Delete the cache by passing an empty selector.
       // TODO: figure out a better way to do this. There doesn't seem to
       // currently be a way to clear KV store data locally via wrangler.
       for (const url of [urlWithLCPImage, urlWithLCPImage]) {
-        await fetch(`http://127.0.0.1:3000/hint`, {
+        await fetch(`http://localhost:3000/hint`, {
           method: 'POST',
           body: JSON.stringify({
             path: url,
@@ -41,7 +40,7 @@ describe('worker', function () {
         }).observe({type: 'resource', buffered: true});
       });
 
-      await browser.url('/__reset__');
+      await browser.url('/__reset');
 
       // Wait until the SW has unregistered.
       await browser.waitUntil(async () => {
@@ -50,7 +49,8 @@ describe('worker', function () {
         });
       });
 
-      await browser.url(urlWithLCPImage);
+      // Set a query param to ensure a cached version of the page isn't used.
+      await browser.url(urlWithLCPImage + '?cache=bust');
 
       const fp2 = await browser.execute(() => {
         return document.querySelector('img').getAttribute('fetchpriority');
@@ -71,7 +71,7 @@ describe('worker', function () {
       // to ensure that it doesn't happen.
       await browser.pause(2000);
 
-      await browser.url('/__reset__');
+      await browser.url('/__reset');
 
       // Wait until the SW has unregistered.
       await browser.waitUntil(async () => {
@@ -80,7 +80,8 @@ describe('worker', function () {
         });
       });
 
-      await browser.url(urlWithoutLCPImage);
+      // Set a query param to ensure a cached version of the page isn't used.
+      await browser.url(urlWithoutLCPImage + '?cache=bust');
 
       const fp2 = await browser.execute(() => {
         return document.querySelector('img').getAttribute('fetchpriority');

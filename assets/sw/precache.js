@@ -1,5 +1,3 @@
-/* global __PRECACHE_MANIFEST__ */
-
 import {PrecacheController} from 'workbox-precaching/PrecacheController.js';
 import {Route} from 'workbox-routing/Route.js';
 import {CacheFirst} from 'workbox-strategies/CacheFirst.js';
@@ -36,5 +34,5 @@ export const install = pc.install;
 export const activate = pc.activate;
 
 export const init = () => {
-  pc.addToCacheList(__PRECACHE_MANIFEST__);
+  pc.addToCacheList(self.__PRECACHE_MANIFEST__);
 };

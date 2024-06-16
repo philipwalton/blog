@@ -1,5 +1,6 @@
 {
-  "contentPartialsSuffix": ".content.html",
+  "contentPartialPath": "_index",
+  "contentPartialName": "_index.html",
   "manifestFileName": "asset-map.json",
   "publicDir": "build",
   "publicPath": "/",

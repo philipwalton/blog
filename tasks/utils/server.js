@@ -1,54 +1,35 @@
-import bodyParser from 'body-parser';
-import express from 'express';
-import morgan from 'morgan';
-import path from 'path';
-import superstatic from 'superstatic';
-import {log} from '../../functions/log.js';
+import http from 'node:http';
+import fs from 'fs-extra';
 
 const PORT = 3001;
+const LOG_FILE = 'beacons.log';
+
 let server;
 
-const app = express()
-  // Log requests that make it to the server.
-  .use(morgan('dev'))
-
-  // Allow setting arbitrary headers for testing purposes.
-  .use((req, res, next) => {
-    if (req.query?.h) {
-      const headers = JSON.parse(decodeURIComponent(req.query.h));
-      for (const [key, value] of Object.entries(headers)) {
-        res.set(key, value);
-      }
-    }
-    next();
-  })
-
-  // Process analytics logs. Note: `body-parser` only needs to be used when
-  // running `superstatic` as `firebase-functions` automatically includes it.
-  // https://firebase.google.com/docs/functions/http-events#use_middleware_modules_with
-  .use('/log', bodyParser.text())
-  .use('/log', log)
-
-  // Any request matching this pattern will return a test fixture.
-  .use(/^\/__(.+)__/, (req, res) => {
-    res.sendFile(path.resolve(`test/fixtures/${req.params[0]}.html`));
-  })
-  // All other requests will use superstatic
-  // https://github.com/firebase/superstatic#superstaticoptions
-  .use(superstatic.default());
-
 export const start = async () => {
-  await new Promise((resolve, reject) => {
-    server = app.listen(PORT, (err) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve();
-      }
+  server = http.createServer((req, res) => {
+    let body = ''; // Store request body chunks
+    req.on('data', (chunk) => (body += chunk));
+    req.on('end', async () => {
+      const contents = [
+        req.url,
+        [...Object.entries(req.headers)]
+          .map((e) => `${e[0]}=${encodeURIComponent(e[1])}`)
+          .join('&'),
+        body,
+      ].join('\n');
+      await fs.appendFileSync(LOG_FILE, contents + '\n--\n', 'utf-8');
+
+      res.end();
     });
+  });
+  return new Promise((resolve) => {
+    server.listen(PORT, 'localhost', () => resolve());
   });
 };
 
 export const stop = () => {
-  server.close();
+  return new Promise((resolve) => {
+    server.close(() => resolve());
+  });
 };

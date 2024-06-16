@@ -1,4 +1,3 @@
-import {strict as assert} from 'assert';
 import fs from 'fs-extra';
 
 const LOG_FILE = 'beacons.log';
@@ -40,24 +39,22 @@ export async function beaconsContain(paramsListOrObj) {
   return false;
 }
 
-/**
- * Gets the array of beacons sent for the current page load.
- * @return {Promise<Array>}
- */
-export async function getBeacons(paramsFilter) {
+async function processLogs() {
   await fs.ensureFile(LOG_FILE);
   const log = await fs.readFile(LOG_FILE, 'utf-8');
   let idx = 0;
 
-  const beacons = log
-    .trim()
-    .split('\n\n')
+  return log
+    .split(/\n--\n/)
     .filter(Boolean)
     .map((payload) => {
-      let [url, ...events] = payload.split('\n');
-      url = new URL(url);
-
       idx++;
+
+      let [url, headers, ...events] = payload.trim().split('\n');
+      const body = events.join('\n');
+
+      url = new URL(url, 'https://localhost:3001');
+      headers = new Headers(new URLSearchParams(headers).entries());
 
       if (events.length) {
         events = events.map((e) => {
@@ -67,23 +64,31 @@ export async function getBeacons(paramsFilter) {
         events = [new URLSearchParams(url.search + `&__idx=${idx}`)];
       }
 
-      // Since this function only returns the beacon data,
-      // assert the correct URL is used here.
-      assert.strictEqual(url.origin, 'https://www.google-analytics.com');
+      return {url, headers, body, events};
+    });
+}
 
-      if (url.pathname === '/g/collect') {
-        for (const event of events) {
-          assert.strictEqual(event.get('v'), '2');
-        }
-      } else {
-        throw new Error(
-          `Incorrect Measurement Protocol pathname: ${url.pathname}`,
-        );
-      }
+export async function getLogs({count = 1, timeout = 10000}) {
+  let logs = [];
+  const startTime = Date.now();
+  while (Date.now() < startTime + timeout) {
+    logs = await processLogs();
+    if (logs.length >= count) {
+      return logs;
+    }
+    // Wait 100ms before checking the logs again.
+    await new Promise((r) => setTimeout(r, 100));
+  }
+  throw new Error(`Timeout after ${timeout}ms waiting for log count: ${count}`);
+}
 
-      return events;
-    })
-    .flat();
+/**
+ * Gets the array of beacons sent for the current page load.
+ * @return {Promise<Array>}
+ */
+export async function getBeacons(paramsFilter) {
+  const log = await processLogs();
+  const beacons = log.map((entry) => entry.events).flat();
 
   return paramsFilter ? beacons.filter(paramsFilter) : beacons;
 }

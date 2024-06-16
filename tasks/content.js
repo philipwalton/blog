@@ -65,6 +65,9 @@ const renderPageContentPartials = async () => {
 
 const buildPages = async () => {
   for (const page of book.pages) {
+    // Ignore dev-only pages when building the production site.
+    if (ENV !== 'development' && page.devOnly) continue;
+
     // Private pages are those that cannot be found by following a link on the
     // site, and thus no content partial needs to be created for them.
     if (!page.private) {
@@ -139,6 +142,8 @@ export const buildAll = async () => {
 
   await buildShell();
   await buildResources();
+
+  await fs.copy('./assets/config/', 'build/', {recursive: true});
 
   console.log(`Built site in ${Math.round(performance.now() - startTime)}ms`);
 };

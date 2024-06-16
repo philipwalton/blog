@@ -19,7 +19,7 @@ export async function setExperimentCookie(value) {
  */
 export async function clearExperimentCookie() {
   await browser.deleteCookies(['xid']);
-  await browser.url('/__reset__');
+  await browser.url('/__reset');
   await browser.waitUntil(async () => {
     return await browser.execute(() => {
       return window.__ready__ === true;

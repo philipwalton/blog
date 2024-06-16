@@ -1,5 +1,5 @@
 import assert from 'assert';
-import {initBook} from '../tasks/utils/book.js';
+import {initBook} from '../../tasks/utils/book.js';
 
 let site;
 let articles;
@@ -69,14 +69,8 @@ describe('The home page', () => {
     }
   });
 
-  it('should contain working links to pages', async () => {
-    const contentPages = pages.filter((page) => {
-      return !(
-        page.path == '/404.html' ||
-        page.path == '/atom.xml' ||
-        page.path == '/manifest.json'
-      );
-    });
+  it('should contain working links to public pages', async () => {
+    const contentPages = pages.filter((page) => !page.private);
 
     for (let i = 1, page; (page = contentPages[i - 1]); i++) {
       const pageLink = await $(`.Header a[title="${page.title}"]`);

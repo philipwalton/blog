@@ -7,21 +7,12 @@ export const start = async ({verbose = true} = {}) => {
   // await tunnel.start();
 
   await new Promise((resolve, reject) => {
-    const args = [
-      `dev`,
-      `--local`,
-      // `--unauthenticated`,
-      // `--host=https://localhost.philipwalton.dev`,
-    ];
-
-    if (process.env.NODE_ENV) {
-      args.push([`--env=${process.env.NODE_ENV}`]);
-    }
+    const args = [`pages`, `dev`, `--port=3000`];
 
     subprocess = spawn('wrangler', args);
 
     subprocess.stdout.on('data', (data) => {
-      if (data.includes(`Listening on`)) {
+      if (data.includes(`Ready on http://localhost:3000`)) {
         resolve();
       }
     });

@@ -1,2 +1,0 @@
-export const GA4_MEASUREMENT_ID = 'G-0DN98LQF0S';
-export const UA_MEASUREMENT_ID = 'UA-21292978-1';

@@ -1,36 +1,7 @@
-account_id = "833aa47653f1a867bf6f206ed576cd2f"
-main = "worker/index.js"
-name = "worker-dev"
-
-compatibility_date = "2022-09-24"
-workers_dev = true
+name = "philipwalton"
+compatibility_date = "2024-06-10"
+pages_build_output_dir = './build'
 
 kv_namespaces = [
   {binding = "PRIORITY_HINTS", id = "7fdf8d6f35d042a5b21b77ab6a56028e", preview_id = "40156d62dc48468aa5e21fe01ed5b01e"},
 ]
-
-[dev]
-host = "localhost:3001" # Origin server
-port = 3000 # Worker listening locally on this port
-
-[vars]
-ENV = "development"
-
-# Override values for `--env production` usage
-[env.production]
-name = "worker"
-routes = [
-  "philipwalton.com/",
-  "philipwalton.com/shell*",
-  "philipwalton.com/articles*",
-  "philipwalton.com/about*",
-  "philipwalton.com/hint",
-]
-
-kv_namespaces = [
-  {binding = "PRIORITY_HINTS", id = "7fdf8d6f35d042a5b21b77ab6a56028e", preview_id = "40156d62dc48468aa5e21fe01ed5b01e"},
-]
-
-workers_dev = false
-[env.production.vars]
-ENV = "production"

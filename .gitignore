@@ -6,7 +6,6 @@ node_modules
 
 # Package temp/cache
 .cache
-.firebase
 .husky
 .vscode
 .wrangler

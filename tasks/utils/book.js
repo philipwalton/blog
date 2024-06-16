@@ -26,22 +26,11 @@ export const getOutputFile = (pathname) => {
 };
 
 const getPartialOutputFile = (outputFile) => {
-  const basename = path.basename(outputFile, '.html');
-  return path.join(
-    path.dirname(outputFile),
-    `${basename}${config.contentPartialsSuffix}`,
-  );
+  return path.join(path.dirname(outputFile), config.contentPartialName);
 };
 
 const getPartialPath = (pathname) => {
-  if (pathname.endsWith('/')) {
-    pathname += 'index.html';
-  }
-  const extname = path.extname(pathname);
-  const basename = path.basename(pathname, extname);
-  const dirname = path.dirname(pathname);
-
-  return path.join(dirname, basename + config.contentPartialsSuffix);
+  return path.join(pathname, config.contentPartialName);
 };
 
 export const initBook = async () => {
@@ -50,8 +39,13 @@ export const initBook = async () => {
   for (const page of book.pages) {
     page.template = getTemplate(page.path);
     page.output = getOutputFile(page.path);
-    page.partialPath = getPartialPath(page.path);
-    page.partialOutput = getPartialOutputFile(page.output);
+
+    // Private pages are those that cannot be found by following a link on the
+    // site, and thus no content partial needs to be created for them.
+    if (!page.private) {
+      page.partialPath = getPartialPath(page.path);
+      page.partialOutput = getPartialOutputFile(page.output);
+    }
   }
 
   for (const resource of book.resources) {

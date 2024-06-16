@@ -11,6 +11,7 @@ const config = fs.readJSONSync('./config.json');
 // Set global variables to be replaced in the source files.
 const globals = {
   'self.__ENV__': JSON.stringify(ENV),
+  'self.__PARTIAL_PATH__': JSON.stringify(config.contentPartialPath),
   'process.env.NODE_ENV': JSON.stringify(ENV),
 };
 

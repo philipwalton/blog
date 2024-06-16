@@ -63,7 +63,7 @@ const addCacheHeadersPlugin = {
 const contentMatcher = ({url}) => {
   return (
     url.hostname === location.hostname &&
-    url.pathname.endsWith('index.content.html')
+    url.pathname.endsWith(self.__PARTIAL_PATH__)
   );
 };
 

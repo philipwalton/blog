@@ -3,7 +3,7 @@ import fs from 'fs-extra';
 import postcss from 'postcss';
 import atImport from 'postcss-import';
 import postcssPresetEnv from 'postcss-preset-env';
-import {ENV} from './utils/env.js';
+import {ENV} from './env.js';
 
 export const bundleCSS = async (srcPath) => {
   const css = await fs.readFile(srcPath, 'utf-8');

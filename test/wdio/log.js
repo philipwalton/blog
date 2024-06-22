@@ -1,6 +1,6 @@
 import {strict as assert} from 'node:assert';
 import {beaconsContain, clearBeacons, getBeacons} from './utils/beacons.js';
-import {initBook} from '../../tasks/utils/book.js';
+import {initBook} from '../../tasks/lib/book.js';
 
 import {
   clearExperimentCookie,

@@ -5,7 +5,7 @@ import {rollup} from 'rollup';
 import replace from '@rollup/plugin-replace';
 import {nodeResolve} from '@rollup/plugin-node-resolve';
 import terser from '@rollup/plugin-terser';
-import {ENV} from './utils/env.js';
+import {ENV} from './env.js';
 
 const config = fs.readJSONSync('./config.json');
 

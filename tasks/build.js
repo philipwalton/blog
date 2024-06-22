@@ -1,11 +1,8 @@
-import {clean} from './clean.js';
-import {buildAll} from './content.js';
-import {bundleSW} from './sw.js';
+import fs from 'fs-extra';
+import {buildAll} from './lib/content.js';
+import {bundleSW} from './lib/sw.js';
 
-export async function build() {
-  await buildAll();
-  await bundleSW();
-}
+await fs.copy('./assets/static/', 'build/', {recursive: true});
 
-await clean();
-await build();
+await buildAll();
+await bundleSW();

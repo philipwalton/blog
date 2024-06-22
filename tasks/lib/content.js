@@ -1,14 +1,14 @@
 import fs from 'fs-extra';
 import path from 'path';
-import {initBook} from './utils/book.js';
-import {ENV} from './utils/env.js';
-import {processHtml} from './utils/html.js';
-import {renderMarkdown} from './utils/markdown.js';
+import {initBook} from './book.js';
+import {ENV} from './env.js';
+import {processHtml} from './html.js';
+import {renderMarkdown} from './markdown.js';
 import {
   initTemplates,
   renderTemplate,
   renderTemplateString,
-} from './utils/templates.js';
+} from './templates.js';
 
 const config = fs.readJSONSync('./config.json');
 let book;
@@ -142,8 +142,6 @@ export const buildAll = async () => {
 
   await buildShell();
   await buildResources();
-
-  await fs.copy('./assets/config/', 'build/', {recursive: true});
 
   console.log(`Built site in ${Math.round(performance.now() - startTime)}ms`);
 };

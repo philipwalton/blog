@@ -1,4 +1,4 @@
-import {initBook} from '../../tasks/utils/book.js';
+import {initBook} from '../../tasks/lib/book.js';
 
 let site;
 let articles;

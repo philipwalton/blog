@@ -11,10 +11,10 @@ import sharp from 'sharp';
 import {promisify} from 'util';
 import {addAsset, generateRevisionedAsset} from './assets.js';
 import {cssCache, jsCache} from './cache.js';
+import {bundleCSS} from './css.js';
+import {bundleJS} from './javascript.js';
 import {renderMarkdown} from './markdown.js';
 import {memoize, memoizeWithSrc, memoizeWithSrcCache} from './memoize.js';
-import {bundleJS} from '../javascript.js';
-import {bundleCSS} from '../css.js';
 
 const memoImgSize = memoize(promisify(imgSizePkg));
 const memoBundleJS = memoizeWithSrcCache(jsCache, bundleJS);

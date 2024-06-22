@@ -1,35 +1,46 @@
 import chokidar from 'chokidar';
-import {build} from './build.js';
-import {cssCache, jsCache} from './utils/cache.js';
-import {start as startServer} from './utils/server.js';
-import {start as startWorker} from './utils/worker.js';
+import fs from 'fs-extra';
+import {cssCache, jsCache} from './lib/cache.js';
+import {buildAll} from './lib/content.js';
+import {bundleSW} from './lib/sw.js';
 
 const cssWatcher = chokidar.watch('assets/css/**/*.css');
 
 cssWatcher.on('ready', () => {
-  cssWatcher.on('all', (...args) => {
+  cssWatcher.on('all', async (...args) => {
     console.log('css', ...args);
     cssCache.invalidate();
-    build();
+    await buildAll();
+    await bundleSW();
   });
 });
 
 const jsWatcher = chokidar.watch('assets/javascript/**/*.js');
 
 jsWatcher.on('ready', () => {
-  jsWatcher.on('all', (...args) => {
+  jsWatcher.on('all', async (...args) => {
     console.log('js', ...args);
     jsCache.invalidate();
-    build();
+    await buildAll();
+    await bundleSW();
   });
 });
 
 const swWatcher = chokidar.watch(['assets/sw/**/*.js', 'worker/**/*.js']);
 
 swWatcher.on('ready', () => {
-  swWatcher.on('all', (...args) => {
+  swWatcher.on('all', async (...args) => {
     console.log('sw', ...args);
-    build();
+    await bundleSW();
+  });
+});
+
+const staticWatcher = chokidar.watch(['assets/static/*']);
+
+staticWatcher.on('ready', () => {
+  staticWatcher.on('all', async (...args) => {
+    console.log('static', ...args);
+    await fs.copy('./assets/static/', 'build/', {recursive: true});
   });
 });
 
@@ -41,11 +52,9 @@ const contentWatcher = chokidar.watch([
 ]);
 
 contentWatcher.on('ready', () => {
-  contentWatcher.on('all', (...args) => {
+  contentWatcher.on('all', async (...args) => {
     console.log('content', ...args);
-    build();
+    await buildAll();
+    await bundleSW();
   });
 });
-
-startWorker();
-startServer();

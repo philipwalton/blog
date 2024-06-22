@@ -4,10 +4,8 @@ import fs from 'fs-extra';
 const PORT = 3001;
 const LOG_FILE = 'beacons.log';
 
-let server;
-
-export const start = async () => {
-  server = http.createServer((req, res) => {
+http
+  .createServer((req, res) => {
     let body = ''; // Store request body chunks
     req.on('data', (chunk) => (body += chunk));
     req.on('end', async () => {
@@ -22,14 +20,5 @@ export const start = async () => {
 
       res.end();
     });
-  });
-  return new Promise((resolve) => {
-    server.listen(PORT, 'localhost', () => resolve());
-  });
-};
-
-export const stop = () => {
-  return new Promise((resolve) => {
-    server.close(() => resolve());
-  });
-};
+  })
+  .listen(PORT, 'localhost');

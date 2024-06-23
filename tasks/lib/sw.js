@@ -61,7 +61,7 @@ export const bundleSW = async () => {
 
   const bundle = await rollup({
     input: {
-      'sw': `assets/sw/sw.js`,
+      'sw': `src/sw/sw.js`,
     },
     // cache: bundleCache,
     plugins,

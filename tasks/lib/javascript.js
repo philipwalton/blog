@@ -40,7 +40,7 @@ export const bundleJS = async (entry) => {
 
   const bundle = await rollup({
     input: {
-      [path.basename(entry, '.js')]: `assets/javascript/${entry}`,
+      [path.basename(entry, '.js')]: `src/javascript/${entry}`,
     },
     cache: bundleCache,
     plugins,

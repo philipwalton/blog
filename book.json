@@ -46,7 +46,7 @@
     },
     {
       "title": "Web Manifest",
-      "path": "/manifest.json"
+      "path": "/site.webmanifest"
     }
   ],
   "articles": [
@@ -301,21 +301,21 @@
       "title": "My Challenge to the Web Performance Community",
       "path": "/articles/my-challenge-to-the-web-performance-community/",
       "date": "2021-10-06T07:18:38.000Z",
-      "image": "assets/images/poster/lh-cwv-correlation-poster.png",
+      "image": "src/images/poster/lh-cwv-correlation-poster.png",
       "excerpt": "Performance optimization should be about making your users happy, not about making your tools happy. And if we really believe that, we should lead by example."
     },
     {
       "title": "Performant A/B Testing with Cloudflare Workers",
       "path": "/articles/performant-a-b-testing-with-cloudflare-workers/",
       "date": "2021-12-20T14:01:14.000Z",
-      "image": "assets/images/poster/ab-testing-poster.png",
+      "image": "src/images/poster/ab-testing-poster.png",
       "excerpt": "I think there's a perception in our industry that A/B testing is super complicated and you really need a tool or service to do it right. And while I'm sure some aspects of A/B are quite complex"
     },
     {
       "title": "Dynamic LCP Priority: Learning from Past Visits",
       "path": "/articles/dynamic-lcp-priority/",
       "date": "2022-12-28T20:43:44.000Z",
-      "image": "assets/images/poster/dynamic-lcp-priority-poster.png",
+      "image": "src/images/poster/dynamic-lcp-priority-poster.png",
       "excerpt": "Earlier this year, Chrome shipped the new Priority Hints API, which lets developers inform the browser which resources are the most important, such as the LCP image. There's just one small problem"
     }
   ]

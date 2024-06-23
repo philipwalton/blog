@@ -59,7 +59,7 @@ const catchAndLogErrors = (fn) => {
 };
 
 export const initTemplates = () => {
-  const env = nunjucks.configure('templates', {
+  const env = nunjucks.configure('src/templates', {
     autoescape: false,
     noCache: true,
     watch: false,
@@ -130,7 +130,7 @@ export const initTemplates = () => {
     new InlineShortcode('Img', async (props) => {
       let {alt, border, href, figcaption, src} = props;
 
-      const filename = `assets/images/articles/${props.src}`;
+      const filename = `src/images/articles/${props.src}`;
 
       const dimensions = await memoImgSize(filename);
       const width = Math.min(1400, dimensions.width);
@@ -188,7 +188,7 @@ export const initTemplates = () => {
     'Style',
     new InlineShortcode('Style', async (props) => {
       const {entry, inline} = props;
-      const filePath = `./assets/css/${entry}`;
+      const filePath = `./src/css/${entry}`;
       const css = await memoBundleCSS(filePath);
 
       if (inline) {

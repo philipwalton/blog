@@ -8,6 +8,6 @@
   "publicStaticPath": "/static",
   "publicModulesDir": "build/modules",
   "publicModulesPath": "/modules",
-  "templatesDir": "templates",
+  "templatesDir": "src/templates",
   "timezone": "America/Los_Angeles"
 }

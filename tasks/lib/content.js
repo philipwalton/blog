@@ -23,7 +23,7 @@ const renderArticleContentPartials = async () => {
     };
 
     const markdown = await fs.readFile(
-      `${article.path.slice(1, -1)}.md`,
+      `src/${article.path.slice(1, -1)}.md`,
       'utf-8',
     );
 

@@ -7,18 +7,9 @@
 /favicon.ico
   cache-control: max-age=31536000, immutable
 
-/manifest.js
+/site.webmanifest
   cache-control: no-cache
 
 /sw.js
   cache-control: no-cache
   ! etag
-
-/
-  cache-control: max-age=300
-
-/about/*
-  cache-control: max-age=300
-
-/articles/*
-  cache-control: max-age=300

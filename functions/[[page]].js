@@ -52,16 +52,7 @@ function setXIDToCookie(xid, response) {
  * @returns {Response}
  */
 function addServerTimingHeaders(response, startTime) {
-  const serverTiming = [];
-
-  const cfCache = response.headers.get('cf-cache-status');
-  if (cfCache) {
-    serverTiming.push(`cf_cache;desc=${cfCache}`);
-  }
-
-  serverTiming.push(`worker;dur=${Date.now() - startTime}`);
-
-  response.headers.set('Server-Timing', serverTiming.join(', '));
+  response.headers.set('Server-Timing', `worker;dur=${Date.now() - startTime}`);
 }
 
 /**
@@ -106,12 +97,8 @@ async function handleRequest({request, env}) {
 
   const clone = new Response(response.body, response);
 
-  // Remove `Etag` headers since the response will be modified.
-  // clone.headers.delete('etag');
-
-  // Modify headers set by Cloudflare
-  // clone.headers.set('cache-control', 'max-age=0');
-  // clone.headers.delete('access-control-allow-origin');
+  // Explicitly set cache-control headers.
+  clone.headers.set('cache-control', 'max-age=60');
 
   setXIDToCookie(xid, clone);
   addServerTimingHeaders(clone, startTime);

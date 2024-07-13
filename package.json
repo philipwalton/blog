@@ -112,6 +112,6 @@
     "workbox-strategies": "^7.1.0",
     "workbox-streams": "^7.1.0",
     "workbox-window": "^7.1.0",
-    "wrangler": "^3.60.3"
+    "wrangler": "^3.64.0"
   }
 }

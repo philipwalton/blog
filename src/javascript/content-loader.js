@@ -6,6 +6,11 @@ import {now} from './utils/performance';
 let history2;
 
 const getContentPartialPath = (pagePath) => {
+  if (pagePath.endsWith(self.__PARTIAL_PATH__)) {
+    // If the pagePath already contains the partial path, don't append it.
+    // Note: this can happen when the SW notifies of a cache update.
+    return pagePath;
+  }
   return pagePath + self.__PARTIAL_PATH__;
 };
 

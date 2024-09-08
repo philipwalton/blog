@@ -98,7 +98,8 @@ async function handleRequest({request, env}) {
   const clone = new Response(response.body, response);
 
   // Explicitly set cache-control headers.
-  clone.headers.set('cache-control', 'max-age=60');
+  const maxAge = url.hostname === 'localhost' ? '0' : '60';
+  clone.headers.set('cache-control', `max-age=${maxAge}`);
 
   setXIDToCookie(xid, clone);
   addServerTimingHeaders(clone, startTime);

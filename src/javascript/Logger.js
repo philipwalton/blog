@@ -13,7 +13,7 @@ const LOG_VERSION = 3;
 
 const SESSION_TIMEOUT = 1000 * 60 * 30; // 30 minutes.
 
-// const SEND_TIMEOUT = self.__ENV__ === 'production' ? SESSION_TIMEOUT : 1000;
+const SEND_TIMEOUT = self.__ENV__ === 'production' ? 60000 : 1000;
 
 let index = 1;
 
@@ -206,21 +206,12 @@ export class Logger {
     }
 
     this._fetchLaterController = new AbortController();
-
-    // To better measure the `fetch_later` experiment, send page_view events
-    // right away so we can compare the rate of received fetch_later events
-    // with the rate of received page_view events.
-    if (params.en === 'page_view' && this._sendCount === 1) {
-      this._fetchLaterResult = {
-        activated: navigator.sendBeacon(`/log?v=${LOG_VERSION}`, data),
-      };
-    } else {
-      this._fetchLaterResult = fetchLater(`/log?v=${LOG_VERSION}`, {
-        method: 'POST',
-        body: data,
-        signal: this._fetchLaterController.signal,
-      });
-    }
+    this._fetchLaterResult = fetchLater(`/log?v=${LOG_VERSION}`, {
+      method: 'POST',
+      body: data,
+      signal: this._fetchLaterController.signal,
+      activateAfter: SEND_TIMEOUT,
+    });
   }
 
   // _dedupeEvents(params) {

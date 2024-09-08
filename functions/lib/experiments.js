@@ -1,6 +1,6 @@
 const FETCH_LATER_TOKEN =
   // eslint-disable-next-line max-len
-  'AiFbmKao6wuKvoETvcxO14nv9Ksg8/r1rB7W5e2psy13ZKFHas0yWJXVW0ymUZAfVTI7A40ulLPGF2K9IM9EzQMAAABXeyJvcmlnaW4iOiJodHRwczovL3BoaWxpcHdhbHRvbi5jb206NDQzIiwiZmVhdHVyZSI6IkZldGNoTGF0ZXJBUEkiLCJleHBpcnkiOjE3MjU0MDc5OTl9';
+  'Ao1ryfd8fdqfiAsCIPw8u/hg/poMifRObWWqJcgoUH1kmUYLdQXZA1vMT1hqitwdlvdG7vrdVUfTAmxQ11PqywIAAABXeyJvcmlnaW4iOiJodHRwczovL3BoaWxpcHdhbHRvbi5jb206NDQzIiwiZmVhdHVyZSI6IkZldGNoTGF0ZXJBUEkiLCJleHBpcnkiOjE3NDIyNTYwMDB9';
 
 const experiments = {
   fetch_later: {

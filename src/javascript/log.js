@@ -38,9 +38,6 @@ export const init = async () => {
   trackErrors();
   trackPageviews();
 
-  // Send a `fetch_later` event to track the reliability of the fetchLater() API
-  log.event('fetch_later', {visibility_state: document.visibilityState});
-
   // Start FCP monitoring first, so its the first event to be logged.
   trackFCP();
 

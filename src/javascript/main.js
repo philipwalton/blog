@@ -1,5 +1,6 @@
 import * as breakpoints from './breakpoints';
 import * as contentLoader from './content-loader';
+import * as linkableHeadings from './linkable-headings';
 import * as sw from './sw-init';
 import * as log from './log';
 
@@ -24,6 +25,7 @@ const initLog = async () => {
 const main = async () => {
   breakpoints.init();
   contentLoader.init();
+  linkableHeadings.init();
 
   // NOTE: make sure `initServiceWorker()` finishes before running
   // `initLog()` because it needs to add pre-send dependencies.

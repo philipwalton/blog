@@ -1,0 +1,16 @@
+.LinkableHeading {
+
+}
+
+.LinkableHeading-anchor {
+  color: var(--text-color-inverted-faded);
+  font-weight: 400;
+  margin-left: 0.333em;
+  text-decoration: none;
+}
+
+.LinkableHeading-anchor:hover,
+.LinkableHeading-anchor:active {
+  color: var(--accent-color);
+  text-decoration: none;
+}

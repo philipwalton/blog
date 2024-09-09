@@ -1,5 +1,6 @@
 import * as alerts from './alerts';
 import History2 from './history2';
+import * as linkableHeadings from './linkable-headings';
 import {log, trackError} from './log';
 import {now} from './utils/performance';
 
@@ -125,6 +126,7 @@ const trackPageview = async (pathname) => {
 export const loadPage = async (pathname) => {
   updatePageContent(await fetchPageContent(pathname));
   executeContainerScripts();
+  linkableHeadings.init();
 };
 
 /**

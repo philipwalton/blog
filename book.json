@@ -315,6 +315,13 @@
       "date": "2022-12-28T20:43:44.000Z",
       "image": "src/images/poster/dynamic-lcp-priority-poster.png",
       "excerpt": "Earlier this year, Chrome shipped the new Priority Hints API, which lets developers inform the browser which resources are the most important, such as the LCP image. There's just one small problem"
+    },
+    {
+      "title": "The State of ES5 on the Web",
+      "path": "/articles/the-state-of-es5-on-the-web/",
+      "date": "2024-09-08T15:18:32.000Z",
+      "image": "src/images/poster/state-of-es5-poster.png",
+      "excerpt": "Should web developers and JavaScript library authors still transpile their code to ES5? This post looks at what the data suggests based on what popular libraries, tools, and websites are doing"
     }
   ]
 }

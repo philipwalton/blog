@@ -242,7 +242,7 @@ This last finding kinda blew my mind.
 
 To reiterate what I said earlier—because it warrants repeating—if a browser does not support ES6+ syntax (such as IE 11), then it will error when trying to load a script file that contains ES6+ syntax. And if the browser *does* support ES6+ syntax, then it doesn't need any of that ES5 helper code or any of the legacy polyfills. There is absolutely no reason to include both.
 
-To double check that the results of this query were accurate, I manually tested 20 random sites on the list and confirmed that they do in fact include both the ES5 helper code as well as ES6+ syntax in some of the same script bundles, and that those script bundles do indeed fail when loaded in IE 11.
+To double check that the results of this query were accurate, I manually tested 20 random sites on the list and confirmed that they do in fact include both the ES5 helper code as well as ES6+ syntax in some of the same script bundles. I also manually visited those sites in IE 11 and confirmed that those script bundles do indeed fail to load.
 
 Keep in mind that these are not just random sites on the Internet; these are the 10,000 most popular websites in the world, which account for the vast majority of all web usage globally.
 

@@ -18,7 +18,7 @@ JavaScript engines have been optimizing for ES5 code for much longer than they h
 
 However, if you're authoring code in ES6+ syntax and then using a build tool to transpile it to ES5, that generally results in a lot of polyfill and transpiler bloat that can significantly increase the size of your final bundles.
 
-To illustrate this point, here's a particularly egregious example:
+To illustrate this point, here's an example:
 
 ```js
 console.log([1, 2, 3].at(-1));
@@ -31,7 +31,7 @@ var arr = [1, 2, 3];
 console.log(arr[arr.length - 1]);
 ```
 
-However, if you transpile this single line of code with [Babel](https://babeljs.io) and [configure it to add polyfills](https://babeljs.io/docs/babel-preset-env#usebuiltins)—even if you limited it to just the needed polyfills based on usage in the source code—it includes [187 core-js dependencies](https://gist.github.com/philipwalton/f7087b287be1af14bda41bcf35b6c3cc) and goes from being 31 bytes to [44,157 bytes minified!](https://gist.githubusercontent.com/philipwalton/f7087b287be1af14bda41bcf35b6c3cc/raw/b5a8126a95eac6a998406cb2d8d3df5b391fc8b5/output.js)
+However, if you transpile this single line of code with [Babel](https://babeljs.io) and [configure it to add polyfills](https://babeljs.io/docs/babel-preset-env#usebuiltins)—even if you limited it to just the needed polyfills based on usage in the source code—it includes [71 core-js dependencies](https://gist.github.com/philipwalton/f7087b287be1af14bda41bcf35b6c3cc) and goes from being 31 bytes to [11,217 bytes minified!](https://gist.githubusercontent.com/philipwalton/f7087b287be1af14bda41bcf35b6c3cc/raw/e35209d1999008b52ab0603af65f3e11360fe22c/output.js)
 
 The point of this example is not to shame Babel or core-js. Those tools need to be able to support all possible ES6+ code, which requires them to account for all sorts of edge cases (though this particular example doesn't have any).
 

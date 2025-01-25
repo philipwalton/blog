@@ -339,7 +339,7 @@ describe('worker', () => {
         });
 
         expect(await a.text()).toMatch(
-          /<meta http-equiv="origin-trial" content="AiFbmKao6wuKvoETvcxO14nv9K/,
+          /<meta http-equiv="origin-trial" content="Ao1ryfd8fdqfiAsCIPw8u/,
         );
 
         const b = await worker.fetch('/', {
@@ -347,7 +347,7 @@ describe('worker', () => {
         });
 
         expect(await b.text()).not.toMatch(
-          /<meta http-equiv="origin-trial" content="AiFbmKao6wuKvoETvcxO14nv9K/,
+          /<meta http-equiv="origin-trial" content="Ao1ryfd8fdqfiAsCIPw8u/,
         );
       });
     });

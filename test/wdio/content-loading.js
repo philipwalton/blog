@@ -1,4 +1,5 @@
 import assert from 'assert';
+import {clearStorage} from './utils/clearStorage.js';
 import {initBook} from '../../tasks/lib/book.js';
 
 let site;
@@ -12,12 +13,7 @@ describe('The content loader', async () => {
     articles = book.articles;
     pages = book.pages;
 
-    await browser.url('/__reset');
-    await browser.waitUntil(async () => {
-      return await browser.execute(() => {
-        return window.__ready__ === true;
-      });
-    });
+    await clearStorage();
   });
 
   beforeEach(async () => {
@@ -161,7 +157,7 @@ describe('The content loader', async () => {
     await articleLink.click();
 
     const shareButton = await $('#share');
-    assert(await shareButton.isDisplayedInViewport());
+    assert(await shareButton.isDisplayed({withinViewport: true}));
 
     await assertIsInitialPageLoad();
   });

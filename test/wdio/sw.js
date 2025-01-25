@@ -1,10 +1,12 @@
 import assert from 'assert';
 import fs from 'fs-extra';
+import {clearStorage} from './utils/clearStorage.js';
 
 describe('Service Worker', () => {
   beforeEach(async () => {
     restoreSWVersion();
-    await browser.url('/__reset');
+    await clearStorage();
+
     // Set the default experiment group.
     await browser.setCookies({name: 'xid', value: '.999', path: '/'});
   });

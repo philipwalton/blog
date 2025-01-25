@@ -1,11 +1,8 @@
 import {strict as assert} from 'node:assert';
 import {beaconsContain, clearBeacons, getBeacons} from './utils/beacons.js';
+import {clearStorage} from './utils/clearStorage.js';
+import {setExperimentCookie} from './utils/setExperimentCookie.js';
 import {initBook} from '../../tasks/lib/book.js';
-
-import {
-  clearExperimentCookie,
-  setExperimentCookie,
-} from './utils/experiments.js';
 
 let articles;
 let pages;
@@ -21,10 +18,10 @@ describe('log', function () {
 
   beforeEach(async () => {
     await clearBeacons();
-    await clearExperimentCookie();
+    await clearStorage();
   });
 
-  describe('experiments', () => {
+  describe.only('experiments', () => {
     // Unskip when running an experiment
     it('should load the proper experiment', async () => {
       await setExperimentCookie('.234');
@@ -54,7 +51,8 @@ describe('log', function () {
         });
       });
 
-      await browser.url('/__reset');
+      await clearStorage();
+
       await setExperimentCookie('.789');
       await browser.url(`/articles/?test_id=${++testID}`);
 

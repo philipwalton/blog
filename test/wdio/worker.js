@@ -1,4 +1,5 @@
 import {strict as assert} from 'assert';
+import {clearStorage} from './utils/clearStorage.js';
 
 describe('worker', function () {
   describe('priority hints', function () {
@@ -40,14 +41,7 @@ describe('worker', function () {
         }).observe({type: 'resource', buffered: true});
       });
 
-      await browser.url('/__reset');
-
-      // Wait until the SW has unregistered.
-      await browser.waitUntil(async () => {
-        return await browser.execute(() => {
-          return window.__ready__ === true;
-        });
-      });
+      await clearStorage();
 
       // Set a query param to ensure a cached version of the page isn't used.
       await browser.url(urlWithLCPImage + '?cache=bust');
@@ -71,14 +65,7 @@ describe('worker', function () {
       // to ensure that it doesn't happen.
       await browser.pause(2000);
 
-      await browser.url('/__reset');
-
-      // Wait until the SW has unregistered.
-      await browser.waitUntil(async () => {
-        return await browser.execute(() => {
-          return window.__ready__ === true;
-        });
-      });
+      await clearStorage();
 
       // Set a query param to ensure a cached version of the page isn't used.
       await browser.url(urlWithoutLCPImage + '?cache=bust');

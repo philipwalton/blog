@@ -68,7 +68,6 @@
     "chromedriver": "^132.0.1",
     "common-tags": "^1.8.2",
     "cssnano": "7.0.6",
-    "dom-utils": "^0.9.0",
     "eslint": "^8.57.0",
     "fs-extra": "^11.3.0",
     "globby": "^14.0.2",

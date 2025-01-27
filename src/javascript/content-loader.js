@@ -1,10 +1,9 @@
 import * as alerts from './alerts';
-import History2 from './history2';
 import * as linkableHeadings from './linkable-headings';
 import {log, trackError} from './log';
 import {now} from './utils/performance';
 
-let history2;
+let isLoaderDisabled = false;
 
 const getContentPartialPath = (pagePath) => {
   if (pagePath.endsWith(self.__PARTIAL_PATH__)) {
@@ -93,21 +92,6 @@ const executeContainerScripts = () => {
 };
 
 /**
- * Sets the scroll position of the main document to the top of the page or
- * to the position of an element if a hash fragment is passed.
- * @param {string} hash The hash fragment of a URL to match with an element ID.
- */
-const setScroll = (hash) => {
-  const target = hash && document.getElementById(hash.slice(1));
-  const scrollPos = target ? target.offsetTop : 0;
-
-  // TODO: There's a weird bug were sometimes this function doesn't do anything
-  // if the browser has already visited the page and thinks it has a scroll
-  // position in mind.
-  window.scrollTo(0, scrollPos);
-};
-
-/**
  * Updates log to reflect the current page.
  * @param {string} pathname
  */
@@ -134,24 +118,35 @@ export const loadPage = async (pathname) => {
  * link click.
  */
 export const disableLoader = () => {
-  history2 && history2.disable();
+  isLoaderDisabled = true;
 };
 
 /**
  * Initializes the dynamic, page-loading code.
  */
 export const init = () => {
-  // Only load external content via fetch if the browser support pushState.
-  if (!(window.history && window.history.pushState)) return;
+  // Only go SPA mode if the browser supports the Navigation API.
+  if (!self.navigation) return;
 
-  history2 = new History2(async (state) => {
-    try {
-      await loadPage(state.pathname);
-      setScroll(state.hash);
-      trackPageview(state.pathname);
-    } catch (err) {
-      trackError(/** @type {!Error} */ (err));
-      throw err;
-    }
+  navigation.addEventListener('navigate', (event) => {
+    const url = new URL(event.destination.url);
+
+    // Don't navigate is cases where `isLoaderDisabled` is `true`.
+    if (isLoaderDisabled) return;
+
+    // Ignore navigations to resources.
+    if (url.pathname.match(/\.(png|svg|webp)$/)) return;
+
+    event.intercept({
+      async handler() {
+        try {
+          await loadPage(url.pathname);
+          trackPageview(url.pathname);
+        } catch (err) {
+          trackError(err);
+          throw err;
+        }
+      },
+    });
   });
 };

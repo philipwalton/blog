@@ -15,7 +15,8 @@
     "clients": false,
     "FetchEvent": false,
     "skipWaiting": false,
-    "HTMLRewriter": false
+    "HTMLRewriter": false,
+    "navigation": false
   },
   "extends": ["eslint:recommended"]
 }

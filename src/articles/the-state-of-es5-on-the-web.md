@@ -268,7 +268,7 @@ Given the data presented in this article, <mark>it definitely does not make sens
 
 Practically speaking, library authors have no information about the browser support needs of the websites importing them, so it doesn't make sense for them to be making that decision for all consumers of their library. At the same time, library authors shouldn't assume that all consumers of their library will be able to run it through a sophisticated build process, so it's important that their published code uses fully standard JavaScript and works in the current set of widely used browsers.
 
-So what targets should library authors choose? In my opinion the best solution for library authors is to use [Baseline](https://web.dev/baseline)—specifically to only include [Baseline Widely Available](https://web.dev/baseline#:~:text=Widely%20available%3A%2030%20months%20has%20passed%20since%20the%20newly%20interoperable%20date.%20The%20feature%20can%20be%20used%20by%20most%20sites%20without%20worrying%20about%20support.) features in any published code.
+So what targets should library authors choose? In my opinion the best solution for library authors is to use [Baseline](https://web-platform-dx.github.io/web-features/)—specifically to only include [Baseline Widely Available](https://web-platform-dx.github.io/web-features/#:~:text=Widely%20available%3A%20The%20feature%20is%20well%20established%20and%20works%20across%20many%20devices%20and%20browser%20versions.%20It%E2%80%99s%20been%20available%20across%20browsers%20for%20at%20least%202%C2%BD%20years%20(30%20months).%20Indicated%20with%20a%20green%20icon.) features in any published code.
 
 If you're not familiar with Baseline, it's an effort by the [WebDX Community Group](https://www.w3.org/community/webdx/) within the W3C to help developers easily identify features that are stable and well supported by all major browsers and browser rendering engines across desktop and mobile. A feature is considered _Baseline Widely Available_ if it has been available in stable versions of all four major browsers for at least 30 months.
 
@@ -315,7 +315,7 @@ The main points I want readers to take from this article are:
   </li>
   <li>
     <strong>Build tools and libraries should not use a fixed browser support policy.</strong>
-    <p>These policies can quickly become outdated, which leads to the scenario highlighted by the data in this article. Browser support decisions should be made by the site itself, not the tools it's using. A good browser support policy for tools and libraries is <a href="https://web.dev/baseline">Baseline Widely Available</a>.</p>
+    <p>These policies can quickly become outdated, which leads to the scenario highlighted by the data in this article. Browser support decisions should be made by the site itself, not the tools it's using. A good browser support policy for tools and libraries is <a href="https://web-platform-dx.github.io/web-features/">Baseline Widely Available</a>.</p>
   </li>
   <li>
     <strong>Website developers who import third-party libraries should process those libraries as part of their build.</strong>

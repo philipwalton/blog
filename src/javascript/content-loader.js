@@ -93,22 +93,41 @@ const executeContainerScripts = () => {
 
 /**
  * Updates log to reflect the current page.
- * @param {string} pathname
+ * @param {URL} url
  */
-const trackPageview = async (pathname) => {
-  log.set({page_path: pathname});
+const trackPageview = async (url) => {
+  log.set({page_path: url.pathname});
   log.event('page_view', {
     navigation_type: 'route_change',
     visibility_state: document.visibilityState,
   });
 };
 
+// /**
+//  * Sets the scroll position of the main document to the top of the page or
+//  * to the position of an element if a hash fragment is passed.
+//  * @param {string} hash The hash fragment of a URL to match with an element ID.
+//  */
+// const setScroll = (hash) => {
+//   const target = hash && document.getElementById(hash.slice(1));
+//   const scrollPos = target ? target.offsetTop : 0;
+
+//   // TODO: There's a weird bug were sometimes this function doesn't do anything
+//   // if the browser has already visited the page and thinks it has a scroll
+//   // position in mind.
+//   window.scrollTo(0, scrollPos);
+// };
+
 /**
  * Loads a page partial for the passed pathname and updates the content.
- * @param {string} pathname
+ * @param {URL} url
  */
-export const loadPage = async (pathname) => {
-  updatePageContent(await fetchPageContent(pathname));
+export const loadPage = async (url) => {
+  const content = await fetchPageContent(url.pathname);
+  if (!url.hash) {
+    window.scrollTo(0, 0);
+  }
+  updatePageContent(content);
   executeContainerScripts();
   linkableHeadings.init();
 };
@@ -140,8 +159,8 @@ export const init = () => {
     event.intercept({
       async handler() {
         try {
-          await loadPage(url.pathname);
-          trackPageview(url.pathname);
+          await loadPage(url);
+          trackPageview(url);
         } catch (err) {
           trackError(err);
           throw err;

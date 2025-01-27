@@ -4,20 +4,20 @@
   box-shadow: 0 0 10px hsla(0, 0%, 0%, 0.4);
   color: #fff;
   display: flex;
-  left: 0;
+  max-width: 100%;
   padding: var(--gap);
-  position: absolute;
-  right: 0;
-  top: 0;
   transform: translate3d(0, -100%, 0);
+  transition:
+    display .2s,
+    transform .2s var(--easing);
+  width: 100%;
 }
 
-.Alert--isTransitioning {
-  transition: transform .2s var(--easing);
-}
-
-.Alert--isActive {
+.Alert:popover-open {
   transform: translate3d(0, 0%, 0);
+  @starting-style {
+    transform: translate3d(0, -100%, 0);
+  }
 }
 
 .Alert-icon {

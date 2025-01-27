@@ -1,5 +1,6 @@
 import assert from 'assert';
 import fs from 'fs-extra';
+import {Key} from 'webdriverio';
 import {clearStorage} from './utils/clearStorage.js';
 
 describe('Service Worker', () => {
@@ -38,10 +39,21 @@ describe('Service Worker', () => {
     await browser.url('/?v=2');
 
     const message = await $('.Message');
-    await message.waitForDisplayed();
 
     // Pause so when watching the test you can visually see the message.
     await browser.pause(1000);
+
+    assert(
+      (await message.getText()).includes(
+        'A newer version of this site is available.',
+      ),
+    );
+
+    await browser.keys([Key.Escape]);
+    // Give the alert time to animate out.
+    await browser.pause(200);
+
+    assert(!(await message.isExisting()));
   });
 
   it(`should not show an update notice for non-major SW version changes`, async () => {

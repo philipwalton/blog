@@ -1,11 +1,9 @@
 @import "./base/custom-media.css";
 
 @import "./components/alert.css";
-@import "./components/alert-container.css";
 @import "./components/footnotes.css";
 @import "./components/linkable-heading.css";
 @import "./components/message.css";
-@import "./components/message-container.css";
 
 @import "highlight.js/styles/github";
 

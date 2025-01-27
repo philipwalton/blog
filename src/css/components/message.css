@@ -1,27 +1,33 @@
 .Message {
+  bottom: 0;
+  opacity: 0;
+  top: auto;
+  transform: translate3d(0, calc(100% + 3em), 0);
+  transition:
+    display .2s,
+    opacity .2s,
+    transform .2s var(--easing);
+}
+
+.Message:popover-open {
+  opacity: 1;
+  transform: translate3d(0, 0%, 0);
+  @starting-style {
+    opacity: 0;
+    transform: translate3d(0, 100%, 0);
+  }
+}
+
+.Message-container {
   align-items: center;
+
   background: hsl(0, 0%, 25%);
   box-shadow: 0 0 1em hsla(0, 0%, 0%, .15);
   color: #fff;
   display: flex;
   line-height: 1.3;
-  margin: 0 1.5em 1.5em;
+  margin: 1.5em;
   padding: 1em 0 1em 1.5em;
-
-  opacity: 0;
-  transform: translate3d(0, 100%, 0);
-}
-
-.Message--isTransitioning {
-  transition:
-      opacity .2s var(--easing),
-      transform .2s var(--easing);
-
-}
-
-.Message--isActive {
-  opacity: 1;
-  transform: translate3d(0, 0%, 0);
 }
 
 .Message-body {

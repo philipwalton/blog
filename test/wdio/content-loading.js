@@ -1,4 +1,5 @@
 import assert from 'assert';
+import {Key} from 'webdriverio';
 import {clearStorage} from './utils/clearStorage.js';
 import {initBook} from '../../tasks/lib/book.js';
 
@@ -160,6 +161,54 @@ describe('The content loader', async () => {
     assert(await shareButton.isDisplayed({withinViewport: true}));
 
     await assertIsInitialPageLoad();
+  });
+
+  it('should show an error if the content cannot be loaded', async () => {
+    // Adds a hash fragments to an article URL.
+    // Don't use an arrow function since this is eval'ed in test browsers.
+    await browser.execute(function () {
+      document.querySelector('.ArticleList-item:first-child a').href =
+        '/non-existent-page/';
+      document.querySelector('.ArticleList-item:last-child a').href =
+        '/another-non-existent-page/';
+    });
+
+    const articleLink1 = await $('.ArticleList-item:first-child a');
+    await articleLink1.click();
+
+    const alert1 = await $('.Alert');
+
+    // Pause so when watching the test you can visually see the alert come in.
+    await browser.pause(1000);
+
+    assert((await alert1.getText()).includes('(404) Not Found'));
+
+    await browser.keys([Key.Escape]);
+    // Give the alert time to animate out.
+    await browser.pause(200);
+
+    assert(!(await alert1.isExisting()));
+
+    const articleLink2 = await $('.ArticleList-item:last-child a');
+    await articleLink2.click();
+
+    // Give the alert time to animate in.
+    await browser.pause(200);
+
+    const alert2 = await $('.Alert');
+
+    // Pause so when watching the test you can visually see the alert come in.
+    await browser.pause(1000);
+
+    assert((await alert2.getText()).includes('(404) Not Found'));
+
+    const closeButton = $('.Alert-close');
+    await closeButton.click();
+
+    // Give the alert time to animate out.
+    await browser.pause(200);
+
+    assert(!(await alert2.isExisting()));
   });
 });
 

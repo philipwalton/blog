@@ -192,3 +192,9 @@ mark {
   background-color: #ffa;
   color: inherit;
 }
+
+[popover] {
+  background: transparent;
+  border: 0;
+  transition-behavior: allow-discrete!important;
+}

@@ -1,4 +1,3 @@
-import {parseUrl} from 'dom-utils';
 import {getActiveBreakpoint} from './breakpoints';
 import {initialSWState} from './sw-state';
 import {fetchLater} from './utils/fetchLater.js';
@@ -337,7 +336,10 @@ function toQueryString(params) {
  */
 function getReferrer() {
   const referrer = document.referrer;
-  if (parseUrl(referrer).hostname !== parseUrl(location.href).hostname) {
+  if (
+    referrer &&
+    new URL(referrer).hostname !== new URL(location.href).hostname
+  ) {
     return referrer;
   } else {
     return '';

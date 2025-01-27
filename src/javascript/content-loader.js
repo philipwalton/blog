@@ -122,10 +122,11 @@ const trackPageview = async (url) => {
  * Loads a page partial for the passed pathname and updates the content.
  * @param {URL} url
  */
-export const loadPage = async (url) => {
+export const loadPage = async (url, event) => {
   const content = await fetchPageContent(url.pathname);
   if (!url.hash) {
-    window.scrollTo(0, 0);
+    const state = event.destination.getState();
+    window.scrollTo(0, state?.scrollY ?? 0);
   }
   updatePageContent(content);
   executeContainerScripts();
@@ -156,10 +157,15 @@ export const init = () => {
     // Ignore navigations to resources.
     if (url.pathname.match(/\.(png|svg|webp)$/)) return;
 
+    // Store the current scroll position in the Navigation state.
+    navigation.updateCurrentEntry({
+      state: {scrollY: self.scrollY},
+    });
+
     event.intercept({
       async handler() {
         try {
-          await loadPage(url);
+          await loadPage(url, event);
           trackPageview(url);
         } catch (err) {
           trackError(err);

@@ -151,6 +151,9 @@ export const init = () => {
   navigation.addEventListener('navigate', (event) => {
     const url = new URL(event.destination.url);
 
+    // Don't intercept cross-origin navigations.
+    if (url.origin !== location.origin) return;
+
     // Don't navigate is cases where `isLoaderDisabled` is `true`.
     if (isLoaderDisabled) return;
 

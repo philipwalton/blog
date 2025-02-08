@@ -173,7 +173,10 @@ describe('worker', () => {
         ]).toString(),
       );
 
-      expect(log.body).toStrictEqual(events[0].toString());
+      const eventWithUA = new URLSearchParams(events[0]);
+      eventWithUA.set('ep.user_agent', BROWSER_HEADERS['user-agent']);
+
+      expect(log.body).toStrictEqual(eventWithUA.toString());
 
       for (const [key, value] of Object.entries(BROWSER_HEADERS)) {
         expect(log.headers.get(key)).toStrictEqual(value);
@@ -283,6 +286,7 @@ describe('worker', () => {
           ...pageParams.entries(),
           ['_uip', '1.2.3.4'],
           ...events[0].entries(),
+          ['ep.user_agent', BROWSER_HEADERS['user-agent']],
         ]).toString(),
       );
       expect(logs[0].body).toStrictEqual('');

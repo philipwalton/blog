@@ -28,6 +28,8 @@ export const log = new Logger((params) => {
   };
 });
 
+const loggedErrors = new WeakSet();
+
 /**
  * Initializes all the analytics setup. Creates trackers and sets initial
  * values on the trackers.
@@ -35,8 +37,8 @@ export const log = new Logger((params) => {
 export const init = async () => {
   setInitialParams();
 
-  trackErrors();
   trackPageviews();
+  trackErrors();
 
   // Start FCP monitoring first, so its the first event to be logged.
   trackFCP();
@@ -97,26 +99,19 @@ const trackPageviews = () => {
 };
 
 /**
- * Tracks a JavaScript error with optional fields object overrides.
+ * Tracks a JavaScript error.
  * This function is exported so it can be used in other parts of the codebase.
  * E.g.:
  *
  *    `fetch('/api.json').catch(trackError);`
  *
  * @param {*=} err
- * @param {ParamOverrides=} paramOverrides
  */
-export const trackError = (err = {}, paramOverrides = {}) => {
-  log.event(
-    'error',
-    Object.assign(
-      {
-        error_name: err.name || '(no error name)',
-        error_message: `${err.stack || err.message || '(no stack trace)'}`,
-      },
-      paramOverrides,
-    ),
-  );
+export const trackError = (err = {}) => {
+  log.event('error', {
+    error_name: err.name || '(no error name)',
+    error_message: `${err.stack || err.message || '(no stack trace)'}`,
+  });
 };
 
 /**
@@ -125,17 +120,15 @@ export const trackError = (err = {}, paramOverrides = {}) => {
  */
 const trackErrors = () => {
   // Errors that have occurred prior to this script running are stored on
-  // `window.__e.q`, as specified in `index.html`.
+  // `window.__e.q`, as specified in `_log.html`.
   const loadErrorEvents = (window.__e && window.__e.q) || [];
 
   const trackErrorEvent = (event) => {
-    // Some browsers don't have an error property, so we fake it.
-    const err = event.error || {
-      message: `${event.message} (${event.lineno}:${event.colno})`,
-    };
-    trackError(err, {
-      error_name: err.name || 'UncaughtError',
-    });
+    const err = event.error ?? event.reason;
+    if (!loggedErrors.has(err)) {
+      trackError(err);
+      loggedErrors.add(err);
+    }
   };
 
   // Replay any stored load error events.
@@ -143,11 +136,11 @@ const trackErrors = () => {
     trackErrorEvent(event);
   }
 
-  // Add a new listener to track event immediately.
+  // Add a new listener to track event immediately and remove the old one.
   window.addEventListener('error', trackErrorEvent);
-
-  // Remove the old listener.
+  window.addEventListener('unhandledrejection', trackErrorEvent);
   window.removeEventListener('error', window.__e);
+  window.removeEventListener('unhandledrejection', window.__e);
 };
 
 const trackCLS = async () => {

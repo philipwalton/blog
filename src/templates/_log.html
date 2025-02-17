@@ -1,5 +1,9 @@
 <!-- Track errors -->
-<script>addEventListener('error', self.__e=function f(e){f.q=f.q||[];f.q.push(e)});</script>
+<script>
+  self.__e=function f(e){f.q=f.q||[];f.q.push(e)};
+  addEventListener('error', self.__e);
+  addEventListener('unhandledrejection', self.__e);
+</script>
 
 {% if EXPERIMENT %}
   <!-- Set an experiment global -->

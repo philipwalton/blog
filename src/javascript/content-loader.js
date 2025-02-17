@@ -59,7 +59,7 @@ const fetchPageContent = async (pathname) => {
     });
 
     // Rethrow to be able to catch it again in an outer scope.
-    throw err;
+    throw new Error(`Failed to load '${pathname}'`, {cause: err});
   }
 };
 

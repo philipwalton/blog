@@ -71,7 +71,8 @@ export class Logger {
     };
 
     this.awaitBeforeSending(this._setClientId());
-    this.awaitBeforeSending(this._updateSessionInfo(true));
+    this.awaitBeforeSending(this._setUACHData());
+    this.awaitBeforeSending(this._updateSessionInfo());
 
     this._updateState();
 
@@ -151,8 +152,15 @@ export class Logger {
     }
 
     if (this._presendDependencies.length) {
-      await Promise.all(this._presendDependencies);
+      const deps = this._presendDependencies.slice();
       this._presendDependencies = [];
+      Promise.allSettled(deps).then((results) => {
+        for (const result of results) {
+          if (result.status === 'rejected') {
+            Promise.reject(result.reason);
+          }
+        }
+      });
     }
 
     const prefixedParams = {
@@ -167,6 +175,11 @@ export class Logger {
     }
 
     this._queue(prefixedParams);
+
+    // Print these to the console when developing locally.
+    if (self.__ENV__ !== 'production') {
+      console.debug('Log event:', prefixedParams);
+    }
   }
 
   /**
@@ -246,6 +259,36 @@ export class Logger {
     }
   }
 
+  async _setUACHData() {
+    const uachData = await navigator.userAgentData?.getHighEntropyValues([
+      'architecture',
+      'bitness',
+      'model',
+      'fullVersionList',
+      'platform',
+      'platformVersion',
+      'wow64',
+    ]);
+
+    if (uachData) {
+      this._pageParams['uaa'] = uachData['architecture'];
+      this._pageParams['uab'] = uachData['bitness'];
+      this._pageParams['uam'] = uachData['model'];
+      this._pageParams['uamb'] = Number(uachData.mobile);
+      this._pageParams['uafvl'] = uachData['fullVersionList']
+        .map((e) => {
+          return [
+            encodeURIComponent(e.brand),
+            encodeURIComponent(e.version),
+          ].join(';');
+        })
+        .join('|');
+      this._pageParams['uap'] = uachData['platform'];
+      this._pageParams['uapv'] = uachData['platformVersion'];
+      this._pageParams['uaw'] = Number(uachData['wow64']);
+    }
+  }
+
   /**
    * @return {Promise<void>}
    */
@@ -322,7 +365,11 @@ function prefixParams(initialLetter, unprefixedParams) {
 function toQueryString(params) {
   return Object.keys(params)
     .filter((key) => {
-      // Filter out, null, undefined, and empty strings, but keep zeros.
+      // Filter out empty string param unless they start with "ua".
+      if (params[key] === '') {
+        return key.startsWith('ua');
+      }
+      // Filter out all other falsy values except 0
       return params[key] || params[key] === 0;
     })
     .map((key) => {

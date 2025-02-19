@@ -1,6 +1,6 @@
 import * as alerts from './alerts';
 import * as linkableHeadings from './linkable-headings';
-import {log, trackError} from './log';
+import {log, trackUnhandledError} from './log';
 import {now} from './utils/performance';
 
 let isLoaderDisabled = false;
@@ -171,7 +171,7 @@ export const init = () => {
           await loadPage(url, event);
           trackPageview(url);
         } catch (err) {
-          trackError(err);
+          trackUnhandledError(err);
           throw err;
         }
       },

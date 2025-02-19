@@ -9,7 +9,7 @@ import {uuid} from './utils/uuid';
  * implementation. This allows you to create a segment or view filter
  * that isolates only data captured with the most recent tracking changes.
  */
-const MEASUREMENT_VERSION = 97;
+const MEASUREMENT_VERSION = 98;
 
 /**
  * A 13-digit, random identifier for the current page.
@@ -38,7 +38,7 @@ export const init = async () => {
   setInitialParams();
 
   trackPageviews();
-  trackErrors();
+  trackUnhandledErrors();
 
   // Start FCP monitoring first, so its the first event to be logged.
   trackFCP();
@@ -103,14 +103,14 @@ const trackPageviews = () => {
  * This function is exported so it can be used in other parts of the codebase.
  * E.g.:
  *
- *    `fetch('/api.json').catch(trackError);`
+ *    `fetch('/api.json').catch(trackUnhandledError);`
  *
  * @param {*=} err
  */
-export const trackError = (err = {}) => {
-  log.event('error', {
-    error_name: err.name || '(no error name)',
-    error_message: `${err.stack || err.message || '(no stack trace)'}`,
+export const trackUnhandledError = (err = {}) => {
+  log.event('unhandled_error', {
+    unhandled_error_name: err.name || '(not set)',
+    unhandled_error_message: `${err.stack || err.message || '(not set)'}`,
   });
 };
 
@@ -118,27 +118,27 @@ export const trackError = (err = {}) => {
  * Tracks any errors that may have occurred on the page prior to analytics being
  * initialized, then adds an event handler to track future errors.
  */
-const trackErrors = () => {
+const trackUnhandledErrors = () => {
   // Errors that have occurred prior to this script running are stored on
   // `window.__e.q`, as specified in `_log.html`.
   const loadErrorEvents = (window.__e && window.__e.q) || [];
 
-  const trackErrorEvent = (event) => {
+  const trackUnhandledErrorEvent = (event) => {
     const err = event.error ?? event.reason;
     if (!loggedErrors.has(err)) {
-      trackError(err);
+      trackUnhandledError(err);
       loggedErrors.add(err);
     }
   };
 
   // Replay any stored load error events.
   for (const event of loadErrorEvents) {
-    trackErrorEvent(event);
+    trackUnhandledErrorEvent(event);
   }
 
   // Add a new listener to track event immediately and remove the old one.
-  window.addEventListener('error', trackErrorEvent);
-  window.addEventListener('unhandledrejection', trackErrorEvent);
+  window.addEventListener('error', trackUnhandledErrorEvent);
+  window.addEventListener('unhandledrejection', trackUnhandledErrorEvent);
   window.removeEventListener('error', window.__e);
   window.removeEventListener('unhandledrejection', window.__e);
 };

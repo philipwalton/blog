@@ -9,7 +9,7 @@ const initServiceWorker = async () => {
     try {
       await sw.init();
     } catch (err) {
-      log.trackError(err);
+      log.trackUnhandledError(err);
     }
   }
 };

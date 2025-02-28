@@ -124,7 +124,7 @@ const addCacheUpdateListener = () => {
   // TODO(philipwalton): consider whether this is the best UX.
   wb.addEventListener('message', async ({data}) => {
     if (data && data.type === 'CACHE_UPDATED') {
-      const {updatedURL} = data.payload;
+      const updatedURL = new URL(data.payload.updatedURL);
 
       // Perform an in-place update with the next content. In most cases this
       // shouldn't be very noticeable to the user, but we'll track how often

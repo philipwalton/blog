@@ -124,7 +124,7 @@ const trackPageview = async (url) => {
  */
 export const loadPage = async (url, event) => {
   const content = await fetchPageContent(url.pathname);
-  if (!url.hash) {
+  if (event && !url.hash) {
     const state = event.destination.getState();
     window.scrollTo(0, state?.scrollY ?? 0);
   }

@@ -276,7 +276,7 @@ export class Logger {
       this._pageParams['uam'] = uachData['model'];
       this._pageParams['uamb'] = Number(uachData.mobile);
       this._pageParams['uafvl'] = uachData['fullVersionList']
-        .map((e) => {
+        ?.map((e) => {
           return [
             encodeURIComponent(e.brand),
             encodeURIComponent(e.version),

@@ -274,7 +274,7 @@ If you're not familiar with Baseline, it's an effort by the [WebDX Community Gro
 
 The main benefit of targeting something like _Baseline Widely Available_ is that it's a moving target, meaning it won't get stuck in the past, like what happened with targeting ES5 (and what is currently happening with the `esmodule` target used by Next.js, Vite, and Parcel).
 
-Library authors can configure their build system to target _Baseline Widely Available_ features now with the following [Browserslist](https://browsersl.ist/) query (for any tool that supports Browserslist):
+Library authors can configure their build system to approximate _Baseline Widely Available_ features now with the following [Browserslist](https://browsersl.ist/) query (for any tool that supports Browserslist):
 
 ```js
 targets: [
@@ -289,7 +289,7 @@ targets: [
 ```
 
 {% Callout 'info' %}
-**Note:** there's an open [feature request](https://github.com/browserslist/browserslist/issues/771) to add Baseline support to Browserslist, which would simplify the above query to just "baseline widely available".
+**Note:** this Browserslist query is the closest you can get to targeting _Baseline Widely Available_ currently, but it's not 100% accurate because in some cases it should include the browser version released immediately prior to the 2.5 years ago date. There is an open [feature request](https://github.com/browserslist/browserslist/issues/771) to add official Baseline support to Browserslist, which would solve this issue and simplify the above query to just "baseline widely available".
 {% endCallout %}
 
 If a site needs to support more browsers than those covered by _Baseline Widely Available_, that's 100% fine. That site can always configure their build system to further transpile any libraries they're importing. The point is this is a decision best made by the website developers, not the library author.

@@ -24,6 +24,26 @@ async function forwardRequest({request, env}) {
     [`v=2`, `tid=${GA4_MEASUREMENT_ID}`, paramsLine].join('&'),
   );
 
+  const ua = request.headers.get('user-agent');
+  const uach = request.headers.get('sec-ch-ua');
+
+  const eventsParams = eventsLines.map((e) => {
+    const params = new URLSearchParams(e);
+    if (
+      params.get('en') === 'page_view' &&
+      Number(params.get('epn.measurement_version')) >= 99
+    ) {
+      if (ua) {
+        params.set('ep.user_agent_1', ua.slice(0, 100));
+        params.set('ep.user_agent_2', ua.slice(100));
+      } else {
+        params.set('ep.user_agent_1', '(empty)');
+      }
+      params.set('ep.ua_ch', uach || '(empty)');
+    }
+    return params;
+  });
+
   const ip = request.headers.get('x-real-ip');
 
   // Set the `_uip` param to the IP address of the user, if available.
@@ -37,8 +57,8 @@ async function forwardRequest({request, env}) {
   // along with the _ss and _fv params.
   const newSessionPageviewEvent =
     (queryParams.has('_ss') || queryParams.has('_fv')) &&
-    eventsLines.length > 1 &&
-    eventsLines.find((line) => line.trim().startsWith('en=page_view'));
+    eventsParams.length > 1 &&
+    eventsParams.find((e) => e.get('en') === 'page_view');
 
   const newSessionParams =
     newSessionPageviewEvent &&
@@ -47,14 +67,14 @@ async function forwardRequest({request, env}) {
   if (newSessionPageviewEvent) {
     queryParams.delete('_fv');
     queryParams.delete('_ss');
-    eventsLines.splice(eventsLines.indexOf(newSessionPageviewEvent), 1);
+    eventsParams.splice(eventsParams.indexOf(newSessionPageviewEvent), 1);
   }
 
   const ga4SessionURL =
     newSessionParams && `${LOG_ENDPOINT}?${newSessionParams}`;
 
   const ga4URL = `${LOG_ENDPOINT}?${queryParams}`;
-  const ga4Body = eventsLines.join('\n');
+  const ga4Body = eventsParams.map(String).join('\n');
   const headers = copyUserHeaders(request.headers);
 
   /**

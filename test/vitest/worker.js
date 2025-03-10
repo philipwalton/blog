@@ -142,7 +142,7 @@ describe('worker', () => {
           ['ep.page_path', '/'],
           ['ep.site_version', '(none)'],
           ['ep.content_source', 'network'],
-          ['epn.measurement_version', '94'],
+          ['epn.measurement_version', '99'],
           ['epn.time_origin', '1718515562946.3'],
           ['ep.page_id', '1718515562946-5699398476786'],
           ['epn.pageshow_count', '1'],
@@ -173,7 +173,18 @@ describe('worker', () => {
         ]).toString(),
       );
 
-      expect(log.body).toStrictEqual(events[0].toString());
+      const eventWithUA = new URLSearchParams(events[0]);
+      eventWithUA.set(
+        'ep.user_agent_1',
+        BROWSER_HEADERS['user-agent'].slice(0, 100),
+      );
+      eventWithUA.set(
+        'ep.user_agent_2',
+        BROWSER_HEADERS['user-agent'].slice(100),
+      );
+      eventWithUA.set('ep.ua_ch', BROWSER_HEADERS['sec-ch-ua']);
+
+      expect(log.body).toStrictEqual(eventWithUA.toString());
 
       for (const [key, value] of Object.entries(BROWSER_HEADERS)) {
         expect(log.headers.get(key)).toStrictEqual(value);
@@ -213,7 +224,7 @@ describe('worker', () => {
           ['ep.page_path', '/'],
           ['ep.site_version', '(none)'],
           ['ep.content_source', 'network'],
-          ['epn.measurement_version', '94'],
+          ['epn.measurement_version', '99'],
           ['epn.time_origin', '1718515562946.3'],
           ['ep.page_id', '1718515562946-5699398476786'],
           ['epn.pageshow_count', '1'],
@@ -228,7 +239,7 @@ describe('worker', () => {
           ['ep.page_path', '/'],
           ['ep.site_version', '(none)'],
           ['ep.content_source', 'network'],
-          ['epn.measurement_version', '94'],
+          ['epn.measurement_version', '99'],
           ['epn.time_origin', '1718515562946.3'],
           ['ep.page_id', '1718515562946-5699398476786'],
           ['epn.pageshow_count', '1'],
@@ -247,7 +258,7 @@ describe('worker', () => {
           ['ep.page_path', '/'],
           ['ep.site_version', '(none)'],
           ['ep.content_source', 'network'],
-          ['epn.measurement_version', '94'],
+          ['epn.measurement_version', '99'],
           ['epn.time_origin', '1718515562946.3'],
           ['ep.page_id', '1718515562946-5699398476786'],
           ['epn.pageshow_count', '1'],
@@ -283,6 +294,9 @@ describe('worker', () => {
           ...pageParams.entries(),
           ['_uip', '1.2.3.4'],
           ...events[0].entries(),
+          ['ep.user_agent_1', BROWSER_HEADERS['user-agent'].slice(0, 100)],
+          ['ep.user_agent_2', BROWSER_HEADERS['user-agent'].slice(100)],
+          ['ep.ua_ch', BROWSER_HEADERS['sec-ch-ua']],
         ]).toString(),
       );
       expect(logs[0].body).toStrictEqual('');

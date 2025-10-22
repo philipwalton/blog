@@ -272,24 +272,21 @@ So what targets should library authors choose? In my opinion the best solution f
 
 If you're not familiar with Baseline, it's an effort by the [WebDX Community Group](https://www.w3.org/community/webdx/) within the W3C to help developers easily identify features that are stable and well supported by all major browsers and browser rendering engines across desktop and mobile. A feature is considered _Baseline Widely Available_ if it has been available in stable versions of all four major browsers for at least 30 months.
 
-The main benefit of targeting something like _Baseline Widely Available_ is that it's a moving target, meaning it won't get stuck in the past, like what happened with targeting ES5 (and what is currently happening with the `esmodule` target used by Next.js, Vite, and Parcel).
+The main benefit of targeting something like _Baseline Widely Available_ is that it's a moving target, meaning it won't get stuck in the past, like what happened with targeting ES5 (and what is currently happening with the `esmodule` target used by Next.js and Parcel).
 
-Library authors can configure their build system to approximate _Baseline Widely Available_ features now with the following [Browserslist](https://browsersl.ist/) query (for any tool that supports Browserslist):
+Library authors can configure their build system to use _Baseline Widely Available_ features now with the following [Browserslist](https://browsersl.ist/) query (for any tool that supports Browserslist):
 
 ```js
-targets: [
-  'chrome >0 and last 2.5 years',
-  'edge >0 and last 2.5 years',
-  'safari >0 and last 2.5 years',
-  'firefox >0 and last 2.5 years',
-  'and_chr >0 and last 2.5 years',
-  'and_ff >0 and last 2.5 years',
-  'ios >0 and last 2.5 years',
+"browserslist": [
+  "baseline widely available"
 ]
 ```
 
+See [Use Baseline with Browserslist](https://web.dev/articles/use-baseline-with-browserslist) for more details.
+
 {% Callout 'info' %}
-**Note:** this Browserslist query is the closest you can get to targeting _Baseline Widely Available_ currently, but it's not 100% accurate because in some cases it should include the browser version released immediately prior to the 2.5 years ago date. There is an open [feature request](https://github.com/browserslist/browserslist/issues/771) to add official Baseline support to Browserslist, which would solve this issue and simplify the above query to just "baseline widely available".
+**Update:** since this post was originally published, [Vite 7.0 was released](https://vite.dev/blog/announcing-vite7.html#default-browser-target-changed-to-baseline-widely-available) and opted to use Baseline Widely Available as its [default browser support target](https://vite.dev/guide/#browser-support). This makes Vite a great option for library authors who don't want to manually configure their own browser support targets.
+
 {% endCallout %}
 
 If a site needs to support more browsers than those covered by _Baseline Widely Available_, that's 100% fine. That site can always configure their build system to further transpile any libraries they're importing. The point is this is a decision best made by the website developers, not the library author.

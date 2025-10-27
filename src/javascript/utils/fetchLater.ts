@@ -1,5 +1,8 @@
-function fetchLaterPolyfill(url, init) {
-  let timeoutHandle;
+function fetchLaterPolyfill(
+  url: string,
+  init: DeferredRequestInit,
+): FetchLaterResult {
+  let timeoutHandle: ReturnType<typeof setTimeout>;
   let activated = false;
 
   function destroy() {
@@ -37,4 +40,4 @@ function fetchLaterPolyfill(url, init) {
   };
 }
 
-export const fetchLater = self.fetchLater || fetchLaterPolyfill;
+export const fetchLater = self.fetchLater ?? fetchLaterPolyfill;

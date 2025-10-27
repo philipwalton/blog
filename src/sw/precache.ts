@@ -8,7 +8,7 @@ const pc = new PrecacheController({
   cacheName: cacheNames.SHELL,
 });
 
-const precacheMatcher = ({url}) => {
+const precacheMatcher = ({url}: {url: URL}): boolean => {
   return Boolean(pc.getCacheKeyForURL(url.href));
 };
 
@@ -17,8 +17,18 @@ const cacheFirst = new CacheFirst({
   plugins: [streamErrorPlugin],
 });
 
-export const precacheHandler = ({request, event}) => {
+export const precacheHandler = ({
+  request,
+  event,
+}: {
+  request: Request;
+  event: ExtendableEvent;
+}): Promise<Response> => {
   const cacheKey = pc.getCacheKeyForURL(request.url);
+
+  if (!cacheKey) {
+    throw new Error('No cache key found for URL: ' + request.url);
+  }
 
   return cacheFirst.handle({
     request: new Request(cacheKey),
@@ -26,13 +36,13 @@ export const precacheHandler = ({request, event}) => {
   });
 };
 
-export const createPrecacheRoute = () => {
+export const createPrecacheRoute = (): Route => {
   return new Route(precacheMatcher, precacheHandler);
 };
 
-export const install = pc.install;
-export const activate = pc.activate;
+export const install = pc.install.bind(pc);
+export const activate = pc.activate.bind(pc);
 
-export const init = () => {
-  pc.addToCacheList(self.__PRECACHE_MANIFEST__);
+export const init = (): void => {
+  pc.addToCacheList((self as any).__PRECACHE_MANIFEST__);
 };

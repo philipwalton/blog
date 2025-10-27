@@ -59,6 +59,8 @@
     "@rollup/plugin-node-resolve": "^16.0.0",
     "@rollup/plugin-replace": "^6.0.2",
     "@rollup/plugin-terser": "^0.4.4",
+    "@rollup/plugin-typescript": "^12.3.0",
+    "@types/workbox-window": "^4.3.4",
     "@wdio/cli": "^9.7.1",
     "@wdio/local-runner": "^9.7.1",
     "@wdio/mocha-framework": "^9.6.4",
@@ -96,6 +98,8 @@
     "rev-path": "^3.0.0",
     "rollup": "^4.32.0",
     "sharp": "^0.33.5",
+    "tslib": "^2.8.1",
+    "typescript": "^5.9.3",
     "vitest": "^3.0.4",
     "wait-on": "^8.0.2",
     "wdio-chromedriver-service": "^8.1.1",
@@ -112,5 +116,8 @@
     "workbox-streams": "^7.3.0",
     "workbox-window": "^7.3.0",
     "wrangler": "^3.105.1"
+  },
+  "dependencies": {
+    "caniuse-lite": "^1.0.30001751"
   }
 }

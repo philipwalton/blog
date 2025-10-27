@@ -2,7 +2,14 @@ import {renderIcon} from './utils/renderIcon.js';
 
 let messageId = 0;
 
-export const add = ({body, action, onAction, onDismiss}) => {
+interface MessageOptions {
+  body: string;
+  action: string;
+  onAction: () => void;
+  onDismiss: () => void;
+}
+
+export const add = ({body, action, onAction, onDismiss}: MessageOptions) => {
   const id = `message-${++messageId}`;
   const message = Object.assign(document.createElement('div'), {
     className: 'Message',
@@ -21,15 +28,15 @@ export const add = ({body, action, onAction, onDismiss}) => {
     `,
   });
 
-  message.addEventListener('toggle', (event) => {
+  message.addEventListener('toggle', (event: ToggleEvent) => {
     if (event.newState === 'closed') {
       message.addEventListener('transitionend', message.remove);
       message.addEventListener('transitioncancel', message.remove);
     }
   });
 
-  message.querySelector('.Message-action').addEventListener('click', onAction);
-  message.querySelector('.Message-close').addEventListener('click', onDismiss);
+  message.querySelector('.Message-action')?.addEventListener('click', onAction);
+  message.querySelector('.Message-close')?.addEventListener('click', onDismiss);
 
   document.body.appendChild(message);
   message.showPopover();

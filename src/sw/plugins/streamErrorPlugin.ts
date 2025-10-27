@@ -1,5 +1,5 @@
 export const streamErrorPlugin = {
-  async handlerDidError({error, event, request}) {
+  async handlerDidError({error, event, request}: any): Promise<Response | undefined> {
     if (event.type === 'fetch') {
       // Always return a response if an error happens so that the request can
       // complete. Otherwise the user will see an incomplete response will
@@ -32,5 +32,6 @@ export const streamErrorPlugin = {
         {status: 404},
       );
     }
+    return undefined;
   },
 };

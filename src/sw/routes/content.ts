@@ -7,10 +7,10 @@ import {cacheNames} from '../caches.js';
 import {messageWindows} from '../messenger.js';
 import {streamErrorPlugin} from '../plugins/streamErrorPlugin.js';
 
-const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+const sleep = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms));
 
 const broadcastUpdatePlugin = new BroadcastUpdatePlugin({
-  generatePayload(data) {
+  generatePayload(data: any) {
     return {
       cacheName: data.cacheName,
       updatedURL: data.request.url,
@@ -19,7 +19,7 @@ const broadcastUpdatePlugin = new BroadcastUpdatePlugin({
 });
 
 const navigationReportPlugin = {
-  async cachedResponseWillBeUsed({cachedResponse, event}) {
+  async cachedResponseWillBeUsed({cachedResponse, event}: any) {
     // Check `event.request` instead of `request` since the latter is a
     // code-generated request for the content partial and is not a
     // navigation request.
@@ -50,20 +50,23 @@ const navigationReportPlugin = {
 
 const addCacheHeadersPlugin = {
   // Add the `X-Cache-Date` header for requests going to the cache
-  async cacheWillUpdate({response}) {
+  async cacheWillUpdate({response}: any): Promise<Response | undefined> {
     if (response.url && response.ok && response.status < 400) {
       return copyResponse(response, (responseInit) => {
-        responseInit.headers.set('X-Cache-Date', new Date().toUTCString());
+        if (responseInit.headers) {
+          (responseInit.headers as Headers).set('X-Cache-Date', new Date().toUTCString());
+        }
         return responseInit;
       });
     }
+    return undefined;
   },
 };
 
-const contentMatcher = ({url}) => {
+const contentMatcher = ({url}: {url: URL}): boolean => {
   return (
     url.hostname === location.hostname &&
-    url.pathname.endsWith(self.__PARTIAL_PATH__)
+    url.pathname.endsWith((self as any).__PARTIAL_PATH__)
   );
 };
 
@@ -72,11 +75,11 @@ export const contentStrategy = new StaleWhileRevalidate({
   plugins: [
     streamErrorPlugin,
     addCacheHeadersPlugin,
-    broadcastUpdatePlugin,
+    broadcastUpdatePlugin as any,
     navigationReportPlugin,
   ],
 });
 
-export const createContentRoute = () => {
+export const createContentRoute = (): Route => {
   return new Route(contentMatcher, contentStrategy);
 };

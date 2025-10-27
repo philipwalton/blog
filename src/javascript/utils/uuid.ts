@@ -5,8 +5,7 @@ import {round} from './round.js';
 /**
  * Performantly generate a unique, 27-char string by combining a
  * timestamp with a 13-digit random number.
- * @return {string}
  */
-export function uuid(prefix = timeOrigin + now()) {
+export function uuid(prefix: number = timeOrigin + now()): string {
   return `${round(prefix)}-${rand()}`;
 }

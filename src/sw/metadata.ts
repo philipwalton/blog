@@ -3,12 +3,17 @@ import {cacheNames} from './caches.js';
 const META_PATH = '/metadata.json';
 const DEFAULT_VERSION = '0.0.0';
 
-const metadata = {
+interface Metadata {
+  version: string;
+  buildTime: number;
+}
+
+const metadata: Metadata = {
   version: self.__VERSION__,
   buildTime: self.__BUILD_TIME__,
 };
 
-export const getStoredMetadata = async () => {
+export const getStoredMetadata = async (): Promise<Metadata> => {
   const cache = await caches.open(cacheNames.META);
   const response = await cache.match(META_PATH);
   return response
@@ -28,7 +33,7 @@ export const getStoredMetadata = async () => {
  * This function should be invoked after you're done with the result of
  * `getMetadata()`, as it will overwrite what that would return.
  */
-const updateStoredMetadata = async () => {
+const updateStoredMetadata = async (): Promise<void> => {
   const cache = await caches.open(cacheNames.META);
   await cache.put(META_PATH, new Response(JSON.stringify(metadata)));
 };
@@ -39,7 +44,10 @@ const updateStoredMetadata = async () => {
  * metadata stored, which means this function should only be called once
  * per service worker lifecycle.
  */
-export const getAndUpdateMetadata = async () => {
+export const getAndUpdateMetadata = async (): Promise<{
+  oldMetadata: Metadata;
+  newMetadata: Metadata;
+}> => {
   const oldMetadata = await getStoredMetadata();
   const newMetadata = metadata;
 

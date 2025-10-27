@@ -6,6 +6,12 @@ import {now, timeOrigin} from './utils/performance';
 import {round} from './utils/round.js';
 import {uuid} from './utils/uuid';
 
+export interface Params {
+  [key: string]: string | number | boolean | undefined;
+}
+
+type HitFilter = (params: Params) => Params;
+
 // Bump this version any time the cloud function logic changes
 // in a backward-incompatible way.
 const LOG_VERSION = 3;
@@ -20,10 +26,24 @@ let index = 1;
  * A class to manage building and sending analytics hits to the `/log` route.
  */
 export class Logger {
+  private _hitFilter: HitFilter | undefined;
+  private _presendDependencies: Promise<any>[];
+  private _eventQueue: Map<number, Params>;
+  private _sendCount: number;
+  private _lastActiveTime: number;
+  private _engagedTime: number;
+  private _pageParams: Params;
+  private _userParams: Params;
+  private _eventParams: Params;
+
+  private _state?: string;
+  private _fetchLaterResult?: FetchLaterResult;
+  private _fetchLaterController?: AbortController;
+
   /**
-   * @param {function(Object):void} hitFilter
+   * Creates a new Logger instance.
    */
-  constructor(hitFilter) {
+  constructor(hitFilter?: HitFilter) {
     this._hitFilter = hitFilter;
     this._presendDependencies = [];
     this._eventQueue = new Map();
@@ -31,11 +51,6 @@ export class Logger {
     this._sendCount = 1;
     this._lastActiveTime = 0;
     this._engagedTime = 0;
-    this._state = null;
-
-    // Default to an object to allow property access.
-    this._fetchLaterResult = {};
-    this._fetchLaterController = null;
 
     this._pageParams = {
       dl: location.href,
@@ -46,11 +61,12 @@ export class Logger {
       sr: `${screen.width}x${screen.height}`,
       sd: `${screen.colorDepth}-bit`,
       dr: getReferrer(),
+      cid: '', // Will be updated asynchronously.
       _p: Math.floor(Math.random() * 1e9),
       _s: 0,
     };
 
-    const userParams = {
+    const userParams: Params = {
       breakpoint: getActiveBreakpoint().name,
       connection_type: getEffectiveConnectionType(),
       pixel_density: getPixelDensity(),
@@ -105,16 +121,16 @@ export class Logger {
         this._engagedTime += changeTime - this._lastActiveTime;
         this._lastActiveTime = 0;
         // Do not await...
-        set('lastEngagedTime', Math.round(timeOrigin + now));
+        set('lastEngagedTime', Math.round(timeOrigin + now()));
       }
       this._state = nextState;
     }
   }
 
   /**
-   * @returns {number}
+   * Gets the amount of time the page has been in the "active" state.
    */
-  _getEngagedTime() {
+  _getEngagedTime(): number {
     let engagedTime = this._engagedTime;
     this._engagedTime = 0;
 
@@ -127,25 +143,23 @@ export class Logger {
   }
 
   /**
-   * @param {Promise} promise
+   * Adds a promise to the presend dependencies.
    */
-  awaitBeforeSending(promise) {
+  awaitBeforeSending(promise: Promise<void>) {
     this._presendDependencies.push(promise);
   }
 
   /**
-   * @param {Object} params
+   * Sets the event parameters.
    */
-  set(params) {
+  set(params: Params) {
     Object.assign(this._eventParams, params);
   }
 
   /**
-   * @param {string} hitType
-   * @param {Object} paramOverrides
-   * @return {Promise<void>}
+   * Logs an event.
    */
-  async event(eventName, paramOverrides = {}) {
+  async event(eventName: string, paramOverrides: Params = {}) {
     const params = {...this._eventParams, ...paramOverrides};
     if (this._hitFilter) {
       Object.assign(params, this._hitFilter(params));
@@ -163,7 +177,7 @@ export class Logger {
       });
     }
 
-    const prefixedParams = {
+    const prefixedParams: Params = {
       en: eventName,
       ...prefixParams('e', params),
     };
@@ -183,12 +197,11 @@ export class Logger {
   }
 
   /**
-   * Queue a beacon with all event data via fetchLater().
-   * @param {Object} params
+   * Queues a beacon with all event data via fetchLater().
    */
-  async _queue(params) {
+  async _queue(params: Params) {
     // If the fetchLater request was already sent, reset internal event state.
-    if (this._fetchLaterResult.activated) {
+    if (this._fetchLaterResult?.activated) {
       this._sendCount++;
       this._eventQueue.clear();
     }
@@ -201,7 +214,10 @@ export class Logger {
       delete this._pageParams._fv;
     }
 
-    this._eventQueue.set(params['ep.event_id'] || ++index, params);
+    // Add the event to the queue using either the event ID or a unique index.
+    this._eventQueue.set((params['ep.event_id'] as number) || ++index, params);
+
+    // TODO: Consider adding a deduplication mechanism.
     // this._dedupeEvents(eventID, params);
 
     const data =
@@ -226,6 +242,7 @@ export class Logger {
     });
   }
 
+  // TODO: Consider adding a deduplication mechanism.
   // _dedupeEvents(params) {
   //   // If an event with the same ID already exists, replace it,
   //   // but merge the `_et` param values first.
@@ -241,10 +258,13 @@ export class Logger {
   // }
 
   /**
-   * @return {Promise<void>}
+   * Sets the client ID on the page params object.
+   * If the client ID is not set, it generates a new one and sets the first
+   * visit and session start parameters. It also persists the client ID to the
+   * KV store.
    */
   async _setClientId() {
-    let cid = await get('clientId', null);
+    let cid = await get<string>('clientId', '');
 
     if (cid) {
       this._pageParams.cid = cid;
@@ -259,6 +279,9 @@ export class Logger {
     }
   }
 
+  /**
+   * Sets the UACH data on the page params object.
+   */
   async _setUACHData() {
     const uachData = await navigator.userAgentData?.getHighEntropyValues([
       'architecture',
@@ -290,16 +313,16 @@ export class Logger {
   }
 
   /**
-   * @return {Promise<void>}
+   * Updates the session information on the page params object.
    */
   async _updateSessionInfo() {
     const time = Date.now();
 
     let seg = 0;
     let [sid, sct, lastEngagedTime] = await Promise.all([
-      get('sessionId', time),
-      get('sessionCount', 1),
-      get('lastEngagedTime', 0),
+      get<number>('sessionId', time),
+      get<number>('sessionCount', 1),
+      get<number>('lastEngagedTime', 0),
     ]);
 
     const isFirstVisit = Boolean(this._pageParams._fv);
@@ -326,9 +349,9 @@ export class Logger {
 }
 
 /**
- * @returns {string}
+ * Gets the current lifecycle state of the page.
  */
-function getCurrentState() {
+function getCurrentState(): string {
   if (document.visibilityState === 'hidden') {
     return 'hidden';
   }
@@ -342,12 +365,9 @@ function getCurrentState() {
  * Accepts a letter prefix and an object of param/value pairs and returns a
  * new object where every param is prefixed with `_p.` or `_pn.` (for number
  * values).
- * @param {string} initialLetter
- * @param {Object} unprefixedParams
- * @return {Object}
  */
-function prefixParams(initialLetter, unprefixedParams) {
-  const prefixedParams = {};
+function prefixParams(initialLetter: string, unprefixedParams: Params): Params {
+  const prefixedParams: Params = {};
   for (const [key, value] of Object.entries(unprefixedParams)) {
     const prefix = initialLetter + (typeof value === 'number' ? 'pn.' : 'p.');
     prefixedParams[prefix + key] =
@@ -359,10 +379,8 @@ function prefixParams(initialLetter, unprefixedParams) {
 /**
  * Accepts and object of param/value pairs and returns a query string
  * representation of the object with all values URL-encoded.
- * @param {Object} params
- * @return {string}
  */
-function toQueryString(params) {
+function toQueryString(params: Params): string {
   return Object.keys(params)
     .filter((key) => {
       // Filter out empty string param unless they start with "ua".
@@ -373,15 +391,17 @@ function toQueryString(params) {
       return params[key] || params[key] === 0;
     })
     .map((key) => {
-      return `${key}=${encodeURIComponent(params[key])}`;
+      // Value cannot be falsy (except for 0) based on the filter above.
+      const value = params[key] as string | number | boolean;
+      return `${key}=${encodeURIComponent(value)}`;
     })
     .join('&');
 }
 
 /**
- * @return {Promise<string>}
+ * Gets the referrer of the page.
  */
-function getReferrer() {
+function getReferrer(): string {
   const referrer = document.referrer;
   if (
     referrer &&
@@ -395,25 +415,21 @@ function getReferrer() {
 
 /**
  * Gets the effective connection type information if available.
- * @return {string}
  */
-function getEffectiveConnectionType() {
-  return (
-    (navigator.connection && navigator.connection.effectiveType) || '(unknown)'
-  );
+function getEffectiveConnectionType(): string {
+  return navigator.connection?.effectiveType || '(unknown)';
 }
 
 /**
  * Returns the currently-active pixel density.
- * @return {string}
  */
-function getPixelDensity() {
-  const densities = [
+function getPixelDensity(): string {
+  const densities: [string, string][] = [
     ['1x', 'all'],
     ['1.5x', '(-webkit-min-device-pixel-ratio: 1.5),(min-resolution: 144dpi)'],
     ['2x', '(-webkit-min-device-pixel-ratio: 2),(min-resolution: 192dpi)'],
   ];
-  let activeDensity;
+  let activeDensity = '1x';
   for (const [density, query] of densities) {
     if (window.matchMedia(query).matches) {
       activeDensity = density;
@@ -424,9 +440,8 @@ function getPixelDensity() {
 
 /**
  * Returns the user's `prefers-color-scheme` preference.
- * @return {string}
  */
-function getColorSchemePreference() {
+function getColorSchemePreference(): string {
   return window.matchMedia('(prefers-color-scheme: light)').matches
     ? 'light'
     : window.matchMedia('(prefers-color-scheme: dark)').matches
@@ -436,9 +451,8 @@ function getColorSchemePreference() {
 
 /**
  * Returns the user's `prefers-reduced-data` preference.
- * @return {string}
  */
-function getReducedDataPreference() {
+function getReducedDataPreference(): string {
   return window.matchMedia('(prefers-reduced-data: reduce)').matches
     ? 'reduce'
     : 'no-preference';
@@ -446,9 +460,8 @@ function getReducedDataPreference() {
 
 /**
  * Returns the user's `prefers-reduced-motion` preference.
- * @return {string}
  */
-function getReducedMotionPref() {
+function getReducedMotionPref(): string {
   return window.matchMedia('(prefers-reduced-motion: reduce)').matches
     ? 'reduce'
     : 'no-preference';
@@ -456,9 +469,8 @@ function getReducedMotionPref() {
 
 /**
  * Returns the user's `prefers-contrast` preference.
- * @return {string}
  */
-function getContrastPreference() {
+function getContrastPreference(): string {
   return window.matchMedia('(prefers-contrast: more)').matches
     ? 'more'
     : window.matchMedia('(prefers-contrast: less)').matches

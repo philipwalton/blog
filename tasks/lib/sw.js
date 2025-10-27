@@ -5,6 +5,7 @@ import {rollup} from 'rollup';
 import replace from '@rollup/plugin-replace';
 import {nodeResolve} from '@rollup/plugin-node-resolve';
 import terser from '@rollup/plugin-terser';
+import typescript from '@rollup/plugin-typescript';
 import {ENV} from './env.js';
 
 const config = fs.readJSONSync('./config.json');
@@ -33,6 +34,7 @@ export const bundleSW = async () => {
   ];
 
   const plugins = [
+    typescript(),
     replace({
       values: {
         'process.env.NODE_ENV': JSON.stringify(ENV),
@@ -61,7 +63,7 @@ export const bundleSW = async () => {
 
   const bundle = await rollup({
     input: {
-      'sw': `src/sw/sw.js`,
+      'sw': `src/sw/sw.ts`,
     },
     // cache: bundleCache,
     plugins,

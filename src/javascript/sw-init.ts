@@ -7,17 +7,17 @@ import * as messages from './messages';
 
 // Defining a Workbox instance has no side effects, so it's OK to do it
 // here in the top-level scope.
-let wb;
+let wb: Workbox;
 
 const MESSAGE_TIMEOUT = 5000;
 
 // A promise that resolves when the navigation report is received.
 // NOTE: this needs to be here because the `message` event listener needs
 // to be added before DOMContentLoaded fires (or it may be missed).
-let navigationReportPromise;
+let navigationReportPromise: Promise<any>;
 const addNavigationReportListener = () => {
   navigationReportPromise = new Promise((resolve) => {
-    wb.addEventListener('message', ({data}) => {
+    wb.addEventListener('message', ({data}: MessageEvent) => {
       if (data.type === 'NAVIGATION_REPORT') {
         resolve(data.payload);
       }
@@ -27,7 +27,7 @@ const addNavigationReportListener = () => {
 
 const setSiteVersionOrTimeout = async () => {
   // Set the site version, if available.
-  const {version} = await new Promise((resolve) => {
+  const {version}: {version: string} = await new Promise((resolve) => {
     // Uncontrolled pages won't have a version.
     if (initialSWState !== 'controlled') {
       resolve({version: '(none)'});
@@ -45,16 +45,18 @@ const setSiteVersionOrTimeout = async () => {
 const setContentSourceOrTimeout = async () => {
   // Before sending any perf data, determine whether the page was served
   // entirely cache-first.
-  const {cacheHit} = await new Promise((resolve) => {
-    // Uncontrolled pages can never be fully cache-first.
-    if (initialSWState !== 'controlled') {
-      resolve({cacheHit: false});
-    } else {
-      // Otherwise, resolve with the navigation report promise or timeout.
-      navigationReportPromise.then(resolve);
-      setTimeout(() => resolve({cacheHit: null}), MESSAGE_TIMEOUT);
-    }
-  });
+  const {cacheHit}: {cacheHit: boolean | null} = await new Promise(
+    (resolve) => {
+      // Uncontrolled pages can never be fully cache-first.
+      if (initialSWState !== 'controlled') {
+        resolve({cacheHit: false});
+      } else {
+        // Otherwise, resolve with the navigation report promise or timeout.
+        navigationReportPromise.then(resolve);
+        setTimeout(() => resolve({cacheHit: null}), MESSAGE_TIMEOUT);
+      }
+    },
+  );
 
   if (cacheHit === null) {
     log.set({content_source: '(not set)'});
@@ -73,7 +75,7 @@ const setContentSourceOrTimeout = async () => {
  * @param {Object} payload
  * @return {Object}
  */
-const processMetadata = (payload = {}) => {
+const processMetadata = (payload: any = {}): any => {
   try {
     const {oldMetadata, newMetadata} = payload;
 
@@ -97,8 +99,8 @@ const processMetadata = (payload = {}) => {
   }
 };
 
-const addInstallListener = () => {
-  wb.addEventListener('installed', (event) => {
+const addInstallListener = (): void => {
+  wb.addEventListener('installed', (event: any) => {
     // `isUpdate` means this is not the first install.
     if (event.isUpdate) {
       // Any time there's a SW update we want to disable SPA loads, since
@@ -119,10 +121,10 @@ const addInstallListener = () => {
   });
 };
 
-const addCacheUpdateListener = () => {
+const addCacheUpdateListener = (): void => {
   // Listen for cache update messages and swap out the content.
   // TODO(philipwalton): consider whether this is the best UX.
-  wb.addEventListener('message', async ({data}) => {
+  wb.addEventListener('message', async ({data}: any) => {
     if (data && data.type === 'CACHE_UPDATED') {
       const updatedURL = new URL(data.payload.updatedURL);
 
@@ -132,14 +134,14 @@ const addCacheUpdateListener = () => {
       loadPage(updatedURL);
 
       log.event('sw_cache_update', {
-        updated_url: updatedURL,
+        updated_url: updatedURL.href,
       });
     }
   });
 };
 
-const addSWUpdateListener = () => {
-  wb.addEventListener('message', async ({data}) => {
+const addSWUpdateListener = (): void => {
+  wb.addEventListener('message', async ({data}: any) => {
     if (data && data.type === 'UPDATE_AVAILABLE') {
       // Default to showing an update message. This is helpful in the event
       // a future version causes an error parsing the message data, the
@@ -154,7 +156,7 @@ const addSWUpdateListener = () => {
         timeSinceNewVersionDeployed,
       } = processMetadata(data.payload);
 
-      const sendEvent = (name) => {
+      const sendEvent = (name: string): void => {
         const params = {
           value: timeSinceNewVersionDeployed || 0,
           old_version: oldVersion || '(not set)',

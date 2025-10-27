@@ -22,13 +22,13 @@ const logRoutes = {
   createLogRoute,
 };
 
-const registerRoutes = (router, routes) => {
+const registerRoutes = (router: Router, routes: Record<string, () => any>): void => {
   for (const route of Object.values(routes)) {
     router.registerRoute(route());
   }
 };
 
-export const init = () => {
+export const init = (): void => {
   const precacheRouter = new Router();
   registerRoutes(precacheRouter, precacheRoutes);
   precacheRouter.addFetchListener();

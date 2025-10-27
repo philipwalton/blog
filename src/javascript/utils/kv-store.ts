@@ -1,11 +1,11 @@
-let dbPromise;
+let dbPromise: Promise<IDBDatabase> | null = null;
 
 /**
- * @return {Promise<IDBDatabase>}
+ * Gets or creates the IndexedDB database for the KV store.
  */
-function getDB() {
+function getDB(): Promise<IDBDatabase> {
   if (!dbPromise) {
-    dbPromise = new Promise((resolve, reject) => {
+    dbPromise = new Promise<IDBDatabase>((resolve, reject) => {
       const req = indexedDB.open('kv-store', 1);
       req.onupgradeneeded = () => req.result.createObjectStore('kv-store');
       req.onerror = () => reject(req.error);
@@ -29,12 +29,12 @@ function getDB() {
 }
 
 /**
- * @param {string} key
- * @return {Promise<any>}
+ * Gets a value from the KV store, with an optional default value if the key
+ * is not found.
  */
-export async function get(key, def) {
+export async function get<T>(key: string, def?: T) {
   const db = await getDB();
-  return new Promise((resolve, reject) => {
+  return new Promise<T>((resolve, reject) => {
     const txn = db.transaction('kv-store', 'readonly');
     const req = txn.objectStore('kv-store').get(key);
     txn.onabort = () => (def === undefined ? reject(txn.error) : resolve(def));
@@ -43,14 +43,12 @@ export async function get(key, def) {
 }
 
 /**
- *
- * @param {*} key
- * @param {*} value
- * @return {Promise<void>}
+ * Sets a value in the KV store, with an optional commit flag to control
+ * whether the transaction should be committed immediately.
  */
-export async function set(key, value, commit) {
+export async function set<T>(key: string, value: T, commit?: boolean) {
   const db = await getDB();
-  return new Promise((resolve, reject) => {
+  return new Promise<T>((resolve, reject) => {
     const txn = db.transaction('kv-store', 'readwrite');
     txn.onabort = () => reject(txn.error);
     txn.oncomplete = () => resolve(value);

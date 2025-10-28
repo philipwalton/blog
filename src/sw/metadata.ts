@@ -3,7 +3,17 @@ import {cacheNames} from './caches.js';
 const META_PATH = '/metadata.json';
 const DEFAULT_VERSION = '0.0.0';
 
-const metadata = {
+interface Metadata {
+  version: string;
+  buildTime: number;
+}
+
+export interface MetadataUpdate {
+  oldMetadata: Metadata;
+  newMetadata: Metadata;
+}
+
+const metadata: Metadata = {
   version: self.__VERSION__,
   buildTime: self.__BUILD_TIME__,
 };
@@ -39,7 +49,7 @@ const updateStoredMetadata = async () => {
  * metadata stored, which means this function should only be called once
  * per service worker lifecycle.
  */
-export const getAndUpdateMetadata = async () => {
+export const getAndUpdateMetadata = async (): Promise<MetadataUpdate> => {
   const oldMetadata = await getStoredMetadata();
   const newMetadata = metadata;
 

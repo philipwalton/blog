@@ -4,11 +4,16 @@ import {CacheFirst} from 'workbox-strategies/CacheFirst.js';
 import {cacheNames} from './caches.js';
 import {streamErrorPlugin} from './plugins/streamErrorPlugin.js';
 
+import type {
+  RouteHandlerCallback,
+  RouteMatchCallbackOptions,
+} from 'workbox-core/types.js';
+
 const pc = new PrecacheController({
   cacheName: cacheNames.SHELL,
 });
 
-const precacheMatcher = ({url}) => {
+const precacheMatcher = ({url}: RouteMatchCallbackOptions): boolean => {
   return Boolean(pc.getCacheKeyForURL(url.href));
 };
 
@@ -17,8 +22,15 @@ const cacheFirst = new CacheFirst({
   plugins: [streamErrorPlugin],
 });
 
-export const precacheHandler = ({request, event}) => {
+export const precacheHandler: RouteHandlerCallback = ({
+  request,
+  event,
+}) => {
   const cacheKey = pc.getCacheKeyForURL(request.url);
+
+  if (!cacheKey) {
+    throw new Error('No cache key found for URL: ' + request.url);
+  }
 
   return cacheFirst.handle({
     request: new Request(cacheKey),
@@ -26,7 +38,7 @@ export const precacheHandler = ({request, event}) => {
   });
 };
 
-export const createPrecacheRoute = () => {
+export const createPrecacheRoute = (): Route => {
   return new Route(precacheMatcher, precacheHandler);
 };
 

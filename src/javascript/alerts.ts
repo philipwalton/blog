@@ -2,7 +2,12 @@ import {renderIcon} from './utils/renderIcon.js';
 
 let alertId = 0;
 
-export const add = ({title, body}) => {
+interface AlertOptions {
+  title: string;
+  body: string;
+}
+
+export const add = ({title, body}: AlertOptions) => {
   const id = `alert-${++alertId}`;
   const alert = Object.assign(document.createElement('div'), {
     className: 'Alert',
@@ -22,8 +27,9 @@ export const add = ({title, body}) => {
     `,
   });
 
-  alert.addEventListener('toggle', (event) => {
-    if (event.newState === 'closed') {
+  alert.addEventListener('toggle', (event: ToggleEvent) => {
+    const toggleEvent = event;
+    if (toggleEvent.newState === 'closed') {
       alert.addEventListener('transitionend', alert.remove);
       alert.addEventListener('transitioncancel', alert.remove);
     }

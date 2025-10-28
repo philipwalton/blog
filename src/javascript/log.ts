@@ -4,6 +4,8 @@ import {initialSWState} from './sw-state';
 import {now, timeOrigin} from './utils/performance';
 import {uuid} from './utils/uuid';
 
+import type {Params} from './Logger';
+
 /**
  * Bump this when making backwards incompatible changes to the tracking
  * implementation. This allows you to create a segment or view filter
@@ -21,14 +23,14 @@ const PAGE_ID = uuid(timeOrigin);
 
 const originalPathname = location.pathname;
 
-export const log = new Logger((params) => {
+export const log = new Logger((params: Params) => {
   return {
     page_time: now(),
     event_id: params.event_id || uuid(),
   };
 });
 
-const loggedErrors = new WeakSet();
+const loggedErrors = new WeakSet<Error>();
 
 /**
  * Initializes all the analytics setup. Creates trackers and sets initial
@@ -60,12 +62,15 @@ const setInitialParams = () => {
     original_page_path: originalPathname,
   });
 
-  const navigationEntry = performance.getEntriesByType('navigation')[0];
+  const navigationEntry = performance.getEntriesByType(
+    'navigation',
+  )[0] as PerformanceNavigationTiming;
+
   if (navigationEntry) {
     // Use kebab case.
     let navigationType = navigationEntry.type.replace(/_/g, '-');
 
-    if (document.prerendering || navigationEntry.activationStart > 0) {
+    if (document.prerendering || (navigationEntry.activationStart ?? 0) > 0) {
       navigationType = 'prerender';
     }
 
@@ -83,7 +88,7 @@ const trackPageviews = () => {
 
   addEventListener(
     'pageshow',
-    (event) => {
+    (event: PageTransitionEvent) => {
       if (event.persisted) {
         pageshowCount++;
 
@@ -104,10 +109,8 @@ const trackPageviews = () => {
  * E.g.:
  *
  *    `fetch('/api.json').catch(trackUnhandledError);`
- *
- * @param {*=} err
  */
-export const trackUnhandledError = (err = {}) => {
+export const trackUnhandledError = (err: Error) => {
   log.event('unhandled_error', {
     unhandled_error_name: err.name || '(not set)',
     unhandled_error_message: `${err.stack || err.message || '(not set)'}`,
@@ -120,11 +123,14 @@ export const trackUnhandledError = (err = {}) => {
  */
 const trackUnhandledErrors = () => {
   // Errors that have occurred prior to this script running are stored on
-  // `window.__e.q`, as specified in `_log.html`.
-  const loadErrorEvents = (window.__e && window.__e.q) || [];
+  // `self.__e.q`, as specified in `_log.html`.
+  const loadErrorEvents = (self.__e && self.__e.q) || [];
 
-  const trackUnhandledErrorEvent = (event) => {
-    const err = event.error ?? event.reason;
+  const trackUnhandledErrorEvent = (
+    event: ErrorEvent | PromiseRejectionEvent,
+  ) => {
+    const err =
+      (event as ErrorEvent).error ?? (event as PromiseRejectionEvent).reason;
     if (!loggedErrors.has(err)) {
       trackUnhandledError(err);
       loggedErrors.add(err);
@@ -137,10 +143,10 @@ const trackUnhandledErrors = () => {
   }
 
   // Add a new listener to track event immediately and remove the old one.
-  window.addEventListener('error', trackUnhandledErrorEvent);
-  window.addEventListener('unhandledrejection', trackUnhandledErrorEvent);
-  window.removeEventListener('error', window.__e);
-  window.removeEventListener('unhandledrejection', window.__e);
+  addEventListener('error', trackUnhandledErrorEvent);
+  addEventListener('unhandledrejection', trackUnhandledErrorEvent);
+  removeEventListener('error', self.__e);
+  removeEventListener('unhandledrejection', self.__e);
 };
 
 const trackCLS = async () => {
@@ -200,7 +206,7 @@ const trackINP = async () => {
 const trackLCP = async () => {
   onLCP(
     (metric) => {
-      let dynamicFetchPriority;
+      let dynamicFetchPriority: string | undefined;
 
       // If the LCP element is an image, send a hint for the next visitor.
       const {element, lcpEntry} = metric.attribution;
@@ -240,7 +246,7 @@ const trackLCP = async () => {
 const trackTTFB = () => {
   onTTFB(
     (metric) => {
-      const params = {
+      const params: Params = {
         value: metric.delta,
         metric_value: metric.value,
         metric_rating: metric.rating,
@@ -269,7 +275,7 @@ const trackTTFB = () => {
           params.worker_start = navigationEntry.workerStart;
         }
 
-        if (navigationEntry.activationStart > 0) {
+        if ((navigationEntry.activationStart ?? 0) > 0) {
           params.activation_start = navigationEntry.activationStart;
         }
 

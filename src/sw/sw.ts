@@ -1,16 +1,19 @@
 import {deleteUnusedCaches} from './caches.js';
 import {messageWindows} from './messenger.js';
-import {getStoredMetadata, getAndUpdateMetadata} from './metadata.js';
+import {getStoredMetadata, getAndUpdateMetadata, type MetadataUpdate} from './metadata.js';
 import * as precache from './precache.js';
 import * as router from './router.js';
 
-let metadataChanges;
+// Give TypeScript the correct global.
+declare const self: ServiceWorkerGlobalScope;
+
+let metadataChanges: MetadataUpdate;
 
 precache.init();
 router.init();
 
-addEventListener('install', (event) => {
-  skipWaiting();
+self.addEventListener('install', (event) => {
+  self.skipWaiting();
 
   const installComplete = async () => {
     await precache.install(event);
@@ -19,8 +22,8 @@ addEventListener('install', (event) => {
   event.waitUntil(installComplete());
 });
 
-addEventListener('activate', (event) => {
-  clients.claim();
+self.addEventListener('activate', (event) => {
+  self.clients.claim();
 
   const activateComplete = async () => {
     if (metadataChanges) {
@@ -41,11 +44,11 @@ addEventListener('activate', (event) => {
   event.waitUntil(activateComplete());
 });
 
-addEventListener('message', (event) => {
+self.addEventListener('message', (event) => {
   if (event.data && event.data.type === 'GET_METADATA') {
     const replySent = async () => {
       const metadata = await getStoredMetadata();
-      event.ports && event.ports[0].postMessage(metadata);
+      event.ports?.[0]?.postMessage(metadata);
     };
     event.waitUntil(replySent());
   }

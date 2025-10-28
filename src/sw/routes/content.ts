@@ -7,10 +7,12 @@ import {cacheNames} from '../caches.js';
 import {messageWindows} from '../messenger.js';
 import {streamErrorPlugin} from '../plugins/streamErrorPlugin.js';
 
-const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+import type {RouteMatchCallback, WorkboxPlugin} from 'workbox-core/types';
+
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const broadcastUpdatePlugin = new BroadcastUpdatePlugin({
-  generatePayload(data) {
+  generatePayload(data: any) {
     return {
       cacheName: data.cacheName,
       updatedURL: data.request.url,
@@ -18,12 +20,12 @@ const broadcastUpdatePlugin = new BroadcastUpdatePlugin({
   },
 });
 
-const navigationReportPlugin = {
+const navigationReportPlugin: WorkboxPlugin = {
   async cachedResponseWillBeUsed({cachedResponse, event}) {
     // Check `event.request` instead of `request` since the latter is a
     // code-generated request for the content partial and is not a
     // navigation request.
-    if (event && event.request && event.request.mode === 'navigate') {
+    if (event instanceof FetchEvent && event.request.mode === 'navigate') {
       const {resultingClientId} = event;
 
       // Don't await this promise (otherwise it would delay the response).
@@ -48,19 +50,24 @@ const navigationReportPlugin = {
   },
 };
 
-const addCacheHeadersPlugin = {
+const addCacheHeadersPlugin: WorkboxPlugin = {
   // Add the `X-Cache-Date` header for requests going to the cache
   async cacheWillUpdate({response}) {
     if (response.url && response.ok && response.status < 400) {
       return copyResponse(response, (responseInit) => {
-        responseInit.headers.set('X-Cache-Date', new Date().toUTCString());
+        // The `copyResponse()` function creates `responseInit.headers`
+        // as a real `Headers` object.
+        (responseInit.headers as Headers).set(
+          'X-Cache-Date',
+          new Date().toUTCString(),
+        );
         return responseInit;
       });
     }
   },
 };
 
-const contentMatcher = ({url}) => {
+const contentMatcher: RouteMatchCallback = ({url}) => {
   return (
     url.hostname === location.hostname &&
     url.pathname.endsWith(self.__PARTIAL_PATH__)
@@ -72,11 +79,11 @@ export const contentStrategy = new StaleWhileRevalidate({
   plugins: [
     streamErrorPlugin,
     addCacheHeadersPlugin,
-    broadcastUpdatePlugin,
+    broadcastUpdatePlugin as WorkboxPlugin,
     navigationReportPlugin,
   ],
 });
 
-export const createContentRoute = () => {
+export const createContentRoute = (): Route => {
   return new Route(contentMatcher, contentStrategy);
 };

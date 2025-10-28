@@ -2,7 +2,10 @@ import {Route} from 'workbox-routing/Route.js';
 import {NetworkOnly} from 'workbox-strategies/NetworkOnly.js';
 import {BackgroundSyncPlugin} from 'workbox-background-sync/BackgroundSyncPlugin.js';
 
-const logMatcher = ({url}) => {
+import type {RouteMatchCallback, WorkboxPlugin} from 'workbox-core/types';
+
+
+const logMatcher: RouteMatchCallback = ({url}) => {
   return url.hostname === location.hostname && url.pathname === '/log';
 };
 
@@ -15,11 +18,11 @@ const logStrategy = new NetworkOnly({
         while ((entry = await queue.shiftRequest())) {
           const {request} = entry;
           try {
-            let firstEventTime;
+            let firstEventTime: number | undefined;
             const originalBody = await request.clone().text();
             const body = originalBody
               .split(/\n/)
-              .map((event) => {
+              .map((event: string) => {
                 const params = new URLSearchParams(event);
                 if (!firstEventTime) {
                   const timeOrigin = Number(params.get('epn.time_origin'));
@@ -27,14 +30,14 @@ const logStrategy = new NetworkOnly({
                   firstEventTime =
                     timeOrigin && pageTime && Math.round(timeOrigin + pageTime);
                 }
-                params.set('ep.sw_replay', true);
+                params.set('ep.sw_replay', 'true');
                 return params.toString();
               })
               .join('\n');
 
             const url = new URL(request.url);
             if (firstEventTime) {
-              url.searchParams.set('ht', firstEventTime);
+              url.searchParams.set('ht', firstEventTime.toString());
             }
             await fetch(new Request(url, {body, method: 'POST'}));
           } catch (err) {
@@ -43,10 +46,10 @@ const logStrategy = new NetworkOnly({
           }
         }
       },
-    }),
+    }) as WorkboxPlugin,
   ],
 });
 
-export const createLogRoute = () => {
+export const createLogRoute = (): Route => {
   return new Route(logMatcher, logStrategy, 'POST');
 };

@@ -1,6 +1,5 @@
 /**
- * Gets the service worker status at page laod time.
- * @return {number} The service worker status.
+ * Gets the service worker status at page load time.
  */
 export const initialSWState = !navigator.serviceWorker
   ? 'unsupported'

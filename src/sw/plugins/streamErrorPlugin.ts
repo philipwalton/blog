@@ -1,4 +1,6 @@
-export const streamErrorPlugin = {
+import type {WorkboxPlugin} from 'workbox-core/types';
+
+export const streamErrorPlugin: WorkboxPlugin = {
   async handlerDidError({error, event, request}) {
     if (event.type === 'fetch') {
       // Always return a response if an error happens so that the request can

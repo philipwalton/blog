@@ -4,6 +4,7 @@ import {rollup} from 'rollup';
 import {nodeResolve} from '@rollup/plugin-node-resolve';
 import replace from '@rollup/plugin-replace';
 import terser from '@rollup/plugin-terser';
+import typescript from '@rollup/plugin-typescript';
 import {ENV} from './env.js';
 
 const config = fs.readJSONSync('./config.json');
@@ -28,6 +29,7 @@ let bundleCache;
 
 export const bundleJS = async (entry) => {
   const plugins = [
+    typescript(),
     nodeResolve(),
     replace({
       values: globals,
@@ -40,7 +42,7 @@ export const bundleJS = async (entry) => {
 
   const bundle = await rollup({
     input: {
-      [path.basename(entry, '.js')]: `src/javascript/${entry}`,
+      [path.basename(entry, '.ts')]: `src/javascript/${entry}`,
     },
     cache: bundleCache,
     plugins,

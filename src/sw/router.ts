@@ -1,9 +1,9 @@
 import {Router} from 'workbox-routing/Router.js';
-import {createPrecacheRoute} from './precache.js';
-import {createContentRoute} from './routes/content.js';
-import {createPagesRoute} from './routes/pages.js';
-import {createStaticAssetsRoute} from './routes/static-assets.js';
-import {createLogRoute} from './routes/log.js';
+import {createPrecacheRoute} from './precache.ts';
+import {createContentRoute} from './routes/content.ts';
+import {createPagesRoute} from './routes/pages.ts';
+import {createStaticAssetsRoute} from './routes/static-assets.ts';
+import {createLogRoute} from './routes/log.ts';
 
 import type {Route} from 'workbox-routing/Route.js';
 

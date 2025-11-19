@@ -1,7 +1,7 @@
 import {Route} from 'workbox-routing/Route.js';
 import {strategy as streamsStrategy} from 'workbox-streams/strategy.js';
-import {contentStrategy} from './content.js';
-import {precacheHandler} from '../precache.js';
+import {contentStrategy} from './content.ts';
+import {precacheHandler} from '../precache.ts';
 
 import type {
   RouteHandlerCallback,

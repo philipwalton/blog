@@ -1,10 +1,10 @@
 import {onCLS, onFCP, onINP, onLCP, onTTFB} from 'web-vitals/attribution';
-import {Logger} from './Logger';
-import {initialSWState} from './sw-state';
-import {now, timeOrigin} from './utils/performance';
-import {uuid} from './utils/uuid';
+import {Logger} from './Logger.ts';
+import {initialSWState} from './sw-state.ts';
+import {now, timeOrigin} from './utils/performance.ts';
+import {uuid} from './utils/uuid.ts';
 
-import type {Params} from './Logger';
+import type {Params} from './Logger.ts';
 
 /**
  * Bump this when making backwards incompatible changes to the tracking

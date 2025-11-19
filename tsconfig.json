@@ -1,25 +1,27 @@
 {
   "compilerOptions": {
-    "target": "ESNext",
-    "module": "ESNext",
-    "lib": ["esnext", "DOM", "WebWorker"],
-    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
     "allowJs": true,
     "checkJs": false,
     "declaration": false,
     "declarationMap": false,
-    "sourceMap": false,
-    "rootDir": "./src",
-    "outDir": "./build/static", // Required for Rollup's typescript plugin.
-    "noEmit": true,
-    "strict": true,
-    "noImplicitAny": true,
-    "strictNullChecks": true,
-    "noFallthroughCasesInSwitch": true,
-    "noUncheckedIndexedAccess": true,
-    "noImplicitOverride": true,
     "exactOptionalPropertyTypes": true,
-    "skipLibCheck": true
+    "lib": ["esnext", "DOM", "WebWorker"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "noEmit": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitAny": true,
+    "noImplicitOverride": true,
+    "noUncheckedIndexedAccess": true,
+    "outDir": "./build/static", // Required for Rollup's typescript plugin.
+    "rewriteRelativeImportExtensions": true,
+    "rootDir": "./src",
+    "skipLibCheck": true,
+    "sourceMap": false,
+    "strict": true,
+    "strictNullChecks": true,
+    "target": "ESNext"
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "build", "test", "tasks", "functions"]

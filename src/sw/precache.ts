@@ -1,8 +1,8 @@
 import {PrecacheController} from 'workbox-precaching/PrecacheController.js';
 import {Route} from 'workbox-routing/Route.js';
 import {CacheFirst} from 'workbox-strategies/CacheFirst.js';
-import {cacheNames} from './caches.js';
-import {streamErrorPlugin} from './plugins/streamErrorPlugin.js';
+import {cacheNames} from './caches.ts';
+import {streamErrorPlugin} from './plugins/streamErrorPlugin.ts';
 
 import type {
   RouteHandlerCallback,

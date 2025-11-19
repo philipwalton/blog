@@ -1,4 +1,4 @@
-import {renderIcon} from './utils/renderIcon.js';
+import {renderIcon} from './utils/renderIcon.ts';
 
 let alertId = 0;
 

@@ -1,8 +1,8 @@
-import {deleteUnusedCaches} from './caches.js';
-import {messageWindows} from './messenger.js';
-import {getStoredMetadata, getAndUpdateMetadata, type MetadataUpdate} from './metadata.js';
-import * as precache from './precache.js';
-import * as router from './router.js';
+import {deleteUnusedCaches} from './caches.ts';
+import {messageWindows} from './messenger.ts';
+import {getStoredMetadata, getAndUpdateMetadata, type MetadataUpdate} from './metadata.ts';
+import * as precache from './precache.ts';
+import * as router from './router.ts';
 
 // Give TypeScript the correct global.
 declare const self: ServiceWorkerGlobalScope;

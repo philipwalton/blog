@@ -1,7 +1,7 @@
-import * as alerts from './alerts';
-import * as linkableHeadings from './linkable-headings';
-import {log, trackUnhandledError} from './log';
-import {now} from './utils/performance';
+import * as alerts from './alerts.ts';
+import * as linkableHeadings from './linkable-headings.ts';
+import {log, trackUnhandledError} from './log.ts';
+import {now} from './utils/performance.ts';
 
 let isLoaderDisabled = false;
 

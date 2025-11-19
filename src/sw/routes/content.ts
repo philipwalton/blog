@@ -3,9 +3,9 @@ import {resultingClientExists} from 'workbox-core/_private/resultingClientExists
 import {copyResponse} from 'workbox-core/copyResponse.js';
 import {Route} from 'workbox-routing/Route.js';
 import {StaleWhileRevalidate} from 'workbox-strategies/StaleWhileRevalidate.js';
-import {cacheNames} from '../caches.js';
-import {messageWindows} from '../messenger.js';
-import {streamErrorPlugin} from '../plugins/streamErrorPlugin.js';
+import {cacheNames} from '../caches.ts';
+import {messageWindows} from '../messenger.ts';
+import {streamErrorPlugin} from '../plugins/streamErrorPlugin.ts';
 
 import type {RouteMatchCallback, WorkboxPlugin} from 'workbox-core/types';
 

@@ -1,8 +1,8 @@
-import * as breakpoints from './breakpoints';
-import * as contentLoader from './content-loader';
-import * as linkableHeadings from './linkable-headings';
-import * as sw from './sw-init';
-import * as log from './log';
+import * as breakpoints from './breakpoints.ts';
+import * as contentLoader from './content-loader.ts';
+import * as linkableHeadings from './linkable-headings.ts';
+import * as sw from './sw-init.ts';
+import * as log from './log.ts';
 
 const initServiceWorker = async () => {
   if ('serviceWorker' in navigator) {

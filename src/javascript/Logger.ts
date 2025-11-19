@@ -1,10 +1,10 @@
-import {getActiveBreakpoint} from './breakpoints';
-import {initialSWState} from './sw-state';
-import {fetchLater} from './utils/fetchLater.js';
-import {get, set} from './utils/kv-store';
-import {now, timeOrigin} from './utils/performance';
-import {round} from './utils/round.js';
-import {uuid} from './utils/uuid';
+import {getActiveBreakpoint} from './breakpoints.ts';
+import {initialSWState} from './sw-state.ts';
+import {fetchLater} from './utils/fetchLater.ts';
+import {get, set} from './utils/kv-store.ts';
+import {now, timeOrigin} from './utils/performance.ts';
+import {round} from './utils/round.ts';
+import {uuid} from './utils/uuid.ts';
 
 export interface Params {
   [key: string]: string | number | boolean | undefined;

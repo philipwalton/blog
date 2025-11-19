@@ -1,9 +1,9 @@
 import {Workbox} from 'workbox-window/Workbox.mjs';
-import {loadPage} from './content-loader';
-import {disableLoader} from './content-loader';
-import {initialSWState} from './sw-state';
-import {log} from './log';
-import * as messages from './messages';
+import {loadPage} from './content-loader.ts';
+import {disableLoader} from './content-loader.ts';
+import {initialSWState} from './sw-state.ts';
+import {log} from './log.ts';
+import * as messages from './messages.ts';
 
 // Defining a Workbox instance has no side effects, so it's OK to do it
 // here in the top-level scope.

@@ -1,4 +1,4 @@
-import {cacheNames} from './caches.js';
+import {cacheNames} from './caches.ts';
 
 const META_PATH = '/metadata.json';
 const DEFAULT_VERSION = '0.0.0';

@@ -22,10 +22,7 @@ const cacheFirst = new CacheFirst({
   plugins: [streamErrorPlugin],
 });
 
-export const precacheHandler: RouteHandlerCallback = ({
-  request,
-  event,
-}) => {
+export const precacheHandler: RouteHandlerCallback = ({request, event}) => {
   const cacheKey = pc.getCacheKeyForURL(request.url);
 
   if (!cacheKey) {

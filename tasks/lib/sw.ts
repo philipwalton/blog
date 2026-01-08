@@ -6,7 +6,7 @@ import replace from '@rollup/plugin-replace';
 import {nodeResolve} from '@rollup/plugin-node-resolve';
 import terser from '@rollup/plugin-terser';
 import typescript from '@rollup/plugin-typescript';
-import {ENV} from './env.js';
+import {ENV} from './env.ts';
 
 const config = fs.readJSONSync('./config.json');
 
@@ -22,13 +22,17 @@ export const bundleSW = async () => {
     {
       url: '/shell-start',
       revision: revHash(
-        await fs.readFile(path.join(config.publicDir, 'shell-start.html')),
+        await fs.readFile(path.join(config.publicDir, 'shell-start.html'), {
+          encoding: 'utf-8',
+        }),
       ),
     },
     {
       url: '/shell-end',
       revision: revHash(
-        await fs.readFile(path.join(config.publicDir, 'shell-end.html')),
+        await fs.readFile(path.join(config.publicDir, 'shell-end.html'), {
+          encoding: 'utf-8',
+        }),
       ),
     },
   ];
@@ -69,7 +73,7 @@ export const bundleSW = async () => {
     plugins,
     preserveSymlinks: true, // Needed for `file:` entries in package.json.
     // preserveEntrySignatures: false,
-    preserveEntrySignatures: true,
+    preserveEntrySignatures: 'strict',
     treeshake: false,
   });
 

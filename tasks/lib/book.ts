@@ -1,9 +1,61 @@
 import fs from 'fs-extra';
 import path from 'path';
 
+interface Site {
+  title: string;
+  titleSuffix: string;
+  slug: string;
+  themeColor: string;
+  backgroundColor: string;
+  description: string;
+  baseUrl: string;
+  buildTime: Date;
+}
+
+interface Page {
+  title?: string;
+  path: string;
+  private?: boolean;
+  devOnly?: boolean;
+  template: string;
+  output: string;
+  partialPath?: string;
+  partialOutput?: string;
+  content?: string;
+}
+
+interface Resource {
+  title: string;
+  path: string;
+  template: string;
+  output: string;
+}
+
+interface Article {
+  title: string;
+  path: string;
+  date: string;
+  excerpt?: string;
+  image?: string;
+  translations?: Record<string, string>;
+  template: string;
+  output: string;
+  partialPath: string;
+  partialOutput: string;
+  markup?: string;
+  content?: string;
+}
+
+export interface Book {
+  site: Site;
+  pages: Page[];
+  resources: Resource[];
+  articles: Article[];
+}
+
 const config = fs.readJSONSync('./config.json');
 
-const getTemplate = (pathname) => {
+const getTemplate = (pathname: string) => {
   let templateFile;
 
   if (pathname == '/') {
@@ -17,7 +69,7 @@ const getTemplate = (pathname) => {
   return path.basename(templateFile);
 };
 
-export const getOutputFile = (pathname) => {
+export const getOutputFile = (pathname: string) => {
   if (pathname.endsWith('/')) {
     pathname += 'index.html';
   }
@@ -25,16 +77,16 @@ export const getOutputFile = (pathname) => {
   return path.resolve(path.join(config.publicDir, pathname));
 };
 
-const getPartialOutputFile = (outputFile) => {
+const getPartialOutputFile = (outputFile: string) => {
   return path.join(path.dirname(outputFile), config.contentPartialName);
 };
 
-const getPartialPath = (pathname) => {
+const getPartialPath = (pathname: string) => {
   return path.join(pathname, config.contentPartialName);
 };
 
-export const initBook = async () => {
-  const book = await fs.readJSON('./book.json');
+export const initBook = async (): Promise<Book> => {
+  const book = (await fs.readJSON('./book.json')) as Book;
 
   for (const page of book.pages) {
     page.template = getTemplate(page.path);

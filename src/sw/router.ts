@@ -10,9 +10,7 @@ import type {Route} from 'workbox-routing/Route.js';
 type RouteList = Array<() => Route>;
 
 // Order matters. Earlier routes are tried first.
-const precacheRoutes: RouteList = [
-  createPrecacheRoute,
-];
+const precacheRoutes: RouteList = [createPrecacheRoute];
 
 // Order matters. Earlier routes are tried first.
 const runtimeRoutes: RouteList = [
@@ -22,14 +20,9 @@ const runtimeRoutes: RouteList = [
 ];
 
 // Order matters. Earlier routes are tried first.
-const logRoutes: RouteList = [
-  createLogRoute,
-];
+const logRoutes: RouteList = [createLogRoute];
 
-const registerRoutes = (
-  router: Router,
-  routes: RouteList,
-): void => {
+const registerRoutes = (router: Router, routes: RouteList): void => {
   for (const route of routes) {
     router.registerRoute(route());
   }

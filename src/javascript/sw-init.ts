@@ -72,8 +72,6 @@ const setContentSourceOrTimeout = async () => {
  * the site, so we can't make too many assumptions about the format, which
  * is why we wrap everything in a try/catch block, and simply return the error
  * if one occurs.
- * @param {Object} payload
- * @return {Object}
  */
 const processMetadata = (payload: any = {}): any => {
   try {

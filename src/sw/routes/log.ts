@@ -4,7 +4,6 @@ import {BackgroundSyncPlugin} from 'workbox-background-sync/BackgroundSyncPlugin
 
 import type {RouteMatchCallback, WorkboxPlugin} from 'workbox-core/types';
 
-
 const logMatcher: RouteMatchCallback = ({url}) => {
   return url.hostname === location.hostname && url.pathname === '/log';
 };

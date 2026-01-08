@@ -3,12 +3,7 @@ import hljs from 'highlight.js';
 import MarkdownIt from 'markdown-it';
 import markdownItAnchor from 'markdown-it-anchor';
 
-/**
- * @param {string} code
- * @param {string} language
- * @returns {string}
- */
-function highlight(code, language) {
+function highlight(code: string, language: string) {
   // TODO(philipwalton): come up with a better way to do code marking.
   let mark = true;
   if (language.includes(':no-mark')) {
@@ -35,16 +30,11 @@ function highlight(code, language) {
   );
 }
 
-/**
- * Renders markdown content as HTML with syntax highlighted code blocks.
- * @param {string} content A markdown string.
- * @return {string} The rendered HTML.
- */
-export const renderMarkdown = (content, opts = {}) => {
+export const renderMarkdown = (content: string) => {
   const md = new MarkdownIt({
     html: true,
     typographer: true,
-    highlight: opts.highlight || highlight,
+    highlight,
   }).use(markdownItAnchor);
 
   return md.render(content);

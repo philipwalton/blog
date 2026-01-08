@@ -16,13 +16,13 @@
     "noUncheckedIndexedAccess": true,
     "outDir": "./build/static", // Required for Rollup's typescript plugin.
     "rewriteRelativeImportExtensions": true,
-    "rootDir": "./src",
+    "rootDir": "./",
     "skipLibCheck": true,
     "sourceMap": false,
     "strict": true,
     "strictNullChecks": true,
     "target": "ESNext"
   },
-  "include": ["src/**/*"],
-  "exclude": ["node_modules", "build", "test", "tasks", "functions"]
+  "include": ["src/**/*", "tasks/**/*"],
+  "exclude": ["node_modules", "build", "test", "functions"]
 }

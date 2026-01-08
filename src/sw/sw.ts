@@ -1,6 +1,10 @@
 import {deleteUnusedCaches} from './caches.ts';
 import {messageWindows} from './messenger.ts';
-import {getStoredMetadata, getAndUpdateMetadata, type MetadataUpdate} from './metadata.ts';
+import {
+  getStoredMetadata,
+  getAndUpdateMetadata,
+  type MetadataUpdate,
+} from './metadata.ts';
 import * as precache from './precache.ts';
 import * as router from './router.ts';
 

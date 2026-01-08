@@ -101,7 +101,6 @@ const trackPageview = async (url: URL) => {
 // /**
 //  * Sets the scroll position of the main document to the top of the page or
 //  * to the position of an element if a hash fragment is passed.
-//  * @param {string} hash The hash fragment of a URL to match with an element ID.
 //  */
 // const setScroll = (hash) => {
 //   const target = hash && document.getElementById(hash.slice(1));

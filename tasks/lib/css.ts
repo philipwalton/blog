@@ -3,9 +3,9 @@ import fs from 'fs-extra';
 import postcss from 'postcss';
 import atImport from 'postcss-import';
 import postcssPresetEnv from 'postcss-preset-env';
-import {ENV} from './env.js';
+import {ENV} from './env.ts';
 
-export const bundleCSS = async (srcPath) => {
+export const bundleCSS = async (srcPath: string) => {
   const css = await fs.readFile(srcPath, 'utf-8');
 
   const plugins = [

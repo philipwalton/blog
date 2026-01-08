@@ -1,11 +1,11 @@
 import fs from 'fs-extra';
 import path from 'path';
-import {rollup} from 'rollup';
+import {rollup, type RollupCache} from 'rollup';
 import {nodeResolve} from '@rollup/plugin-node-resolve';
 import replace from '@rollup/plugin-replace';
 import terser from '@rollup/plugin-terser';
 import typescript from '@rollup/plugin-typescript';
-import {ENV} from './env.js';
+import {ENV} from './env.ts';
 
 const config = fs.readJSONSync('./config.json');
 
@@ -25,9 +25,9 @@ const terserConfig = {
   },
 };
 
-let bundleCache;
+let bundleCache: RollupCache | false = false;
 
-export const bundleJS = async (entry) => {
+export const bundleJS = async (entry: string) => {
   const plugins = [
     typescript(),
     nodeResolve(),
@@ -53,7 +53,7 @@ export const bundleJS = async (entry) => {
     },
   });
 
-  bundleCache = bundle.cache;
+  bundleCache = bundle.cache ?? false;
 
   return await bundle.write({
     format: 'esm',

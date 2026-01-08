@@ -12,7 +12,7 @@ http
       const contents = [
         req.url,
         [...Object.entries(req.headers)]
-          .map((e) => `${e[0]}=${encodeURIComponent(e[1])}`)
+          .map((e) => `${e[0]}=${encodeURIComponent(String(e[1] || ''))}`)
           .join('&'),
         body,
       ].join('\n');

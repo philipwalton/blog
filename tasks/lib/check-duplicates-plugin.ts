@@ -1,3 +1,5 @@
+import type {NormalizedOutputOptions, OutputBundle, Plugin} from 'rollup';
+
 /**
  * Takes an array of module file paths and checks for duplicates that point
  * to the same node module.
@@ -9,9 +11,9 @@
  *
  * @param {Array<string>} modulePaths
  */
-export const checkModuleDuplicates = (modulePaths) => {
+export const checkModuleDuplicates = (modulePaths: string[]) => {
   const NODE_MODULES = 'node_modules';
-  const moduleIds = {};
+  const moduleIds: Record<string, string[]> = {};
   for (const modulePath of modulePaths) {
     if (modulePath.includes(NODE_MODULES)) {
       const id = modulePath.slice(
@@ -40,13 +42,13 @@ export const checkModuleDuplicates = (modulePaths) => {
  * https://github.com/rollup/rollup/issues/3060#issuecomment-522719783
  * @return {Object}
  */
-export const checkDuplicatesPlugin = () => {
+export const checkDuplicatesPlugin = (): Plugin => {
   const NODE_MODULES = 'node_modules';
   const nodeModuleIds = new Map();
 
   return {
     name: 'check-duplicates',
-    load(id) {
+    load(id: string) {
       if (id.includes(NODE_MODULES)) {
         const nodeModuleId = id.slice(
           id.lastIndexOf(NODE_MODULES) + NODE_MODULES.length + 1,
@@ -63,10 +65,11 @@ export const checkDuplicatesPlugin = () => {
         nodeModuleIds.set(nodeModuleId, id);
       }
     },
-    generateBundle(options, bundle) {
-      const chunkNames = new Set();
+    generateBundle(options: NormalizedOutputOptions, bundle: OutputBundle) {
+      const chunkNames = new Set<string>();
       for (const chunkInfo of Object.values(bundle)) {
         const name = chunkInfo.name;
+        if (!name) continue;
 
         if (chunkNames.has(name)) {
           throw new Error(`Duplicate chunk name detected: '${name}'`);

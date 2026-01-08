@@ -1,7 +1,7 @@
 import htmlMinifier from 'html-minifier';
-import {ENV} from './env.js';
+import {ENV} from './env.ts';
 
-const minifyHtml = (html) => {
+const minifyHtml = (html: string) => {
   const opts = {
     removeComments: true,
     collapseWhitespace: true,
@@ -17,6 +17,6 @@ const minifyHtml = (html) => {
   return htmlMinifier.minify(html, opts);
 };
 
-export const processHtml = (html) => {
+export const processHtml = (html: string) => {
   return ENV === 'development' ? html : minifyHtml(html);
 };

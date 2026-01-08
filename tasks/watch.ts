@@ -1,10 +1,10 @@
 import chokidar from 'chokidar';
 import fs from 'fs-extra';
-import {cssCache, jsCache} from './lib/cache.js';
-import {buildAll} from './lib/content.js';
-import {bundleSW} from './lib/sw.js';
+import {cssCache, jsCache} from './lib/cache.ts';
+import {buildAll} from './lib/content.ts';
+import {bundleSW} from './lib/sw.ts';
 
-const watch = (arg) => {
+const watch = (arg: string | string[]) => {
   return chokidar.watch(arg, {ignoreInitial: true});
 };
 
@@ -44,7 +44,7 @@ const staticWatcher = watch(['src/static']);
 staticWatcher.on('ready', () => {
   staticWatcher.on('all', async (event, path) => {
     console.log('static', event, path);
-    await fs.copy('./src/static/', 'build/', {recursive: true});
+    await fs.copy('./src/static/', 'build/');
   });
 });
 

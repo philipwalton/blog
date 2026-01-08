@@ -2,13 +2,13 @@ import fs from 'fs-extra';
 import path from 'path';
 import revHash from 'rev-hash';
 import {revPath} from 'rev-path';
-import {memoize} from './memoize.js';
+import {memoize} from './memoize.ts';
 
 const getHash = memoize(revHash);
 const revisionFile = memoize(revPath);
 
 const config = fs.readJSONSync('./config.json');
-let manifest;
+let manifest: Record<string, string>;
 
 const ensureManifest = () => {
   if (!manifest) {
@@ -37,7 +37,7 @@ export const resetManifest = () => {
   saveManifest();
 };
 
-export const getAsset = (filename) => {
+export const getAsset = (filename: string) => {
   ensureManifest();
 
   const basename = path.basename(filename);
@@ -49,7 +49,11 @@ export const getAsset = (filename) => {
   return manifest[basename];
 };
 
-export const addAsset = (filename, revisionedFilename, content) => {
+export const addAsset = (
+  filename: string,
+  revisionedFilename: string,
+  content: string | Buffer | Uint8Array,
+) => {
   ensureManifest();
 
   // Revisioned assets always have unique filenames, so they
@@ -60,23 +64,28 @@ export const addAsset = (filename, revisionedFilename, content) => {
 
   fs.outputFileSync(
     path.join(config.publicStaticDir, revisionedFilename),
-    content,
+    typeof content === 'string' ? content : new Uint8Array(content),
   );
 
   saveManifest();
 };
 
-export const getRevisionedAssetUrl = (filename) => {
+export const getRevisionedAssetUrl = (filename: string) => {
   return path.join(config.publicStaticPath, getAsset(filename) || filename);
 };
 
-export const generateRevisionedAsset = (filename, content) => {
+export const generateRevisionedAsset = (
+  filename: string,
+  content?: string | Buffer | Uint8Array,
+) => {
   if (!content) {
     content = fs.readFileSync(filename);
   }
 
   const basename = path.basename(filename);
-  const hash = getHash(content);
+  const hash = getHash(
+    typeof content === 'string' ? content : new Uint8Array(content),
+  );
   const revisionedFilename = revisionFile(basename, hash);
 
   // Updates the internal revision map so it can be referenced later.

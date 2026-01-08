@@ -9,31 +9,90 @@ import path from 'path';
 import resolve from 'resolve';
 import sharp from 'sharp';
 import {promisify} from 'util';
-import {addAsset, generateRevisionedAsset} from './assets.js';
-import {cssCache, jsCache} from './cache.js';
-import {bundleCSS} from './css.js';
-import {bundleJS} from './javascript.js';
-import {renderMarkdown} from './markdown.js';
-import {memoize, memoizeWithSrc, memoizeWithSrcCache} from './memoize.js';
+import {addAsset, generateRevisionedAsset} from './assets.ts';
+import {cssCache, jsCache} from './cache.ts';
+import {bundleCSS} from './css.ts';
+import {bundleJS} from './javascript.ts';
+import {renderMarkdown} from './markdown.ts';
+import {memoize, memoizeWithSrc, memoizeWithSrcCache} from './memoize.ts';
+
+interface Config {
+  contentPartialPath: string;
+  contentPartialName: string;
+  manifestFileName: string;
+  publicDir: string;
+  publicPath: string;
+  publicStaticDir: string;
+  publicStaticPath: string;
+  publicModulesDir: string;
+  publicModulesPath: string;
+  templatesDir: string;
+  timezone: string;
+}
+
+interface ImgProps {
+  src: string;
+  alt: string;
+  border?: boolean;
+  href?: string | false;
+  figcaption?: string;
+  figure?: boolean;
+}
+
+interface ScriptProps {
+  entry: string;
+}
+
+interface StyleProps {
+  entry: string;
+  inline?: boolean;
+}
+
+interface NunjucksParser {
+  nextToken: () => {value: string};
+  parseSignature: (allowUnknown?: boolean, noParens?: boolean) => unknown;
+  advanceAfterBlockEnd: (value?: string) => void;
+  parseUntilBlocks: (header: string) => unknown;
+}
+
+interface NunjucksNodes {
+  CallExtensionAsync: new (
+    ext: object,
+    method: string,
+    args: unknown,
+    content?: unknown[],
+  ) => unknown;
+}
 
 const memoImgSize = memoize(promisify(imgSizePkg));
 const memoBundleJS = memoizeWithSrcCache(jsCache, bundleJS);
 const memoBundleCSS = memoizeWithSrcCache(cssCache, bundleCSS);
 const memoGenerateRevisionedAsset = memoize(generateRevisionedAsset);
-const memoOptimizeImage = memoizeWithSrc((src, size, format, opts) => {
-  return sharp(src).resize(size)[format](opts).toBuffer();
-});
+const memoOptimizeImage = memoizeWithSrc(
+  (
+    src: string,
+    size: {width: number},
+    format: keyof sharp.FormatEnum,
+    opts?: Record<string, unknown>,
+  ) => {
+    return (
+      (sharp(src).resize(size) as unknown as Record<string, Function>)[format]!(
+        opts,
+      ) as sharp.Sharp
+    ).toBuffer();
+  },
+);
 
-const config = fs.readJSONSync('./config.json');
+const config: Config = fs.readJSONSync('./config.json');
 
-const generateLowResArticleImage = async (filename) => {
+const generateLowResArticleImage = async (filename: string) => {
   const minified = await memoOptimizeImage(filename, {width: 700}, 'webp');
   const basename = path.basename(filename, path.extname(filename));
 
   return generateRevisionedAsset(`${basename}.webp`, minified);
 };
 
-const generateHighResArticleImage = async (filename) => {
+const generateHighResArticleImage = async (filename: string) => {
   const minified = await memoOptimizeImage(filename, {width: 1400}, 'webp');
   const basename = path.basename(filename, path.extname(filename));
 
@@ -43,11 +102,9 @@ const generateHighResArticleImage = async (filename) => {
 /**
  * Nunjucks silently catches errors, which can make debugging incredibly hard.
  * This function logs errors so at least they're visible somewhere.
- * @param {Function} fn
- * @return {Function}
  */
-const catchAndLogErrors = (fn) => {
-  return (...args) => {
+const catchAndLogErrors = <A extends unknown[], R>(fn: (...args: A) => R) => {
+  return (...args: A) => {
     try {
       return fn(...args);
     } catch (err) {
@@ -68,36 +125,36 @@ export const initTemplates = () => {
 
   env.addFilter(
     'htmlescape',
-    catchAndLogErrors((content) => {
+    catchAndLogErrors((content: string) => {
       return he.encode(content, {useNamedReferences: true});
     }),
   );
 
   env.addFilter(
     'jsescape',
-    catchAndLogErrors((content) => {
+    catchAndLogErrors((content: string) => {
       return jsesc(content);
     }),
   );
 
   env.addFilter(
     'format',
-    catchAndLogErrors((str, formatString) => {
+    catchAndLogErrors((str: string, formatString: string) => {
       return moment.tz(str, config.timezone).format(formatString);
     }),
   );
 
   env.addFilter(
     'revision',
-    catchAndLogErrors((filename) => {
+    catchAndLogErrors((filename: string) => {
       return memoGenerateRevisionedAsset(filename);
     }),
   );
 
-  const inlineCache = {};
+  const inlineCache: Record<string, string> = {};
   env.addFilter(
     'inline',
-    catchAndLogErrors((fileURL) => {
+    catchAndLogErrors((fileURL: string) => {
       if (!inlineCache[fileURL]) {
         // Inline from node_modules with the `npm:` prefix,
         // otherwise inline from the build directory.
@@ -113,30 +170,37 @@ export const initTemplates = () => {
 
   env.addExtension(
     'Callout',
-    new BlockShortcode('Callout', (content, type) => {
+    new BlockShortcode('Callout', (content: string, type: string) => {
       const classes = ['Callout'];
       if (type) {
         classes.push(`Callout--${type}`);
       }
-      return `<div class="${classes.join(' ')}">${renderMarkdown(
-        content.trim(),
-        {highlight: false},
-      )}</div>`;
+      return `<div class="${classes.join(' ')}">${renderMarkdown(content.trim())}</div>`;
     }),
   );
 
   env.addExtension(
     'Img',
-    new InlineShortcode('Img', async (props) => {
+    new InlineShortcode('Img', async (props: ImgProps) => {
       let {alt, border, href, figcaption, src} = props;
 
       const filename = `src/images/articles/${props.src}`;
-
       const dimensions = await memoImgSize(filename);
+
+      if (!dimensions || !dimensions.width || !dimensions.height) {
+        throw new Error(`Could not determine dimensions for ${filename}`);
+      }
+
       const width = Math.min(1400, dimensions.width);
       const height = Math.round(dimensions.height * (width / dimensions.width));
 
-      const attrs = {src, width, height, alt};
+      const attrs: {
+        src: string;
+        width: number;
+        height: number;
+        alt: string;
+        srcset?: string;
+      } = {src, width, height, alt};
 
       if (filename.match(/\.(png|jpg)$/)) {
         const [highResSrc, lowResSrc] = await Promise.all([
@@ -174,7 +238,7 @@ export const initTemplates = () => {
 
   env.addExtension(
     'Script',
-    new InlineShortcode('Script', async (props) => {
+    new InlineShortcode('Script', async (props: ScriptProps) => {
       const {output} = await memoBundleJS(props.entry);
       const revisionedFilename = output[0].fileName;
 
@@ -186,7 +250,7 @@ export const initTemplates = () => {
 
   env.addExtension(
     'Style',
-    new InlineShortcode('Style', async (props) => {
+    new InlineShortcode('Style', async (props: StyleProps) => {
       const {entry, inline} = props;
       const filePath = `./src/css/${entry}`;
       const css = await memoBundleCSS(filePath);
@@ -205,7 +269,7 @@ export const initTemplates = () => {
   );
 };
 
-function attrify(obj) {
+function attrify(obj: Record<string, string | number | boolean | undefined>) {
   let attrs = [];
   for (const [attr, value] of Object.entries(obj)) {
     if (value && !attr.startsWith('_')) {
@@ -219,23 +283,18 @@ function attrify(obj) {
  * Class to create new Nunjucks shortcode blocks.
  */
 class InlineShortcode {
-  /**
-   * @param {string} shortcodeName
-   * @param {Function} shortcodeFn
-   */
-  constructor(shortcodeName, shortcodeFn) {
+  _shortcodeFn: Function;
+  _shortcodeName: string;
+  tags: string[];
+
+  constructor(shortcodeName: string, shortcodeFn: Function) {
     this._shortcodeFn = shortcodeFn;
     this._shortcodeName = shortcodeName;
 
     this.tags = [shortcodeName];
   }
 
-  /**
-   * @param {Object} parser Nunjucks object
-   * @param {Object} nodes Nunjucks object
-   * @returns {any}
-   */
-  parse(parser, nodes) {
+  parse(parser: NunjucksParser, nodes: NunjucksNodes) {
     const tok = parser.nextToken();
 
     const args = parser.parseSignature(true, true);
@@ -247,11 +306,8 @@ class InlineShortcode {
     return new nodes.CallExtensionAsync(this, 'run', args);
   }
 
-  /**
-   * @param  {...any} args Parser params
-   */
-  async run(...args) {
-    const done = args.pop();
+  async run(...args: unknown[]) {
+    const done = args.pop() as nunjucks.Callback<unknown, unknown>;
     // const body = args.pop();
     const [ctx, ...argArray] = args;
 
@@ -265,23 +321,18 @@ class InlineShortcode {
  * Class to create new Nunjucks shortcode blocks.
  */
 class BlockShortcode {
-  /**
-   * @param {string} shortcodeName
-   * @param {Function} shortcodeFn
-   */
-  constructor(shortcodeName, shortcodeFn) {
+  _shortcodeFn: Function;
+  _shortcodeName: string;
+  tags: string[];
+
+  constructor(shortcodeName: string, shortcodeFn: Function) {
     this._shortcodeFn = shortcodeFn;
     this._shortcodeName = shortcodeName;
 
     this.tags = [shortcodeName];
   }
 
-  /**
-   * @param {Object} parser Nunjucks object
-   * @param {Object} nodes Nunjucks object
-   * @returns {any}
-   */
-  parse(parser, nodes) {
+  parse(parser: NunjucksParser, nodes: NunjucksNodes) {
     const tok = parser.nextToken();
 
     const args = parser.parseSignature(true, true);
@@ -293,12 +344,9 @@ class BlockShortcode {
     return new nodes.CallExtensionAsync(this, 'run', args, [body]);
   }
 
-  /**
-   * @param  {...any} args Parser params
-   */
-  async run(...args) {
-    const done = args.pop();
-    const body = args.pop();
+  async run(...args: unknown[]) {
+    const done = args.pop() as nunjucks.Callback<unknown, unknown>;
+    const body = args.pop() as () => string;
     const [ctx, ...argArray] = args;
 
     const content = this._shortcodeFn.call(ctx, body(), ...argArray);
@@ -307,5 +355,12 @@ class BlockShortcode {
   }
 }
 
-export const renderTemplate = promisify(nunjucks.render);
-export const renderTemplateString = promisify(nunjucks.renderString);
+export const renderTemplate = promisify(nunjucks.render) as (
+  name: string,
+  context?: object,
+) => Promise<string>;
+
+export const renderTemplateString = promisify(nunjucks.renderString) as (
+  src: string,
+  context?: object,
+) => Promise<string>;

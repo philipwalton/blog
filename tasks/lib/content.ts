@@ -1,17 +1,17 @@
 import fs from 'fs-extra';
 import path from 'path';
-import {initBook} from './book.js';
-import {ENV} from './env.js';
-import {processHtml} from './html.js';
-import {renderMarkdown} from './markdown.js';
+import {type Book, initBook} from './book.ts';
+import {ENV} from './env.ts';
+import {processHtml} from './html.ts';
+import {renderMarkdown} from './markdown.ts';
 import {
   initTemplates,
   renderTemplate,
   renderTemplateString,
-} from './templates.js';
+} from './templates.ts';
 
 const config = fs.readJSONSync('./config.json');
-let book;
+let book: Book;
 
 const renderArticleContentPartials = async () => {
   for (const article of book.articles) {
@@ -34,7 +34,7 @@ const renderArticleContentPartials = async () => {
 
 const buildArticles = async () => {
   for (const article of book.articles) {
-    await fs.outputFile(article.partialOutput, processHtml(article.content));
+    await fs.outputFile(article.partialOutput, processHtml(article.content!));
 
     const data = {
       ENV,
@@ -71,7 +71,7 @@ const buildPages = async () => {
     // Private pages are those that cannot be found by following a link on the
     // site, and thus no content partial needs to be created for them.
     if (!page.private) {
-      await fs.outputFile(page.partialOutput, processHtml(page.content));
+      await fs.outputFile(page.partialOutput!, processHtml(page.content!));
     }
 
     const data = {
@@ -122,10 +122,10 @@ const buildShell = async () => {
 
   await fs.outputFile(
     path.join(config.publicDir, 'shell-start.html'),
-    shellStart,
+    shellStart!,
   );
 
-  await fs.outputFile(path.join(config.publicDir, 'shell-end.html'), shellEnd);
+  await fs.outputFile(path.join(config.publicDir, 'shell-end.html'), shellEnd!);
 };
 
 export const buildAll = async () => {

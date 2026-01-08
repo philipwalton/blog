@@ -1,4 +1,6 @@
-class Cache {
+export class Cache {
+  _lastModified: Date;
+
   constructor() {
     this._lastModified = new Date();
   }

@@ -2,7 +2,12 @@ const FETCH_LATER_TOKEN =
   // eslint-disable-next-line max-len
   'Ao1ryfd8fdqfiAsCIPw8u/hg/poMifRObWWqJcgoUH1kmUYLdQXZA1vMT1hqitwdlvdG7vrdVUfTAmxQ11PqywIAAABXeyJvcmlnaW4iOiJodHRwczovL3BoaWxpcHdhbHRvbi5jb206NDQzIiwiZmVhdHVyZSI6IkZldGNoTGF0ZXJBUEkiLCJleHBpcnkiOjE3NDIyNTYwMDB9';
 
-const experiments = {
+interface Experiment {
+  range: [number, number];
+  init: (rewriter: HTMLRewriter) => void;
+}
+
+const experiments: Record<string, Experiment> = {
   fetch_later: {
     range: [0, 0.5],
     init: (rewriter) => {
@@ -16,10 +21,7 @@ const experiments = {
  * `fetch_later` experiment as a global variable.
  */
 class ExperimentScriptHandler {
-  /**
-   * @param {Object} element
-   */
-  element(element) {
+  element(element: Element) {
     element.before(
       // eslint-disable-next-line max-len
       `<meta http-equiv="origin-trial" content="${FETCH_LATER_TOKEN}"><script>self.__x='fetch_later'</script>`,
@@ -30,25 +32,22 @@ class ExperimentScriptHandler {
   }
 }
 
-/**
- * @param {string} xid
- * @returns {string}
- */
-export function getExperiment(xid) {
+export function getExperiment(xid: string): string | undefined {
+  const x = Number(xid);
   for (const [key, entry] of Object.entries(experiments)) {
     const [min, max] = entry.range;
-    if (xid >= min && xid < max) {
+    if (x >= min && x < max) {
       return key;
     }
   }
 }
 
-/**
- *
- * @param {string} experiment
- * @param {HTMLRewriter} rewriter
- * @returns {HTMLRewriter}
- */
-export function applyExperiment(experiment, rewriter) {
-  return experiments[experiment].init(rewriter);
+export function applyExperiment(
+  experiment: string,
+  rewriter: HTMLRewriter,
+): void {
+  const exp = experiments[experiment];
+  if (exp) {
+    exp.init(rewriter);
+  }
 }

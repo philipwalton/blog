@@ -1,6 +1,6 @@
 class PriorityHintsTransform {
   #applied = false;
-  element(element) {
+  element(element: Element) {
     if (!this.#applied) {
       element.setAttribute('fetchpriority', 'high');
       this.#applied = true;
@@ -8,20 +8,14 @@ class PriorityHintsTransform {
   }
 }
 
-/**
- * @param {string} experiment
- * @param {HTMLRewriter} rewriter
- */
-export function addPriorityHints(rewriter, selector) {
+export function addPriorityHints(
+  rewriter: HTMLRewriter,
+  selector: string,
+): void {
   rewriter.on(selector, new PriorityHintsTransform());
 }
 
-/**
- * @param {Request} request
- * @param {string} path
- * @returns {string}
- */
-export function getPriorityHintKey(request, path) {
+export function getPriorityHintKey(request: Request, path: string): string {
   const device =
     request.headers.get('sec-ch-ua-mobile') === '?1' ? 'mobile' : 'desktop';
 
@@ -30,12 +24,14 @@ export function getPriorityHintKey(request, path) {
   return `${device}:${encodeURIComponent(path)}`;
 }
 
-/**
- * @param {Request} request
- * @param {Object} store
- */
-export async function storePriorityHints(request, store) {
-  const {path, selector} = await request.json();
+export async function storePriorityHints(
+  request: Request,
+  store: KVNamespace,
+): Promise<void> {
+  const {path, selector} = (await request.json()) as {
+    path: string;
+    selector: string;
+  };
   const key = getPriorityHintKey(request, path);
 
   const storedSelector = await store.get(key);

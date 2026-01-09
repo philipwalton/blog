@@ -18,8 +18,11 @@
   "scripts": {
     "clean": "node ./tasks/clean.ts",
     "build": "node ./tasks/build.ts",
-    "format": "prettier \"**/*.{cjs,js,json,ts}\" --write --ignore-path .gitignore",
-    "lint": "eslint \"**/*.js\" --fix --ignore-path .gitignore",
+    "format": "prettier \"**/*.{js,json,ts}\" --write --ignore-path .gitignore",
+    "lint": "eslint \"**/*.{js,ts}\" --fix --ignore-path .gitignore",
+    "types:build": "wrangler types",
+    "types:check": "tsc --noEmit",
+    "types": "run-s types:buid types:check",
     "release:major": "npm version major -m 'Release v%s'",
     "release:minor": "npm version minor -m 'Release v%s'",
     "release:patch": "npm version patch -m 'Release v%s'",
@@ -35,7 +38,8 @@
     "test:suite": "run-s ready vitest wdio",
     "posttest": "pkill -f 'npm run server'",
     "vitest": "vitest run",
-    "version": "NODE_ENV=production run-s clean build",
+    "wdio": "wdio run wdio.conf.js",
+    "version": "NODE_ENV=production run-s clean types build",
     "postversion": "npm run deploy",
     "prepare": "husky install"
   },
@@ -45,8 +49,9 @@
     }
   },
   "lint-staged": {
-    "**/*.js": "eslint --fix --ignore-path .gitignore",
-    "**/*.{cjs,js,json}": "prettier --write --ignore-path .gitignore"
+    "**/*.{ts}": "eslint --fix --ignore-path .gitignore",
+    "**/*.{ts,json}": "prettier --write --ignore-path .gitignore",
+    "wrangler.toml": "wrangler types"
   },
   "prettier": {
     "arrowParens": "always",
@@ -123,6 +128,6 @@
     "workbox-strategies": "^7.3.0",
     "workbox-streams": "^7.3.0",
     "workbox-window": "^7.3.0",
-    "wrangler": "^3.105.1"
+    "wrangler": "^4.58.0"
   }
 }

@@ -1,17 +1,23 @@
-function copyUserHeaders(oldHeaders) {
-  const newHeaders = new Headers();
-  for (const [key, value] of oldHeaders.entries()) {
+interface Env extends Cloudflare.Env {
+  CF_PAGES?: string;
+  ASSETS: Fetcher;
+}
+
+function copyUserHeaders(oldHeaders: Headers): [string, string][] {
+  const newHeaders: [string, string][] = [];
+  oldHeaders.forEach((value, key) => {
     if (key === 'user-agent' || key.startsWith('sec-ch-ua')) {
-      newHeaders.set(key, value);
+      newHeaders.push([key, value]);
     }
-  }
+  });
   return newHeaders;
 }
 
-/**
- * @param {Request} request
- */
-async function forwardRequest({request, env}) {
+async function forwardRequest({
+  request,
+  env,
+}: EventContext<Env, string, unknown>): Promise<Response> {
+  // ... (keep middle same)
   const GA4_MEASUREMENT_ID = 'G-0DN98LQF0S';
   const LOG_ENDPOINT = env.CF_PAGES
     ? 'https://www.google-analytics.com/g/collect'
@@ -77,21 +83,17 @@ async function forwardRequest({request, env}) {
   const ga4Body = eventsParams.map(String).join('\n');
   const headers = copyUserHeaders(request.headers);
 
-  /**
-   * @param {string} url
-   * @param {string} body
-   */
-  const beacon = (url, body) => {
+  const beacon = (url: string, body?: string) => {
     return fetch(url, {
       method: 'POST',
       headers,
-      body,
+      body: body ?? null,
     });
   };
 
   const requests = [];
   if (ga4SessionURL) {
-    requests.push(beacon(ga4SessionURL));
+    requests.push(beacon(ga4SessionURL.toString()));
   }
   requests.push(beacon(ga4URL, ga4Body));
 
@@ -99,7 +101,9 @@ async function forwardRequest({request, env}) {
   return new Response();
 }
 
-export async function onRequestPost(context) {
+export async function onRequestPost(
+  context: EventContext<Env, string, unknown>,
+): Promise<Response> {
   const url = new URL(context.request.url);
 
   // return processLog(url, request, env);
@@ -111,6 +115,9 @@ export async function onRequestPost(context) {
   return new Response(); // Empty 200.
 }
 
-export async function onRequestGet({request, env}) {
+export async function onRequestGet({
+  request,
+  env,
+}: EventContext<Env, string, unknown>): Promise<Response> {
   return env.ASSETS.fetch(request);
 }

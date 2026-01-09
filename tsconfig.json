@@ -30,6 +30,12 @@
       "vitest/globals"
     ]
   },
-  "include": ["src/**/*", "tasks/**/*", "test/**/*"],
-  "exclude": ["node_modules", "build", "functions"]
+  "include": [
+    "src/**/*",
+    "tasks/**/*",
+    "test/**/*",
+    "functions/**/*",
+    "worker-configuration.d.ts"
+  ],
+  "exclude": ["node_modules", "build"]
 }

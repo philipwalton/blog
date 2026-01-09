@@ -21,12 +21,14 @@ const metadata: Metadata = {
 export const getStoredMetadata = async () => {
   const cache = await caches.open(cacheNames.META);
   const response = await cache.match(META_PATH);
-  return response
-    ? await response.json()
-    : {
-        version: DEFAULT_VERSION,
-        buildTime: 0,
-      };
+  return (
+    response
+      ? await response.json()
+      : {
+          version: DEFAULT_VERSION,
+          buildTime: 0,
+        }
+  ) as Metadata;
 };
 
 // TODO(philipwalton): at some point it might make sense to expose a route

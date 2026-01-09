@@ -1,8 +1,4 @@
-/**
- * @param {URL}
- * @returns {URL}
- */
-export function getRedirectPath(path) {
+export function getRedirectPath(path: string): string | undefined {
   // Keep a copy of original path since redirected path may be modified.
   const originalPath = path;
 

@@ -2,38 +2,27 @@ import {applyExperiment, getExperiment} from './lib/experiments.js';
 import {addPriorityHints, getPriorityHintKey} from './lib/performance.js';
 import {getRedirectPath} from './lib/redirects.js';
 
-/**
- * @returns {string}
- */
-function createXID() {
+interface Env extends Cloudflare.Env {
+  ASSETS: Fetcher;
+}
+
+function createXID(): string {
   return `${Math.random()}`.slice(1, 5) || '.000';
 }
 
-/**
- * @param {string} cookie
- * @returns {boolean}
- */
-function getXIDFromCookie(cookie) {
-  return cookie.match(/(?:^|;) *xid=(\.\d+) *(?:;|$)/) && RegExp.$1;
+function getXIDFromCookie(cookie: string): string | null {
+  const match = cookie.match(/(?:^|;) *xid=(\.\d+) *(?:;|$)/);
+  return match && match[1] ? match[1] : null;
 }
 
-/**
- * Normalizes by removing any content partial path.
- * @param {string} path
- * @returns {string}
- */
-function normalizePath(path) {
+function normalizePath(path: string): string {
   if (path.endsWith('_index')) {
     return path.slice(0, -6);
   }
   return path;
 }
 
-/**
- * @param {Request} request
- * @param {Response} response
- */
-function setXIDToCookie(xid, response) {
+function setXIDToCookie(xid: string, response: Response): void {
   response.headers.set(
     'Set-Cookie',
     [
@@ -47,23 +36,14 @@ function setXIDToCookie(xid, response) {
   );
 }
 
-/**
- * @param {Response} response
- * @returns {Response}
- */
-function addServerTimingHeaders(response, startTime) {
+function addServerTimingHeaders(response: Response, startTime: number): void {
   response.headers.set('Server-Timing', `worker;dur=${Date.now() - startTime}`);
 }
 
-/**
- * @param {Object} param
- * @param {Request} param.request
- * @param {URL} param.url
- * @param {number} param.startTime
- * @param {Object} param.vars
- * @returns {Response}
- */
-async function handleRequest({request, env}) {
+async function handleRequest({
+  request,
+  env,
+}: EventContext<Env, string, unknown>): Promise<Response> {
   const startTime = Date.now();
   const url = new URL(request.url);
 
@@ -114,6 +94,8 @@ async function handleRequest({request, env}) {
   return rewriter.transform(clone);
 }
 
-export async function onRequestGet(context) {
+export async function onRequestGet(
+  context: EventContext<Env, string, unknown>,
+): Promise<Response> {
   return handleRequest(context);
 }

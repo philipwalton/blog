@@ -209,7 +209,8 @@ const trackLCP = async () => {
       let dynamicFetchPriority: string | undefined;
 
       // If the LCP element is an image, send a hint for the next visitor.
-      const {element, lcpEntry} = metric.attribution;
+      const {target, lcpEntry} = metric.attribution;
+
       if (lcpEntry?.url && lcpEntry.element?.tagName.toLowerCase() === 'img') {
         const elementWithPriority = document.querySelector('[fetchpriority]');
         if (elementWithPriority) {
@@ -220,7 +221,7 @@ const trackLCP = async () => {
           '/hint',
           JSON.stringify({
             path: originalPathname,
-            selector: element,
+            selector: target,
           }),
         );
       }
@@ -229,7 +230,7 @@ const trackLCP = async () => {
         value: metric.delta,
         metric_rating: metric.rating,
         metric_value: metric.value,
-        debug_target: element || '(not set)',
+        debug_target: target || '(not set)',
         debug_url: metric.attribution.url,
         debug_dfp: dynamicFetchPriority,
         debug_ttfb: metric.attribution.timeToFirstByte,

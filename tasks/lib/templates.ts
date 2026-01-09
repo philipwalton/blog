@@ -1,7 +1,7 @@
 import {oneLine} from 'common-tags';
 import fs from 'fs-extra';
 import he from 'he';
-import imgSizePkg from 'image-size';
+import {imageSizeFromFile} from 'image-size/fromFile';
 import jsesc from 'jsesc';
 import moment from 'moment-timezone';
 import nunjucks from 'nunjucks';
@@ -64,7 +64,7 @@ interface NunjucksNodes {
   ) => unknown;
 }
 
-const memoImgSize = memoize(promisify(imgSizePkg));
+const memoImgSize = memoize(imageSizeFromFile);
 const memoBundleJS = memoizeWithSrcCache(jsCache, bundleJS);
 const memoBundleCSS = memoizeWithSrcCache(cssCache, bundleCSS);
 const memoGenerateRevisionedAsset = memoize(generateRevisionedAsset);

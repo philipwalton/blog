@@ -201,9 +201,14 @@ export class Logger {
    */
   async _queue(params: Params) {
     // If the fetchLater request was already sent, reset internal event state.
-    if (this._fetchLaterResult?.activated) {
+    if (
+      this._fetchLaterResult?.activated ||
+      // TODO: check the size of `data` (less than 64KB) instead of queue size
+      this._eventQueue.size > 10
+    ) {
       this._sendCount++;
       this._eventQueue.clear();
+      delete this._fetchLaterResult;
     }
 
     this._pageParams._s = this._sendCount;
@@ -215,7 +220,8 @@ export class Logger {
     }
 
     // Add the event to the queue using either the event ID or a unique index.
-    this._eventQueue.set((params['ep.event_id'] as number) || ++index, params);
+    const key = (params['ep.event_id'] as number) || ++index;
+    this._eventQueue.set(key, params);
 
     // TODO: Consider adding a deduplication mechanism.
     // this._dedupeEvents(eventID, params);

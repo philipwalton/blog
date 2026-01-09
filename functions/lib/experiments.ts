@@ -1,5 +1,4 @@
 const FETCH_LATER_TOKEN =
-  // eslint-disable-next-line max-len
   'Ao1ryfd8fdqfiAsCIPw8u/hg/poMifRObWWqJcgoUH1kmUYLdQXZA1vMT1hqitwdlvdG7vrdVUfTAmxQ11PqywIAAABXeyJvcmlnaW4iOiJodHRwczovL3BoaWxpcHdhbHRvbi5jb206NDQzIiwiZmVhdHVyZSI6IkZldGNoTGF0ZXJBUEkiLCJleHBpcnkiOjE3NDIyNTYwMDB9';
 
 interface Experiment {
@@ -23,7 +22,6 @@ const experiments: Record<string, Experiment> = {
 class ExperimentScriptHandler {
   element(element: Element) {
     element.before(
-      // eslint-disable-next-line max-len
       `<meta http-equiv="origin-trial" content="${FETCH_LATER_TOKEN}"><script>self.__x='fetch_later'</script>`,
       {
         html: true,

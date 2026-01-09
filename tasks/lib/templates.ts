@@ -108,7 +108,6 @@ const catchAndLogErrors = <A extends unknown[], R>(fn: (...args: A) => R) => {
     try {
       return fn(...args);
     } catch (err) {
-      // eslint-disable-next-line
       console.error(err);
       process.exit(1);
     }
@@ -182,7 +181,8 @@ export const initTemplates = () => {
   env.addExtension(
     'Img',
     new InlineShortcode('Img', async (props: ImgProps) => {
-      let {alt, border, href, figcaption, src} = props;
+      const {alt, border, figcaption, src} = props;
+      let {href} = props;
 
       const filename = `src/images/articles/${props.src}`;
       const dimensions = await memoImgSize(filename);
@@ -270,7 +270,7 @@ export const initTemplates = () => {
 };
 
 function attrify(obj: Record<string, string | number | boolean | undefined>) {
-  let attrs = [];
+  const attrs = [];
   for (const [attr, value] of Object.entries(obj)) {
     if (value && !attr.startsWith('_')) {
       attrs.push(`${attr}="${value}"`);

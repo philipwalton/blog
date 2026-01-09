@@ -319,6 +319,7 @@ export class Logger {
     const time = Date.now();
 
     let seg = 0;
+    // eslint-disable-next-line prefer-const
     let [sid, sct, lastEngagedTime] = await Promise.all([
       get<number>('sessionId', time),
       get<number>('sessionCount', 1),

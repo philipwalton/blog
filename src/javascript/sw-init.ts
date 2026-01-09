@@ -208,7 +208,7 @@ export const init = async () => {
   try {
     log.awaitBeforeSending(setSiteVersionOrTimeout());
     log.awaitBeforeSending(setContentSourceOrTimeout());
-  } catch (err) {
+  } catch {
     // Do nothing.
   }
 

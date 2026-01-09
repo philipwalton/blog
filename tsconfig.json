@@ -21,8 +21,15 @@
     "sourceMap": false,
     "strict": true,
     "strictNullChecks": true,
-    "target": "ESNext"
+    "target": "ESNext",
+    "types": [
+      "node",
+      "@wdio/globals/types",
+      "@wdio/mocha-framework",
+      "expect-webdriverio",
+      "vitest/globals"
+    ]
   },
-  "include": ["src/**/*", "tasks/**/*"],
-  "exclude": ["node_modules", "build", "test", "functions"]
+  "include": ["src/**/*", "tasks/**/*", "test/**/*"],
+  "exclude": ["node_modules", "build", "functions"]
 }

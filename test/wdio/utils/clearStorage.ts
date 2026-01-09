@@ -1,5 +1,11 @@
+declare global {
+  interface Window {
+    __ready__?: boolean;
+  }
+}
+
 /**
- * @returns {Promise}
+ * @returns {Promise<void>}
  */
 export async function clearStorage() {
   await browser.deleteCookies();

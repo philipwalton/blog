@@ -1,11 +1,11 @@
 import {strict as assert} from 'node:assert';
-import {beaconsContain, clearBeacons, getBeacons} from './utils/beacons.js';
-import {clearStorage} from './utils/clearStorage.js';
-import {setExperimentCookie} from './utils/setExperimentCookie.js';
-import {initBook} from '../../tasks/lib/book.js';
+import {beaconsContain, clearBeacons, getBeacons} from './utils/beacons.ts';
+import {clearStorage} from './utils/clearStorage.ts';
+import {setExperimentCookie} from './utils/setExperimentCookie.ts';
+import {initBook, type Article, type Page} from '../../tasks/lib/book.ts';
 
-let articles;
-let pages;
+let articles: Article[];
+let pages: Page[];
 
 let testID = 0;
 
@@ -64,20 +64,23 @@ describe('log', function () {
           'up.service_worker_state': 'supported',
         });
       });
+      assert(beacon1 instanceof URLSearchParams);
       assert(!beacon1.has('up.experiment'));
 
       // Reload to ensure that the experiment works with service worker.
 
       await browser.url(`/articles/?test_id=${++testID}`);
 
-      const beacon2 = await browser.waitUntil(() => {
-        return beaconsContain({
+      const beacon2 = await browser.waitUntil(async () => {
+        const result = await beaconsContain({
           'dl': new RegExp(`test_id=${testID}`),
           'en': 'page_view',
           'ep.page_path': '/articles/',
           'up.service_worker_state': 'controlled',
         });
+        return result instanceof URLSearchParams ? result : false;
       });
+      assert(beacon2 instanceof URLSearchParams);
       assert(!beacon2.has('up.experiment'));
     });
   });
@@ -105,38 +108,39 @@ describe('log', function () {
       });
 
       const beacons = await getBeacons((params) => {
-        return params.get('dl').includes(`?test_id=${testID}`);
+        const dl = params.get('dl');
+        return dl ? dl.includes(`?test_id=${testID}`) : false;
       });
 
       for (const beacon of beacons) {
         assert.strictEqual(beacon.get('v'), '2');
         assert.strictEqual(beacon.get('tid'), 'G-0DN98LQF0S');
-        assert.match(beacon.get('cid'), /^\d{13}-\d{13}$/);
+        assert.match(beacon.get('cid') || '', /^\d{13}-\d{13}$/);
 
-        assert.match(beacon.get('sid'), /^\d{13}$/);
-        assert.match(beacon.get('sct'), /^\d+$/);
-        assert.match(beacon.get('seg'), /^(0|1)+$/);
+        assert.match(beacon.get('sid') || '', /^\d{13}$/);
+        assert.match(beacon.get('sct') || '', /^\d+$/);
+        assert.match(beacon.get('seg') || '', /^(0|1)+$/);
 
         assert.strictEqual(beacon.get('epn.pageshow_count'), '1');
         assert.strictEqual(beacon.get('ep.original_page_path'), '/');
-        assert.match(beacon.get('epn.measurement_version'), /\d+/);
+        assert.match(beacon.get('epn.measurement_version') || '', /\d+/);
         assert.match(
-          beacon.get('ep.navigation_type'),
+          beacon.get('ep.navigation_type') || '',
           /(navigate|reload|route_change)/,
         );
 
-        assert(beacon.get('epn.time_origin') <= Date.now());
-        assert(beacon.get('epn.time_origin') > Date.now() - 60 * 1000);
-        assert(beacon.get('epn.page_time') > 0);
-        assert(beacon.get('epn.page_time') < 60 * 1000);
+        assert(Number(beacon.get('epn.time_origin')) <= Date.now());
+        assert(Number(beacon.get('epn.time_origin')) > Date.now() - 60 * 1000);
+        assert(Number(beacon.get('epn.page_time')) > 0);
+        assert(Number(beacon.get('epn.page_time')) < 60 * 1000);
       }
     });
 
     it('should update the session count and engagement status after additional visits', async () => {
       await browser.url(`/?test_id=${++testID}`);
 
-      const beacon1 = await browser.waitUntil(() => {
-        return beaconsContain({
+      const beacon1 = await browser.waitUntil(async () => {
+        const result = await beaconsContain({
           'dl': new RegExp(`test_id=${testID}`),
           'seg': '0',
           'sct': '1',
@@ -146,19 +150,23 @@ describe('log', function () {
           'en': 'page_view',
           'ep.page_path': '/',
         });
+        return result instanceof URLSearchParams ? result : false;
       });
+      assert(beacon1 instanceof URLSearchParams);
 
       // TODO: remove all navigations to __blank in this test once the
       // fetch_later experiment has ended.
       await browser.url(`/__blank`);
 
-      const fcp1 = await browser.waitUntil(() => {
-        return beaconsContain({
+      const fcp1 = await browser.waitUntil(async () => {
+        const result = await beaconsContain({
           'dl': new RegExp(`test_id=${testID}`),
           'en': 'FCP',
           'ep.page_path': '/',
         });
+        return result instanceof URLSearchParams ? result : false;
       });
+      assert(fcp1 instanceof URLSearchParams);
 
       // Only the first event in the session should have `_ss` or `_fv` set.
       assert(!fcp1.has('_ss'));
@@ -167,29 +175,33 @@ describe('log', function () {
       await clearBeacons();
       await browser.url(`/about/?test_id=${testID}`);
 
-      const beacon2 = await browser.waitUntil(() => {
-        return beaconsContain({
+      const beacon2 = await browser.waitUntil(async () => {
+        const result = await beaconsContain({
           'seg': '1',
           'sct': '1',
-          'sid': beacon1.get('sid'),
+          'sid': beacon1.get('sid') || '',
           'en': 'page_view',
           'dl': new RegExp(`test_id=${testID}`),
           'ep.page_path': '/about/',
         });
+        return result instanceof URLSearchParams ? result : false;
       });
+      assert(beacon2 instanceof URLSearchParams);
 
       assert(!beacon2.has('_ss'));
       assert(!beacon2.has('_fv'));
 
       await browser.url(`/__blank`);
 
-      const fcp2 = await browser.waitUntil(() => {
-        return beaconsContain({
+      const fcp2 = await browser.waitUntil(async () => {
+        const result = await beaconsContain({
           'dl': new RegExp(`test_id=${testID}`),
           'en': 'FCP',
           'ep.page_path': '/about/',
         });
+        return result instanceof URLSearchParams ? result : false;
       });
+      assert(fcp2 instanceof URLSearchParams);
 
       assert(!fcp2.has('_ss'));
       assert(!fcp2.has('_fv'));
@@ -212,8 +224,8 @@ describe('log', function () {
       await clearBeacons();
       await browser.url(`/articles/?test_id=${testID}`);
 
-      const beacon3 = await browser.waitUntil(() => {
-        return beaconsContain({
+      const beacon3 = await browser.waitUntil(async () => {
+        const result = await beaconsContain({
           'seg': '0',
           'sct': '9',
           'sid': /^\d{13}$/,
@@ -222,20 +234,24 @@ describe('log', function () {
           'en': 'page_view',
           'ep.page_path': '/articles/',
         });
+        return result instanceof URLSearchParams ? result : false;
       });
+      assert(beacon3 instanceof URLSearchParams);
 
       assert(!beacon3.has('_fv'));
-      assert(beacon3.get('sid') > beacon1.get('sid'));
+      assert(Number(beacon3.get('sid')) > Number(beacon1.get('sid')));
 
       await browser.url(`/__blank`);
 
-      const fcp3 = await browser.waitUntil(() => {
-        return beaconsContain({
+      const fcp3 = await browser.waitUntil(async () => {
+        const result = await beaconsContain({
           'dl': new RegExp(`test_id=${testID}`),
           'en': 'FCP',
           'ep.page_path': '/articles/',
         });
+        return result instanceof URLSearchParams ? result : false;
       });
+      assert(fcp3 instanceof URLSearchParams);
 
       assert(!fcp3.has('_ss'));
       assert(!fcp3.has('_fv'));
@@ -288,13 +304,13 @@ describe('log', function () {
         });
       });
 
-      const articleLink = await $(`a[href="${articles[0].path}"]`);
+      const articleLink = await $(`a[href="${articles[0]?.path}"]`);
       await articleLink.click();
 
       // Wait a bit to allow the page to load and send a pageview.
       await browser.waitUntil(async () => {
         const title = await browser.getTitle();
-        return title.includes(articles[0].title);
+        return title.includes(articles[0]?.title || '');
       });
 
       // Navigate away to trigger sending log data.
@@ -303,7 +319,7 @@ describe('log', function () {
       await browser.waitUntil(() => {
         return beaconsContain({
           'en': 'page_view',
-          'ep.page_path': articles[0].path,
+          'ep.page_path': articles[0]?.path || '',
           'ep.original_page_path': '/',
         });
       });
@@ -322,12 +338,12 @@ describe('log', function () {
 
       // Load a page.
 
-      const articleLink = await $(`a[href="${pages[1].path}"]`);
+      const articleLink = await $(`a[href="${pages[1]?.path}"]`);
       await articleLink.click();
       // await browser.pause(1000);
       await browser.waitUntil(async () => {
         const title = await browser.getTitle();
-        return title.includes(pages[1].title);
+        return title.includes(pages[1]?.title || '');
       });
 
       // Click 'back' to the home page
@@ -337,7 +353,7 @@ describe('log', function () {
       // await browser.pause(1000);
       await browser.waitUntil(async () => {
         const title = await browser.getTitle();
-        return title.includes(pages[0].title);
+        return title.includes(pages[0]?.title || '');
       });
 
       // Click 'forward' to the articles page
@@ -347,7 +363,7 @@ describe('log', function () {
       // await browser.pause(1000);
       await browser.waitUntil(async () => {
         const title = await browser.getTitle();
-        return title.includes(pages[1].title);
+        return title.includes(pages[1]?.title || '');
       });
 
       await browser.url('/__blank');
@@ -356,17 +372,17 @@ describe('log', function () {
         return beaconsContain([
           {
             'en': 'page_view',
-            'ep.page_path': pages[1].path,
+            'ep.page_path': pages[1]?.path || '',
             'ep.original_page_path': '/',
           },
           {
             'en': 'page_view',
-            'ep.page_path': pages[0].path,
+            'ep.page_path': pages[0]?.path || '',
             'ep.original_page_path': '/',
           },
           {
             'en': 'page_view',
-            'ep.page_path': pages[1].path,
+            'ep.page_path': pages[1]?.path || '',
             'ep.original_page_path': '/',
           },
         ]);

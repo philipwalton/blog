@@ -1,8 +1,4 @@
-/**
- * @param {string} value
- * @returns {Promise}
- */
-export async function setExperimentCookie(value) {
+export async function setExperimentCookie(value: string) {
   await browser.setCookies({
     name: 'xid',
     value: value,

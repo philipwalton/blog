@@ -1,5 +1,5 @@
 import {describe, expect, it, beforeEach} from 'vitest';
-import {clearBeacons, getLogs} from '../wdio/utils/beacons.js';
+import {clearBeacons, getLogs} from '../wdio/utils/beacons.ts';
 
 const BASE_URL = 'http://localhost:3000';
 
@@ -22,7 +22,7 @@ const BROWSER_HEADERS = {
 const HEADERS = {...CLOUDFLARE_HEADERS, ...BROWSER_HEADERS};
 
 const worker = {
-  async fetch(path, requestInit = {}) {
+  async fetch(path: string, requestInit: RequestInit = {}): Promise<Response> {
     Object.assign((requestInit.headers ||= {}), HEADERS);
     const url = new URL(path, BASE_URL);
 
@@ -161,7 +161,7 @@ describe('worker', () => {
 
       const [log] = await getLogs({count: 1});
 
-      const url = new URL(log.url, BASE_URL);
+      const url = new URL(log?.url || '', BASE_URL);
 
       expect(url.pathname).toStrictEqual('/log');
       expect(url.search.slice(1)).toStrictEqual(
@@ -184,10 +184,10 @@ describe('worker', () => {
       );
       eventWithUA.set('ep.ua_ch', BROWSER_HEADERS['sec-ch-ua']);
 
-      expect(log.body).toStrictEqual(eventWithUA.toString());
+      expect(log?.body).toStrictEqual(eventWithUA.toString());
 
       for (const [key, value] of Object.entries(BROWSER_HEADERS)) {
-        expect(log.headers.get(key)).toStrictEqual(value);
+        expect(log?.headers.get(key)).toStrictEqual(value);
       }
     });
 
@@ -284,7 +284,7 @@ describe('worker', () => {
 
       const logs = await getLogs({count: 2});
 
-      const url1 = new URL(logs[0].url, BASE_URL);
+      const url1 = new URL(logs[0]!.url, BASE_URL);
 
       expect(url1.pathname).toStrictEqual('/log');
       expect(url1.search.slice(1)).toStrictEqual(
@@ -293,19 +293,19 @@ describe('worker', () => {
           ['tid', 'G-0DN98LQF0S'],
           ...pageParams.entries(),
           ['_uip', '1.2.3.4'],
-          ...events[0].entries(),
+          ...events[0]!.entries(),
           ['ep.user_agent_1', BROWSER_HEADERS['user-agent'].slice(0, 100)],
           ['ep.user_agent_2', BROWSER_HEADERS['user-agent'].slice(100)],
           ['ep.ua_ch', BROWSER_HEADERS['sec-ch-ua']],
         ]).toString(),
       );
-      expect(logs[0].body).toStrictEqual('');
+      expect(logs[0]!.body).toStrictEqual('');
 
       for (const [key, value] of Object.entries(BROWSER_HEADERS)) {
-        expect(logs[0].headers.get(key)).toStrictEqual(value);
+        expect(logs[0]!.headers.get(key)).toStrictEqual(value);
       }
 
-      const url2 = new URL(logs[1].url, BASE_URL);
+      const url2 = new URL(logs[1]!.url, BASE_URL);
       const pageParamsStripped = new URLSearchParams(pageParams);
       pageParamsStripped.delete('_fv');
       pageParamsStripped.delete('_ss');
@@ -319,12 +319,12 @@ describe('worker', () => {
           ['_uip', '1.2.3.4'],
         ]).toString(),
       );
-      expect(logs[1].body).toStrictEqual(
-        [events[1].toString(), events[2].toString()].join('\n'),
+      expect(logs[1]!.body).toStrictEqual(
+        [events[1]!.toString(), events[2]!.toString()].join('\n'),
       );
 
       for (const [key, value] of Object.entries(BROWSER_HEADERS)) {
-        expect(logs[1].headers.get(key)).toStrictEqual(value);
+        expect(logs[1]!.headers.get(key)).toStrictEqual(value);
       }
     });
   });

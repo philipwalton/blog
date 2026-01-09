@@ -1,6 +1,6 @@
 const specs = process.env.SPECS?.split(',');
 
-module.exports.config = {
+export const config = {
   //
   // ====================
   // Runner Configuration
@@ -23,7 +23,7 @@ module.exports.config = {
   // then the current working directory is where your `package.json` resides, so `wdio`
   // will be called from there.
   //
-  specs: (specs ?? ['*']).map((spec) => `./test/wdio/${spec}.js`),
+  specs: (specs ?? ['*']).map((spec) => `./test/wdio/${spec}.ts`),
   // Patterns to exclude.
   exclude: [
     // 'path/to/excluded/files'
@@ -52,6 +52,8 @@ module.exports.config = {
   //
   capabilities: [
     {
+      // Use WebDriver Classic mode for Chrome if BiDi is failing.
+      //'wdio:enforceWebDriverClassic': true,
       // maxInstances can get overwritten per capability. So if you have an in-house Selenium
       // grid with only 5 firefox instances available you can make sure that not more than
       // 5 instances get started at a time.

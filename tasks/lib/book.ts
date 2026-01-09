@@ -1,7 +1,7 @@
 import fs from 'fs-extra';
 import path from 'path';
 
-interface Site {
+export interface Site {
   title: string;
   titleSuffix: string;
   slug: string;
@@ -12,7 +12,7 @@ interface Site {
   buildTime: Date;
 }
 
-interface Page {
+export interface Page {
   title?: string;
   path: string;
   private?: boolean;
@@ -24,14 +24,14 @@ interface Page {
   content?: string;
 }
 
-interface Resource {
+export interface Resource {
   title: string;
   path: string;
   template: string;
   output: string;
 }
 
-interface Article {
+export interface Article {
   title: string;
   path: string;
   date: string;

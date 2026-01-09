@@ -1,7 +1,7 @@
 import assert from 'assert';
 import fs from 'fs-extra';
 import {Key} from 'webdriverio';
-import {clearStorage} from './utils/clearStorage.js';
+import {clearStorage} from './utils/clearStorage.ts';
 
 describe('Service Worker', () => {
   beforeEach(async () => {
@@ -96,8 +96,8 @@ const originalSWVersion = JSON.stringify(
  * @param {string} newVersion
  * @return {Promise<void>}
  */
-async function updateSWVersion(newVersion) {
-  const oldVersion = new RegExp(originalSWVersion.replace(/\./g, '\\.'), ['g']);
+async function updateSWVersion(newVersion: string) {
+  const oldVersion = new RegExp(originalSWVersion.replace(/\./g, '\\.'), 'g');
 
   await fs.outputFile(
     './build/sw.js',
@@ -110,7 +110,10 @@ async function updateSWVersion(newVersion) {
       const text = await res.text();
       done(/"\d+\.\d+\.\d+"/.exec(text));
     });
-    return match && match[0] === JSON.stringify(newVersion);
+    return (
+      Boolean(match) &&
+      (match as RegExpExecArray)[0] === JSON.stringify(newVersion)
+    );
   });
 }
 

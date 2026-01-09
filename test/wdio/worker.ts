@@ -1,5 +1,5 @@
 import {strict as assert} from 'assert';
-import {clearStorage} from './utils/clearStorage.js';
+import {clearStorage} from './utils/clearStorage.ts';
 
 describe('worker', function () {
   describe('priority hints', function () {
@@ -27,7 +27,7 @@ describe('worker', function () {
       await browser.url(urlWithLCPImage);
 
       const fp1 = await browser.execute(() => {
-        return document.querySelector('img').getAttribute('fetchpriority');
+        return document.querySelector('img')?.getAttribute('fetchpriority');
       });
 
       // Wait until the hint has been sent.
@@ -47,7 +47,7 @@ describe('worker', function () {
       await browser.url(urlWithLCPImage + '?cache=bust');
 
       const fp2 = await browser.execute(() => {
-        return document.querySelector('img').getAttribute('fetchpriority');
+        return document.querySelector('img')?.getAttribute('fetchpriority');
       });
 
       assert.strictEqual(fp1, null);
@@ -58,7 +58,7 @@ describe('worker', function () {
       await browser.url(urlWithoutLCPImage);
 
       const fp1 = await browser.execute(() => {
-        return document.querySelector('img').getAttribute('fetchpriority');
+        return document.querySelector('img')?.getAttribute('fetchpriority');
       });
 
       // No hint should be sent for this page, but we need to wait a bit
@@ -71,7 +71,7 @@ describe('worker', function () {
       await browser.url(urlWithoutLCPImage + '?cache=bust');
 
       const fp2 = await browser.execute(() => {
-        return document.querySelector('img').getAttribute('fetchpriority');
+        return document.querySelector('img')?.getAttribute('fetchpriority');
       });
 
       assert.strictEqual(fp1, null);

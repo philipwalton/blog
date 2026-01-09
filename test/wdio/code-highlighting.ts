@@ -1,7 +1,7 @@
-import {initBook} from '../../tasks/lib/book.js';
+import {initBook, type Site, type Article} from '../../tasks/lib/book.ts';
 
-let site;
-let articles;
+let site: Site;
+let articles: Article[];
 
 describe('Code syntax highlighting', () => {
   before(async () => {
@@ -16,6 +16,10 @@ describe('Code syntax highlighting', () => {
       return article.path.includes(specificityArticleSlug);
     });
 
+    if (!specificityArticle) {
+      throw new Error('Specificity article not found');
+    }
+
     await browser.url(specificityArticle.path);
 
     // I'm not sure why this is needed, but sometime the above command
@@ -23,7 +27,10 @@ describe('Code syntax highlighting', () => {
     // (possibly due to service worker???)
     await browser.waitUntil(async () => {
       const title = await browser.getTitle();
-      return title === specificityArticle.title + site.titleSuffix;
+      return (
+        title ===
+        (specificityArticle ? specificityArticle.title + site.titleSuffix : '')
+      );
     });
   });
 

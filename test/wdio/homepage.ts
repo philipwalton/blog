@@ -1,9 +1,14 @@
 import assert from 'assert';
-import {initBook} from '../../tasks/lib/book.js';
+import {
+  initBook,
+  type Site,
+  type Article,
+  type Page,
+} from '../../tasks/lib/book.ts';
 
-let site;
-let articles;
-let pages;
+let site: Site;
+let articles: Article[];
+let pages: Page[];
 
 describe('The home page', () => {
   before(async () => {
@@ -22,7 +27,7 @@ describe('The home page', () => {
     // (possibly due to service worker???)
     await browser.waitUntil(async () => {
       const title = await browser.getTitle();
-      return title === pages[0].title + site.titleSuffix;
+      return title === pages[0]!.title + site.titleSuffix;
     });
   });
 
@@ -36,7 +41,7 @@ describe('The home page', () => {
 
   it('should have the right title', async () => {
     const actualTitle = await browser.getTitle();
-    const expectedTitle = pages[0].title + site.titleSuffix;
+    const expectedTitle = pages[0]!.title + site.titleSuffix;
     assert.strictEqual(actualTitle, expectedTitle);
   });
 
@@ -91,10 +96,8 @@ describe('The home page', () => {
 
 /**
  * Returns whether the passed URL matches the URL for the current page.
- * @param {string} expectedUrl The URL to test against.
- * @return {() => Promise<boolean>} True if the passed URL matches.
  */
-function urlMatches(expectedUrl) {
+function urlMatches(expectedUrl: string) {
   return async () => {
     const url = await browser.getUrl();
     return url.includes(expectedUrl);

@@ -1,11 +1,23 @@
 import assert from 'assert';
 import {Key} from 'webdriverio';
-import {clearStorage} from './utils/clearStorage.js';
-import {initBook} from '../../tasks/lib/book.js';
+import {clearStorage} from './utils/clearStorage.ts';
+import {
+  initBook,
+  type Site,
+  type Page,
+  type Article,
+} from '../../tasks/lib/book.ts';
 
-let site;
-let articles;
-let pages;
+let site: Site;
+let articles: Article[];
+let pages: Page[];
+
+declare global {
+  interface Window {
+    __INITIAL_PAGE_LOAD__?: boolean;
+    __controllerVersion__?: string;
+  }
+}
 
 describe('The content loader', async () => {
   before(async () => {
@@ -25,7 +37,7 @@ describe('The content loader', async () => {
     // (possibly due to service worker???)
     await browser.waitUntil(async () => {
       const title = await browser.getTitle();
-      return title == pages[0].title + site.titleSuffix;
+      return title == pages[0]!.title + site.titleSuffix;
     });
 
     // Don't use an arrow function since this is eval'ed in test browsers.
@@ -35,15 +47,15 @@ describe('The content loader', async () => {
   });
 
   it('should load page partials instead of full pages', async () => {
-    const articleLink = await $(`a[href="${articles[0].path}"]`);
+    const articleLink = await $(`a[href="${articles[0]!.path}"]`);
     await articleLink.click();
 
     await browser.waitUntil(async () => {
       const title = await browser.getTitle();
       const urlPath = await getUrlPath();
       return (
-        title == articles[0].title + site.titleSuffix &&
-        urlPath == articles[0].path
+        title == articles[0]!.title + site.titleSuffix &&
+        urlPath == articles[0]!.path
       );
     });
 
@@ -51,12 +63,12 @@ describe('The content loader', async () => {
   });
 
   it('should not attempt to load non-HTML content', async () => {
-    const articleLink = await $(`a[href="${articles[28].path}"]`);
+    const articleLink = await $(`a[href="${articles[28]!.path}"]`);
     await articleLink.click();
 
     await browser.waitUntil(async () => {
       const urlPath = await getUrlPath();
-      return urlPath == articles[28].path;
+      return urlPath == articles[28]!.path;
     });
 
     const img = await $('figure img');
@@ -70,25 +82,25 @@ describe('The content loader', async () => {
     browser.setWindowSize(1024, 768);
 
     // Navigates to an article.
-    const articleLink = await $(`a[href="${articles[0].path}"]`);
+    const articleLink = await $(`a[href="${articles[0]!.path}"]`);
     await articleLink.click();
     await browser.waitUntil(async () => {
       const title = await browser.getTitle();
       const urlPath = await getUrlPath();
       return (
-        title == articles[0].title + site.titleSuffix &&
-        urlPath == articles[0].path
+        title == articles[0]!.title + site.titleSuffix &&
+        urlPath == articles[0]!.path
       );
     });
 
     // Navigates to a page.
-    const pageLink = await $(`a[href="${pages[2].path}"]`);
+    const pageLink = await $(`a[href="${pages[2]!.path}"]`);
     await pageLink.click();
     await browser.waitUntil(async () => {
       const title = await browser.getTitle();
       const urlPath = await getUrlPath();
       return (
-        title == pages[2].title + site.titleSuffix && urlPath == pages[2].path
+        title == pages[2]!.title + site.titleSuffix && urlPath == pages[2]!.path
       );
     });
 
@@ -98,8 +110,8 @@ describe('The content loader', async () => {
       const title = await browser.getTitle();
       const urlPath = await getUrlPath();
       return (
-        title == articles[0].title + site.titleSuffix &&
-        urlPath == articles[0].path
+        title == articles[0]!.title + site.titleSuffix &&
+        urlPath == articles[0]!.path
       );
     });
 
@@ -109,7 +121,7 @@ describe('The content loader', async () => {
       const title = await browser.getTitle();
       const urlPath = await getUrlPath();
       return (
-        title == pages[0].title + site.titleSuffix && urlPath == pages[0].path
+        title == pages[0]!.title + site.titleSuffix && urlPath == pages[0]!.path
       );
     });
 
@@ -119,8 +131,8 @@ describe('The content loader', async () => {
       const title = await browser.getTitle();
       const urlPath = await getUrlPath();
       return (
-        title == articles[0].title + site.titleSuffix &&
-        urlPath == articles[0].path
+        title == articles[0]!.title + site.titleSuffix &&
+        urlPath == articles[0]!.path
       );
     });
 
@@ -130,7 +142,7 @@ describe('The content loader', async () => {
       const title = await browser.getTitle();
       const urlPath = await getUrlPath();
       return (
-        title == pages[2].title + site.titleSuffix && urlPath == pages[2].path
+        title == pages[2]!.title + site.titleSuffix && urlPath == pages[2]!.path
       );
     });
 
@@ -151,7 +163,9 @@ describe('The content loader', async () => {
     // Adds a hash fragments to an article URL.
     // Don't use an arrow function since this is eval'ed in test browsers.
     await browser.execute(function () {
-      document.querySelector('.ArticleList-item:last-child a').href += '#share';
+      document.querySelector<HTMLAnchorElement>(
+        '.ArticleList-item:last-child a',
+      )!.href += '#share';
     });
 
     const articleLink = await $('.ArticleList-item:last-child a');
@@ -167,10 +181,12 @@ describe('The content loader', async () => {
     // Adds a hash fragments to an article URL.
     // Don't use an arrow function since this is eval'ed in test browsers.
     await browser.execute(function () {
-      document.querySelector('.ArticleList-item:first-child a').href =
-        '/non-existent-page/';
-      document.querySelector('.ArticleList-item:last-child a').href =
-        '/another-non-existent-page/';
+      document.querySelector<HTMLAnchorElement>(
+        '.ArticleList-item:first-child a',
+      )!.href = '/non-existent-page/';
+      document.querySelector<HTMLAnchorElement>(
+        '.ArticleList-item:last-child a',
+      )!.href = '/another-non-existent-page/';
     });
 
     const articleLink1 = await $('.ArticleList-item:first-child a');

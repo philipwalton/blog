@@ -41,7 +41,7 @@
     "wdio": "wdio run wdio.conf.js",
     "version": "NODE_ENV=production run-s clean types build",
     "postversion": "npm run deploy",
-    "prepare": "husky install"
+    "prepare": "husky"
   },
   "husky": {
     "hooks": {
@@ -132,5 +132,8 @@
     "workbox-streams": "^7.4.0",
     "workbox-window": "^7.4.0",
     "wrangler": "^4.58.0"
+  },
+  "overrides": {
+    "chokidar": "$chokidar"
   }
 }

@@ -1,0 +1,41 @@
+{
+  "compilerOptions": {
+    "allowImportingTsExtensions": true,
+    "allowJs": true,
+    "checkJs": false,
+    "declaration": false,
+    "declarationMap": false,
+    "exactOptionalPropertyTypes": true,
+    "lib": ["esnext", "DOM", "WebWorker"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "noEmit": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitAny": true,
+    "noImplicitOverride": true,
+    "noUncheckedIndexedAccess": true,
+    "outDir": "./build/static", // Required for Rollup's typescript plugin.
+    "rewriteRelativeImportExtensions": true,
+    "rootDir": "./",
+    "skipLibCheck": true,
+    "sourceMap": false,
+    "strict": true,
+    "strictNullChecks": true,
+    "target": "ESNext",
+    "types": [
+      "node",
+      "@wdio/globals/types",
+      "@wdio/mocha-framework",
+      "expect-webdriverio",
+      "vitest/globals"
+    ]
+  },
+  "include": [
+    "src/**/*",
+    "tasks/**/*",
+    "test/**/*",
+    "functions/**/*",
+    "worker-configuration.d.ts"
+  ],
+  "exclude": ["node_modules", "build"]
+}

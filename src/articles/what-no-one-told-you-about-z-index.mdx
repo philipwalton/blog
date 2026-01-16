@@ -1,3 +1,12 @@
+---
+title: 'What No One Told You About Z-Index'
+date: 2013-01-15T19:17:39.000Z
+translations:
+  'français': 'https://iamvdo.me/blog/comprendre-z-index-et-les-contextes-dempilement'
+---
+
+import Img from '../../components/Img.astro';
+
 The problem with z-index is that very few people understand how it really works. It's not complicated, but it if you've never taken the time to read its specification, there are almost certainly crucial aspects that you're completely unaware of.
 
 Don't believe me? Well, see if you can solve this problem:
@@ -36,13 +45,13 @@ Here's what the HTML and basic CSS look like. I've also included a visual demo (
 }
 ```
 
-<style>
+<style>{`
 .CodepenContainer {
   border: 1px solid #ccc;
   margin: 0 0 var(--gap);
   padding: 2px;
 }
-</style>
+`}</style>
 
 <div class="CodepenContainer">
   <iframe
@@ -57,13 +66,13 @@ Here's what the HTML and basic CSS look like. I've also included a visual demo (
 
 **Here's the challenge:** try to see if you can make the red `<span>` element stack behind the blue and green `<span>` elements without breaking any of the following rules:
 
-* Do not alter the HTML markup in any way.
-* Do not add/change the z-index property of any element.
-* Do not add/change the position property of any element.
+- Do not alter the HTML markup in any way.
+- Do not add/change the z-index property of any element.
+- Do not add/change the position property of any element.
 
-To see if you can figure it out, click the *edit on Codepen* link above and play around with it for a bit. If you've succeeded, it should look like the example below.
+To see if you can figure it out, click the _edit on Codepen_ link above and play around with it for a bit. If you've succeeded, it should look like the example below.
 
-*Warning: Don't click on the CSS tab of the example below or it will give away the answer.*
+_Warning: Don't click on the CSS tab of the example below or it will give away the answer._
 
 <div class="CodepenContainer">
   <iframe
@@ -75,7 +84,6 @@ To see if you can figure it out, click the *edit on Codepen* link above and play
     src="https://codepen.io/philipwalton/embed/dfCtb?height=300&theme-id=5742">
   </iframe>
 </div>
-
 
 ## The Solution
 
@@ -111,17 +119,16 @@ Every stacking context has a single HTML element as its root element. When a new
 
 New stacking contexts can be formed on an element in one of three ways:
 
-* When an element is the root element of a document (the `<html>` element)
-* When an element has a position value other than `static` and a z-index value other than `auto`
-* When an element has an opacity value less than `1`
+- When an element is the root element of a document (the `<html>` element)
+- When an element has a position value other than `static` and a z-index value other than `auto`
+- When an element has an opacity value less than `1`
 
 The first and second ways to form stacking context make a lot of sense and are generally understood by Web developers (even if they don't know what they're called).
 
 The third way (opacity) is almost never mentioned outside of w3c specification documents.
 
-{% Callout 'info' %}
-**Update:** In addition to opacity, several newer CSS properties also create stacking contexts. These include: [transforms](http://www.w3.org/TR/css3-transforms/), [filters](http://www.w3.org/TR/filter-effects/), [css-regions](http://www.w3.org/TR/css3-regions/), [paged media](http://www.w3.org/TR/css3-page/), and possibly others. As a general rule, it seems that if a CSS property requires rendering in an offscreen context, it must create a new stacking context.
-{% endCallout %}
+> [!NOTE]
+> In addition to opacity, several newer CSS properties also create stacking contexts. These include: [transforms](http://www.w3.org/TR/css3-transforms/), [filters](http://www.w3.org/TR/filter-effects/), [css-regions](http://www.w3.org/TR/css3-regions/), [paged media](http://www.w3.org/TR/css3-page/), and possibly others. As a general rule, it seems that if a CSS property requires rendering in an offscreen context, it must create a new stacking context.
 
 ## Determining an Element's Position in the Stacking Order
 
@@ -183,6 +190,6 @@ Hopefully it's now a little more clear why the red box moved behind the other bo
 
 ## Additional Resources
 
-* [Elaborate description of Stacking Contexts](http://www.w3.org/TR/CSS2/zindex.html)
-* [The stacking context](https://developer.mozilla.org/en-US/docs/CSS/Understanding_z-index/The_stacking_context)
-* [The Z-Index CSS Property: A Comprehensive Look](http://coding.smashingmagazine.com/2009/09/15/the-z-index-css-property-a-comprehensive-look/)
+- [Elaborate description of Stacking Contexts](http://www.w3.org/TR/CSS2/zindex.html)
+- [The stacking context](https://developer.mozilla.org/en-US/docs/CSS/Understanding_z-index/The_stacking_context)
+- [The Z-Index CSS Property: A Comprehensive Look](http://coding.smashingmagazine.com/2009/09/15/the-z-index-css-property-a-comprehensive-look/)

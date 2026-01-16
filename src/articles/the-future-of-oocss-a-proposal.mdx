@@ -1,3 +1,10 @@
+---
+title: 'The Future of OOCSS: A Proposal'
+date: 2013-01-17T19:02:16.000Z
+---
+
+import Img from '../../components/Img.astro';
+
 In CSS we often code the same visual components over and over again &mdash; even within the same project. It's embarrassing how many separate times in my career I've coded a two-column layout, or tabbed navigation, or a dropdown menu, or a popup (and the list goes on).
 
 To deal with this problem [Nicole Sullivan](http://stubbornella.org) created the [Object Oriented CSS](https://github.com/stubbornella/oocss/wiki) (OOCSS) project. She suggests that instead of defining entire components in a single selector, developers should identify the visual patterns that appear over and over again and break them down into their reusable parts, defining each part as a separate class. Those classes can then be used and reused together in the HTML to build a variety of complex UI components.
@@ -11,7 +18,6 @@ What if CSS had object oriented functionality built in? What if there were a way
 There have been [attempts to do this](http://ianstormtaylor.com/oocss-plus-sass-is-the-best-way-to-css/) with preprocessors, but I think we need to think bigger. Preprocessors can't solve all the problems, and CSS should definitely be able to do this on its own.
 
 Luckily with the recent speed of browser development, my wish might actually be possible.
-
 
 ## Where Preprocessors Fall Short
 
@@ -78,7 +84,7 @@ Sometimes this is possible, but often it's not. And even in cases when it could 
 
 ### You Lose the Inheritance Chain
 
-When you don't put a component's base class in the markup, you have no way of knowing what a particular class or element *is*. In traditional OOP, you can inspect an object to determine what classes it inherits from, but that's not possible here.
+When you don't put a component's base class in the markup, you have no way of knowing what a particular class or element _is_. In traditional OOP, you can inspect an object to determine what classes it inherits from, but that's not possible here.
 
 Imagine you've created many different types of widgets that all `@extend` the `.widget` base class. Then, as a result of some user interaction, you need to temporarily disable all of them via JavaScript. If the `widget` class isn't in the HTML it's going to be very difficult!
 
@@ -229,11 +235,11 @@ CSS should have its own way to define class inheritance. It should be simple and
 
 Any native solution should meet some minimum requirements, and I think the above list of `@extend`'s shortcomings is a good place to start.
 
-* It should work no matter where it's defined (including media queries)
-* It should expose the inheritance chain to JavaScript APIs
-* It should not be affected by specificity or source order
-* It should easily handle descendants, nested elements, and other complex selectors
-* It should allow for multiple levels of inheritance
+- It should work no matter where it's defined (including media queries)
+- It should expose the inheritance chain to JavaScript APIs
+- It should not be affected by specificity or source order
+- It should easily handle descendants, nested elements, and other complex selectors
+- It should allow for multiple levels of inheritance
 
 My proposal for native OOCSS introduces two new features: a new kind of simple selector and a new `@` rule.
 
@@ -418,6 +424,6 @@ I think we as a community should be pushing the boundaries of our core technolog
 
 ## Additional Resources
 
-* [OOCSS](https://github.com/stubbornella/oocss/wiki)
-* [Sass's @extend feature](http://sass-lang.com/docs/yardoc/file.SASS_REFERENCE.html#extend)
-* [CSS Specificity](http://www.w3.org/TR/CSS21/cascade.html#specificity)
+- [OOCSS](https://github.com/stubbornella/oocss/wiki)
+- [Sass's @extend feature](http://sass-lang.com/docs/yardoc/file.SASS_REFERENCE.html#extend)
+- [CSS Specificity](http://www.w3.org/TR/CSS21/cascade.html#specificity)

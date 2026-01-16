@@ -1,3 +1,10 @@
+---
+title: 'Loading Polyfills Only When Needed'
+date: 2016-09-27T22:41:26.000Z
+---
+
+import Img from '../../components/Img.astro';
+
 New JavaScript and HTML features are being introduced all the time that make our lives as developers easier.
 
 In many cases, these new features are so helpful we choose to use them on production websites before they're fully implemented in all browsers. To not break the experience for users on older browsers, we of course include polyfills for any not-fully-supported features.
@@ -6,7 +13,7 @@ The problem with this approach is it prioritizes developer convenience over user
 
 The solution to this problem is to only load polyfills when they're needed, but as it turns out, in practice that's a lot harder than it sounds. Over the years I've seen a number of attempts to do this right, but (if I'm being honest) I've never liked any of them enough to actually use myself. I've always just done my own thing.
 
-This topic has come up several times in conversation recently, so I decided to write about my approach. I want to stress that I'm not trying to promote this as the *one true way* to conditionally load polyfills&mdash;it just happens to be the way I like to do it. It's the best balance of simplicity and performance for my projects.
+This topic has come up several times in conversation recently, so I decided to write about my approach. I want to stress that I'm not trying to promote this as the _one true way_ to conditionally load polyfills&mdash;it just happens to be the way I like to do it. It's the best balance of simplicity and performance for my projects.
 
 ## Problems with existing solutions
 
@@ -39,7 +46,7 @@ The solution works by using `document.write()`:
 </script>
 ```
 
-The problem with this solution is it can negatively affect performance for all users (even those with native `Promise` and `fetch` support). For browsers that need the polyfill, it creates a synchronous, blocking script tag, but even for browsers that never execute the `document.write()` statement, it can *still* be problematic. The mere presence of a `document.write()` statement (detected by the browser's preload scanner) can prevent certain optimizations.
+The problem with this solution is it can negatively affect performance for all users (even those with native `Promise` and `fetch` support). For browsers that need the polyfill, it creates a synchronous, blocking script tag, but even for browsers that never execute the `document.write()` statement, it can _still_ be problematic. The mere presence of a `document.write()` statement (detected by the browser's preload scanner) can prevent certain optimizations.
 
 The other problem with `document.write()` is it may [not always work](https://developers.google.com/web/updates/2016/08/removing-document-write). Chrome recently started blocking scripts loaded via `document.write()` in some cases, so using this technique going forward is definitely not a good idea.
 
@@ -72,7 +79,7 @@ In short, for users on a browser that natively support all the features required
 
 ## My strategy
 
-The primary principle of my polyfill strategy is: *I optimize the experience for users on modern browsers.*
+The primary principle of my polyfill strategy is: _I optimize the experience for users on modern browsers._
 
 That doesn't mean that I don't care about the experience of users on older browsers, it just means in situations where I can't optimize equally for everyone, I'll choose to optimize for users on modern browsers.
 
@@ -108,7 +115,7 @@ For example, if your app depends on a feature that's only natively supported in 
 
 As a general rule, I will only use a new feature if it's natively supported in browsers used by more than half of my user base. And if I'm using a combination of new features, I apply that rule to native support for the entire feature-set. By following that rule, I know I'm always optimizing for the majority rather than some small subset.
 
-I also want to stress that you should be making this decision based on *your* usage data, not global percentages.
+I also want to stress that you should be making this decision based on _your_ usage data, not global percentages.
 
 For example, on this blog (in the past 30 days), almost 90% of users were running the latest (or second latest) version of Chrome or Firefox. About 8% were running some version of Safari, and every other browser represented less than 1% of the total user base.
 

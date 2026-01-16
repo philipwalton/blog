@@ -1,3 +1,12 @@
+---
+title: "Measuring Your Site's Responsive Breakpoint Usage"
+date: 2014-12-23T06:38:36.000Z
+translations:
+  'Português': 'https://imasters.com.br/analytics/medindo-o-uso-do-breakpoint-responsivo-de-um-site/'
+---
+
+import Img from '../../components/Img.astro';
+
 Most web analytics tools will give you a lot of information about your users' devices. These insights can be extremely useful for measuring trends and are particularly important if you have a separate mobile and desktop site or a different design for Android and iOS. But if you've built your site responsively, device information just doesn't tell the whole story.
 
 Responsive design aims to divorce itself from device or platform-specific factors. Instead, it adapts to device-agnostic properties like screen size, pixel density, and device orientation.
@@ -6,21 +15,21 @@ If your site is built on device-less principles, but its usage is measured again
 
 ## The device problem
 
-To illustrate this problem, consider the iPhone. The range of iPhone screen sizes can go from 320 pixels on an iPhone 5s in portrait mode to 960 pixels on an iPhone 6 plus in landscape mode. That's a *huge* range. In fact, on this site that range covers four out of the five total breakpoints.
+To illustrate this problem, consider the iPhone. The range of iPhone screen sizes can go from 320 pixels on an iPhone 5s in portrait mode to 960 pixels on an iPhone 6 plus in landscape mode. That's a _huge_ range. In fact, on this site that range covers four out of the five total breakpoints.
 
-If you want to glean any useful information about the effectiveness of a design at a particular breakpoint, you can't do that with device data alone. In short, sites built responsively should be measuring breakpoint usage *in addition* to device usage.
+If you want to glean any useful information about the effectiveness of a design at a particular breakpoint, you can't do that with device data alone. In short, sites built responsively should be measuring breakpoint usage _in addition_ to device usage.
 
 If our design methodologies aim to be device-agnostic, why are so many of our analytics tools so device-focused? The answer, of course, is that these tools do not know how you've built your site, the media queries you care about, or what you've chosen to call them.
 
 Fortunately, tools like Google Analytics allow you to send custom dimensions and metrics to track exactly this type of user-specific data.
 
-*Note: the rest of this article explains how to measure breakpoint usage in Google Analytics, but the concepts and code samples should apply to other platforms as well.*
+_Note: the rest of this article explains how to measure breakpoint usage in Google Analytics, but the concepts and code samples should apply to other platforms as well._
 
 ## Custom dimensions and metrics
 
 In Google Analytics, a metric is an interaction that can be counted or quantified. Common metrics are things like users (the number of visitors who came to your site), sessions (the number of visits those visitors made), and pageviews (the number of pages those visitors viewed). Since metrics are quantifiable, they are always a numeric datatype.
 
-Dimensions are how you subdivide your metrics into relevant categories. For example if your metric is pageviews, you may want to subdivide that by page path or page title. Similarly, if your metric is users you  may want to subdivide that by the user's browser or geographic location. Dimensions are typically strings, but they may be other datatypes like numbers or dates.
+Dimensions are how you subdivide your metrics into relevant categories. For example if your metric is pageviews, you may want to subdivide that by page path or page title. Similarly, if your metric is users you may want to subdivide that by the user's browser or geographic location. Dimensions are typically strings, but they may be other datatypes like numbers or dates.
 
 Given this, it's hopefully clear that you'd want to track responsive breakpoints as a custom dimension. If your site had 1,000 pageviews on Tuesday, you may be curious to know how many of those pages were displayed at the smallest breakpoint verses the larger ones. For pretty much any metric you care about (users, sessions, pageviews, etc.), it's valuable to know what responsive breakpoint was active at that time of the interaction.
 

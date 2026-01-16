@@ -1,3 +1,10 @@
+---
+title: 'Cascading Cache Invalidation'
+date: 2019-10-09T08:26:44.000Z
+---
+
+import Img from '../../components/Img.astro';
+
 For several years now, pretty much every article published on caching best practices has recommended the following two things for deploying JavaScript code in production:
 
 - Add revision information to the filenames of your assets (usually content hashes)
@@ -23,12 +30,12 @@ Imagine you've built and deployed a website, and you've used code splitting so m
 
 In the following dependency graph, there's a _main_ entry chunk, three asynchronously-loaded dependency chunks (_dep1_, _dep2_ and _dep3_), and then a _vendor_ chunk that includes all the site's `node_module` dependencies. And in following with caching best practices, all filenames include revision hashes.
 
-{% Img
-  border=true,
-  src="caching-module-dependency-graph-before.svg",
-  alt="A typical JavaScript module dependency tree",
+<Img
+  border
+  src="caching-module-dependency-graph-before.svg"
+  alt="A typical JavaScript module dependency tree"
   figcaption="A typical JavaScript module dependency tree"
-%}
+/>
 
 Since the _dep2_ and _dep3_ chunks import modules from the _vendor_ chunk, at the top of their generated output code you'll likely see import statements that looks like this:
 
@@ -60,12 +67,12 @@ Finally, since the contents of _main_ have changed, its filename must change alo
 
 After all these changes, here's what the new graph looks like:
 
-{% Img
-  border=true,
-  src="caching-module-dependency-graph-after.svg",
-  alt="A JavaScript module dependency tree (after rename)",
+<Img
+  border
+  src="caching-module-dependency-graph-after.svg"
+  alt="A JavaScript module dependency tree (after rename)"
   figcaption="The modules in the tree affected by a single code change in a leaf node"
-%}
+/>
 
 As you can see from this example, a tiny code change made to just one source file actually invalidated 80% of the chunks in the bundle.
 
@@ -157,9 +164,8 @@ import {...} from '/vendor.mjs';
 
 This means the source code of your modules can safely reference the un-revisioned module names and the browser will always load the revisioned files. And since the revision hashes don't appear in the module's source code (they only appear in the import map) changes to those hashes won't ever invalidate any modules other than the one that changed.
 
-{% Callout 'info' %}
-**Note:** you might be wondering why I made a copy of each file instead of just renaming it. This is necessary in order to support browsers that don't support Import Maps. Those browsers will see a request for `/vendor.mjs` and just load that URL as normal, so both files need to exist on your server.
-{% endCallout %}
+> [!NOTE]
+> You might be wondering why I made a copy of each file instead of just renaming it. This is necessary in order to support browsers that don't support Import Maps. Those browsers will see a request for `/vendor.mjs` and just load that URL as normal, so both files need to exist on your server.
 
 If you want to see Import Maps in action, I've created a [set of demos](https://github.com/philipwalton/import-maps-caching-demos) showcasing all of the techniques outlined in this article. Also check out the [build configuration](https://github.com/philipwalton/import-maps-caching-demos/blob/master/demos/import-maps-native/rollup.config.js) if you want to see how I generate the import map and revision hashes for each file.
 

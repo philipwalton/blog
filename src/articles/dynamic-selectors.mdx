@@ -1,3 +1,10 @@
+---
+title: 'Dynamic Selectors'
+date: 2013-02-20T22:22:24.000Z
+---
+
+import Img from '../../components/Img.astro';
+
 When creating a new CSS library or framework, developers typically take one of two approaches with component naming: the [Bootstrap](http://twitter.github.com/bootstrap/) approach or the [jQueryUI](http://jqueryui.com/) approach.
 
 Bootstrap tries to be as simple and basic as possible, calling a component exactly what it is. If something is a tooltip, why not use the class selector `.tooltip` to define how it looks? This approach keeps things simple, clean, and easy to remember, but it has one big disadvantage. If you're trying to incorporate Bootstrap into an existing project, the chances are pretty high it will conflict with your existing selectors.
@@ -8,7 +15,7 @@ Choosing between these two paths isn't always easy. Namespacing might be better 
 
 What if there were a third option? One with all the benefits of clean and simple names like Bootstrap, but without any of the possible conflicts?
 
-With the help of a CSS preprocessor like [Sass](http://sass-lang.com/), this *is* possible.
+With the help of a CSS preprocessor like [Sass](http://sass-lang.com/), this _is_ possible.
 
 ## Define Selectors with a Variable
 
@@ -77,7 +84,7 @@ $.fn.messagebox.defaults.className = "some-other-name";
 
 At this point I'm sure some readers are wondering whether I've overlooked half the problem. Dynamically building selectors is one thing, but what if the old class name is in hundreds of places in the HTML, how do you deal with that?
 
-The truth is I don't think that situation would be very common. The typical use case for dynamic selectors is when you want to start using a third party library, haven't written any code for it yet, and realize there would be conflicts. In this use case, you're picking a class name that *isn't* in the HTML precisely to avoid conflict.
+The truth is I don't think that situation would be very common. The typical use case for dynamic selectors is when you want to start using a third party library, haven't written any code for it yet, and realize there would be conflicts. In this use case, you're picking a class name that _isn't_ in the HTML precisely to avoid conflict.
 
 The only time I could see dynamic selectors leading to a lot of find-and-replace in the HTML is if you change your mind and suddenly decide you want to name your classes something else, in which case it's not really the library author's fault. Also, if you're repeating a lot of the same markup for each component and you think it's likely you'll change your mind later, this is a perfect place to abstract that markup into templates, partials, or helpers.
 

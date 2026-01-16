@@ -1,3 +1,12 @@
+---
+title: 'Side Effects in CSS'
+date: 2015-03-04T05:25:06.000Z
+translations:
+  'Português': 'https://imasters.com.br/front-end/css/efeitos-colaterais-no-css/'
+---
+
+import Img from '../../components/Img.astro';
+
 It feels like every few days I read about some shiny new way people are writing CSS. Many of these "new" ways are not actually new, they're variations on one or more well-known methodologies, but with a few changes sprinkled on top.
 
 Now, I'm certainly not against change, nor trying to make improvements on current best practices, but if you're going to make changes, they should be for the better. From what I've seen recently, many of these new methodologies have not been better, if anything, they've been a step backward.
@@ -10,13 +19,13 @@ Lots of frameworks provide structure and organization to your code, and consiste
 
 BEM is different because it makes you a promise. If you follow all of the rules, you'll avoid the single hardest problem in CSS:
 
-*Getting your rules to match the elements you want, without them accidentally matching the elements you don’t.*
+_Getting your rules to match the elements you want, without them accidentally matching the elements you don’t._
 
 ## The hardest problem in CSS
 
 There are two types of problems in CSS: cosmetic problems and architectural problems. Cosmetic problems&mdash;issues like vertical centering or equal-height columns&mdash;usually engender the most vocal complaints, but they're almost never showstoppers. They're annoying, sure, but they don't break the build.
 
-Architectural problems, on the other hand, can cripple development. I can remember distinct cases, at each of the companies I've worked for, where we postponed developing a new feature because we were too afraid to make *any* changes to the CSS.
+Architectural problems, on the other hand, can cripple development. I can remember distinct cases, at each of the companies I've worked for, where we postponed developing a new feature because we were too afraid to make _any_ changes to the CSS.
 
 CSS is global, and every rule you write has the potential to affect entirely unrelated parts of the site.<sup>[[1]](#footnote-1)</sup> It's this unpredictability that makes writing good CSS so hard.
 
@@ -42,7 +51,7 @@ In CSS, side effects come in three main forms:
 
 ### Base rule changes
 
-Developers *have* to use HTML tags to write HTML, and there are a finite number of tags to choose from.<sup>[[2]](#footnote-2)</sup> While it can be tempting to define a lot of base styles using tag selectors (technically they're called [type selectors](http://www.w3.org/TR/CSS21/selector.html#type-selectors)) in order to avoid having to add classes to all your content elements, doing so necessarily creates an undeclared dependency between those rules and all of your components.
+Developers _have_ to use HTML tags to write HTML, and there are a finite number of tags to choose from.<sup>[[2]](#footnote-2)</sup> While it can be tempting to define a lot of base styles using tag selectors (technically they're called [type selectors](http://www.w3.org/TR/CSS21/selector.html#type-selectors)) in order to avoid having to add classes to all your content elements, doing so necessarily creates an undeclared dependency between those rules and all of your components.
 
 When first building a website, this doesn't usually seem like a big deal, in fact it feels natural and DRY. You create some base, foundational styles (margins, font sizes, colors, etc.), and then your components build on top of them&mdash;so they don't have to rewrite the shared rules.
 
@@ -64,7 +73,7 @@ Lots of developers are aware of the above two forms of CSS side effects, so you'
 
 While this approach is slightly safer, it can still produce side effects. As I hinted at above, the appearance of safety can actually make this practice more risky.
 
-Limiting the scope of a selector to a particular DOM subtree *does* guarantee that it won't affect elements outside of that subtree. The problem is it *doesn't* guarantee that it won't unintentionally affect elements within the same subtree.
+Limiting the scope of a selector to a particular DOM subtree _does_ guarantee that it won't affect elements outside of that subtree. The problem is it _doesn't_ guarantee that it won't unintentionally affect elements within the same subtree.
 
 Consider the following example:
 
@@ -82,7 +91,7 @@ Consider the following example:
 }
 ```
 
-While it's true that `.title` elements not inside `.article` or `.widget` subtrees will not get either of these styles, there's still the possibility that a `.title` element will be inside *both* `.article` and `.widget` subtrees at the same time.
+While it's true that `.title` elements not inside `.article` or `.widget` subtrees will not get either of these styles, there's still the possibility that a `.title` element will be inside _both_ `.article` and `.widget` subtrees at the same time.
 
 Given the CSS above, the widget title in this example is going to render with an unexpected bottom border:
 
@@ -109,7 +118,7 @@ I should also point out that using scoped type selectors makes this problem much
 
 ## How BEM eliminates side effects
 
-I said above that all CSS rules are global and every rule has the potential to conflict with every other rule on the page. This means side effects cannot be prevented by the language; however, they *can* be prevented via a disciplined and enforceable naming convention. And that's exactly what BEM provides.
+I said above that all CSS rules are global and every rule has the potential to conflict with every other rule on the page. This means side effects cannot be prevented by the language; however, they _can_ be prevented via a disciplined and enforceable naming convention. And that's exactly what BEM provides.
 
 - **Base rule changes:**<br>
   Strict BEM conventions require the sole use of class selectors. You start with a global reset, and then you use blocks to style everything on the page. In other words, adding a class to an element is the only way to style it, which means all styling is opt-in rather than de facto. Blocks encapsulate all of their styling and rely on no external dependencies.<sup>[[3]](#footnote-3)</sup>
@@ -162,7 +171,7 @@ If your exceptions are limited to just one area of your site (say, the content a
 
 While I haven't tested this approach in a real-world scenario, I mention it because it's an example of a variation on BEM conventions that doesn't compromise its guarantee of no side effects. Since all BEM blocks are styled via classes, styling elements that don't have a class is "safe", at least from conflict with the rest of your CSS (obviously if you're using classes for other things, this can still be risky as adding a class to such an element would prevent it from matching the selector).
 
-Another example I encounter frequently is using site-wide state or support classes. [Modernizr](http://modernizr.com/) is a good example. Though this technique *does* increase the specificity of the selectors it's used on, the increased specificity should only affect other rules defined within the same block file (assuming you've followed all the other BEM conventions).
+Another example I encounter frequently is using site-wide state or support classes. [Modernizr](http://modernizr.com/) is a good example. Though this technique _does_ increase the specificity of the selectors it's used on, the increased specificity should only affect other rules defined within the same block file (assuming you've followed all the other BEM conventions).
 
 ```css
 .GridRow {

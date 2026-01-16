@@ -1,14 +1,24 @@
-Okay, before I start, I want to get one thing out of the way upfront. This article is *not* a rant about how much I hate specificity. If you want to read an article like that, I'm sure you can find dozens elsewhere online.
+---
+title: 'Do We Actually Need Specificity In CSS?'
+date: 2015-11-01T22:37:42.000Z
+translations:
+  '日本語': 'http://postd.cc/do-we-actually-need-specificity-in-css/'
+  'Português': 'https://imasters.com.br/desenvolvimento/sera-que-realmente-precisamos-da-especificidade-no-css/'
+---
+
+import Img from '../../components/Img.astro';
+
+Okay, before I start, I want to get one thing out of the way upfront. This article is _not_ a rant about how much I hate specificity. If you want to read an article like that, I'm sure you can find dozens elsewhere online.
 
 What I want to do is pose an actual, honest question to the web development community and hopefully get people thinking.
 
-To restate the question in a way that gets more at the heart of the issue: *If we lived in a world where specificity was never added to the cascade, would things be better or worse?*
+To restate the question in a way that gets more at the heart of the issue: _If we lived in a world where specificity was never added to the cascade, would things be better or worse?_
 
-Now, I'm sure some people are thinking: *Who cares? Specificity exists, and we're stuck with it. So what's the point of bringing this up?*
+Now, I'm sure some people are thinking: _Who cares? Specificity exists, and we're stuck with it. So what's the point of bringing this up?_
 
 To anyone thinking that, I'm happy to inform you that you're wrong :-)
 
-In this article I'm going to show that it *is possible* to prevent specificity from affecting the cascade&mdash;meaning this question isn't purely theoretical. If it turns out to be true that specificity does more harm than good, there's something we can actually do about it today.
+In this article I'm going to show that it _is possible_ to prevent specificity from affecting the cascade&mdash;meaning this question isn't purely theoretical. If it turns out to be true that specificity does more harm than good, there's something we can actually do about it today.
 
 ## A little background
 
@@ -20,7 +30,7 @@ Importance also makes a lot of sense. There are always going to be cases where y
 
 But I think specificity is different.
 
-Specificity isn't intuitive, and&mdash;especially for new developers&mdash;the results can often seem like a *gotcha* rather than the intended behavior. I'm also not sure there's an equivalent in other systems or languages.
+Specificity isn't intuitive, and&mdash;especially for new developers&mdash;the results can often seem like a _gotcha_ rather than the intended behavior. I'm also not sure there's an equivalent in other systems or languages.
 
 For example, what if specificity were a thing in JavaScript. Imagine how much more unpredictable your code would be if the following test passed.
 
@@ -37,13 +47,13 @@ It would be crazy and completely unmanageable if the `window.document.foo = 'bar
 
 I'm sure there are thousands, probably even millions of websites out there that depend on specificity to make their styles work. If browsers started ignoring specificity tomorrow, all of those sites would break.
 
-I'm not suggesting that specificity isn't being used; clearly it is. What I *am* suggesting is that perhaps it's not useful enough to make it worth the unpredictability and the confusion that comes with it.
+I'm not suggesting that specificity isn't being used; clearly it is. What I _am_ suggesting is that perhaps it's not useful enough to make it worth the unpredictability and the confusion that comes with it.
 
 I believe specificity is useful in the same way global variables can be useful. And just as most people consider reliance on global variables to be an anti-pattern, maybe it's the same with specificity.
 
-Moreover, I can't think of a single time in my life when I've written a CSS rule that I wanted to override another CSS rule (using specificity) where I didn't *also* put the more specific rule later in the source order.
+Moreover, I can't think of a single time in my life when I've written a CSS rule that I wanted to override another CSS rule (using specificity) where I didn't _also_ put the more specific rule later in the source order.
 
-To make that last statement more clear, I've never done something like in the example below, where the more-specific footer links are defined *before* the less-specific default links:
+To make that last statement more clear, I've never done something like in the example below, where the more-specific footer links are defined _before_ the less-specific default links:
 
 ```css
 .footer a {
@@ -81,7 +91,7 @@ For what it's worth, adding `!important` in these situations is actually recomme
 
 ## Removing specificity from the cascade
 
-This is where things get pretty interesting. While it's not possible to simply instruct the browser to ignore specificity altogether, it *is* possible to prevent specificity from affecting the cascade for a particular CSS file or set of CSS files.
+This is where things get pretty interesting. While it's not possible to simply instruct the browser to ignore specificity altogether, it _is_ possible to prevent specificity from affecting the cascade for a particular CSS file or set of CSS files.
 
 How? The answer is to make specificity and source order the same.
 
@@ -106,7 +116,7 @@ aside.sidebar ul a { }
 .sidebar a { }
 ```
 
-These selectors can be rewritten to be in ascending-specificity order *without affecting the elements they'll match*. I've highlighted the additions below:
+These selectors can be rewritten to be in ascending-specificity order _without affecting the elements they'll match_. I've highlighted the additions below:
 
 ```css
 /* 0.2.5 */
@@ -193,20 +203,20 @@ Here's the basic algorithm you'd need to follow:
 
 1. Iterate through each selector in your stylesheets.
 2. For each selector:
-    1. If the selector contains any ID selectors, replace them with ID attribute selectors, otherwise do nothing.
-    2. Calculate the specificity of the current selector (with any IDs replaced).
-    3. If the current selector is the first selector, do nothing. Otherwise, compare its specificity to the specificity of the previous selector.
-    4. If the previous selector is less specific than the current selector, do nothing. Otherwise, rewrite the current selector so its specificity is greater than or equal to the specificity of the previous selector.
-        1. If the current selector begins with the `:root` selector or a type selector other than `html`, rewrite the selector with `:root` prepended as an ancestor. Otherwise rewrite the selector so the first part is listed both chained to `:root` and as a descendant of `:root`.
+   1. If the selector contains any ID selectors, replace them with ID attribute selectors, otherwise do nothing.
+   2. Calculate the specificity of the current selector (with any IDs replaced).
+   3. If the current selector is the first selector, do nothing. Otherwise, compare its specificity to the specificity of the previous selector.
+   4. If the previous selector is less specific than the current selector, do nothing. Otherwise, rewrite the current selector so its specificity is greater than or equal to the specificity of the previous selector.
+      1. If the current selector begins with the `:root` selector or a type selector other than `html`, rewrite the selector with `:root` prepended as an ancestor. Otherwise rewrite the selector so the first part is listed both chained to `:root` and as a descendant of `:root`.
 3. Once all selectors have been rewritten, output the final styles. They will now be in ascending-specificity order.
 
 ### Potential downsides
 
 While the approach I've outlined above can definitely work, it does come with a few downsides. For one thing, it will increase the file size of your CSS. This probably won't be a big deal if you already keep your specificity low and write your rules in mostly ascending-specificity order. And, since it's only adding the word "root" a bunch of times, it should gzip very well, so my guess is the difference will be negligible.
 
-The other thing to be aware of is potential problems with referencing external styles. If you include *bootstrap.css* from a CDN and then use this technique on your other styles, there's potential for weirdness since one set of selectors will be rewritten and the other set will not.
+The other thing to be aware of is potential problems with referencing external styles. If you include _bootstrap.css_ from a CDN and then use this technique on your other styles, there's potential for weirdness since one set of selectors will be rewritten and the other set will not.
 
-And you won't necessarily be able to just include *bootstrap.css* in your build because it may or may not currently depend on specificity to work correctly.
+And you won't necessarily be able to just include _bootstrap.css_ in your build because it may or may not currently depend on specificity to work correctly.
 
 ## Final thoughts
 
@@ -216,19 +226,12 @@ I suspect it would vastly simplify things, but it also might uncover how much we
 
 If there's a large team out there constantly fighting specificity battles, it would be interesting to hear if something like this helps. If you do try it, feel free to [let me know](/about/#contact) your findings. Or better yet, write a follow-up article and I'll link to it.
 
-{% Callout 'info' %}
-**Update:** *(November 3, 2015)*
+> [!NOTE]
+> _(Update: November 3, 2015)_: [Lea Verou](https://twitter.com/LeaVerou) pointed out to me [on Twitter](https://twitter.com/LeaVerou/status/661617150243672064) that you could use the `:not()` pseudo-class as an alternative to using `:root` for arbitrarily increasing selector specificity.
+>
+> The advantage of using `:not()` is you can apply it to any element (including `<html>`), so you wouldn't have to split selectors. You could also use it to add type or ID-level specificity, e.g. `:not(z)` or `:not(#z)`, so you wouldn't always have to increase by classes.
+>
+> The downside of using `:not()` is you must be careful to pick a selector that's guaranteed to not match the element, otherwise it won't work.
 
-[Lea Verou](https://twitter.com/LeaVerou) pointed out to me [on Twitter](https://twitter.com/LeaVerou/status/661617150243672064) that you could use the `:not()` pseudo-class as an alternative to using `:root` for arbitrarily increasing selector specificity.
-
-The advantage of using `:not()` is you can apply it to any element (including `<html>`), so you wouldn't have to split selectors. You could also use it to add type or ID-level specificity, e.g. `:not(z)` or `:not(#z)`, so you wouldn't always have to increase by classes.
-
-The downside of using `:not()` is you must be careful to pick a selector that's guaranteed to not match the element, otherwise it won't work.
-{% endCallout %}
-
-{% Callout 'info' %}
-
-**Update:** *(November 14, 2015)*
-
-[David Khourshid](https://twitter.com/davidkpiano/) wrote a response to this article entitled [The Simplicity of Specificity](http://codepen.io/davidkpiano/post/the-simplicity-of-specificity) where he argues that CSS should not be compared to an imperative language, and things would be better if we wrote rules that were source order-independent. While it's probably no surprise that I disagree with this position, I encourage you to read it if you want an alternative perspective.
-{% endCallout %}
+> [!NOTE]
+> _(Update: November 14, 2015)_: [David Khourshid](https://twitter.com/davidkpiano/) wrote a response to this article entitled [The Simplicity of Specificity](http://codepen.io/davidkpiano/post/the-simplicity-of-specificity) where he argues that CSS should not be compared to an imperative language, and things would be better if we wrote rules that were source order-independent. While it's probably no surprise that I disagree with this position, I encourage you to read it if you want an alternative perspective.

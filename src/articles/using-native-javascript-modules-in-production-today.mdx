@@ -1,3 +1,10 @@
+---
+title: 'Using Native JavaScript Modules in Production Today'
+date: 2019-08-20T07:20:17.000Z
+---
+
+import Img from '../../components/Img.astro';
+
 Two years ago [I wrote about a technique](https://philipwalton.com/articles/deploying-es2015-code-in-production-today/)&mdash;now commonly referred to as the module/nomodule pattern&mdash;that allows you to write ES2015+ JavaScript and then use bundlers and transpilers to generate two versions of your codebase, one with modern syntax (loaded via `<script type="module">`) and one with ES5 syntax (loaded via `<script nomodule>`). The technique allows you to ship significantly less code to module-supporting browsers, and it's now supported by most web frameworks and CLIs.
 
 But back then, even with the ability to deploy modern JavaScript in production, and even though most browsers supported modules, I still recommended bundling your code.
@@ -18,8 +25,8 @@ And if you've ever looked inside your `node_modules` directory, you probably kno
 
 <table>
   <tr>
-    <th>Package</td>
-    <th>Module count</td>
+    <th>Package</th>
+    <th>Module count</th>
   </tr>
   <tr>
     <td><a href="https://www.npmjs.com/package/date-fns">date-fns</a></td>
@@ -45,9 +52,8 @@ In fact, modules is the format we all _should_ be bundling to because browsers a
 
 Fortunately, at least one popular bundler today ([Rollup](https://rollupjs.org)) supports [modules as an output format](https://rollupjs.org/guide/en/#outputformat), which means it's possible to both bundle your code _and_ deploy modules in production (without all the loader boilerplate). And since Rollup has fantastic tree-shaking (the best of any bundler in my experience), bundling to modules with Rollup produces the smallest final code size of any option currently available.
 
-{% Callout 'info' %}
-**Update:** Parcel [plans to add module support](https://twitter.com/devongovett/status/1163792519764877312) in the next version. Webpack does not currently support a module output format, but here are a few issues to follow the discussion ([#2933](https://github.com/webpack/webpack/issues/2933), [#8895](https://github.com/webpack/webpack/issues/8895), [#8896](https://github.com/webpack/webpack/issues/8896)).
-{% endCallout %}
+> [!NOTE]
+> Parcel [plans to add module support](https://twitter.com/devongovett/status/1163792519764877312) in the next version. Webpack does not currently support a module output format, but here are a few issues to follow the discussion ([#2933](https://github.com/webpack/webpack/issues/2933), [#8895](https://github.com/webpack/webpack/issues/8895), [#8896](https://github.com/webpack/webpack/issues/8896)).
 
 Another misconception is that you can't use modules unless 100% of your dependencies use modules, and unfortunately (very unfortunate in my opinion), most npm packages are still published as CommonJS (some actually even author as ES2015 but then transpile to CommonJS before publishing to npm)!
 
@@ -118,7 +124,7 @@ Hopefully this example makes it clear how manual code splitting with Rollup work
 
 For example, it's very hard to follow what's happening in this file (actual output from one of my older projects using webpack's code splitting), and almost none of this code is needed in module-supporting browsers:
 
-```js:no-mark
+```js
 (window["webpackJsonp"] = window["webpackJsonp"] || []).push([["import1"],{
 
 /***/ "tLzr":
@@ -219,11 +225,10 @@ While some `modulepreload` plugins do exist on npm, generating a `modulepreload`
 
 For example, here's [how I generate the `modulepreload` list](https://github.com/philipwalton/blog/blob/90e914731c77296dccf2ed315599326c6014a080/tasks/javascript.js#L18-L43) for this site as well as [for my demo app](https://github.com/philipwalton/rollup-native-modules-boilerplate/blob/78c687bf757374b5e685508e3afc9560a86a3c96/rollup.config.js#L57-L84) (introduced below).
 
-{% Callout 'info' %}
-**Note:** while `modulepreload` is definitely better than classic `preload` for module scripts, it does have worse browser support (it's Chrome-only at the moment). If a sizable portion of your traffic is non-Chrome traffic, it may make sense to use classic preload instead.
-
-One caution when using preload though is that, unlike `modulepreload`, `preload`-ed scripts don't get put in the browser's module map, which means it's possible that a `preload`-ed request gets processed more than once (e.g. if a module imports the file before the browser is done preloading it).
-{% endCallout %}
+> [!NOTE]
+> While `modulepreload` is definitely better than classic `preload` for module scripts, it does have worse browser support (it's Chrome-only at the moment). If a sizable portion of your traffic is non-Chrome traffic, it may make sense to use classic preload instead.
+>
+> One caution when using preload though is that, unlike `modulepreload`, `preload`-ed scripts don't get put in the browser's module map, which means it's possible that a `preload`-ed request gets processed more than once (e.g. if a module imports the file before the browser is done preloading it).
 
 ## Why deploy real modules?
 
@@ -266,12 +271,13 @@ For browsers that don't support modules at all, you can use the `module/nomodule
 
 Since it's always easier to talk about cross-browser compatibility than it is to actually make it work, I've built [a demo app](https://rollup-native-modules-boilerplate.glitch.me/) that uses all the techniques I outlined here.
 
-{% Img
-  border=true,
-  href="https://rollup-native-modules-boilerplate.glitch.me/",
-  src="native-javascript-modules-demo.png",
-  alt="A demo app showing how to use native JavaScript modules with legacy browser support"
-%}
+<a href="https://rollup-native-modules-boilerplate.glitch.me/">
+  <Img
+    border
+    src="native-javascript-modules-demo.png"
+    alt="A demo app showing how to use native JavaScript modules with legacy browser support"
+  />
+</a>
 
 The demo works in browsers that don't support dynamic `import()` (like Edge 18 and Firefox ESR), and it also works in browsers that don't support modules (like Internet Explorer 11).
 

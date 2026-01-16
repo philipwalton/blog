@@ -1,3 +1,10 @@
+---
+title: 'Introducing HTML Inspector'
+date: 2013-06-11T15:22:52.000Z
+---
+
+import Img from '../../components/Img.astro';
+
 [HTML Inspector](https://github.com/philipwalton/html-inspector) is a code quality tool to help you and your team write better markup. It's written in JavaScript and runs in the browser, so testing your HTML has never been easier.
 
 Like [JSHint](http://www.jshint.com/) and [CSSLint](http://csslint.net), HTML Inspector is completely customizable, so you can use what you like and ignore what you don't. It's also extensible and pluggable, making it possible to write your own rules that enforce your chosen conventions.
@@ -14,7 +21,7 @@ The best way to see how HTML Inspector works is to watch it in action. Simply do
 
 To add HTML Inspector to a page and run it with the default rules and configurations, just add the following lines right before the closing `</body>` tag, and check out the warnings in the console:
 
-```xml
+```html
 <!-- Include jQuery if it's not already loaded -->
 <script src="path/to/html-inspector.js"></script>
 <script> HTMLInspector.inspect() </script>

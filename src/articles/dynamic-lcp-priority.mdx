@@ -1,3 +1,12 @@
+---
+title: 'Dynamic LCP Priority: Learning from Past Visits'
+date: 2022-12-28T20:43:44.000Z
+excerpt: "Earlier this year, Chrome shipped the new Priority Hints API, which lets developers inform the browser which resources are the most important, such as the LCP image. There's just one small problem"
+image: 'src/images/poster/dynamic-lcp-priority-poster.png'
+---
+
+import Img from '../../components/Img.astro';
+
 Earlier this year, Chrome shipped the new [Priority Hints API](https://web.dev/priority-hints/), which lets developers set `fetchpriority="high"` on `<img>`, `<script>`, `<link>` or other elements that you want to ensure are loaded with a high priority. Personally, I'm a huge fan of this API. And I think that adding it to your site is one of the simplest and most effective ways to improve [LCP](https://web.dev/lcp/).
 
 There's just one small problem. In order to be able to use this API, you have to know ahead of time what the LCP element is going to be for every page you want to use it on.
@@ -55,10 +64,10 @@ In the above code the `attribution.element` value is a CSS selector that can be 
 
 Note that I said this payload will _usually_ be sent, but not always. Depending on the user's screen size, the largest element on this page is not always an image. For example, the following visualization shows what the most common LCP element is for this page across typical desktop and mobile viewport sizes.
 
-{% Img
-  src="lcp-desktop-mobile.png",
+<Img
+  src="lcp-desktop-mobile.png"
   alt="An example showing how the LCP element for a page can differ across desktop and mobile screen sizes"
-%}
+/>
 
 And as you can see, the largest element on desktop is usually an image, but on mobile it's often the first paragraph of text.
 

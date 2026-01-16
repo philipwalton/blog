@@ -1,3 +1,10 @@
+---
+title: 'Stop Copying Social Code Snippets'
+date: 2014-04-20T23:17:32.000Z
+---
+
+import Img from '../../components/Img.astro';
+
 If you're a web developer, chances are, at some point, you've had to add a social widget to one of your page. Actually, probably more than one. And chances are you didn't want to put too much thought into it, so you just copied some code from the Internet and called it a day. Done and done.
 
 I mean, the Web is filled with code that has been blindly copied from one source to another. Tweet buttons, Like buttons, Disqus comments, Google Analytics, all of these come with nice, neat, prepackaged code snippets.
@@ -29,13 +36,13 @@ Almost every social snippet out there does the same two things:
 
 That's it. Don't believe me? Well, let's look at a few examples.
 
-*(If you do believe me and just want to skip to my recommendations, go to the section entitled [What To Do Instead](#what-to-do-instead).)*
+_(If you do believe me and just want to skip to my recommendations, go to the section entitled [What To Do Instead](#what-to-do-instead).)_
 
 ### Twitter
 
 Here is the code that [developers.twitter.com](https://dev.twitter.com/docs/tweet-button) recommends you use to get a tweet button on your site.
 
-```xml
+```html
 <a href="http://example.com" class="twitter-share-button" data-lang="en">Tweet</a>
 <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="https://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
 ```

@@ -1,3 +1,12 @@
+---
+title: 'Why Web Developers Need to Care about Interactivity'
+date: 2017-12-19T17:25:23.000Z
+translations:
+  'français': 'https://frank.taillandier.me/2017/12/21/pourquoi-les-developpeurs-web-doivent-se-soucier-de-l-interactivite/'
+---
+
+import Img from '../../components/Img.astro';
+
 Anyone who's browsed the web on their phone has, at one point or another, experienced this situation:
 
 <p>
@@ -65,11 +74,10 @@ In fact, even interactions like scrolling (which are usually handled on a separa
 
 To see a blocked main thread in action, click the button below (which will add a `wheel` and `touchstart` event listener and run the `while` loop shown above), then try to select any text, click any link, or scroll around. Also, notice how the animated GIF stops animating:
 
-{% Callout 'info' %}
-**Update:** some browsers are now able to render animated GIFs while the main thread is blocked; however, that has not historically been the case, and not all browsers currently support this feature.
-{% endCallout %}
+> [!NOTE]
+> Some browsers are now able to render animated GIFs while the main thread is blocked; however, that has not historically been the case, and not all browsers currently support this feature.
 
-<style>
+<style>{`
 input[type="text"] {
   background: #fff;
   border: 1px solid var(--border-color-input);
@@ -114,7 +122,7 @@ label > input[type="checkbox"] {
   border-top: 1px solid var(--border-color);
   padding-top: var(--gap);
 }
-</style>
+`}</style>
 
 <div class="Demo">
   <p>
@@ -130,12 +138,12 @@ label > input[type="checkbox"] {
     <tr>
       <td><code>&lt;img&gt;</code></td>
       <td>
-        {% Img
-          figure=false,
-          href=false,
-          src="animated-loading-spinner.gif",
+        <Img
+          figure={false}
+          href={false}
+          src="animated-loading-spinner.gif"
           alt="Loading spinner"
-        %}
+        />
       </td>
     </tr>
     <tr>
@@ -150,7 +158,7 @@ label > input[type="checkbox"] {
       </td>
     </tr>
   </table>
-  <script>
+  <script>{`
   document.getElementById('block-main-thread-demo').onclick = function() {
     var noop = function() {};
     document.addEventListener('wheel', noop);
@@ -166,12 +174,11 @@ label > input[type="checkbox"] {
       document.removeEventListener('touchstart', noop);
     }, 0);
   };
-  </script>
+  `}</script>
 </div>
 
-{% Callout 'info' %}
-**Warning!** You might suddenly find yourself on a new page once the main thread is unblocked!
-{% endCallout %}
+> [!WARNING]
+> You might suddenly find yourself on a new page once the main thread is unblocked!
 
 ### What blocks the main thread
 
@@ -231,19 +238,19 @@ In other words, we should care about all of the above.
 
 For lab testing, I highly recommend tools like [Lighthouse](https://developers.google.com/web/tools/lighthouse/), and [WebPageTest](https://www.webpagetest.org/), both of which measure TTI and also give additional interactivity information. For example, WebPageTest's waterfall view has a ["Page is Interactive"](https://calendar.perfplanet.com/2017/time-to-interactive-measuring-more-of-the-user-experience/) bar along the bottom. This is great for visualizing when these bad experiences would likely happen.
 
-{% Img
-  border=true,
-  src="interactivity-web-page-test.png",
+<Img
+  border
+  src="interactivity-web-page-test.png"
   alt="WebPageTest's interactivity report"
-%}
+/>
 
 And Lighthouse gives you a score for your [estimated input latency](https://developers.google.com/web/tools/lighthouse/audits/estimated-input-latency):
 
-{% Img
-  border=true,
-  src="input-latency-lighthouse.png",
+<Img
+  border
+  src="input-latency-lighthouse.png"
   alt="Input latency in a Lighthouse performance report"
-%}
+/>
 
 Note that this is "estimated input latency" because it's a lab simulation; no users are actually interacting with this page so it's a measure of probability.
 

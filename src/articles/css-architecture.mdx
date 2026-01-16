@@ -1,8 +1,18 @@
+---
+title: 'CSS Architecture'
+date: 2012-11-17T02:04:25.000Z
+excerpt: "To many Web developers, being good at CSS means you can take a visual mock-up and replicate it perfectly in code. You don't use tables, and you pride yourself on using as few images as possible. If you're really good, you use the latest and greatest techniques like media queries, transitions and transforms. While all this is certainly true of good CSS developers, there's an entirely separate side to CSS that rarely gets mentioned when assessing one's skill."
+translations:
+  '中文': 'https://www.zfanw.com/blog/css-architecture.html'
+---
+
+import Img from '../../components/Img.astro';
+
 To many Web developers, being good at CSS means you can take a visual mock-up and replicate it perfectly in code. You don't use tables, and you pride yourself on using as few images as possible. If you're really good, you use the latest and greatest techniques like media queries, transitions and transforms. While all this is certainly true of good CSS developers, there's an entirely separate side to CSS that rarely gets mentioned when assessing one's skill.
 
 Interestingly, we don't usually make this oversight with other languages. A Rails developer isn't considered good just because his code works to spec. This is considered baseline. Of course it must work to spec; its merit is based on other things: Is the code readable? Is it easy to change or extend? Is it decoupled from other parts of the application? Will it scale?
 
-These questions are natural when assessing other parts of the code base, and CSS shouldn't be any different. Today's web applications are larger than ever, and a poorly thought-out CSS architecture can cripple development. It's time to evaluate CSS the same way we evaluate every other part of the application. It cannot be an afterthought or written off as merely the *designer's* problem.
+These questions are natural when assessing other parts of the code base, and CSS shouldn't be any different. Today's web applications are larger than ever, and a poorly thought-out CSS architecture can cripple development. It's time to evaluate CSS the same way we evaluate every other part of the application. It cannot be an afterthought or written off as merely the _designer's_ problem.
 
 ## The Goals of Good CSS Architecture
 
@@ -97,8 +107,7 @@ In large applictaions you have to make trade-offs and compromises. The fragility
 
 When creating reusable design components, it's very common to scope (as it were) the component's sub-elements inside the component's class name. For example:
 
-
-```xml
+```html
 <div class="widget">
   <h3 class="title">...</h3>
   <div class="contents">
@@ -110,12 +119,11 @@ When creating reusable design components, it's very common to scope (as it were)
 </div>
 ```
 
-
 ```css
-.widget {}
-.widget .title {}
-.widget .contents {}
-.widget .action {}
+.widget { }
+.widget .title { }
+.widget .contents { }
+.widget .action { }
 ```
 
 The idea is that the `.title`, `.contents`, and `.action` sub-element classes can be safely styled without having to worry about those styles spilling over to any other elements styled with the same classes. This is true, but it doesn't prevent the styling of classes with those same names from spilling into this component.
@@ -333,10 +341,10 @@ Preprocessors help you write CSS faster, not better. Ultimately it gets turned i
 
 Many of the so-called "features" of preprocessors can actually be very bad for CSS architecture. The following are some of the "features" I avoid at all costs (and though the general ideas apply to all preprocessor languages, these guidelines apply specifically to Sass).
 
-* Never nest rules purely for code organization. Only nest when the outputted CSS is what you want.
-* Never use a mixin if you're not passing an argument. Mixins without arguments are much better used as templates which can be extended.
-* Never use `@extend` on a selector that isn't a single class. It doesn't make sense from a design perspective and it bloats the compiled CSS.
-* Never use `@extend` for UI components in component modifier rules because you lose the inheritance chain (more on this in a bit).
+- Never nest rules purely for code organization. Only nest when the outputted CSS is what you want.
+- Never use a mixin if you're not passing an argument. Mixins without arguments are much better used as templates which can be extended.
+- Never use `@extend` on a selector that isn't a single class. It doesn't make sense from a design perspective and it bloats the compiled CSS.
+- Never use `@extend` for UI components in component modifier rules because you lose the inheritance chain (more on this in a bit).
 
 The best parts of preprocessors are functions like [`@extend`](http://sass-lang.com/docs/yardoc/file.SASS_REFERENCE.html#extend) and [`%placeholder`](http://sass-lang.com/docs/yardoc/file.SASS_REFERENCE.html#placeholder_selectors_). Both allow you to easily manage CSS abstraction without adding bloat to your CSS or a huge list of base classes in your HTML that can be very hard to manage.
 
@@ -391,12 +399,12 @@ A tool like CSS Lint is essential for any large team to ensure at least a baseli
 
 Based on the conventions I've proposed above, it becomes very easy to write rules to detect particular antipatterns. Here are a few suggestions that I use:
 
-* Don't allow IDs in your selectors.
-* Don't use non-semantic type selectors (e.g. DIV, SPAN) in any multi-part rule.
-* Don't use more than 2 combinators in a selector.
-* Don't allow any class names that begin with "js-".
-* Warn if frequently using layout and positioning for non "l-" prefixed rules.
-* Warn if a class defined by itself is later redefined as a child of something else.
+- Don't allow IDs in your selectors.
+- Don't use non-semantic type selectors (e.g. DIV, SPAN) in any multi-part rule.
+- Don't use more than 2 combinators in a selector.
+- Don't allow any class names that begin with "js-".
+- Warn if frequently using layout and positioning for non "l-" prefixed rules.
+- Warn if a class defined by itself is later redefined as a child of something else.
 
 These are obviously just suggestions, but they're intended to get you thinking about how to enforce the standards you want on your projects.
 
@@ -406,11 +414,11 @@ Earlier I suggested that it would be easy to search your HTML classes and all li
 
 HTML Inspector traverses your HTML and (much like CSS Lint) allows you to write your own rules that throw errors and warnings when some convention is being broken. I currently use the following rules:
 
-* Warn if the same ID is used more than once on a page.
-* Don't use any classes that aren't mentioned in any stylesheet or pass a whitelist (like "js-" prefixed classes).
-* Modifer classes shouldn't be used without their base class.
-* Sub-object classes shouldn't be used when no ancestor contains the base class.
-* Plain old DIV or SPAN elements, without classes attached, should not be used in the HTML.
+- Warn if the same ID is used more than once on a page.
+- Don't use any classes that aren't mentioned in any stylesheet or pass a whitelist (like "js-" prefixed classes).
+- Modifer classes shouldn't be used without their base class.
+- Sub-object classes shouldn't be used when no ancestor contains the base class.
+- Plain old DIV or SPAN elements, without classes attached, should not be used in the HTML.
 
 ## Summary
 

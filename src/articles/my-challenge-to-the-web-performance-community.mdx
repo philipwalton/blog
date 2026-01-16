@@ -1,9 +1,18 @@
+---
+title: 'My Challenge to the Web Performance Community'
+date: 2021-10-06T07:18:38.000Z
+excerpt: 'Performance optimization should be about making your users happy, not about making your tools happy. And if we really believe that, we should lead by example.'
+image: 'src/images/poster/lh-cwv-correlation-poster.png'
+---
+
+import Img from '../../components/Img.astro';
+
 I have noticed a trend in recent years—a trend that I've [admittedly been part of myself](https://twitter.com/philwalton/status/910036089137590273)—where performance-minded developers will rebuild a site and then post a screenshot of their [Lighthouse](https://developers.google.com/web/tools/lighthouse) score on social media to show off how fast it is.
 
-{% Img
-  src="perfect-lighthouse-score.png",
+<Img
+  src="perfect-lighthouse-score.png"
   alt="A Lighthouse report with perfect scores"
-%}
+/>
 
 What might come as a surprise to many of the people reading this post is that I kinda want this trend to stop—or at least, I want it to change.
 
@@ -17,10 +26,10 @@ In fact, my colleague Brendan Kenny [just published some research](https://discu
 
 **Almost half of all pages that scored 100 on Lighthouse didn't meet the recommended Core Web Vitals thresholds.**
 
-{% Img
-  src="lh-cwv-correlation.png",
+<Img
+  src="lh-cwv-correlation.png"
   alt="A visualization of how Lighthouse scores correlate with Core Web Vitals"
-%}
+/>
 
 I've always known it was possible to get a 100 on Lighthouse yet still have real-world issues, but I wouldn't have guessed it was _this_ common. Incidentally, the data also shows that the reverse is common too: many pages that fully meet all the Core Web Vitals thresholds actually have very poor Lighthouse scores.
 

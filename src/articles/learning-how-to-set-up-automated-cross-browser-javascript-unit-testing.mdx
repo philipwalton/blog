@@ -1,3 +1,10 @@
+---
+title: 'Learning How to Set Up Automated, Cross-browser JavaScript Unit Testing'
+date: 2016-07-11T06:48:41.000Z
+---
+
+import Img from '../../components/Img.astro';
+
 We all know how important it is to test our code in multiple browsers. And I think for the most part, we in the web development community do a pretty good job at this&mdash;at least when first releasing a project.
 
 What we don't do a good job of is testing our code every time we make a change.
@@ -126,11 +133,11 @@ After all, an automated system isn't much of a win if it introduces brand new he
 
 ### Requirements
 
-* I need to be able to run the tests from the command line.
-* I need to be able to debug failed tests locally.
-* I need all the dependencies required to run my tests to be installable via `npm`, so anyone checking out my code could run them by simply typing `npm install && npm test`.
-* I need the process for running the tests on a CI machine to be the same process as running them from my development machine. That way the builds are the same and failures can be debugged without having to check in new changes.
-* I need all the tests to run automatically anytime I (or anyone else) commits new changes or makes a pull request.
+- I need to be able to run the tests from the command line.
+- I need to be able to debug failed tests locally.
+- I need all the dependencies required to run my tests to be installable via `npm`, so anyone checking out my code could run them by simply typing `npm install && npm test`.
+- I need the process for running the tests on a CI machine to be the same process as running them from my development machine. That way the builds are the same and failures can be debugged without having to check in new changes.
+- I need all the tests to run automatically anytime I (or anyone else) commits new changes or makes a pull request.
 
 With this rough list in mind, the next step was to dive into how automated, cross-browser testing works on the popular cloud testing providers.
 
@@ -202,8 +209,7 @@ request({
 
 Notice in the post body you see `framework: 'mocha'`. Sauce Labs provides support for many of the popular JavaScript unit testing frameworks including Mocha, Jasmine, QUnit, and YUI. And by "support" it just means that Sauce Lab's webdriver client knows where to look to get the test results (though in most cases you still have to populate those results yourself, more on that later).
 
-If you're using a test framework not in that list, you can set `framework: 'custom'`, and Sauce Labs will instead look for a global variable called `window.global_test_results`. The format for the results is listed in the [custom framework](https://wiki.saucelabs.com/display/DOCS/Reporting+JavaScript+Unit+Test+Results+to+Sauce+Labs+Using+a+Custom+Framework
-) section of the documentation.
+If you're using a test framework not in that list, you can set `framework: 'custom'`, and Sauce Labs will instead look for a global variable called `window.global_test_results`. The format for the results is listed in the [custom framework](https://wiki.saucelabs.com/display/DOCS/Reporting+JavaScript+Unit+Test+Results+to+Sauce+Labs+Using+a+Custom+Framework) section of the documentation.
 
 #### Making Mocha test results available to Sauce Lab's webdriver client
 
@@ -396,10 +402,10 @@ Once you understand all the steps, it's quite simple. Here they are, summarized:
 
 1. Create an open-source Sauce Labs account and get a username and access key.
 2. Update your test page's source code so Sauce Labs can read the results of the tests through a global JavaScript variable.
-2. Use ngrok to create a secure tunnel to your local test page, so it's accessible publicly on the internet.
-3. Call the [Start JS Unit Tests](https://wiki.saucelabs.com/display/DOCS/JavaScript+Unit+Testing+Methods#JavaScriptUnitTestingMethods-StartJSUnitTests) API method with the list of browsers/platforms you want to test.
-4. Call the [Get JS Unit Test Status](https://wiki.saucelabs.com/display/DOCS/JavaScript+Unit+Testing+Methods#JavaScriptUnitTestingMethods-GetJSUnitTestStatus) method periodically until all jobs are finished.
-5. Report the results.
+3. Use ngrok to create a secure tunnel to your local test page, so it's accessible publicly on the internet.
+4. Call the [Start JS Unit Tests](https://wiki.saucelabs.com/display/DOCS/JavaScript+Unit+Testing+Methods#JavaScriptUnitTestingMethods-StartJSUnitTests) API method with the list of browsers/platforms you want to test.
+5. Call the [Get JS Unit Test Status](https://wiki.saucelabs.com/display/DOCS/JavaScript+Unit+Testing+Methods#JavaScriptUnitTestingMethods-GetJSUnitTestStatus) method periodically until all jobs are finished.
+6. Report the results.
 
 ## Making it even easier
 

@@ -1,3 +1,12 @@
+---
+title: "Why I'm Excited About Native CSS Variables"
+date: 2015-12-06T20:43:53.000Z
+translations:
+  'français': 'https://terkel.github.io/why-im-excited-about-native-css-variables/'
+---
+
+import Img from '../../components/Img.astro';
+
 A few weeks ago CSS variables&mdash;more accurately known as [CSS Custom Properties](https://drafts.csswg.org/css-variables/)&mdash;shipped in Chrome Canary behind the Experimental Web Platform Features flag.<sup>[[1]](#footnote-1)</sup>
 
 When Chrome engineer [Addy Osmani](https://twitter.com/addyosmani) first tweeted about the release, he was met with a surprising amount of [negativity](https://twitter.com/joshlangner/status/661608288707026944), [hostility](https://twitter.com/kuizinas/status/661600615911526401), and [skepticism](https://twitter.com/DanTup/status/661609987047866368). At least, it was surprising to me, given how excited I am about this feature.
@@ -17,9 +26,8 @@ CSS preprocessors are fantastic tools, but their variables are static and lexica
 
 In this article I'm going to discuss some of the things you can do with CSS custom properties that you can't do with preprocessor variables. I'll also demo some of the new design patterns that custom properties enable. Finally, I'll discuss why I think in the future we'll most likely use preprocessor variables and custom properties together, to leverage the best of both worlds.
 
-{% Callout 'info' %}
-**Note:** this article is _not_ an introduction to CSS custom properties. If you've never heard of them or are unfamiliar with how they work, I'd recommend [getting yourself acquainted](https://developer.mozilla.org/en-US/docs/Web/CSS/Using_CSS_variables) first.
-{% endCallout %}
+> [!NOTE]
+> This article is _not_ an introduction to CSS custom properties. If you've never heard of them or are unfamiliar with how they work, I'd recommend [getting yourself acquainted](https://developer.mozilla.org/en-US/docs/Web/CSS/Using_CSS_variables) first.
 
 ## The limitations of preprocessor variables
 
@@ -237,12 +245,12 @@ Even with the extra verbosity of the custom property syntax, the amount of code 
 The following demo uses the above code to build a basic site layout that automatically redefines the gutter value as the viewport width changes. Check it out in a browser that supports custom properties to see it in action!
 
 <figure>
-  {% Img
-    figure=false,
-    href="http://codepen.io/philipwalton/pen/epLWNO/?editors=110",
-    src="custom-properties-responsive.png",
-    alt="Responsive Properties Demo"
-  %}
+  <a href="http://codepen.io/philipwalton/pen/epLWNO/?editors=110">
+    <Img
+      src="custom-properties-responsive.png"
+      alt="Responsive Properties Demo"
+    />
+  </a>
   <figcaption>
     View the demo on CodePen: <a href="http://codepen.io/philipwalton/pen/epLWNO/?editors=110">editor view</a> / <a href="http://codepen.io/philipwalton/full/epLWNO/">full page</a>
   </figcaption>
@@ -300,12 +308,12 @@ The main difference is that the extension is opt-in by the button component, and
 The following demo illustrates contextual styling of both links and buttons in the header of a site as well as the content area.
 
 <figure>
-  {% Img
-    figure=false,
-    href="http://codepen.io/philipwalton/pen/KdxmWL/?editors=110",
-    src="custom-properties-contextual-styling.png",
-    alt="Responsive Properties Demo"
-  %}
+  <a href="http://codepen.io/philipwalton/pen/KdxmWL/?editors=110">
+    <Img
+      src="custom-properties-contextual-styling.png"
+      alt="Responsive Properties Demo"
+    />
+  </a>
   <figcaption>
     View the demo on CodePen: <a href="http://codepen.io/philipwalton/pen/KdxmWL/?editors=110">editor view</a> / <a href="http://codepen.io/philipwalton/full/KdxmWL/">full page</a>
   </figcaption>

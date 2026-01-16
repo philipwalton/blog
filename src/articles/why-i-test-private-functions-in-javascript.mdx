@@ -1,3 +1,10 @@
+---
+title: 'Why I Test Private Functions In JavaScript'
+date: 2013-07-17T15:47:00.000Z
+---
+
+import Img from '../../components/Img.astro';
+
 Last week I published an article on this blog entitled [How to Unit Test Private Functions in JavaScript](/articles/how-to-unit-test-private-functions-in-javascript/ 'How to Unit Test Private Functions in JavaScript'). The article was well received and even mentioned in a few popular newsletters (most notably [JavaScript Weekly](http://javascriptweekly.com/archive/138.html)). Still, a decent amount of the feedback I received in the comments and on Twitter strongly disagreed with my approach. The most common criticism was: unit testing private functions is unnecessary and a mark of bad design.
 
 Admittedly, that article focused too much on the "how" of the technique and not enough on the "why".
@@ -8,11 +15,11 @@ In this article I'll try to respond to some of that criticism and go a little de
 
 When you don't explain your reasons, it's easy for readers to make incorrect assumptions. I definitely didn't explain my rationale nearly enough in the last article, so I suppose I'm mostly to blame.
 
-To help clarify what I *am* saying, I think it would be helpful to start by pointing out what I *am not* saying:
+To help clarify what I _am_ saying, I think it would be helpful to start by pointing out what I _am not_ saying:
 
-* I'm not saying you should *always* test your private functions.
-* I'm not saying you should test *all* of your private functions.
-* I'm not saying people who don’t test private functions are doing it wrong.
+- I'm not saying you should _always_ test your private functions.
+- I'm not saying you should test _all_ of your private functions.
+- I'm not saying people who don’t test private functions are doing it wrong.
 
 It's fine if people disagree with me. In fact, I welcome the debate and enjoy hearing counter arguments, especially from developers with a lot more experience. At the end of the day, it's up to each individual to weigh the arguments and make up their own mind.
 
@@ -127,7 +134,7 @@ The modules either warrant testing or they don't. And they either should be priv
 
 The decision to make functionality public or private should be purely about program design, encapsulation, and a separation of concerns.
 
-Sometimes, due to language constraints, code *must* be public in order to be tested, but I consider that an entirely different question. Sacrificing API design for testing because of language constraints should be seen as a necessary evil, not as a best-practice.
+Sometimes, due to language constraints, code _must_ be public in order to be tested, but I consider that an entirely different question. Sacrificing API design for testing because of language constraints should be seen as a necessary evil, not as a best-practice.
 
 And taking advantage of tools to mitigate language constraints should be seen as liberating, not as proof of a code smell.
 
@@ -147,4 +154,4 @@ In JavaScript, developers often hide a lot more than just "methods". Modules, cl
 
 Due to the nature of the browser environment, code is kept private for a variety of reasons. It's not always simply because that code is an implementation detail.
 
-As a final thought, I understand (and largely agree with) the aversion to testing private methods and the general desire to avoid over-testing. However, I think it's worth putting the whole issue into perspective. Obviously over-testing is something that *is* possible, but in the end it does very little harm. At worst, it may waste some time, but I'd far rather err on the side of over-testing than under-testing.
+As a final thought, I understand (and largely agree with) the aversion to testing private methods and the general desire to avoid over-testing. However, I think it's worth putting the whole issue into perspective. Obviously over-testing is something that _is_ possible, but in the end it does very little harm. At worst, it may waste some time, but I'd far rather err on the side of over-testing than under-testing.

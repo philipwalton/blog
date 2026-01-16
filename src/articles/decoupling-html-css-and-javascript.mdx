@@ -1,3 +1,10 @@
+---
+title: 'Decoupling Your HTML, CSS, and JavaScript'
+date: 2013-08-18T19:39:09.000Z
+---
+
+import Img from '../../components/Img.astro';
+
 Any non-trivial site or application on the Web today will contain a large amount of HTML, CSS, and JavaScript. As the use of the Internet evolves and our dependence on it increases, having a plan for organizing and maintaining your front-end code is an absolute must.
 
 In today's large Web companies, an increasing number of people are touching an increasingly large percentage of the front-end code. As a result, most organizations struggle to keep their code modular. Changes to one part of the application often inadvertently break unrelated parts downstream.
@@ -164,10 +171,10 @@ One of the best ways to prevent unintended consequences is to connect these thre
 
 To avoid the above anti-patterns, keep the following principles in mind:
 
-* Favor explicit component and behavior classes over complex CSS selectors in both CSS and JavaScript.
-* Style components based on what they are, not where they are.
-* Don't use the same class for both style and behavior.
-* Differentiate state styles from default styles.
+- Favor explicit component and behavior classes over complex CSS selectors in both CSS and JavaScript.
+- Style components based on what they are, not where they are.
+- Don't use the same class for both style and behavior.
+- Differentiate state styles from default styles.
 
 Using classes this way will often require a lot of classes being present in the HTML, but the gains in predictability and maintainability are well worth it. After all, adding classes to HTML is quite easy and something that a developer of any skill level can do. To quote [Nicolas Gallagher](http://nicolasgallagher.com/about-html-semantics-front-end-architecture/):
 

@@ -1,3 +1,12 @@
+---
+title: 'How We Track Pageviews Is All Wrong'
+date: 2017-04-11T17:46:25.000Z
+translations:
+  'русский': 'https://web.archive.org/web/20190412205654/http://softdroid.net/kak-my-otslezhivaem-prosmotry-stranic'
+---
+
+import Img from '../../components/Img.astro';
+
 All analytics tools I know of track pageviews in a way that&mdash;to put it bluntly&mdash;simply doesn't work for a growing number of websites today and is completely incompatible with the direction the web is heading.
 
 For the most part, these tools assume (by default) that each pageview corresponds to a full page load, and that each page load runs some analytics tracking code, and sends a pageview to a back-end server. Anything that deviates from this model requires extra work on the part of the site developer&mdash;work most developers don't have the time or expertise to do.
@@ -10,10 +19,10 @@ To give you a specific example, consider [mail.google.com](https://mail.google.c
 
 The vast majority of Gmail users almost never reload the page, which raises a few important questions from an analytics point of view:
 
-* If a user loads Gmail once, and then uses it hundreds of times over the next few days without reloading, should that really only be considered one pageview?
-* If a user clicks the logo to refresh the content (or via pull to refresh in the mobile version of the app), should that be considered a pageview? Is that usage functionally different from refreshing the page to load new content?
-* What about when the user loads a new message, should that be considered a new pageview?
-* If two users visit Gmail the exact same number of times per day, but one of them loads the site anew every time and the other leaves it open in a background tab, should those two usage patterns result in dramatically different pageview counts?
+- If a user loads Gmail once, and then uses it hundreds of times over the next few days without reloading, should that really only be considered one pageview?
+- If a user clicks the logo to refresh the content (or via pull to refresh in the mobile version of the app), should that be considered a pageview? Is that usage functionally different from refreshing the page to load new content?
+- What about when the user loads a new message, should that be considered a new pageview?
+- If two users visit Gmail the exact same number of times per day, but one of them loads the site anew every time and the other leaves it open in a background tab, should those two usage patterns result in dramatically different pageview counts?
 
 The problem these questions are meant to illustrate is that, for some sites, sticking to the traditional definition of a pageview would result in very unrealistic usage data. And the problem gets worse when you a consider a single site that changes its implementation over time.
 
@@ -25,15 +34,15 @@ This is a pretty bad situation to be in: where you (the developer) want to impro
 
 ## The solution
 
-I think there is a solution, and the solution I propose takes a cue from the metric name itself: *Pageviews*.
+I think there is a solution, and the solution I propose takes a cue from the metric name itself: _Pageviews_.
 
-Instead of tracking how many times a page was *loaded*, track how many times it was *viewed*. We can do this with the [Page Visibility API](https://developer.mozilla.org/en-US/docs/Web/API/Page_Visibility_API), which has actually been around for quite some time and is [well supported](http://caniuse.com/#feat=pagevisibility) in all browsers, both on desktop and mobile.
+Instead of tracking how many times a page was _loaded_, track how many times it was _viewed_. We can do this with the [Page Visibility API](https://developer.mozilla.org/en-US/docs/Web/API/Page_Visibility_API), which has actually been around for quite some time and is [well supported](http://caniuse.com/#feat=pagevisibility) in all browsers, both on desktop and mobile.
 
 As it turns out, tracking how often the page was viewed rather than how often it was loaded elegantly handles a surprising number of cases that fail using the current model:
 
-* When users leave an app in a background tab and switch to it hours or days later without reloading.
-* When users leave a tab open as a reference and switch to it often for quick access to the content (again, without reloading the page).
-* When users open a page in a background tab and then forget about it (never actually viewing the content).
+- When users leave an app in a background tab and switch to it hours or days later without reloading.
+- When users leave a tab open as a reference and switch to it often for quick access to the content (again, without reloading the page).
+- When users open a page in a background tab and then forget about it (never actually viewing the content).
 
 The Page Visibility API consists of both the [`document.visibilityState`](https://developer.mozilla.org/en-US/docs/Web/API/Document/visibilityState) property as well as the [`visibilitychange`](https://developer.mozilla.org/en-US/docs/Web/Events/visibilitychange) event. With these two pieces you can ensure that pageviews are never sent unless the page's `visibilityState` is `visible`, and you can also send pageviews in cases where a user returns to your site after it's been in a background tab for a while, by listening for `visibilitychange` events. The Page Visibility API solves the problem of how to track pageviews on apps that never need to be reloaded.
 
@@ -48,11 +57,11 @@ The basic idea for tracking pageviews with the Page Visibility and History APIs 
 3. If the visibility state changes from hidden to visible and enough time has passed since the previous interaction by this user, send a pageview.
 4. If the URL changes (just the [pathname](https://developer.mozilla.org/en-US/docs/Web/API/HTMLHyperlinkElementUtils/pathname) or [search](https://developer.mozilla.org/en-US/docs/Web/API/HTMLHyperlinkElementUtils/search) parts, not the [hash](https://developer.mozilla.org/en-US/docs/Web/API/HTMLHyperlinkElementUtils/hash) part since that's used for anchor links) send a pageview.
 
-The third step above is the most important one, and it's also the most ambiguous. The question is: *How long is "enough time" since the previous user interaction?*
+The third step above is the most important one, and it's also the most ambiguous. The question is: _How long is "enough time" since the previous user interaction?_
 
 On the one hand, you wouldn't want to track every visibility state change as a new pageview since it's common for users to frequently switch between tabs (and in fact some apps work best when used in multiple tabs at the same time and expect a lot of tab switching).
 
-On the other hand, you want to capture the fact that a user is *returning* to your site or application after not using it for a while (i.e. a separate usage instance rather than a single, continuous usage instance).
+On the other hand, you want to capture the fact that a user is _returning_ to your site or application after not using it for a while (i.e. a separate usage instance rather than a single, continuous usage instance).
 
 Luckily, all analytics tools already define a way to differentiate between distinct usage instances, they're called [sessions](https://support.google.com/analytics/answer/2731565).
 
@@ -60,9 +69,8 @@ A session is a group of interactions that take place within a given time frame, 
 
 So getting back to the third step in the list above, my proposal is that if a user's session has timed out and the page's visibility state changes from hidden to visible, a new pageview should be sent. Visibility state changes that occur in the middle of a session should not be considered distinct pageviews (though they can still be tracked as events if that information is relevant).
 
-{% Callout 'info' %}
-**Note:** if you use [autotrack](https://github.com/googleanalytics/autotrack) (specifically the [pageVisibilityTracker](https://github.com/googleanalytics/autotrack/blob/master/docs/plugins/page-visibility-tracker.md) and [urlChangeTracker](https://github.com/googleanalytics/autotrack/blob/master/docs/plugins/url-change-tracker.md) plugins), you don't have to worry about implementing this logic yourself. These plugins handle all of this for you automatically (with configuration options to customize the behavior).
-{% endCallout %}
+> [!NOTE]
+> If you use [autotrack](https://github.com/googleanalytics/autotrack) (specifically the [pageVisibilityTracker](https://github.com/googleanalytics/autotrack/blob/master/docs/plugins/page-visibility-tracker.md) and [urlChangeTracker](https://github.com/googleanalytics/autotrack/blob/master/docs/plugins/url-change-tracker.md) plugins), you don't have to worry about implementing this logic yourself. These plugins handle all of this for you automatically (with configuration options to customize the behavior).
 
 ### Handling false positives
 
@@ -78,11 +86,11 @@ This makes sense as I know from my own usage patterns that it's quite common to 
 
 In some cases you may be interested in knowing how often your site is loaded but never viewed. You may also want to know whether a pageview resulted from the initial page load or whether it resulted from a visibility state or URL change.
 
-While you could create a custom dimension to track this (and in fact I usually do), this problem makes it clear that what we really need is two separate metrics: *Pageviews* and *Page Loads.*
+While you could create a custom dimension to track this (and in fact I usually do), this problem makes it clear that what we really need is two separate metrics: _Pageviews_ and _Page Loads._
 
 Fortunately most analytics tools today allow users to define their own [custom metrics](https://support.google.com/analytics/answer/2709828) to track whatever custom data they want. In fact, autotrack already comes with [an option to track page loads](https://github.com/googleanalytics/autotrack/blob/master/docs/plugins/page-visibility-tracker.md#options) separately from pageviews via a custom metric.
 
-By decoupling pageviews from page loads we can fully embrace the intention behind the *Pageviews* metric: measuring how many times users actually *viewed* your page, regardless of how many times they loaded it.
+By decoupling pageviews from page loads we can fully embrace the intention behind the _Pageviews_ metric: measuring how many times users actually _viewed_ your page, regardless of how many times they loaded it.
 
 ### How pageviews affect sessions
 
@@ -90,7 +98,7 @@ Some readers might be wondering why all this matters. Who cares if you only trac
 
 Again, while this may seem like a reasonable question, if you understand the data model most analytics tools use, you'll realize it breaks down rather quickly.
 
-Most analytics tools assume that every session contains at least one pageview, and that pageview is used to determine dimensions like [*Landing Page*](https://developers.google.com/analytics/devguides/reporting/core/dimsmets#view=detail&group=page_tracking&jump=ga_landingpagepath) and metrics like [*Exits*](https://developers.google.com/analytics/devguides/reporting/core/dimsmets#view=detail&group=page_tracking&jump=ga_exits). If you only track a pageview for the initial page load and then all subsequent sessions just contain events, most of your session reports will be messed up.
+Most analytics tools assume that every session contains at least one pageview, and that pageview is used to determine dimensions like [_Landing Page_](https://developers.google.com/analytics/devguides/reporting/core/dimsmets#view=detail&group=page_tracking&jump=ga_landingpagepath) and metrics like [_Exits_](https://developers.google.com/analytics/devguides/reporting/core/dimsmets#view=detail&group=page_tracking&jump=ga_exits). If you only track a pageview for the initial page load and then all subsequent sessions just contain events, most of your session reports will be messed up.
 
 This happens today with almost all web apps that use traditional analytics, and it further illustrates the limitations of the old model.
 

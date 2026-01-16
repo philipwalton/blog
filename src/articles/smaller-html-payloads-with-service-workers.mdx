@@ -1,3 +1,10 @@
+---
+title: 'Smaller HTML Payloads with Service Workers'
+date: 2020-01-07T08:02:37.000Z
+---
+
+import Img from '../../components/Img.astro';
+
 Many developers know that you can use [service workers](https://developers.google.com/web/fundamentals/primers/service-workers) to cache web pages (and their sub-resources) in order to serve those pages to users when they're offline.
 
 And while this _is_ true, it's far from the only thing that service workers can do to improve the performance and reliability of a website. A lesser known capability of service workers is that you can programmatically generate your responses&mdash;you aren't limited to _just_ fetching from the network or reading from the cache.
@@ -10,10 +17,10 @@ On this site, after a user visits once and the service worker is installed, **th
 
 By only requesting the contents of a page, the networks payloads become substantially smaller, and the pages can load quite a bit faster. For example, on this site over the past 30 days, page loads from a service worker had a **47.6% smaller network payloads**, and a median [First Contentful Paint (FCP)](https://web.dev/fcp/) that was **52.3% faster** than page loads without a service worker (416ms vs. 851ms). In the graph below, you can clearly see the entire distribution shifted to the left:
 
-{% Img
-  src="fcp-histogram-by-sw-status.png",
+<Img
+  src="fcp-histogram-by-sw-status.png"
   alt="First Contentful Paint (FCP) distribution by service worker status"
-%}
+/>
 
 ## How it works
 
@@ -154,9 +161,8 @@ In the above code I'm using a [cache-first](https://developers.google.com/web/to
 
 If you prefer to always get fresh content from the network, you can use a [network-first](https://developers.google.com/web/tools/workbox/modules/workbox-strategies#network_first_network_falling_back_to_cache) strategy instead.
 
-{% Callout 'info' %}
-**Note:** A nice benefit of using `workbox-streams` is that it'll automatically fallback to a full text response in browsers that don't support Readable Streams (though at this point [all modern browsers support streams](https://caniuse.com/#feat=mdn-api_readablestream)).
-{% endCallout %}
+> [!NOTE]
+> A nice benefit of using `workbox-streams` is that it'll automatically fallback to a full text response in browsers that don't support Readable Streams (though at this point [all modern browsers support streams](https://caniuse.com/#feat=mdn-api_readablestream)).
 
 ### 5) Set the correct title
 
@@ -165,7 +171,7 @@ Observant readers might have noticed that, if you serve the same cached shell co
 The best way to deal with this is for your page partials to include a script tag at the end that sets the title (and any other page-specific data) at runtime. For example, my [page partial template](https://github.com/philipwalton/blog/blob/v2.15.1/templates/partial.html#L3) uses something like this:
 
 ```html
-{% raw %}<script>document.title = '{{ page.title }}'</script>{% endraw %}
+<script>document.title = '{{ page.title }}'</script>
 ```
 
 Note that this is not a problem for search crawlers or other services that render page preview cards. These tools do not run your service worker, which means they'll always get the full HTML page when making a request.
@@ -263,9 +269,8 @@ Comparing the performance results between the "No Service Worker" case and the "
 
 And if you look at the performance results for visitors who already had the content partial in their cache, you can see the responses are near instant for the majority of users!
 
-{% Callout 'info' %}
-**Note:** if you're not familiar with how service worker thread startup time can affect performance, watch my talk on [Building Faster, More Resilient Apps with Service Worker](https://youtu.be/25aCD5XL1Jk) from Chrome Dev Summit in 2018
-{% endCallout %}
+> [!NOTE]
+> If you're not familiar with how service worker thread startup time can affect performance, watch my talk on [Building Faster, More Resilient Apps with Service Worker](https://youtu.be/25aCD5XL1Jk) from Chrome Dev Summit in 2018
 
 ## Key takeaways
 

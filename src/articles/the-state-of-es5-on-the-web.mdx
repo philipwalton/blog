@@ -1,3 +1,12 @@
+---
+title: 'The State of ES5 on the Web'
+date: 2024-09-08T15:18:32.000Z
+excerpt: 'Should web developers and JavaScript library authors still transpile their code to ES5? This post looks at what the data suggests based on what popular libraries, tools, and websites are doing'
+image: 'src/images/poster/state-of-es5-poster.png'
+---
+
+import Img from '../../components/Img.astro';
+
 In 2017, I [wrote an article](/articles/deploying-es2015-code-in-production-today/) showing web developers how they could deploy ES6+ code (a.k.a. ES2015) to production, without needing to transpile it to ES5. This technique was liberating for website developers who wanted the freedom to write modern code without having to worry about transpiler or polyfill bloat.
 
 Unfortunately, while many website developers were able to use this technique, most JavaScript library _authors_ could not.
@@ -121,7 +130,7 @@ That said, Babel is still the most popular tool to transpile JavaScript, and as 
 
 In addition to looking at the popular build tools, I also looked at some of the [most popular libraries in use today](https://2023.stateofjs.com/en-US/other-tools/#libraries) (again based on the [State of JS survey](https://2023.stateofjs.com/), in rough popularity order):
 
-To test each of these libraries, I created a bundle entry point that only imported that specific library, using one of the code examples from the library's documentation. I then bundled the code using both Rollup and Webpack to test the output and see if it included any ES6+ syntax (specifically, any ES6+ syntax that [isn't supported in IE 11](https://caniuse.com/?search=es6#:~:text=Notable%20partial%20support%20in%20IE11%20includes%20(at%20least%20some)%20support%20for%20const%2C%20let%2C%20block%2Dlevel%20function%20declaration%2C%20typed%20arrays%2C%20Map%2C%20Set%20and%20WeakMap.)).
+To test each of these libraries, I created a bundle entry point that only imported that specific library, using one of the code examples from the library's documentation. I then bundled the code using both Rollup and Webpack to test the output and see if it included any ES6+ syntax (specifically, any ES6+ syntax that [isn't supported in IE 11](<https://caniuse.com/?search=es6#:~:text=Notable%20partial%20support%20in%20IE11%20includes%20(at%20least%20some)%20support%20for%20const%2C%20let%2C%20block%2Dlevel%20function%20declaration%2C%20typed%20arrays%2C%20Map%2C%20Set%20and%20WeakMap.>)).
 
 Here's what I found:
 
@@ -215,9 +224,8 @@ This creates a problem for any website that wants to support ES5 and is using Ba
 
 So this raises the question, is this _actually_ causing a problem for real websites, or are most of them properly configuring their tools? The next section looks at data from [HTTP Archive](https://httparchive.org/) to answer that question.
 
-{% Callout 'info' %}
-**Note:** some of the libraries in the table above publish both ES5 and ES6+ versions, typically with the ES5 version set on the `package.main` field, and the ES6+ version set on either the `package.module` or `package.exports` fields. In these cases I only looked at whatever version of the script was getting pulled in by the bundler when using the default configuration (since that's what most people use) and bundlers today default to using `package.module` or `package.exports` over `package.main` (see: [[1]](https://webpack.js.org/guides/package-exports/), [[2]](https://www.npmjs.com/package/@rollup/plugin-node-resolve), [[3]](https://esbuild.github.io/api/#conditions)).
-{% endCallout %}
+> [!NOTE]
+> Some of the libraries in the table above publish both ES5 and ES6+ versions, typically with the ES5 version set on the `package.main` field, and the ES6+ version set on either the `package.module` or `package.exports` fields. In these cases I only looked at whatever version of the script was getting pulled in by the bundler when using the default configuration (since that's what most people use) and bundlers today default to using `package.module` or `package.exports` over `package.main` (see: [[1]](https://webpack.js.org/guides/package-exports/), [[2]](https://www.npmjs.com/package/@rollup/plugin-node-resolve), [[3]](https://esbuild.github.io/api/#conditions)).
 
 ### ES5 usage in the wild
 
@@ -241,7 +249,7 @@ Here's what I found ([full results](https://docs.google.com/spreadsheets/d/1WAJE
 
 This last finding kinda blew my mind.
 
-To reiterate what I said earlier—because it warrants repeating—if a browser does not support ES6+ syntax (such as IE 11), then it will error when trying to load a script file that contains ES6+ syntax. And if the browser *does* support ES6+ syntax, then it doesn't need any of that ES5 helper code or any of the legacy polyfills. There is absolutely no reason to include both.
+To reiterate what I said earlier—because it warrants repeating—if a browser does not support ES6+ syntax (such as IE 11), then it will error when trying to load a script file that contains ES6+ syntax. And if the browser _does_ support ES6+ syntax, then it doesn't need any of that ES5 helper code or any of the legacy polyfills. There is absolutely no reason to include both.
 
 To double check that the results of this query were accurate, I manually tested 20 random sites on the list and confirmed that they do in fact include both the ES5 helper code as well as ES6+ syntax in some of the same script bundles. I also manually visited those sites in IE 11 and confirmed that those script bundles do indeed fail to load.
 
@@ -268,7 +276,7 @@ Given the data presented in this article, <mark>it definitely does not make sens
 
 Practically speaking, library authors have no information about the browser support needs of the websites importing them, so it doesn't make sense for them to be making that decision for all consumers of their library. At the same time, library authors shouldn't assume that all consumers of their library will be able to run it through a sophisticated build process, so it's important that their published code uses fully standard JavaScript and works in the current set of widely used browsers.
 
-So what targets should library authors choose? In my opinion the best solution for library authors is to use [Baseline](https://web-platform-dx.github.io/web-features/)—specifically to only include [Baseline Widely Available](https://web-platform-dx.github.io/web-features/#:~:text=Widely%20available%3A%20The%20feature%20is%20well%20established%20and%20works%20across%20many%20devices%20and%20browser%20versions.%20It%E2%80%99s%20been%20available%20across%20browsers%20for%20at%20least%202%C2%BD%20years%20(30%20months).%20Indicated%20with%20a%20green%20icon.) features in any published code.
+So what targets should library authors choose? In my opinion the best solution for library authors is to use [Baseline](https://web-platform-dx.github.io/web-features/)—specifically to only include [Baseline Widely Available](<https://web-platform-dx.github.io/web-features/#:~:text=Widely%20available%3A%20The%20feature%20is%20well%20established%20and%20works%20across%20many%20devices%20and%20browser%20versions.%20It%E2%80%99s%20been%20available%20across%20browsers%20for%20at%20least%202%C2%BD%20years%20(30%20months).%20Indicated%20with%20a%20green%20icon.>) features in any published code.
 
 If you're not familiar with Baseline, it's an effort by the [WebDX Community Group](https://www.w3.org/community/webdx/) within the W3C to help developers easily identify features that are stable and well supported by all major browsers and browser rendering engines across desktop and mobile. A feature is considered _Baseline Widely Available_ if it has been available in stable versions of all four major browsers for at least 30 months.
 
@@ -288,9 +296,8 @@ targets: [
 ]
 ```
 
-{% Callout 'info' %}
-**Note:** this Browserslist query is the closest you can get to targeting _Baseline Widely Available_ currently, but it's not 100% accurate because in some cases it should include the browser version released immediately prior to the 2.5 years ago date. There is an open [feature request](https://github.com/browserslist/browserslist/issues/771) to add official Baseline support to Browserslist, which would solve this issue and simplify the above query to just "baseline widely available".
-{% endCallout %}
+> [!NOTE]
+> This Browserslist query is the closest you can get to targeting _Baseline Widely Available_ currently, but it's not 100% accurate because in some cases it should include the browser version released immediately prior to the 2.5 years ago date. There is an open [feature request](https://github.com/browserslist/browserslist/issues/771) to add official Baseline support to Browserslist, which would solve this issue and simplify the above query to just "baseline widely available".
 
 If a site needs to support more browsers than those covered by _Baseline Widely Available_, that's 100% fine. That site can always configure their build system to further transpile any libraries they're importing. The point is this is a decision best made by the website developers, not the library author.
 

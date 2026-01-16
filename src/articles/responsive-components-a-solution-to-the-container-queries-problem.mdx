@@ -1,3 +1,13 @@
+---
+title: 'Responsive Components: a Solution to the Container Queries Problem'
+date: 2018-02-27T08:12:12.000Z
+translations:
+  'русский': 'http://css-live.ru/javascript/otzyvchivye-komponenty-reshenie-problemy-vyrazhenij-ot-kontejnera.html'
+  'Português': 'http://desenvolvimentoparaweb.com/css/responsive-components-container-queries/'
+---
+
+import Img from '../../components/Img.astro';
+
 Container queries is a [proposal](https://wicg.github.io/container-queries) that would allow web developers to style DOM elements based on the size of a containing element rather than the size of the browser viewport.
 
 If you're a web developer, you've probably heard about container queries before. For about as long as we've had responsive web design, we've had developers asking for them (initially [element queries](https://ianstormtaylor.com/media-queries-are-a-hack/), then [changing to container queries](https://alistapart.com/article/container-queries-once-more-unto-the-breach)). In fact, container queries may well be the [most requested](https://adactio.com/journal/12585) CSS feature ever that we still don't have in browsers.
@@ -157,9 +167,8 @@ if ('ResizeObserver' in self) {
 }
 ```
 
-{% Callout 'info' %}
-**Note:** this example uses ES5 syntax because (as I explain later) I recommend inlining this code directly in your HTML rather than including it in an external JavaScript file. Older syntax is used for wider browser support.
-{% endCallout %}
+> [!NOTE]
+> This example uses ES5 syntax because (as I explain later) I recommend inlining this code directly in your HTML rather than including it in an external JavaScript file. Older syntax is used for wider browser support.
 
 This code creates a single `ResizeObserver` instance with a callback function. It then queries the DOM for elements with the `data-observe-resizes` attribute and starts observing them. The callback function, which is invoked initially upon observation and then again after any change, checks the size of each element and adds (or removes) the corresponding breakpoint classes.
 
@@ -224,9 +233,8 @@ class ResponsiveContainer extends HTMLElement {
 self.customElements.define('responsive-container', ResponsiveContainer);
 ```
 
-{% Callout 'info' %}
-**Note:** while it may be tempting to create a new ResizeObserver for every container element, it's actually much better to create a single ResizeObserver that observes many elements. To learn more, see <a href="https://groups.google.com/a/chromium.org/d/msg/blink-dev/z6ienONUb5A/F5-VcUZtBAAJ">Aleks Totic's findings on ResizeObserver performance</a> in the <a href="https://groups.google.com/a/chromium.org/forum/#!forum/blink-dev">blink-dev</a> mailing list.
-{% endCallout %}
+> [!NOTE]
+> While it may be tempting to create a new ResizeObserver for every container element, it's actually much better to create a single ResizeObserver that observes many elements. To learn more, see <a href="https://groups.google.com/a/chromium.org/d/msg/blink-dev/z6ienONUb5A/F5-VcUZtBAAJ">Aleks Totic's findings on ResizeObserver performance</a> in the <a href="https://groups.google.com/a/chromium.org/forum/#!forum/blink-dev">blink-dev</a> mailing list.
 
 ### Nested components
 
@@ -260,9 +268,8 @@ Note that when using my recommended strategy for additive matching, you can stil
 
 At the end of the day, you can pick whichever convention makes the most sense for you and works best for your situation.
 
-{% Callout 'info' %}
-**Note:** the `:matches()` selector isn't well supported in current browsers. However, you can use tools like [postcss-selector-matches](https://www.npmjs.com/package/postcss-selector-matches) to transpile `:matches()` into something the works cross-browser.
-{% endCallout %}
+> [!NOTE]
+> The `:matches()` selector isn't well supported in current browsers. However, you can use tools like [postcss-selector-matches](https://www.npmjs.com/package/postcss-selector-matches) to transpile `:matches()` into something the works cross-browser.
 
 ### Height-based breakpoints
 

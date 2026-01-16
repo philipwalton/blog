@@ -1,10 +1,19 @@
+---
+title: 'Deploying ES2015+ Code in Production Today'
+date: 2017-09-13T19:23:12.000Z
+translations:
+  '中文': 'https://jdc.jd.com/archives/4911'
+---
+
+import Img from '../../components/Img.astro';
+
 Most web developers I talk to these days love writing JavaScript with all the newest language features&mdash;async/await, classes, arrow functions, etc. However, despite the fact that all modern browsers can run ES2015+ code and natively support the features I just mentioned, most developers still transpile their code to ES5 and bundle it with polyfills to accommodate the small percentage of users still on older browsers.
 
 This kinda sucks. In an ideal world, we wouldn't be shipping unnecessary code.
 
-With new JavaScript and DOM APIs, we can [conditionally load polyfills](https://philipwalton.com/articles/loading-polyfills-only-when-needed/) because we can feature detect their support at runtime. But with new JavaScript *syntax*, this is a lot trickier since any unknown syntax will cause a parse error, and then none of the code will run.
+With new JavaScript and DOM APIs, we can [conditionally load polyfills](https://philipwalton.com/articles/loading-polyfills-only-when-needed/) because we can feature detect their support at runtime. But with new JavaScript _syntax_, this is a lot trickier since any unknown syntax will cause a parse error, and then none of the code will run.
 
-While we don't currently have a good solution for feature-detecting new syntax, we *do* have a way to feature-detect basic ES2015 syntax support today.
+While we don't currently have a good solution for feature-detecting new syntax, we _do_ have a way to feature-detect basic ES2015 syntax support today.
 
 The solution is `<script type="module">`.
 
@@ -12,11 +21,10 @@ Most developers think of `<script type="module">` as way to load ES modules (and
 
 To put that another way, every browser that supports `<script type="module">` also supports most of the ES2015+ features you know and love. For example:
 
-
-* Every browser that supports `<script type="module">` also supports **async/await**
-* Every browser that supports `<script type="module">` also supports **Classes**.
-* Every browser that supports `<script type="module">` also supports **arrow functions**.
-* Every browser that supports `<script type="module">` also supports **fetch**, and **Promises**, and **Map**, and **Set**, and much more!
+- Every browser that supports `<script type="module">` also supports **async/await**
+- Every browser that supports `<script type="module">` also supports **Classes**.
+- Every browser that supports `<script type="module">` also supports **arrow functions**.
+- Every browser that supports `<script type="module">` also supports **fetch**, and **Promises**, and **Map**, and **Set**, and much more!
 
 The only thing left to do is provide a fallback for browsers that don't support `<script type="module">`. Luckily, if you're currently generating an ES5 version of your code, you've already done that work. All you need now is to generate an ES2015+ version!
 
@@ -106,11 +114,10 @@ module.exports = {
 
 When run, these two configs will output two, production-ready JavaScript files:
 
-* `main.mjs` (the syntax will be ES2015+)
-* `main.es5.js` (the syntax will be ES5)
+- `main.mjs` (the syntax will be ES2015+)
+- `main.es5.js` (the syntax will be ES5)
 
 The next step is to update your HTML to conditionally load the ES2015+ bundle in browsers that support modules. You can do this with a combination of `<script type="module">` and `<script nomodule>`:
-
 
 ```html
 <!-- Browsers with ES module support load this file. -->
@@ -123,13 +130,12 @@ The next step is to update your HTML to conditionally load the ES2015+ bundle in
 
 <a id="mjs-warnings"></a>
 
-{% Callout 'info' %}
-**Note:** I've updated the examples in this article to use the `.mjs` file extension for any file I load as a module. Since [this practice](https://developers.google.com/web/fundamentals/primers/modules#mjs) is relatively new, I'd be remiss if I didn't point out a few gotcha you might encounter when using it:
-
-* Your web server needs to be configured to serve `.mjs` files with the `Content-Type` header `text/javascript`. If your browser is failing to load your `.mjs` files, that may be why.
-* If you're using Webpack and [babel-loader](https://github.com/babel/babel-loader) to bundle your JavaScript, you've likely copy/pasted [some configuration code](https://github.com/babel/babel-loader/blob/8f240b498bb24ef89f7b306f5ac806e84b813b0d/README.md#usage) that only transpiles `.js` files. Changing the regular expression in your config from `/\.js$/` to `/\.m?js$/` should fix your issue.
-* Older webpack versions [don't create a sourcemap](https://github.com/webpack/webpack/issues/7927) for `.mjs` files, but [since webpack 4.19.1](https://github.com/webpack/webpack/releases/tag/v4.19.1) this has been fixed.
-{% endCallout %}
+> [!NOTE]
+> I've updated the examples in this article to use the `.mjs` file extension for any file I load as a module. Since [this practice](https://developers.google.com/web/fundamentals/primers/modules#mjs) is relatively new, I'd be remiss if I didn't point out a few gotcha you might encounter when using it:
+>
+> - Your web server needs to be configured to serve `.mjs` files with the `Content-Type` header `text/javascript`. If your browser is failing to load your `.mjs` files, that may be why.
+> - If you're using Webpack and [babel-loader](https://github.com/babel/babel-loader) to bundle your JavaScript, you've likely copy/pasted [some configuration code](https://github.com/babel/babel-loader/blob/8f240b498bb24ef89f7b306f5ac806e84b813b0d/README.md#usage) that only transpiles `.js` files. Changing the regular expression in your config from `/\.js$/` to `/\.m?js$/` should fix your issue.
+> - Older webpack versions [don't create a sourcemap](https://github.com/webpack/webpack/issues/7927) for `.mjs` files, but [since webpack 4.19.1](https://github.com/webpack/webpack/releases/tag/v4.19.1) this has been fixed.
 
 ### Important considerations
 
@@ -139,9 +145,8 @@ For the most part, this technique "just works", but there are a few details abou
 2. Modules always run code in [strict mode](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Strict_mode), so if for whatever reason any of your code needs to be run outside of strict mode, it'll have to be loaded separately.
 3. Modules treat top-level `var` and `function` declarations differently from scripts. For example, in a script `var foo = 'bar'` and `function foo() {…}` can be accessed from `window.foo`, but in a module this is not the case. Make sure you're not depending on this behavior in your code.
 
-{% Callout 'warning' %}
-**Warning!** Safari 10 doesn't support the `nomodule` attribute, but you can solve this by [inlining a JavaScript snippet](https://gist.github.com/samthor/64b114e4a4f539915a95b91ffd340acc) in your HTML prior to using any `<script nomodule>` tags. *(Note: this has been fixed in Safari 11).*
-{% endCallout %}
+> [!WARNING]
+> Safari 10 doesn't support the `nomodule` attribute, but you can solve this by [inlining a JavaScript snippet](https://gist.github.com/samthor/64b114e4a4f539915a95b91ffd340acc) in your HTML prior to using any `<script nomodule>` tags. _(Note: this has been fixed in Safari 11)._
 
 ## A working example
 
@@ -149,9 +154,9 @@ I created [webpack-esnext-boilerplate](https://github.com/philipwalton/webpack-e
 
 With this boilerplate I intentionally included several advanced webpack features because I wanted to show that this technique is production-ready and works in real-world scenarios. These include well-known bundling best-practices like:
 
-* [Code splitting](https://webpack.js.org/guides/code-splitting/)
-* [Dynamic imports](https://webpack.js.org/guides/code-splitting/#dynamic-imports) (loading additional code conditionally at runtime)
-* [Asset fingerprinting](https://webpack.js.org/guides/caching/) (for effective long-term caching)
+- [Code splitting](https://webpack.js.org/guides/code-splitting/)
+- [Dynamic imports](https://webpack.js.org/guides/code-splitting/#dynamic-imports) (loading additional code conditionally at runtime)
+- [Asset fingerprinting](https://webpack.js.org/guides/caching/) (for effective long-term caching)
 
 And since I would never recommend something I wouldn't use myself, I've updated this blog to use the technique as well. You can check out the [source code](https://github.com/philipwalton/blog) if you'd like to see more.
 
@@ -163,19 +168,19 @@ In my opinion, definitely! The savings can be substantial. For example, here's a
 
 <table>
   <tr>
-   <th>Version</th>
-   <th>Size (minified)</th>
-   <th><strong>Size (minified + gzipped)</strong></th>
+    <th>Version</th>
+    <th>Size (minified)</th>
+    <th><strong>Size (minified + gzipped)</strong></th>
   </tr>
   <tr>
-   <td>ES2015+ (main.mjs)</td>
-   <td>80K</td>
-   <td><strong>21K</strong></td>
+    <td>ES2015+ (main.mjs)</td>
+    <td>80K</td>
+    <td><strong>21K</strong></td>
   </tr>
   <tr>
-   <td>ES5 (main.es5.js)</td>
-   <td>175K</td>
-   <td><strong>43K</strong></td>
+    <td>ES5 (main.es5.js)</td>
+    <td>175K</td>
+    <td><strong>43K</strong></td>
   </tr>
 </table>
 
@@ -185,19 +190,19 @@ Larger files take longer to download, but they also take longer to parse and eva
 
 <table>
   <tr>
-   <th>Version</th>
-   <th>Parse/eval time (individual runs)</th>
-   <th><strong>Parse/eval time (avg)</strong></th>
+    <th>Version</th>
+    <th>Parse/eval time (individual runs)</th>
+    <th><strong>Parse/eval time (avg)</strong></th>
   </tr>
   <tr>
-   <td>ES2015+ (main.mjs)</td>
-   <td>184ms, 164ms, 166ms</td>
-   <td><strong>172ms</strong></td>
+    <td>ES2015+ (main.mjs)</td>
+    <td>184ms, 164ms, 166ms</td>
+    <td><strong>172ms</strong></td>
   </tr>
   <tr>
-   <td>ES5 (main.es5.js)</td>
-   <td>389ms, 351ms, 360ms</td>
-   <td><strong>367ms</strong></td>
+    <td>ES5 (main.es5.js)</td>
+    <td>389ms, 351ms, 360ms</td>
+    <td><strong>367ms</strong></td>
   </tr>
 </table>
 
@@ -211,15 +216,14 @@ The reality is transpiling and including polyfills is quickly becoming the new n
 
 <a id="double-download-issue"></a>
 
-{% Callout 'info' %}
-**Note:** a few developers have commented that, when using this technique, [some desktop browsers will download both the module and `nomodule` versions of the script](https://github.com/philipwalton/webpack-esnext-boilerplate/issues/1#issuecomment-445280691). As a result they prefer not to use it until browsers fix these bugs.
-
-I strongly disagree with this. Here's why:
-
-The [cost of shipping lots of unneeded JavaScript to low-end mobile browsers](https://v8.dev/blog/cost-of-javascript-2019) can be significant! We (on the Chrome team) have seen numerous occurrences of polyfill bloat adding **seconds** to the total startup time of websites on low-end mobile devices. On the other hand, a user on desktop IE or Edge having to download something twice is likely to have **zero effect** on startup time since the incorrectly downloaded bundle isn't executed and is only downloaded optimistically and off the main thread (by the preload scanner).
-
-In addition to performance cost, there's also a literal monetary cost. Most users affected by the double-download bug are on WiFi with an unlimited data plan. Downloading an extra file doesn't cost them anything&mdash;this is often not the case for mobile web users.
-{% endCallout %}
+> [!NOTE]
+> A few developers have commented that, when using this technique, [some desktop browsers will download both the module and `nomodule` versions of the script](https://github.com/philipwalton/webpack-esnext-boilerplate/issues/1#issuecomment-445280691). As a result they prefer not to use it until browsers fix these bugs.
+>
+> I strongly disagree with this. Here's why:
+>
+> The [cost of shipping lots of unneeded JavaScript to low-end mobile browsers](https://v8.dev/blog/cost-of-javascript-2019) can be significant! We (on the Chrome team) have seen numerous occurrences of polyfill bloat adding **seconds** to the total startup time of websites on low-end mobile devices. On the other hand, a user on desktop IE or Edge having to download something twice is likely to have **zero effect** on startup time since the incorrectly downloaded bundle isn't executed and is only downloaded optimistically and off the main thread (by the preload scanner).
+>
+> In addition to performance cost, there's also a literal monetary cost. Most users affected by the double-download bug are on WiFi with an unlimited data plan. Downloading an extra file doesn't cost them anything&mdash;this is often not the case for mobile web users.
 
 ## It's time we start publishing our modules as ES2015
 
@@ -254,7 +258,7 @@ By publishing ES2015, we give developers a choice, and that ultimately benefits 
 
 ## Conclusion
 
-While `<script type="module">` was intended to be a mechanism for loading ES modules (and their dependencies) in the browser, it doesn't have to be used *just* for that purpose.
+While `<script type="module">` was intended to be a mechanism for loading ES modules (and their dependencies) in the browser, it doesn't have to be used _just_ for that purpose.
 
 `<script type="module">` will happily load a single JavaScript file, and this gives developers a much-needed means for conditionally loading modern features in browsers that can support it.
 
@@ -262,9 +266,8 @@ This, along with the `nomodule` attribute, gives us a way to use ES2015+ code in
 
 Writing ES2015 code is a win for developers, and deploying ES2015 code is a win for users.
 
-
 ### Further reading
 
-* [ES6 Modules in Chrome M61+](https://medium.com/dev-channel/es6-modules-in-chrome-canary-m60-ba588dfb8ab7)
-* [ECMAScript modules in browsers](https://jakearchibald.com/2017/es-modules-in-browsers/)
-* [ES6 Modules in Depth](https://ponyfoo.com/articles/es6-modules-in-depth)
+- [ES6 Modules in Chrome M61+](https://medium.com/dev-channel/es6-modules-in-chrome-canary-m60-ba588dfb8ab7)
+- [ECMAScript modules in browsers](https://jakearchibald.com/2017/es-modules-in-browsers/)
+- [ES6 Modules in Depth](https://ponyfoo.com/articles/es6-modules-in-depth)

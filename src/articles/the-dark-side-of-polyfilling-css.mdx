@@ -1,3 +1,10 @@
+---
+title: 'The Dark Side of Polyfilling CSS'
+date: 2016-12-22T18:18:08.000Z
+---
+
+import Img from '../../components/Img.astro';
+
 Earlier this year I wrote an [article for Smashing Magazine](https://www.smashingmagazine.com/2016/03/houdini-maybe-the-most-exciting-development-in-css-youve-never-heard-of/) about [Houdini](https://github.com/w3c/css-houdini-drafts/wiki), and I called it the "most exciting development in CSS you've never heard of". In the article I argue that Houdini APIs will (among other things) make it possible to polyfill CSS features in a way that simply cannot be done today.
 
 While the article was generally quite well-received, I did notice the same question popping up over and over again in my inbox and on Twitter. The basic gist of the question was:
@@ -10,7 +17,7 @@ So the best way I can think of to answer this question&mdash;and explain why I'm
 
 And the best way to do that is to write a polyfill ourselves.
 
-<style>
+<style>{`
 .Media {
   display: flex;
   flex-direction: column;
@@ -44,21 +51,19 @@ And the best way to do that is to write a polyfill ourselves.
   width: 100%;
   height: 100%;
 }
-</style>
+`}</style>
 
-{% Callout %}
-
-  <div class="Media">
-    <div class="Media-subject">
-      <div class="VideoContainer">
-        <iframe class="VideoContainer-frame" width="240" height="135" src="https://www.youtube.com/embed/ZskP7cvj3WA" frameborder="0" allowfullscreen></iframe>
-      </div>
-    </div>
-    <div class="Media-body">
-      <strong>Note:</strong> this article is a written version of a talk I gave at <a href="http://www.thedotpost.com/2016/12/philip-walton-the-dark-side-of-polyfilling-css">dotCSS on December 2, 2016</a>. The article goes into quite a bit more detail, but if you'd rather watch the video (23 minutes), I've included it as well.
-    </div>
-  </div>
-{% endCallout %}
+> [!NOTE]
+> <div class="Media">
+>   <div class="Media-subject">
+>     <div class="VideoContainer">
+>       <iframe class="VideoContainer-frame" width="240" height="135" src="https://www.youtube.com/embed/ZskP7cvj3WA" frameborder="0" allowfullscreen></iframe>
+>     </div>
+>   </div>
+>   <div class="Media-body">
+>     <strong>Note:</strong> this article is a written version of a talk I gave at <a href="http://www.thedotpost.com/2016/12/philip-walton-the-dark-side-of-polyfilling-css">dotCSS on December 2, 2016</a>. The article goes into quite a bit more detail, but if you'd rather watch the video (23 minutes), I've included it as well.
+>   </div>
+> </div>
 
 ## The `random` keyword
 
@@ -79,12 +84,12 @@ As you can see, since `random` returns a unitless number, it can be used with `c
 For the rest of this post, we're going to be working with the [demo page](https://philipwalton.github.io/talks/2016-12-02/demos/1/) I used in my talk. Here's what it looks like:
 
 <figure>
-  {% Img
-    figure=false,
-    href="https://philipwalton.github.io/talks/2016-12-02/demos/1/",
-    src="random-polyfill-demo-page.png",
-    alt="Random keywork polyfill demo page"
-  %}
+  <a href="https://philipwalton.github.io/talks/2016-12-02/demos/1/">
+    <Img
+      src="random-polyfill-demo-page.png"
+      alt="Random keywork polyfill demo page"
+    />
+  </a>
   <figcaption>
     An <a href="https://philipwalton.github.io/talks/2016-12-02/demos/1/">example </a> of what a site using the <code>random</code> keyword might look like.
   </figcaption>
@@ -163,9 +168,8 @@ for (const stylesheet of document.styleSheets) {
 }
 ```
 
-{% Callout 'info' %}
-**Note:** in a real polyfill you wouldn't just do a simple find and replace for the word `random`, as it could be present in many forms outside of its keyword form (e.g. in a URL, in a custom property name, in quoted text in the `content` property, etc.). The actual code in the final demo uses a more robust replacement mechanism, but for the sake of simplicity I'm using the simple version here.
-{% endCallout %}
+> [!NOTE]
+> In a real polyfill you wouldn't just do a simple find and replace for the word `random`, as it could be present in many forms outside of its keyword form (e.g. in a URL, in a custom property name, in quoted text in the `content` property, etc.). The actual code in the final demo uses a more robust replacement mechanism, but for the sake of simplicity I'm using the simple version here.
 
 If you load [demo #2](https://philipwalton.github.io/talks/2016-12-02/demos/2/) and paste the above code into the JavaScript console and run it, it'll actually do what it's supposed to do, but you won't see any random-width progress bars when it's done.
 
@@ -523,25 +527,25 @@ No matter what you try, you'll always have to rewrite the CSS whenever a change 
 
 In order to understand why the performance of CSS polyfills is so bad, you really have to understand the browser rendering pipeline&mdash;specifically the steps in the pipeline that you as a developer have access to.
 
-{% Img
-  border=true,
-  href=false,
-  src="browser-rendering-pipeline.svg",
-  alt="JavaScript access to the browser rendering pipeline",
+<Img
+  border
+  href={false}
+  src="browser-rendering-pipeline.svg"
+  alt="JavaScript access to the browser rendering pipeline"
   figcaption="JavaScript access to the browser rendering pipeline"
-%}
+/>
 
 As you can see, the only real point of entry is the DOM, which our polyfill made use of through querying for elements matching the CSS selector as well as through updating the CSS text of the `<style>` tag.
 
 But given the current state of JavaScript access to the browser's rendering pipeline, this is the path our polyfill is forced to take.
 
-{% Img
-  border=true,
-  href=false,
-  src="browser-rendering-pipeline-polyfill.svg",
-  alt="Polyfill entry points to the browser rendering pipeline",
+<Img
+  border
+  href={false}
+  src="browser-rendering-pipeline-polyfill.svg"
+  alt="Polyfill entry points to the browser rendering pipeline"
   figcaption="Polyfill entry points to the browser rendering pipeline"
-%}
+/>
 
 As you can see, JavaScript is not able to intervene in the initial rendering pipeline after the DOM is constructed, which means any changes our polyfill makes will force the entire rendering process to start over.
 

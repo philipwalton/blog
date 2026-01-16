@@ -120,13 +120,13 @@ I should also point out that using scoped type selectors makes this problem much
 
 I said above that all CSS rules are global and every rule has the potential to conflict with every other rule on the page. This means side effects cannot be prevented by the language; however, they _can_ be prevented via a disciplined and enforceable naming convention. And that's exactly what BEM provides.
 
-- **Base rule changes:**<br>
+- **Base rule changes:**<br />
   Strict BEM conventions require the sole use of class selectors. You start with a global reset, and then you use blocks to style everything on the page. In other words, adding a class to an element is the only way to style it, which means all styling is opt-in rather than de facto. Blocks encapsulate all of their styling and rely on no external dependencies.<sup>[[3]](#footnote-3)</sup>
 
-- **Naming collisions:**<br>
+- **Naming collisions:**<br />
   In BEM, every class selector is either the block name itself or uses the block name as a prefix, and the rules for each block live in their own dedicated file. Since file systems do not allow two files to have the same name, the OS is actually helping to prevent accidental duplication. If you follow all of the BEM naming conventions, and you ensure all block code resides in its own file, you will never have naming collisions.
 
-- **Subtree matches:**<br>
+- **Subtree matches:**<br />
   The subtree matching example in the previous section used the selectors `.article .title` and `.widget .title`. Since the class name "title" was used in both cases, there's a risk of subtree matching. BEM avoids this risk by requiring that all element classes be prefixed with the block name. The BEM equivalents of these two title selectors would be `.Article-title` and `.Widget-title` (or `.article__title` and `.widget__title`, depending on your preference).<sup>[[4]](#footnote-4)</sup> Since the class names are different, their styles won't ever conflict, and thus it's impossible to have unintended subtree matches.
 
 ### Enforcing conventions

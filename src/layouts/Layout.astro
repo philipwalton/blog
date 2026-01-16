@@ -1,0 +1,77 @@
+---
+import Head from '../components/Head.astro';
+import Icons from '../components/Icons.astro';
+
+interface Props {
+  title?: string;
+  description?: string;
+  excerpt?: string;
+  path?: string;
+  type?: string;
+  image?: string;
+  private?: boolean;
+  date?: string;
+}
+
+const site = {
+  title: 'Philip Walton',
+  titleSuffix: ' — Philip Walton',
+  slug: 'philipwalton',
+  themeColor: '#ffffff',
+  backgroundColor: '#ffffff',
+  description: 'Thoughts on web development, open source, software architecture, and the future.',
+  baseUrl: 'https://philipwalton.com',
+};
+
+const props = Astro.props;
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <Head
+    title={props.title}
+    description={props.description}
+    excerpt={props.excerpt}
+    path={props.path}
+    type={props.type}
+    image={props.image}
+    private={props.private}
+    site={site}
+  />
+</head>
+
+<body>
+  <header class="Header" id="header">
+    <a class="Header-info" href="/" title="Home">
+      <h1 class="Header-title">Philip Walton</h1>
+      <div class="Header-tagline">Engineer @ Google</div>
+    </a>
+    <nav class="Header-social">
+      <a class="Header-socialLink" href="https://twitter.com/philwalton" title="Twitter" style="--fill:#5ac">
+        <svg class="Icon" viewBox="0 0 32 32">
+          <use xlink:href="#icon-twitter"></use>
+        </svg>
+      </a>
+      <a class="Header-socialLink" href="https://github.com/philipwalton" title="Github" style="--fill:#111">
+        <svg class="Icon" viewBox="0 0 32 32">
+          <use xlink:href="#icon-github"></use>
+        </svg>
+      </a>
+      <a class="Header-socialLink" href="http://feeds.feedburner.com/philipwalton" title="RSS" style="--fill:#f93">
+        <svg class="Icon" viewBox="0 0 32 32">
+          <use xlink:href="#icon-rss"></use>
+        </svg>
+      </a>
+    </nav>
+    <nav class="Header-nav">
+      <a class="Header-navLink" href="/articles/" title="Articles">Articles</a>
+      <a class="Header-navLink" href="/about/" title="About">About</a>
+    </nav>
+  </header>
+  <main id="content" class="Content">
+    <slot />
+  </main>
+  <Icons />
+</body>
+</html>

@@ -1,0 +1,56 @@
+---
+import PageLayout from '../../layouts/PageLayout.astro';
+import { getCollection } from 'astro:content';
+
+// Get all articles and sort by date (newest first)
+const articles = await getCollection('articles');
+const sortedArticles = articles.sort((a, b) =>
+  new Date(b.data.date).getTime() - new Date(a.data.date).getTime()
+);
+
+// Group articles by year
+const articlesByYear = sortedArticles.reduce((acc, article) => {
+  const year = new Date(article.data.date).getFullYear().toString();
+  if (!acc[year]) {
+    acc[year] = [];
+  }
+  acc[year].push(article);
+  return acc;
+}, {} as Record<string, typeof sortedArticles>);
+
+// Get years in descending order
+const years = Object.keys(articlesByYear).sort((a, b) => Number(b) - Number(a));
+
+function formatDate(date: Date): string {
+  return date.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
+}
+
+function formatDateISO(date: Date): string {
+  return date.toISOString();
+}
+---
+
+<PageLayout title="Articles" path="/articles/">
+  {years.map((year) => (
+    <>
+      <h3>{year}</h3>
+      <ul>
+        {articlesByYear[year].map((article) => {
+          const date = new Date(article.data.date);
+          return (
+            <li>
+              <a href={`/articles/${article.slug}/`} title={article.data.title}>
+                {article.data.title}
+              </a>
+              {' '}(<time datetime={formatDateISO(date)}>{formatDate(date)}</time>)
+            </li>
+          );
+        })}
+      </ul>
+    </>
+  ))}
+</PageLayout>

@@ -5,13 +5,16 @@
 node_modules
 
 # Package temp/cache
+.astro
 .cache
+.claude
 .husky
 .vscode
 .wrangler
 
 # Static site output
 build
+dist
 
 # Log files
 *.log

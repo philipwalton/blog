@@ -1,0 +1,36 @@
+---
+interface Props {
+  src: string;
+  alt: string;
+  border?: boolean;
+  href?: string | false;
+  figcaption?: string;
+  figure?: boolean;
+}
+
+const { src, alt, border = false, href, figcaption, figure = true } = Astro.props;
+
+// For now, use the src as-is. In a full Astro setup, this would use
+// Astro's image optimization or a custom image processing pipeline.
+const imageSrc = src.startsWith('/') ? src : `/static/${src}`;
+const linkHref = href === false ? null : (href || imageSrc);
+---
+
+{figure !== false ? (
+  <figure class:list={[{ 'noborder': !border }]}>
+    {linkHref ? (
+      <a href={linkHref}>
+        <img src={imageSrc} alt={alt} />
+      </a>
+    ) : (
+      <img src={imageSrc} alt={alt} />
+    )}
+    {figcaption && <figcaption>{figcaption}</figcaption>}
+  </figure>
+) : linkHref ? (
+  <a href={linkHref}>
+    <img src={imageSrc} alt={alt} />
+  </a>
+) : (
+  <img src={imageSrc} alt={alt} />
+)}

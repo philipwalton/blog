@@ -1,0 +1,73 @@
+---
+interface Site {
+  title: string;
+  titleSuffix: string;
+  themeColor: string;
+  description: string;
+  baseUrl: string;
+}
+
+interface Props {
+  title?: string;
+  description?: string;
+  excerpt?: string;
+  path?: string;
+  type?: string;
+  image?: string;
+  private?: boolean;
+  site: Site;
+}
+
+const { title, description, excerpt, path, type, image, private: isPrivate, site } = Astro.props;
+
+const pageTitle = title ? `${title}${site.titleSuffix}` : site.title;
+const pageDescription = excerpt || description || site.description;
+---
+
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>{pageTitle}</title>
+
+<!-- Track errors -->
+<script is:inline>
+  self.__e=function f(e){f.q=f.q||[];f.q.push(e)};
+  addEventListener('error', self.__e);
+  addEventListener('unhandledrejection', self.__e);
+</script>
+
+<!-- TODO: Add inline CSS via Astro's style system -->
+
+<!-- Generated via: realfavicongenerator.net and modified -->
+<link rel="icon" type="image/png" sizes="32x32" href="/static/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/static/favicon-16x16.png">
+<link rel="manifest" href="/site.webmanifest">
+<link rel="mask-icon" href="/static/safari-pinned-tab.svg" color="#4d4d4d">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-title" content={site.title}>
+<meta name="application-name" content={site.title}>
+<meta name="theme-color" content={site.themeColor}>
+
+<link href="https://feeds.feedburner.com/philipwalton" rel="alternate" title={site.title} type="application/atom+xml">
+<meta name="description" content={pageDescription}>
+
+{!isPrivate && path && (
+  <>
+    <link rel="canonical" href={`${site.baseUrl}${path}`}>
+    {type === 'article' && (
+      <>
+        <meta name="og:title" content={title}>
+        <meta name="og:type" content={type}>
+        <meta name="og:url" content={`${site.baseUrl}${path}`}>
+        {image && excerpt && (
+          <>
+            <meta name="og:image" content={`${site.baseUrl}${image}`}>
+            <meta name="og:description" content={excerpt}>
+            <meta name="twitter:card" content="summary_large_image">
+          </>
+        )}
+      </>
+    )}
+  </>
+)}

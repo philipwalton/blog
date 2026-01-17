@@ -4,6 +4,9 @@
 # Node stuff
 node_modules
 
+# Git worktrees
+.worktrees
+
 # Package temp/cache
 .cache
 .husky

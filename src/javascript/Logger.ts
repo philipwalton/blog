@@ -1,5 +1,4 @@
 import {getActiveBreakpoint} from './breakpoints.ts';
-import {initialSWState} from './sw-state.ts';
 import {fetchLater} from './utils/fetchLater.ts';
 import {get, set} from './utils/kv-store.ts';
 import {now, timeOrigin} from './utils/performance.ts';
@@ -74,7 +73,6 @@ export class Logger {
       contrast_preference: getContrastPreference(),
       reduce_data_preference: getReducedDataPreference(),
       reduce_motion_preference: getReducedMotionPref(),
-      service_worker_state: initialSWState,
     };
     if (self.__x) {
       userParams.experiment = self.__x;

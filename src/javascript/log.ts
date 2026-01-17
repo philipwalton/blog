@@ -1,6 +1,5 @@
 import {onCLS, onFCP, onINP, onLCP, onTTFB} from 'web-vitals/attribution';
 import {Logger} from './Logger.ts';
-import {initialSWState} from './sw-state.ts';
 import {now, timeOrigin} from './utils/performance.ts';
 import {uuid} from './utils/uuid.ts';
 
@@ -268,13 +267,6 @@ const trackTTFB = () => {
           dom_load_end: navigationEntry.domContentLoadedEventEnd,
           window_load_end: navigationEntry.loadEventEnd,
         });
-
-        if (
-          initialSWState === 'controlled' &&
-          'workerStart' in navigationEntry
-        ) {
-          params.worker_start = navigationEntry.workerStart;
-        }
 
         if ((navigationEntry.activationStart ?? 0) > 0) {
           params.activation_start = navigationEntry.activationStart;

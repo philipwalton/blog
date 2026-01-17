@@ -1,36 +1,36 @@
 import * as breakpoints from './breakpoints.ts';
 import * as contentLoader from './content-loader.ts';
 import * as linkableHeadings from './linkable-headings.ts';
-import * as sw from './sw-init.ts';
 import * as log from './log.ts';
 
-const initServiceWorker = async () => {
+/**
+ * Unregisters all service workers and deletes all caches.
+ * This is used to clean up after removing service worker support.
+ */
+const cleanupServiceWorker = async () => {
   if ('serviceWorker' in navigator) {
-    try {
-      await sw.init();
-    } catch (err) {
-      log.trackUnhandledError(err as Error);
-    }
+    const registrations = await navigator.serviceWorker.getRegistrations();
+    await Promise.all(registrations.map((r) => r.unregister()));
   }
-};
-
-const initLog = async () => {
-  log.init();
+  if ('caches' in self) {
+    const cacheNames = await caches.keys();
+    await Promise.all(cacheNames.map((name) => caches.delete(name)));
+  }
 };
 
 /**
  * The main script entry point for the site. Initializes all the sub modules
- * log tracking, and the service worker.
+ * and log tracking.
  */
 const main = async () => {
   breakpoints.init();
   contentLoader.init();
   linkableHeadings.init();
 
-  // NOTE: make sure `initServiceWorker()` finishes before running
-  // `initLog()` because it needs to add pre-send dependencies.
-  await initServiceWorker();
-  await initLog();
+  // Clean up any existing service workers and caches from previous versions.
+  await cleanupServiceWorker();
+
+  log.init();
 };
 
 main();

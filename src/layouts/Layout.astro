@@ -2,6 +2,10 @@
 import Head from '../components/Head.astro';
 import Icons from '../components/Icons.astro';
 
+// Import CSS - main.css is critical, defer.css is for non-critical styles
+import '../css/main.css';
+import '../css/defer.css';
+
 interface Props {
   title?: string;
   description?: string;
@@ -73,5 +77,6 @@ const props = Astro.props;
     <slot />
   </main>
   <Icons />
+  <script src="../javascript/main.ts"></script>
 </body>
 </html>

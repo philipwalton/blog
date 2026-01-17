@@ -6,12 +6,12 @@ import {now} from './utils/performance.ts';
 let isLoaderDisabled = false;
 
 const getContentPartialPath = (pagePath: string) => {
-  if (pagePath.endsWith(self.__PARTIAL_PATH__)) {
+  if (pagePath.endsWith(import.meta.env.PUBLIC_PARTIAL_PATH)) {
     // If the pagePath already contains the partial path, don't append it.
     // Note: this can happen when the SW notifies of a cache update.
     return pagePath;
   }
-  return pagePath + self.__PARTIAL_PATH__;
+  return pagePath + import.meta.env.PUBLIC_PARTIAL_PATH;
 };
 
 /**

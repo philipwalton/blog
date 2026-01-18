@@ -1,4 +1,6 @@
 ---
+import { Image } from 'astro:assets';
+
 interface Props {
   src: string;
   alt: string;
@@ -10,27 +12,39 @@ interface Props {
 
 const { src, alt, border = false, href, figcaption, figure = true } = Astro.props;
 
-// For now, use the src as-is. In a full Astro setup, this would use
-// Astro's image optimization or a custom image processing pipeline.
-const imageSrc = src.startsWith('/') ? src : `/static/${src}`;
-const linkHref = href === false ? null : (href || imageSrc);
+// Import all article images using import.meta.glob
+const images = import.meta.glob<{ default: ImageMetadata }>(
+  '/src/images/articles/*.{png,jpg,jpeg,gif,svg,webp}',
+  { eager: true }
+);
+
+// Look up the image by filename
+const imagePath = `/src/images/articles/${src}`;
+const imageModule = images[imagePath];
+
+if (!imageModule) {
+  throw new Error(`Image not found: ${src}. Available images: ${Object.keys(images).join(', ')}`);
+}
+
+const image = imageModule.default;
+const linkHref = href === false ? null : (href || image.src);
 ---
 
 {figure !== false ? (
   <figure class:list={[{ 'noborder': !border }]}>
     {linkHref ? (
       <a href={linkHref}>
-        <img src={imageSrc} alt={alt} />
+        <Image src={image} alt={alt} />
       </a>
     ) : (
-      <img src={imageSrc} alt={alt} />
+      <Image src={image} alt={alt} />
     )}
     {figcaption && <figcaption>{figcaption}</figcaption>}
   </figure>
 ) : linkHref ? (
   <a href={linkHref}>
-    <img src={imageSrc} alt={alt} />
+    <Image src={image} alt={alt} />
   </a>
 ) : (
-  <img src={imageSrc} alt={alt} />
+  <Image src={image} alt={alt} />
 )}

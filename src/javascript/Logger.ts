@@ -26,7 +26,8 @@ let index = 1;
  */
 export class Logger {
   private _hitFilter: HitFilter | undefined;
-  private _presendDependencies: Promise<any>[];
+  private _presendDependencies: Promise<unknown>[];
+
   private _eventQueue: Map<number, Params>;
   private _sendCount: number;
   private _lastActiveTime: number;
@@ -141,10 +142,21 @@ export class Logger {
   }
 
   /**
-   * Adds a promise to the presend dependencies.
+   * Adds a promise to the presend dependencies, with a timeout so it
+   * can't block send forever. It also includes a built-in catch handler
+   * to catch any errors with presend dependencies without blocking send.
    */
-  awaitBeforeSending(promise: Promise<void>) {
-    this._presendDependencies.push(promise);
+  awaitBeforeSending(promise: Promise<unknown>, timeout: number = 5000) {
+    this._presendDependencies.push(
+      Promise.race([
+        new Promise((r) => setTimeout(r, timeout)),
+        promise.catch((err) => {
+          // Call Promise.reject() to trigger an unhandled promise rejection,
+          // without rejecting the current promise and breaking logging.
+          Promise.reject(err);
+        }),
+      ]),
+    );
   }
 
   /**
@@ -163,18 +175,6 @@ export class Logger {
       Object.assign(params, this._hitFilter(params));
     }
 
-    if (this._presendDependencies.length) {
-      const deps = this._presendDependencies.slice();
-      this._presendDependencies = [];
-      Promise.allSettled(deps).then((results) => {
-        for (const result of results) {
-          if (result.status === 'rejected') {
-            Promise.reject(result.reason);
-          }
-        }
-      });
-    }
-
     const prefixedParams: Params = {
       en: eventName,
       ...prefixParams('e', params),
@@ -186,11 +186,15 @@ export class Logger {
       prefixedParams._et = engagedTime;
     }
 
+    // Await presend dependencies after all params are set, so that they
+    // relfect the state at the time when the event was logged.
+    await Promise.all(this._presendDependencies);
+
     this._queue(prefixedParams);
 
     // Print these to the console when developing locally.
     if (import.meta.env.DEV) {
-      console.debug('Log event:', prefixedParams);
+      console.debug('Log event:', prefixedParams, {...this._pageParams});
     }
   }
 

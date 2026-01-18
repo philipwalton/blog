@@ -61,9 +61,7 @@ const setInitialParams = () => {
     original_page_path: originalPathname,
   });
 
-  const navigationEntry = performance.getEntriesByType(
-    'navigation',
-  )[0] as PerformanceNavigationTiming;
+  const navigationEntry = performance.getEntriesByType('navigation')[0];
 
   if (navigationEntry) {
     // Use kebab case.
@@ -111,8 +109,8 @@ const trackPageviews = () => {
  */
 export const trackUnhandledError = (err: Error) => {
   log.event('unhandled_error', {
-    unhandled_error_name: err.name || '(not set)',
-    unhandled_error_message: `${err.stack || err.message || '(not set)'}`,
+    unhandled_error_name: err?.name || '(not set)',
+    unhandled_error_message: `${err?.stack || err?.message || '(not set)'}`,
   });
 };
 

@@ -1,0 +1,47 @@
+---
+/**
+ * Shared home page content - article list with excerpts.
+ * Used by both the full page and the partial.
+ */
+import {getCollection} from 'astro:content';
+
+// Get all articles and sort by date (newest first)
+const articles = await getCollection('articles');
+const sortedArticles = articles.sort(
+  (a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime()
+);
+
+function formatDate(date: Date): string {
+  return date.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
+}
+
+function formatDateISO(date: Date): string {
+  return date.toISOString();
+}
+---
+
+<ul class="ArticleList">
+  {sortedArticles.map((article) => {
+    const date = new Date(article.data.date);
+    const excerpt = article.data.excerpt || '';
+    return (
+      <li class="ArticleList-item">
+        <a href={`/articles/${article.slug}/`} class="ArticlePreview">
+          <time class="ArticlePreview-date" datetime={formatDateISO(date)}>
+            {formatDate(date)}
+          </time>
+          <h2 class="ArticlePreview-title">{article.data.title}</h2>
+          {excerpt && (
+            <p class="ArticlePreview-excerpt">
+              {excerpt.slice(0, 180).trim()}&hellip;
+            </p>
+          )}
+        </a>
+      </li>
+    );
+  })}
+</ul>

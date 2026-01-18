@@ -1,0 +1,31 @@
+---
+/**
+ * Partial layout for pages - outputs just the page content without
+ * the full HTML shell, for SPA-style navigation.
+ */
+
+interface Props {
+  title: string;
+}
+
+const { title } = Astro.props;
+
+const site = {
+  title: 'Philip Walton',
+  titleSuffix: ' — Philip Walton',
+};
+
+// Build the document title
+const documentTitle = title ? `${title}${site.titleSuffix}` : site.title;
+---
+
+<article id="post" role="article" class="hentry">
+  <header class="ContentHeader">
+    <h1 class="ContentHeader-pageTitle">{title}</h1>
+  </header>
+  <slot />
+</article>
+
+<script define:vars={{ documentTitle }}>
+  document.title = documentTitle;
+</script>

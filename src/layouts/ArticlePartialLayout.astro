@@ -1,0 +1,90 @@
+---
+/**
+ * Partial layout for articles - outputs just the article content without
+ * the full HTML shell, for SPA-style navigation.
+ */
+
+interface Props {
+  title: string;
+  date: Date;
+  path: string;
+  translations?: Record<string, string>;
+}
+
+const { title, date, path, translations } = Astro.props;
+
+const site = {
+  title: 'Philip Walton',
+  titleSuffix: ' — Philip Walton',
+  baseUrl: 'https://philipwalton.com',
+};
+
+function formatDate(date: Date): string {
+  return date.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
+}
+
+function formatDateISO(date: Date): string {
+  return date.toISOString();
+}
+
+// Build Twitter share URL
+const shareUrl = `${site.baseUrl}${path}`;
+const shareParams = new URLSearchParams({
+  text: title,
+  url: shareUrl,
+  via: 'philwalton',
+});
+const twitterShareUrl = `http://twitter.com/intent/tweet?${shareParams.toString()}`;
+
+// Build the document title
+const documentTitle = `${title}${site.titleSuffix}`;
+---
+
+<article id="post" role="article" class="hentry">
+  <header class="ContentHeader">
+    <h1 class="ContentHeader-articleTitle entry-title">{title}</h1>
+    <div class="ContentHeader-meta">
+      <time class="ContentHeader-articleDate published" datetime={formatDateISO(date)}>
+        {formatDate(date)}
+      </time>
+      {translations && Object.keys(translations).length > 0 && (
+        <span class="ContentHeader-articleTranslations">
+          (translations:
+          {Object.entries(translations).map(([lang, url], index, arr) => (
+            <>
+              <a href={url}>{lang}</a>
+              {index < arr.length - 1 && ', '}
+            </>
+          ))}
+          )
+        </span>
+      )}
+    </div>
+  </header>
+
+  <div class="entry-content">
+    <slot />
+  </div>
+
+  <footer class="entry-unrelated">
+    <div id="share" class="Share Callout">
+      <span class="Share-figure">
+        <svg class="Icon" viewBox="0 0 39 32">
+          <use xlink:href="#icon-twitter-bird"></use>
+        </svg>
+      </span>
+      <p class="Share-pitch">
+        If you liked this article and think others should read it, please
+        <a href={twitterShareUrl}>share it on Twitter</a>.
+      </p>
+    </div>
+  </footer>
+</article>
+
+<script define:vars={{ documentTitle }}>
+  document.title = documentTitle;
+</script>

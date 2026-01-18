@@ -21,7 +21,7 @@ describe('log', function () {
     await clearStorage();
   });
 
-  describe.only('experiments', () => {
+  describe('experiments', () => {
     // Unskip when running an experiment
     it('should load the proper experiment', async () => {
       await setExperimentCookie('.234');
@@ -32,12 +32,11 @@ describe('log', function () {
           'dl': new RegExp(`test_id=${testID}`),
           'en': 'page_view',
           'ep.page_path': '/',
-          'up.service_worker_state': 'supported',
           'up.experiment': 'fetch_later',
         });
       });
 
-      // Reload to ensure that the experiment works with service worker.
+      // Reload to ensure that the experiment persists across page loads.
 
       await browser.url(`/?test_id=${++testID}`);
 
@@ -47,7 +46,6 @@ describe('log', function () {
           'en': 'page_view',
           'ep.page_path': '/',
           'up.experiment': 'fetch_later',
-          'up.service_worker_state': 'controlled',
         });
       });
 
@@ -61,13 +59,12 @@ describe('log', function () {
           'dl': new RegExp(`test_id=${testID}`),
           'en': 'page_view',
           'ep.page_path': '/articles/',
-          'up.service_worker_state': 'supported',
         });
       });
       assert(beacon1 instanceof URLSearchParams);
       assert(!beacon1.has('up.experiment'));
 
-      // Reload to ensure that the experiment works with service worker.
+      // Reload to ensure that the experiment persists across page loads.
 
       await browser.url(`/articles/?test_id=${++testID}`);
 
@@ -76,7 +73,6 @@ describe('log', function () {
           'dl': new RegExp(`test_id=${testID}`),
           'en': 'page_view',
           'ep.page_path': '/articles/',
-          'up.service_worker_state': 'controlled',
         });
         return result instanceof URLSearchParams ? result : false;
       });

@@ -2,7 +2,6 @@ import chokidar from 'chokidar';
 import fs from 'fs-extra';
 import {cssCache, jsCache} from './lib/cache.ts';
 import {buildAll} from './lib/content.ts';
-import {bundleSW} from './lib/sw.ts';
 
 const watch = (arg: string | string[]) => {
   return chokidar.watch(arg, {ignoreInitial: true});
@@ -15,7 +14,6 @@ cssWatcher.on('ready', () => {
     console.log('css', event, path);
     cssCache.invalidate();
     await buildAll();
-    await bundleSW();
   });
 });
 
@@ -26,16 +24,6 @@ jsWatcher.on('ready', () => {
     console.log('js', event, path);
     jsCache.invalidate();
     await buildAll();
-    await bundleSW();
-  });
-});
-
-const swWatcher = watch(['src/sw', 'worker']);
-
-swWatcher.on('ready', () => {
-  swWatcher.on('all', async (event, path) => {
-    console.log('sw', event, path);
-    await bundleSW();
   });
 });
 
@@ -59,6 +47,5 @@ contentWatcher.on('ready', () => {
   contentWatcher.on('all', async (event, path) => {
     console.log('content', event, path);
     await buildAll();
-    await bundleSW();
   });
 });

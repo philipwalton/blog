@@ -32,14 +32,10 @@ const fetchPageContent = async (pathname: string) => {
       throw new Error(`Response: (${response.status}) ${response.statusText}`);
     }
     const responseDuration = now() - responseStartTime;
-    const cacheHit = Boolean(response.headers.get('X-Cache-Hit'));
 
     // Queue the log logic to not delay returning the response.
     queueMicrotask(() => {
-      log.set({
-        page_path: pathname,
-        content_source: cacheHit ? 'cache' : 'network',
-      });
+      log.set({page_path: pathname});
       log.event('route_transition', {value: responseDuration});
     });
 

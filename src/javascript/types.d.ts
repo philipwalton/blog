@@ -1,13 +1,5 @@
 declare global {
   interface WindowOrWorkerGlobalScope {
-    __PARTIAL_PATH__: string;
-    __ENV__: 'development' | 'production';
-
-    __PARTIAL_PATH__: string;
-    __VERSION__: string;
-    __BUILD_TIME__: number;
-    __PRECACHE_MANIFEST__: string[];
-
     // Experiment global from _log.html
     __x?: string;
 

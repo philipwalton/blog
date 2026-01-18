@@ -134,7 +134,6 @@ describe('worker', () => {
         ['up.contrast_preference', 'no-preference'],
         ['up.reduce_data_preference', 'no-preference'],
         ['up.reduce_motion_preference', 'no-preference'],
-        ['up.service_worker_state', 'controlled'],
       ]);
       const events = [
         new URLSearchParams([
@@ -215,7 +214,6 @@ describe('worker', () => {
         ['up.contrast_preference', 'no-preference'],
         ['up.reduce_data_preference', 'no-preference'],
         ['up.reduce_motion_preference', 'no-preference'],
-        ['up.service_worker_state', 'supported'],
         ['up.experiment', 'fetch_later'],
       ]);
       const events = [

@@ -6,4 +6,7 @@ export default defineConfig({
   integrations: [mdx()],
   // Output static HTML by default
   output: 'static',
+  image: {
+    layout: 'full-width',
+  },
 });

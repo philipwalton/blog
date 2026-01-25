@@ -3,8 +3,6 @@ title: 'Untangling Deeply-Nested Promise Chains'
 date: 2016-08-17T14:53:31.000Z
 ---
 
-import Img from '../../components/Img.astro';
-
 If you've been writing JavaScript for a while, you've probably heard terms like [callback hell](http://callbackhell.com/) or the [pyramid of doom](<https://en.wikipedia.org/wiki/Pyramid_of_doom_(programming)>). When [promises](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) were added to JavaScript a few years ago, I remember reading a lot of blog posts claiming that these problems would be solved; unfortunately, that was a little too optimistic. With more and more web APIs becoming promise-based, we've proven that even promises don't prevent us from writing overly-nested, hard-to-read code.
 
 The place I'm seeing this happen a lot these days is in [Service Worker](https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API) scripts that are heavily promise-based. Specifically, blog posts and tutorials that are supposed to be showing us the proper way to use Service Worker.

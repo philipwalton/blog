@@ -1,4 +1,7 @@
 ---
+import type { ImageMetadata } from 'astro';
+import { getImage } from 'astro:assets';
+
 interface Site {
   title: string;
   titleSuffix: string;
@@ -20,6 +23,22 @@ interface Props {
 
 const { title, description, excerpt, path, type, image, private: isPrivate, site } = Astro.props;
 
+// Import all poster images so they're included in the build
+const posterImages = import.meta.glob<{ default: ImageMetadata }>(
+  '/src/images/poster/*.png',
+);
+
+// Get the processed image URL if an image path is provided (convert to WebP)
+let ogImageUrl: string | undefined;
+if (image) {
+  const imageModule = posterImages[`/${image}`];
+  if (imageModule) {
+    const imageData = (await imageModule()).default;
+    const webpImage = await getImage({ src: imageData, format: 'webp' });
+    ogImageUrl = `${site.baseUrl}${webpImage.src}`;
+  }
+}
+
 const pageTitle = title ? `${title}${site.titleSuffix}` : site.title;
 const pageDescription = excerpt || description || site.description;
 ---
@@ -38,14 +57,11 @@ const pageDescription = excerpt || description || site.description;
 </script>
 
 <!-- Generated via: realfavicongenerator.net and modified -->
-<link rel="icon" type="image/png" sizes="32x32" href="/static/favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="/static/favicon-16x16.png">
-<link rel="manifest" href="/site.webmanifest">
-<link rel="mask-icon" href="/static/safari-pinned-tab.svg" color="#4d4d4d">
-<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-<meta name="apple-mobile-web-app-title" content={site.title}>
-<meta name="application-name" content={site.title}>
-<meta name="theme-color" content={site.themeColor}>
+<link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<link rel="manifest" href="/site.webmanifest" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+<meta name="apple-mobile-web-app-title" content="Philip Walton" />
 
 <link href="https://feeds.feedburner.com/philipwalton" rel="alternate" title={site.title} type="application/atom+xml">
 <meta name="description" content={pageDescription}>
@@ -58,9 +74,9 @@ const pageDescription = excerpt || description || site.description;
         <meta name="og:title" content={title}>
         <meta name="og:type" content={type}>
         <meta name="og:url" content={`${site.baseUrl}${path}`}>
-        {image && excerpt && (
+        {ogImageUrl && excerpt && (
           <>
-            <meta name="og:image" content={`${site.baseUrl}${image}`}>
+            <meta name="og:image" content={ogImageUrl}>
             <meta name="og:description" content={excerpt}>
             <meta name="twitter:card" content="summary_large_image">
           </>

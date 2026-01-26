@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" width="512" height="512"><svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" width="512" height="512"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" width="600" height="600"><svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" width="600" height="600"><svg id="a" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600">
   <defs>
     <style>
       .c {fill: #eee;}
@@ -9,6 +9,6 @@
       }
     </style>
   </defs>
-  <circle class="c" cx="256" cy="256" r="256"></circle>
-  <path class="l" d="M308.58,105h-107.1v401.17c17.57,3.81,35.8,5.84,54.52,5.84.03,0,.06,0,.08,0v-110.2h48.3c77.7,0,114.1-40.6,114.1-118.3v-58.8c0-74.2-32.9-119.7-109.9-119.7ZM364.58,287c0,46.9-19.6,65.8-60.2,65.8h-48.3v-198.1h52.5c39.9,0,56,22.4,56,67.2v65.1Z"></path>
+  <circle class="c" cx="300" cy="300" r="300"></circle>
+  <path class="l" d="M353.51,125.43h-125.51v465.85c20.58,5.07,41.98,8.03,63.98,8.61v-126.65h56.6c91.05,0,133.71-47.58,133.71-138.63v-68.91c0-86.95-38.55-140.27-128.79-140.27ZM419.13,338.71c0,54.96-22.97,77.11-70.55,77.11h-56.6v-232.15h61.52c46.76,0,65.62,26.25,65.62,78.75v76.29Z"></path>
 </svg>

@@ -83,7 +83,7 @@ With these two features it's now quite easy to configure a build that code-split
 
 Here's an example config that uses the `manualChunks` option to put each imported node module into a chunk that matches its package name (well, technically, its directory name inside `node_modules`).
 
-```js
+```js {14-15}
 export default {
   input: {
     main: 'src/main.mjs',
@@ -97,8 +97,8 @@ export default {
     if (id.includes('node_modules')) {
       // Return the directory name following the last `node_modules`.
       // Usually this is the package, but it could also be the scope.
-      **const dirs = id.split(path.sep);**
-      **return dirs[dirs.lastIndexOf('node_modules') + 1];**
+      const dirs = id.split(path.sep);
+      return dirs[dirs.lastIndexOf('node_modules') + 1];
     }
   },
 }

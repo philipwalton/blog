@@ -21,13 +21,13 @@ Luckily with the recent speed of browser development, my wish might actually be 
 
 Sass's `@extend` feature is often suggested as a solution to the OOCSS debate. With `@extend` you can define a simple selector and then within another selector declare that you're extending it. Here's an example:
 
-```scss
+```scss /@extend .button;/
 .button {
   background-color: gray;
   border: thin solid black;
 }
 .button-primary {
-  **@extend .button;**
+  @extend .button;
   background-color: blue;
 }
 ```

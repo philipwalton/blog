@@ -15,7 +15,7 @@ The problem, however, is that when functions are hidden inside a closure, it's v
 
 Here's an example:
 
-```javascript
+```js
 var myModule = (function() {
 
   function foo() {
@@ -68,7 +68,7 @@ If you're using a build system, you can do exactly that.
 
 Consider the above myModule example with the following code additions (changes highlighted):
 
-```javascript
+```js {15-17}
 var myModule = (function() {
 
   function foo() {
@@ -83,9 +83,9 @@ var myModule = (function() {
     }
   }
 
-  **/* test-code */**
-  **api._foo = foo**
-  **/* end-test-code */**
+  /* test-code */
+  api._foo = foo
+  /* end-test-code */
 
   return api
 }())
@@ -107,13 +107,13 @@ npm install grunt-strip-code --save-dev
 
 Then enable it inside your Gruntfile:
 
-```javascript
+```js
 grunt.loadNpmTasks('grunt-strip-code');
 ```
 
 Next, add your project specific data to the `initConfig` object:
 
-```javascript
+```js
 grunt.initConfig({
   strip_code: {
     options: {
@@ -130,7 +130,7 @@ grunt.initConfig({
 
 Finally, add your new task to the deploy step (making sure not to add it to the testing step):
 
-```javascript
+```js {8}
 grunt.registerTask("test", [
   "concat",
   "jshint",
@@ -138,7 +138,7 @@ grunt.registerTask("test", [
 ])
 grunt.registerTask("deploy", [
   "concat",
-  **"strip-code"**,
+  "strip-code",
   "jshint",
   "uglify"
 ])
@@ -158,9 +158,9 @@ Anytime you change your code between when it's tested and when it's deployed, yo
 
 Luckily, there are two relatively simple strategies to help prevent this. The easiest way is to assign your test only functions to an object namespace that is obviously not intended for normal use. For example:
 
-```javascript
+```js {2}
 /* test-code */
-**api.__testonly__.foo = foo**
+api.__testonly__.foo = foo
 /* end-test-code */
 ```
 
@@ -168,14 +168,14 @@ Using a namespace like `__testonly__` not only makes the intent obvious, it also
 
 Another strategy is to split your test suite into two phases. The first phase tests the private functions. The second phase strips the code and then tests the public functions. Here's an example of that:
 
-```javascript
+```js {4-5,7}
 grunt.registerTask("test", [
   "concat",
   "jshint",
-  **"jasmine:private"**,
-  **"strip-code"**,
+  "jasmine:private",
+  "strip-code",
   "jshint",
-  **"jasmine:public"**
+  "jasmine:public"
 ])
 ```
 

@@ -116,15 +116,15 @@ aside.sidebar ul a { }
 
 These selectors can be rewritten to be in ascending-specificity order _without affecting the elements they'll match_. I've highlighted the additions below:
 
-```css
+```css {5[1-11],8[1-16]}
 /* 0.2.5 */
 main.content aside.sidebar ul li a { }
 
 /* 0.3.3 */
-**:root:root** aside.sidebar ul a { }
+:root:root aside.sidebar ul a { }
 
 /* 0.4.1 */
-**:root:root:root** .sidebar a { }
+:root:root:root .sidebar a { }
 ```
 
 This works because all HTML documents have a root element (the `<html>` element), so adding the `:root` pseudo-class to the beginning of a selector won't change what elements it can match.
@@ -152,15 +152,15 @@ aside.sidebar ul a { }
 
 Will get transpiled to:
 
-```css
+```css {2[5-19],5[1-11],8[1-16]}
 /* 0.2.5 */
-main**[id="content"]** aside.sidebar ul li a { }
+main[id="content"] aside.sidebar ul li a { }
 
 /* 0.3.3 */
-**:root:root** aside.sidebar ul a { }
+:root:root aside.sidebar ul a { }
 
 /* 0.4.1 */
-**:root:root:root** .sidebar a { }
+:root:root:root .sidebar a { }
 ```
 
 ### Handling selectors that may already refer to the root element
@@ -179,14 +179,14 @@ With most selectors, it's not possible to tell by looking at them whether they m
 
 To account for the possibility that either of these selectors might intend to match the `<html>` element, you'd have to include both possibilities and rewrite them as follows:
 
-```css
-**:root**.columns,
-**:root** .columns {
+```css /:root/
+:root.columns,
+:root .columns {
   display: flex;
 }
 
-**:root**.no-flexbox .columns,
-**:root** .no-flexbox .columns {
+:root.no-flexbox .columns,
+:root .no-flexbox .columns {
   display: table;
 }
 ```

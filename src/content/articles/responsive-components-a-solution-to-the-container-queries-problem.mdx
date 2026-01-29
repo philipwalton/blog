@@ -62,8 +62,8 @@ Here's an example that defines base styles for `.MyComponent` and then override 
 
 Of course, these breakpoints use media queries, so they apply to the size of the browser viewport. What container query advocates want is the ability to do something like this (note, this is proposed syntax, not official syntax):
 
-```css
-.Container**:media(min-width: 36em)** > .MyComponent {
+```css /:media(min-width: 36em)/
+.Container:media(min-width: 36em) > .MyComponent {
   /* Overrides that only apply for medium container sizes */
 }
 ```
@@ -72,16 +72,16 @@ Unfortunately, the above syntax doesn't work in any browser today and probably w
 
 However, what _does work_ today is something like this:
 
-```css
+```css /.MD/ /.LG/
 .MyComponent {
   /* Base styles that work on any screen size */
 }
 
-**.MD** > .MyComponent {
+.MD > .MyComponent {
   /* Overrides that apply for medium container sizes */
 }
 
-**.LG** > .MyComponent {
+.LG > .MyComponent {
   /* Overrides that apply for large container sizes */
 }
 ```
@@ -180,8 +180,8 @@ In other words, this code will turn a container element that's 600 pixels wide f
 
 Into this:
 
-```html
-<div **class="SM MD"** data-observe-resizes>
+```html /class="SM MD"/
+<div class="SM MD" data-observe-resizes>
   <div class="MyComponent">...</div>
 </div>
 ```
@@ -196,9 +196,9 @@ The code in the ResizeObserver callback above defines a set of default breakpoin
 
 I recommend changing the code above to use whatever default breakpoint mappings make the most sense for your components, and then any component that needs its own set of specific breakpoints can define them inline:
 
-```html
+```html {2[6-57]}
 <div data-observe-resizes
-     **data-breakpoints='{"BP1":400,"BP2":800,"BP3":1200}'**>
+     data-breakpoints='{"BP1":400,"BP2":800,"BP3":1200}'>
   <div class="MyComponent">...</div>
 </div>
 ```

@@ -40,11 +40,11 @@ In other words, it will output ES2015+ code instead of ES5.
 
 For example, if you're using webpack and your main script entry point is `./path/to/main.mjs`, then the config for your current, ES5 version might look like this (note, I'm calling this bundle `main.es5.js` since it's ES5):
 
-```js
+```js {4,19-21}
 module.exports = {
   entry: './path/to/main.mjs',
   output: {
-    filename: **'main.es5.js'**,
+    filename: 'main.es5.js',
     path: path.resolve(__dirname, 'public'),
   },
   module: {
@@ -59,9 +59,9 @@ module.exports = {
               useBuiltIns: true,
               targets: {
                 browsers: [
-                  **'> 1%',**
-                  **'last 2 versions',**
-                  **'Firefox ESR',**
+                  '> 1%',
+                  'last 2 versions',
+                  'Firefox ESR',
                 ],
               },
             }],
@@ -75,11 +75,11 @@ module.exports = {
 
 To make a modern, ES2015+ version, all you have to do is make second config and set your target environment to only include browsers that support `<script type="module">`. It might look like this (note, here I'm using the `.mjs` extension since it's a module):
 
-```js
+```js {4,19-23}
 module.exports = {
   entry: './path/to/main.mjs',
   output: {
-    filename: **'main.mjs'**,
+    filename: 'main.mjs',
     path: path.resolve(__dirname, 'public'),
   },
   module: {
@@ -94,11 +94,11 @@ module.exports = {
               useBuiltIns: true,
               targets: {
                 browsers: [
-                  **'Chrome >= 60',**
-                  **'Safari >= 10.1',**
-                  **'iOS >= 10.3',**
-                  **'Firefox >= 54',**
-                  **'Edge >= 15',**
+                  'Chrome >= 60',
+                  'Safari >= 10.1',
+                  'iOS >= 10.3',
+                  'Firefox >= 54',
+                  'Edge >= 15',
                 ],
               },
             }],
@@ -233,11 +233,11 @@ I fully understand that this presents a lot of challenges for the immediate futu
 
 The problem is most developers that use Babel configure it to not transpile anything in `node_modules`, but if modules are published with ES2015+ source code, this is a problem. Luckily the fix is easy. You just have to remove the `node_modules` exclusion from your build config:
 
-```js
+```js {4}
 rules: [
   {
     test: /\.m?js$/,
-    **exclude: /node_modules/, // Remove this line**
+    exclude: /node_modules/, // Remove this line
     use: {
       loader: 'babel-loader',
       options: {

@@ -141,10 +141,10 @@ In the original car class example, there was a private property called `_mileage
 
 The following example shows that same class rewritten using Private Parts. Notice that the code looks almost identical, yet the privacy is now real.
 
-```javascript
+```javascript {3}
 var Car = (function() {
 
-  **var _ = PrivateParts.createKey();**
+  var _ = PrivateParts.createKey();
 
   function Car(mileage) {
     // Store the mileage property privately.

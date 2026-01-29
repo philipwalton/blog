@@ -38,11 +38,11 @@ The second option is to use the [`beacon` transport mechanism](https://developer
 
 Here's what the modified snippet looks like when using the beacon transport mechanism. Note the addition of the [`set`](https://developers.google.com/analytics/devguides/collection/analyticsjs/accessing-trackers#updating_tracker_data) command specifying `'transport', 'beacon'`, which tells the [tracker](https://developers.google.com/analytics/devguides/collection/analyticsjs/creating-trackers) to use `navigator.sendBeacon()` for all subsequent [hits](https://support.google.com/analytics/answer/6086082):
 
-```html
+```html {4}
 <script>
   window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};
   ga('create', 'UA-XXXXX-Y', 'auto');
-  **ga('set', 'transport', 'beacon');**
+  ga('set', 'transport', 'beacon');
   ga('send', 'pageview');
 </script>
 <script async src="https://www.google-analytics.com/analytics.js"></script>
@@ -56,12 +56,12 @@ I prefer to put all my analytics-related code in a separate file that I load asy
 
 If you use a build tool that supports code splitting (like [Webpack](https://webpack.js.org/)), you can lazily initialize your tracking code from your script's main entry point like this:
 
-```js
+```js {5}
 // index.js
 
 const main = () => {
   // Load custom tracking code lazily, so it's non-blocking.
-  **import('./analytics/base.js').then((analytics) => analytics.init());**
+  import('./analytics/base.js').then((analytics) => analytics.init());
 
   // Initiate all other code paths here...
 };
@@ -132,12 +132,12 @@ const dimensions = {
 
 Now, if you set this custom dimension value on the tracker, it will [send](https://developers.google.com/analytics/devguides/collection/analyticsjs/sending-hits) that value with all future hits. If this is your first tracking version, set it to `'1'`.
 
-```js
-**const TRACKING_VERSION = '1';**
+```js {1,5}
+const TRACKING_VERSION = '1';
 
 ga('create', 'UA-XXXXX-Y', 'auto');
 ga('set', 'transport', 'beacon');
-**ga('set', dimensions.TRACKING_VERSION, TRACKING_VERSION);**
+ga('set', dimensions.TRACKING_VERSION, TRACKING_VERSION);
 ga('send', 'pageview');
 ```
 
@@ -168,17 +168,17 @@ Without this _Client ID_ dimension you can only report on users in aggregate, wh
 
 To get the client ID value created by analytics.js in your tracking code, you invoke the [`get()`](https://developers.google.com/analytics/devguides/collection/analyticsjs/accessing-trackers#getting_data_stored_on_a_tracker) method to read the value stored on the tracker. Then you can invoke the [`set()`](https://developers.google.com/analytics/devguides/collection/analyticsjs/accessing-trackers#updating_tracker_data) method to assign that value to your newly created custom dimension:
 
-```js
+```js {3,10}
 const dimensions = {
   TRACKING_VERSION: 'dimension1',
-  **CLIENT_ID: 'dimension2',**
+  CLIENT_ID: 'dimension2',
 };
 
 // ...
 
 ga((tracker) => {
   var clientId = tracker.get('clientId');
-  **tracker.set(dimensions.CLIENT_ID, clientId);**
+  tracker.set(dimensions.CLIENT_ID, clientId);
 });
 ```
 
@@ -202,16 +202,16 @@ const uuid = function b(a) {
 
 Then set the _Window ID_ value on your tracker object before you send any data to Google Analytics:
 
-```js
+```js {4,9}
 const dimensions = {
   TRACKING_VERSION: 'dimension1',
   CLIENT_ID: 'dimension2',
-  **WINDOW_ID: 'dimension3',**
+  WINDOW_ID: 'dimension3',
 };
 
 export const init = () => {
   // ...
-  **ga('set', dimensions.WINDOW_ID, uuid());**
+  ga('set', dimensions.WINDOW_ID, uuid());
   // ...
 };
 ```
@@ -228,12 +228,12 @@ I mentioned previously that tracking _Client ID_ via a custom dimension is immen
 
 To track the _Hit ID_, _Hit Time_, and _Hit Type_ custom dimensions, first create them in Google Analytics and set their scope to "Hit". Then, in your tracking code, [override](https://developers.google.com/analytics/devguides/collection/analyticsjs/tasks#adding_to_a_task) the [buildHitTask](https://developers.google.com/analytics/devguides/collection/analyticsjs/tasks) and set these values on the [model](https://developers.google.com/analytics/devguides/collection/analyticsjs/model-object-reference), thus ensuring they're applied to every hit:
 
-```js
+```js {3-5,13-15}
 const dimensions = {
   // ...
-  **HIT_ID: 'dimension4',**
-  **HIT_TIME: 'dimension5',**
-  **HIT_TYPE: 'dimension6',**
+  HIT_ID: 'dimension4',
+  HIT_TIME: 'dimension5',
+  HIT_TYPE: 'dimension6',
 };
 
 export const init = () => {
@@ -241,9 +241,9 @@ export const init = () => {
   ga((tracker) => {
     const originalBuildHitTask = tracker.get('buildHitTask');
     tracker.set('buildHitTask', (model) => {
-      **model.set(dimensions.HIT_ID, uuid(), true);**
-      **model.set(dimensions.HIT_TIME, String(+new Date), true);**
-      **model.set(dimensions.HIT_TYPE, model.get('hitType'), true);**
+      model.set(dimensions.HIT_ID, uuid(), true);
+      model.set(dimensions.HIT_TIME, String(+new Date), true);
+      model.set(dimensions.HIT_TYPE, model.get('hitType'), true);
 
       originalBuildHitTask(model);
     });
@@ -268,10 +268,10 @@ I track unhandled errors by adding a global `error` event listener as the very f
 
 This code stores any unhandled errors in an array on the listener function itself. Then, once the rest of the analytics code has loaded, you can report on these errors with the following functions:
 
-```js
+```js {3}
 export const init = () => {
   // ...
-  **trackErrors();**
+  trackErrors();
   // ...
 };
 
@@ -428,12 +428,12 @@ My test tracker is used to send experimental data&mdash;implementations I'm test
 
 I've included a [multiple-trackers](https://github.com/philipwalton/analyticsjs-boilerplate/blob/master/src/analytics/multiple-trackers.js) example in analyticsjs-boilerplate, but you can get the basic gist of how it works from the code below. Essentially, you give each tracker a distinct name (and tracking ID), and then you prepend all commands with the corresponding name:
 
-```js
-ga('create', 'UA-XXXXX-Y', 'auto', **'prod'**);
-ga('create', 'UA-XXXXX-Z', 'auto', **'test'**);
+```js {1[36-42],2[36-42],4[5-9],5[5-9]}
+ga('create', 'UA-XXXXX-Y', 'auto', 'prod');
+ga('create', 'UA-XXXXX-Z', 'auto', 'test');
 
-ga('**prod**.send', 'pageview');
-ga('**test**.send', 'pageview');
+ga('prod.send', 'pageview');
+ga('test.send', 'pageview');
 ```
 
 ## Filtering out local/spam data

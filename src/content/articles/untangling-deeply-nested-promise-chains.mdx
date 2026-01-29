@@ -72,16 +72,16 @@ However, in the case of our Service Worker `fetch` example, there is a distinct 
 
 An easy way to indicate to a reader which condition they're in is to give each `Response` object a name specific to that condition:
 
-```js
+```js /networkResponse/ /cacheResponse/
 self.addEventListener('fetch', (event) => {
   event.respondWith(
     caches.open('cache:v1').then((cache) => {
-      return fetch(event.request).then((**networkResponse**) => {
-        cache.put(event.request, **networkResponse**.clone());
-        return **networkResponse**;
+      return fetch(event.request).then((networkResponse) => {
+        cache.put(event.request, networkResponse.clone());
+        return networkResponse;
       }).catch(() => {
-        return cache.match(event.request).then((**cacheResponse**) => {
-          return **cacheResponse** || Response.error();
+        return cache.match(event.request).then((cacheResponse) => {
+          return cacheResponse || Response.error();
         });
       });
     })
@@ -110,9 +110,9 @@ While I support the desire to break the code into more manageable chunks, doing 
 
 If you have an expression that's so long/complex that you feel the need to visually separate it, why not _actually_ separate it: evaluate the expression elsewhere and assign the result to a variable.
 
-```js
+```js /networkOrCacheResponse
 self.addEventListener('fetch', (event) => {
-  const **networkOrCacheResponse** = caches.open('cache:v1').then((cache) => {
+  const networkOrCacheResponse = caches.open('cache:v1').then((cache) => {
     return fetch(event.request).then((networkResponse) => {
       cache.put(event.request, networkResponse.clone());
       return networkResponse;
@@ -123,7 +123,7 @@ self.addEventListener('fetch', (event) => {
     });
   });
 
-  event.respondWith(**networkOrCacheResponse**);
+  event.respondWith(networkOrCacheResponse);
 });
 ```
 
@@ -135,8 +135,8 @@ As it stands in the above code example, the `networkOrCacheResponse` object can 
 
 To solve this problem we can write a utility function that accepts a `Request` object and returns a promise that will resolve to either the network or cache response to that request. Such a function might look like this:
 
-```js
-const **getNetworkOrCacheResponse** = (request) => {
+```js /getNetworkOrCacheResponse/
+const getNetworkOrCacheResponse = (request) => {
   return caches.open('cache:v1').then((cache) => {
     return fetch(request).then((networkResponse) => {
       cache.put(request, networkResponse.clone());
@@ -150,7 +150,7 @@ const **getNetworkOrCacheResponse** = (request) => {
 };
 
 self.addEventListener('fetch', (event) => {
-  event.respondWith(**getNetworkOrCacheResponse**(event.request));
+  event.respondWith(getNetworkOrCacheResponse(event.request));
 });
 ```
 
@@ -165,13 +165,13 @@ The `getNetworkOrCacheResponse` function contains logic that deals with two very
 
 To improve readability, we can abstract the cache-related logic into separate, self-contained functions:
 
-```js
-const **addToCache** = (request, networkResponseClone) => {
+```js /addToCache/ /getCacheResponse/
+const addToCache = (request, networkResponseClone) => {
   return caches.open('cache:v1')
     .then((cache) => cache.put(request, networkResponseClone));
 }
 
-const **getCacheResponse** = (request) => {
+const getCacheResponse = (request) => {
   return caches.open('cache:v1').then((cache) => {
     return cache.match(request);
   });
@@ -179,10 +179,10 @@ const **getCacheResponse** = (request) => {
 
 const getNetworkOrCacheResponse = (request) => {
   return fetch(request).then((networkResponse) => {
-    **addToCache**(request, networkResponse.clone());
+    addToCache(request, networkResponse.clone());
     return networkResponse;
   }).catch(() => {
-    return **getCacheResponse**(request)
+    return getCacheResponse(request)
       .then((cacheResponse) => cacheResponse || Response.error());
   });
 };

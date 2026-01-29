@@ -127,17 +127,17 @@ This means that to polyfill a CSS feature that the browser _doesn't_ understand,
 
 In other words, you have to turn this:
 
-```css
+```css /random/
 .foo {
-  width: calc(**random** * 100%);
+  width: calc(random * 100%);
 }
 ```
 
 into something like this, that's randomly generated at runtime:
 
-```css
+```css /0.35746/
 .foo {
-  width: calc(**0.35746** * 100%);
+  width: calc(0.35746 * 100%);
 }
 ```
 
@@ -147,7 +147,7 @@ So we know we have to modify the existing CSS to add new style rules that mimic 
 
 The most natural place to assume you'd be able to do that is the CSS Object Model (CSSOM) which can be accessed on `document.styleSheets`. The code might look something like this:
 
-```js
+```js {14[32-71]}
 for (const stylesheet of document.styleSheets) {
   // Flatten nested rules (@media blocks, etc.) into a single array.
   const rules = [...stylesheet.rules].reduce((prev, next) => {
@@ -161,7 +161,7 @@ for (const stylesheet of document.styleSheets) {
       const value = rule.style[property];
 
       if (value.includes('random')) {
-        rule.style[property] = **value.replace('random', Math.random());**
+        rule.style[property] = value.replace('random', Math.random());
       }
     }
   }
@@ -183,19 +183,19 @@ CSS rules can be added to a page with either `<style>` elements or `<link rel="s
 
 The following code defines a `getPageStyles` utility function that returns a promise that will resolve with the full CSS text of all page styles:
 
-```js
+```js {4[11-69],10[14-65],12[14-27]}
 const getPageStyles = () => {
   // Query the document for any element that could have styles.
   var styleElements =
-      [...**document.querySelectorAll('style, link[rel="stylesheet"]')**];
+      [...document.querySelectorAll('style, link[rel="stylesheet"]')];
 
   // Fetch all styles and ensure the results are in document order.
   // Resolve with a single string of CSS text.
   return Promise.all(styleElements.map((el) => {
     if (el.href) {
-      return **fetch(el.href).then((response) => response.text());**
+      return fetch(el.href).then((response) => response.text());
     } else {
-      return **el.innerHTML;**
+      return el.innerHTML;
     }
   })).then((stylesArray) => stylesArray.join('\n'));
 }
@@ -359,14 +359,14 @@ By far the most common option I see for how polyfill authors handle the issue of
 
 Here's how we could update our PostCSS plugin to do just that:
 
-```js
+```js {5[24-65],7[9-33]}
 // ...
 
   rule.walkDecls((decl, i) => {
     if (decl.value.includes('random')) {
-      const elements = **document.querySelectorAll(rule.selector)**;
+      const elements = document.querySelectorAll(rule.selector);
       for (const element of elements) {
-        **element.style[decl.prop]** =
+        element.style[decl.prop] =
             decl.value.replace('random', Math.random());
       }
     }
@@ -431,28 +431,8 @@ p {
 
 If we were to add a unique data attribute to each paragraph in the DOM, we could rewrite the CSS as follows to target each paragraph element with its own, individual rule:
 
-```css
+```css {4[2-16],7[2-16],10[2-16]}
 * {
-  box-sizing: border-box;
-}
-p**[data-pid='1']** {
-  opacity: 0.23421;
-}
-p**[data-pid='2']** {
-  opacity: 0.82305;
-}
-p**[data-pid='3']** {
-  opacity: 0.31178;
-}
-.foo {
-  opacity: initial;
-}
-```
-
-Of course, if you're paying attention, this still doesn't quite work because it alters the specificity of these selectors, which will likely lead to unintended side-effects. _However_, we can ensure the proper cascade order is maintained by increasing _every other selector_ on the page by the same specificity amount with some clever hackery:
-
-```css
-*​**:not(.z)** {
   box-sizing: border-box;
 }
 p[data-pid='1'] {
@@ -464,7 +444,27 @@ p[data-pid='2'] {
 p[data-pid='3'] {
   opacity: 0.31178;
 }
-.foo**:not(.z)** {
+.foo {
+  opacity: initial;
+}
+```
+
+Of course, if you're paying attention, this still doesn't quite work because it alters the specificity of these selectors, which will likely lead to unintended side-effects. _However_, we can ensure the proper cascade order is maintained by increasing _every other selector_ on the page by the same specificity amount with some clever hackery:
+
+```css {1[2-11],13[5-13]}
+*​:not(.z) {
+  box-sizing: border-box;
+}
+p[data-pid='1'] {
+  opacity: 0.23421;
+}
+p[data-pid='2'] {
+  opacity: 0.82305;
+}
+p[data-pid='3'] {
+  opacity: 0.31178;
+}
+.foo:not(.z) {
   opacity: initial;
 }
 ```

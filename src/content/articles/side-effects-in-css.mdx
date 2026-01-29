@@ -93,16 +93,16 @@ While it's true that `.title` elements not inside `.article` or `.widget` subtre
 
 Given the CSS above, the widget title in this example is going to render with an unexpected bottom border:
 
-```html
+```html /class="title"/
 <!-- The .article module -->
 <article class="article">
-  <h2 **class="title"**>Article Title</h2>
+  <h2 class="title">Article Title</h2>
   <div class="content">
     <p>…</p>
 
     <!-- The .widget module -->
     <form class="widget">
-      <h2 **class="title"**>Widget Title</h2>
+      <h2 class="title">Widget Title</h2>
       <fieldset>…</fieldset>
     </form>
 

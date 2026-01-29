@@ -123,11 +123,11 @@ Since we're using a custom dimension, the key is going to be `'dimensionN'` wher
 
 The above code now becomes (changes highlighted):
 
-```js
+```js {4}
 Object.keys(breakpoints).forEach(function(breakpoint) {
   var mql = window.matchMedia(breakpoints[breakpoint]);
   if (mql.matches) {
-    **ga('set', 'dimensionN', breakpoint);**
+    ga('set', 'dimensionN', breakpoint);
   }
 });
 ```
@@ -188,7 +188,7 @@ ga('send', 'event', 'breakpoint', 'change', 'sm');
 
 You can add this event tracking code to your existing breakpoint change listeners. Make sure you update the tracker object with the new breakpoint before you send the event, otherwise the event will be associated with the previous breakpoint.
 
-```js
+```js {13}
 Object.keys(breakpoints).forEach(function(breakpoint) {
   var mql = window.matchMedia(breakpoints[breakpoint]);
 
@@ -201,7 +201,7 @@ Object.keys(breakpoints).forEach(function(breakpoint) {
   mql.addListener(function() {
     if (mql.matches) {
       ga('set', 'dimensionN', breakpoint);
-      **ga('send', 'event', 'breakpoint', 'change', breakpoint);**
+      ga('send', 'event', 'breakpoint', 'change', breakpoint);
     }
   });
 });
@@ -214,9 +214,9 @@ If a browser window is resized from small to large (or vise versa) very quickly,
 
 This rate-limiting can be done by adding a debounce of one second to the change listener function. In plain English that means a hit will only be sent if another change isn't detected within the next second. This is implemented using a simple `setTimeout`:
 
-```js
+```js {2,15-16,19}
 // Create a timeout reference in an external scope.
-**var timeout;**
+var timeout;
 
 Object.keys(breakpoints).forEach(function(breakpoint) {
   var mql = window.matchMedia(breakpoints[breakpoint]);
@@ -229,11 +229,11 @@ Object.keys(breakpoints).forEach(function(breakpoint) {
   // Update the breakpoint as the matched media changes, and send an event.
   mql.addListener(function() {
     if (mql.matches) {
-      **clearTimeout(timeout);**
-      **timeout = setTimeout(function() {**
+      clearTimeout(timeout);
+      timeout = setTimeout(function() {
         ga('set', 'dimensionN', breakpoint);
         ga('send', 'event', 'breakpoint', 'change', breakpoint);
-      **}, 1000);**
+      }, 1000);
     }
   });
 });

@@ -146,14 +146,14 @@ To put that another way: if you ensure all your code is run in short, distinct t
 
 Given what I just said, I could refactor my `main()` function to use `setTimeout()` and `requestIdleCallback()` to break up my initialization code into separate tasks:
 
-```js
+```js /setTimeout/ /requestIdleCallback/
 const main = () => {
-  **setTimeout**(() => drawer.init(), 0);
-  **setTimeout**(() => contentLoader.init(), 0);
-  **setTimeout**(() => breakpoints.init(), 0);
-  **setTimeout**(() => alerts.init(), 0);
+  setTimeout(() => drawer.init(), 0);
+  setTimeout(() => contentLoader.init(), 0);
+  setTimeout(() => breakpoints.init(), 0);
+  setTimeout(() => alerts.init(), 0);
 
-  **requestIdleCallback**(() => analytics.init());
+  requestIdleCallback(() => analytics.init());
 };
 
 main();
@@ -179,18 +179,18 @@ I showed above that `Int.DateTimeFormat` objects can be pretty expensive to init
 
 Consider the following simplified component example that we want to refactor to use this new strategy:
 
-```js
+```js /this.formatter/ /this.formatter.format/
 class MyComponent {
   constructor() {
     addEventListener('click', () => this.handleUserClick());
 
-    **this.formatter** = new Intl.DateTimeFormat('en-US', {
+    this.formatter = new Intl.DateTimeFormat('en-US', {
       timeZone: 'America/Los_Angeles',
     });
   }
 
   handleUserClick() {
-    console.log(**this.formatter.format**(new Date()));
+    console.log(this.formatter.format(new Date()));
   }
 }
 ```
@@ -206,14 +206,14 @@ In this case it's really important that the event listeners run right away, but 
 
 So here's how we could update this code to use the _idle-until-urgent_ strategy. Note, I'm making use of an `IdleValue` helper class, which I'll explain next:
 
-```js
+```js /new IdleValue/ /.getValue()/
 import {IdleValue} from './path/to/IdleValue.mjs';
 
 class MyComponent {
   constructor() {
     addEventListener('click', () => this.handleUserClick());
 
-    this.formatter = **new IdleValue**(() => {
+    this.formatter = new IdleValue(() => {
       return new Intl.DateTimeFormat('en-US', {
         timeZone: 'America/Los_Angeles',
       });
@@ -221,7 +221,7 @@ class MyComponent {
   }
 
   handleUserClick() {
-    console.log(this.formatter**.getValue()**.format(new Date()));
+    console.log(this.formatter.getValue().format(new Date()));
   }
 }
 ```
@@ -258,7 +258,7 @@ While including the `IdleValue` class in my example above didn't require many ch
 
 If you're in a situation where you want to use the `IdleValue` class but you can't change your public API, you can use the `IdleValue` class with ES2015 getters:
 
-```js
+```js {12-14}
 class MyComponent {
   constructor() {
     addEventListener('click', () => this.handleUserClick());
@@ -270,9 +270,9 @@ class MyComponent {
     });
   }
 
-  **get formatter() {**
-  **  return this._formatter.getValue();**
-  **}**
+  get formatter() {
+    return this._formatter.getValue();
+  }
 
   // ...
 }
@@ -280,14 +280,14 @@ class MyComponent {
 
 Or, if you don't mind a little abstraction, you can use the [`defineIdleProperty()`](https://github.com/GoogleChromeLabs/idlize/blob/master/docs/defineIdleProperty.md) helper (which uses `Object.defineProperty()` under the hood):
 
-```js
+```js {7[5-23]}
 import {defineIdleProperty} from './path/to/defineIdleProperty.mjs';
 
 class MyComponent {
   constructor() {
     addEventListener('click', () => this.handleUserClick());
 
-    **defineIdleProperty**(this, 'formatter', () => {
+    defineIdleProperty(this, 'formatter', () => {
       return new Intl.DateTimeFormat('en-US', {
         timeZone: 'America/Los_Angeles',
       });
@@ -352,8 +352,8 @@ If you're familiar with the advice I give in my recent article on the [Page Life
 
 In fact, if you use the `IdleQueue` class, you can enable this ability with a simple configuration option passed to the constructor.
 
-```js
-const queue = new IdleQueue(**{ensureTasksRun: true}**);
+```js /{ensureTasksRun: true}/
+const queue = new IdleQueue({ensureTasksRun: true});
 ```
 
 For tasks like rendering, there's no need to ensure tasks run before the page unloads, but for tasks like saving user state and sending end-of-session analytics, you'll likely want to set this option to true.

@@ -98,13 +98,13 @@ A huge benefit of running your tests manually in a browser is, if one of your te
 
 It's as simple as this:
 
-```javascript
+```javascript /debugger/
 describe('SomeClass', () => {
   describe('someMethod', () => {
     it('accepts thing A and transforms it into thing B', () => {
       const sc = new SomeClass();
 
-      **debugger;**
+      debugger;
       assert.equal(sc.someMethod('A'), 'B');
     });
   });
@@ -309,9 +309,9 @@ request({
 
 The response will look something like this:
 
-```javascript
+```javascript {2}
 {
-  **"completed": false,**
+  "completed": false,
   "js tests": [
     {
       "url": "https://saucelabs.com/jobs/75ac4cadb85e415fae957f7811d778b8",

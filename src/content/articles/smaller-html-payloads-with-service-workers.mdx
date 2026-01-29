@@ -102,7 +102,7 @@ Once you've put the shell partials in the cache, the next step is to configure n
 
 A naive way to do this would be to get the text of each response and concatenate them together to form a new response:
 
-```js
+```js {11[48-67],12[23-63],13[48-65]}
 import {getCacheKeyForURL} from 'workbox-precaching';
 
 function getText(responsePromise) {
@@ -113,9 +113,9 @@ addEventListener('fetch', (event) => {
   if (event.request.mode === 'navigate') {
     event.respondWith(async function() {
       const textPartials = await Promise.all([
-        getText(caches.match(getCacheKeyForURL(**'/shell-start.html'**))),
-        getText(fetch(**event.request.url + 'index.content.html'**)),
-        getText(caches.match(getCacheKeyForURL(**'/shell-end.html'**))),
+        getText(caches.match(getCacheKeyForURL('/shell-start.html'))),
+        getText(fetch(event.request.url + 'index.content.html')),
+        getText(caches.match(getCacheKeyForURL('/shell-end.html'))),
       ]);
 
       return new Response(textPartials.join(''), {
@@ -132,7 +132,7 @@ All modern browsers and servers support sending and receiving HTML as a stream o
 
 If you've never heard of Readable Streams before, don't worry. When using Workbox (which I recommend) you don't have to deal with them directly. The [workbox-streams](https://developers.google.com/web/tools/workbox/reference-docs/latest/workbox.streams) package has a utility method for creating a streaming response by combining other [runtime caching strategies](https://developers.google.com/web/tools/workbox/modules/workbox-strategies#what_are_workbox_strategies).
 
-```js
+```js {12[44-63],15[26-61],18[44-61]}
 import {cacheNames} from 'workbox-core';
 import {getCacheKeyForURL} from 'workbox-precaching';
 import {registerRoute} from 'workbox-routing';
@@ -144,13 +144,13 @@ const contentStrategy = new StaleWhileRevalidate({cacheName: 'content'});
 
 const navigationHandler = composeStrategies([
   () => shellStrategy.handle({
-    request: new Request(getCacheKeyForURL(**'/shell-start.html'**)),
+    request: new Request(getCacheKeyForURL('/shell-start.html')),
   }),
   ({url}) => contentStrategy.handle({
-    request: new Request(**url.pathname + 'index.content.html'**),
+    request: new Request(url.pathname + 'index.content.html'),
   }),
   () => shellStrategy.handle({
-    request: new Request(getCacheKeyForURL(**'/shell-end.html'**)),
+    request: new Request(getCacheKeyForURL('/shell-end.html')),
   }),
 ]);
 

@@ -26,13 +26,13 @@
     "release:major": "npm version major -m 'Release v%s'",
     "release:minor": "npm version minor -m 'Release v%s'",
     "release:patch": "npm version patch -m 'Release v%s'",
-    "deploy": "git push --follow-tags && wrangler pages deploy",
+    "deploy": "git push --follow-tags && wrangler deploy",
     "start": "run-p build server watch",
     "watch": "node ./tasks/watch.ts",
     "ready": "wait-on http://localhost:3000 && wait-on http://localhost:3001",
     "server": "run-p server:*",
-    "server:log": "node tasks/server.ts",
-    "server:worker": "wrangler pages dev --port=3000 --show-interactive-dev-session=false",
+    "server:log": "node test/server.ts",
+    "server:worker": "wrangler dev --port=3000 --var ENVIRONMENT:dev",
     "pretest": "run-s clean build",
     "test": "run-p -r server test:suite",
     "test:suite": "run-s ready vitest wdio",
@@ -126,5 +126,9 @@
   },
   "overrides": {
     "chokidar": "$chokidar"
+  },
+  "dependencies": {
+    "@shikijs/transformers": "^3.21.0",
+    "remark-github-blockquote-alert": "^2.0.1"
   }
 }

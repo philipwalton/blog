@@ -1,5 +1,6 @@
 import {defineConfig} from 'astro/config';
 import mdx from '@astrojs/mdx';
+import remarkGfmAlerts from 'remark-github-blockquote-alert';
 import {transformerMetaWordHighlight} from '@shikijs/transformers';
 import {transformerMetaRangeHighlight} from './src/plugins/transformerMetaRangeHighlight.ts';
 
@@ -11,6 +12,7 @@ export default defineConfig({
     layout: 'full-width',
   },
   markdown: {
+    remarkPlugins: [remarkGfmAlerts],
     shikiConfig: {
       themes: {
         light: 'github-light',

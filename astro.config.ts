@@ -1,3 +1,5 @@
+import fs from 'node:fs';
+import type {Plugin} from 'vite';
 import {defineConfig} from 'astro/config';
 import mdx from '@astrojs/mdx';
 import remarkGfmAlerts from 'remark-github-blockquote-alert';
@@ -10,6 +12,7 @@ export default defineConfig({
   output: 'static',
   image: {
     layout: 'full-width',
+    breakpoints: [800, 1200, 1600],
   },
   markdown: {
     remarkPlugins: [remarkGfmAlerts],

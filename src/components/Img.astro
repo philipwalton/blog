@@ -1,5 +1,5 @@
 ---
-import { Image } from 'astro:assets';
+import { getImage } from 'astro:assets';
 
 interface Props {
   src: string;
@@ -15,7 +15,6 @@ const { src, alt, border = false, href, figcaption, figure = true } = Astro.prop
 // Import all article images using import.meta.glob
 const images = import.meta.glob<{ default: ImageMetadata }>(
   '/src/images/articles/*.{png,jpg,jpeg,gif,svg,webp}',
-  { eager: true }
 );
 
 // Look up the image by filename
@@ -26,25 +25,52 @@ if (!imageModule) {
   throw new Error(`Image not found: ${src}. Available images: ${Object.keys(images).join(', ')}`);
 }
 
-const image = imageModule.default;
-const linkHref = href === false ? null : (href || image.src);
+const image = (await imageModule()).default;
+const processed = await getImage({ src: image });
+
+// For the link, use the full-size image or explicit href
+const linkHref = href === false ? null : (href || processed.src);
 ---
 
 {figure !== false ? (
   <figure class:list={[{ 'noborder': !border }]}>
     {linkHref ? (
       <a href={linkHref}>
-        <Image src={image} alt={alt} />
+        <img
+          src={processed.src}
+          srcset={processed.srcSet.attribute}
+          alt={alt}
+          width={processed.attributes.width}
+          height={processed.attributes.height}
+        />
       </a>
     ) : (
-      <Image src={image} alt={alt} />
+      <img
+        src={processed.src}
+        srcset={processed.srcSet.attribute}
+        alt={alt}
+        width={processed.attributes.width}
+        height={processed.attributes.height}
+      />
     )}
     {figcaption && <figcaption>{figcaption}</figcaption>}
   </figure>
 ) : linkHref ? (
   <a href={linkHref}>
-    <Image src={image} alt={alt} />
+    <img
+      src={processed.src}
+      srcset={processed.srcSet.attribute}
+      alt={alt}
+      width={processed.attributes.width}
+      height={processed.attributes.height}
+    />
   </a>
 ) : (
-  <Image src={image} alt={alt} />
+  <img
+    src={processed.src}
+    srcset={processed.srcSet.attribute}
+    alt={alt}
+    width={processed.attributes.width}
+    height={processed.attributes.height}
+  />
 )}

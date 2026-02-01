@@ -1,10 +1,5 @@
 import assert from 'assert';
-import {
-  initBook,
-  type Site,
-  type Article,
-  type Page,
-} from './utils/book.ts';
+import {initBook, type Site, type Article, type Page} from './utils/book.ts';
 
 let site: Site;
 let articles: Article[];

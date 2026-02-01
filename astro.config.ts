@@ -1,6 +1,3 @@
-import { codeToHtml } from 'shiki'
-
-
 import fs from 'node:fs';
 import type {Plugin} from 'vite';
 import {defineConfig} from 'astro/config';

@@ -1,5 +1,9 @@
 import {applyExperiment, getExperiment} from './worker/experiments.js';
-import {addPriorityHints, getPriorityHintKey, storePriorityHints} from './worker/performance.js';
+import {
+  addPriorityHints,
+  getPriorityHintKey,
+  storePriorityHints,
+} from './worker/performance.js';
 import {getRedirectPath} from './worker/redirects.js';
 import {forwardLog} from './worker/log.js';
 
@@ -43,10 +47,7 @@ function addServerTimingHeaders(response: Response, startTime: number): void {
   response.headers.set('Server-Timing', `worker;dur=${Date.now() - startTime}`);
 }
 
-async function handleGetRequest(
-  request: Request,
-  env: Env,
-): Promise<Response> {
+async function handleGetRequest(request: Request, env: Env): Promise<Response> {
   const startTime = Date.now();
   const url = new URL(request.url);
 

@@ -15,7 +15,8 @@ export const GET: APIRoute = async () => {
   // Render the partial layout with the home content as slot
   const html = await container.renderToString(PagePartialLayout, {
     props: {
-      title: 'Recent Articles',
+      title: 'Home',
+      heading: 'Recent Articles',
     },
     slots: {
       default: homeHtml,

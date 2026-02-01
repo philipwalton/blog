@@ -8,7 +8,7 @@ http
   .createServer((req, res) => {
     let body = ''; // Store request body chunks
     req.on('data', (chunk) => (body += chunk));
-    req.on('end', async () => {
+    req.on('end', () => {
       const contents = [
         req.url,
         [...Object.entries(req.headers)]
@@ -16,8 +16,10 @@ http
           .join('&'),
         body,
       ].join('\n');
-      await fs.appendFileSync(LOG_FILE, contents + '\n--\n', 'utf-8');
+      fs.appendFileSync(LOG_FILE, contents + '\n--\n', 'utf-8');
 
+
+      console.log(contents);
       res.end();
     });
   })

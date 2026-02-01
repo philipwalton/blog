@@ -1,4 +1,4 @@
-import {initBook, type Site, type Article} from '../../tasks/lib/book.ts';
+import {initBook, type Site, type Article} from './utils/book.ts';
 
 let site: Site;
 let articles: Article[];
@@ -11,13 +11,13 @@ describe('Code syntax highlighting', () => {
   });
 
   beforeEach(async () => {
-    const specificityArticleSlug = 'do-we-actually-need-specificity-in-css';
+    const specificityArticleSlug = 'the-ga-setup-i-use-on-every-site-i-build';
     const specificityArticle = articles.find((article) => {
       return article.path.includes(specificityArticleSlug);
     });
 
     if (!specificityArticle) {
-      throw new Error('Specificity article not found');
+      throw new Error('Google Analytics article not found.');
     }
 
     await browser.url(specificityArticle.path);
@@ -35,12 +35,17 @@ describe('Code syntax highlighting', () => {
   });
 
   it('should be present on code blocks', async () => {
-    const code = await $('pre code.language-css');
+    const code = await $('.astro-code');
     await code.waitForExist();
   });
 
-  it('should allow for marking specific sections', async () => {
-    const mark = await $('pre code.language-css mark');
+  it('should allow for marking specific lines', async () => {
+    const mark = await $('.astro-code .line.highlighted');
+    await mark.waitForExist();
+  });
+
+  it('should allow for marking specific words/characters', async () => {
+    const mark = await $('.astro-code .highlighted-word');
     await mark.waitForExist();
   });
 });

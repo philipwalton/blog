@@ -27,7 +27,8 @@
   font-style: italic;
 }
 
-@media (--break-md) {
+/* Breakpoint: MD*/
+@media (min-width: 36em) {
   .Checklist li {
     padding-left: 3em;
   }

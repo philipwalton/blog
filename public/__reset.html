@@ -1,0 +1,22 @@
+<script>
+(async () => {
+  const regs = await navigator.serviceWorker.getRegistrations();
+  for (const reg of regs) {
+    await reg.unregister();
+  }
+
+  const cachesKeys = await caches.keys();
+  for (const cachesKey of cachesKeys) {
+    await caches.delete(cachesKey);
+  }
+
+  localStorage.clear();
+
+  await new Promise((resolve) => {
+    const req = indexedDB.deleteDatabase("kv-store");
+    req.onsuccess = resolve;
+  })
+
+  window.__ready__ = true;
+})();
+</script>

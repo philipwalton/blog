@@ -6,9 +6,10 @@
 
 interface Props {
   title: string;
+  heading?: string;
 }
 
-const { title } = Astro.props;
+const { title, heading = title } = Astro.props;
 
 const site = {
   title: 'Philip Walton',
@@ -21,7 +22,7 @@ const documentTitle = title ? `${title}${site.titleSuffix}` : site.title;
 
 <article id="post" role="article" class="hentry">
   <header class="ContentHeader">
-    <h1 class="ContentHeader-pageTitle">{title}</h1>
+    <h1 class="ContentHeader-pageTitle">{heading}</h1>
   </header>
   <slot />
 </article>

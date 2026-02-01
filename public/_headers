@@ -4,9 +4,6 @@
 /static/*
   cache-control: max-age=31536000, immutable
 
-/favicon.ico
-  cache-control: max-age=31536000, immutable
-
 /site.webmanifest
   cache-control: no-cache
 

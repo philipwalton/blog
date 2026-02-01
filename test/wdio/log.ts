@@ -2,7 +2,7 @@ import {strict as assert} from 'node:assert';
 import {beaconsContain, clearBeacons, getBeacons} from './utils/beacons.ts';
 import {clearStorage} from './utils/clearStorage.ts';
 import {setExperimentCookie} from './utils/setExperimentCookie.ts';
-import {initBook, type Article, type Page} from '../../tasks/lib/book.ts';
+import {initBook, type Article, type Page} from './utils/book.ts';
 
 let articles: Article[];
 let pages: Page[];

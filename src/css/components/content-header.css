@@ -34,13 +34,15 @@
 }
 
 
-@media (--break-lg) {
+/* Breakpoint: LG */
+@media (min-width: 48em) {
   .ContentHeader-pageTitle {
     text-align: center;
   }
 }
 
-@media (--break-xl) {
+/* Breakpoint: XL*/
+@media (min-width: 60em) {
   .ContentHeader-articleTitle {
     font-size: 2.2em;
   }

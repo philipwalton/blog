@@ -15,7 +15,8 @@
   font-size: .9em;
 }
 
-@media (--break-lg) {
+/* Breakpoint: LG */
+@media (min-width: 48em) {
   .Share {
     margin-top: calc(2 * var(--gap));
   }

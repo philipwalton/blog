@@ -71,7 +71,8 @@
   text-transform: uppercase;
 }
 
-@media (--break-lg) {
+/* Breakpoint: LG */
+@media (min-width: 48em) {
   .Header {
     --link-color: inherit;
     --link-color-active: var(--accent-color);

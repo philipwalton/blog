@@ -1,9 +1,12 @@
-import {applyExperiment, getExperiment} from './lib/experiments.js';
-import {addPriorityHints, getPriorityHintKey} from './lib/performance.js';
-import {getRedirectPath} from './lib/redirects.js';
+import {applyExperiment, getExperiment} from './worker/experiments.js';
+import {addPriorityHints, getPriorityHintKey, storePriorityHints} from './worker/performance.js';
+import {getRedirectPath} from './worker/redirects.js';
+import {forwardLog} from './worker/log.js';
 
-interface Env extends Cloudflare.Env {
+interface Env {
   ASSETS: Fetcher;
+  PRIORITY_HINTS: KVNamespace;
+  ENVIRONMENT: string;
 }
 
 function createXID(): string {
@@ -40,10 +43,10 @@ function addServerTimingHeaders(response: Response, startTime: number): void {
   response.headers.set('Server-Timing', `worker;dur=${Date.now() - startTime}`);
 }
 
-async function handleRequest({
-  request,
-  env,
-}: EventContext<Env, string, unknown>): Promise<Response> {
+async function handleGetRequest(
+  request: Request,
+  env: Env,
+): Promise<Response> {
   const startTime = Date.now();
   const url = new URL(request.url);
 
@@ -84,6 +87,11 @@ async function handleRequest({
   setXIDToCookie(xid, clone);
   addServerTimingHeaders(clone, startTime);
 
+  const contentType = clone.headers.get('content-type') || '';
+  if (!contentType.includes('text/html')) {
+    return clone;
+  }
+
   const rewriter = new HTMLRewriter();
   if (priorityHintsSelector) {
     addPriorityHints(rewriter, priorityHintsSelector);
@@ -94,8 +102,43 @@ async function handleRequest({
   return rewriter.transform(clone);
 }
 
-export async function onRequestGet(
-  context: EventContext<Env, string, unknown>,
+async function handlePostRequest(
+  request: Request,
+  env: Env,
 ): Promise<Response> {
-  return handleRequest(context);
+  const url = new URL(request.url);
+
+  // Handle /hint POST requests
+  if (url.pathname === '/hint') {
+    await storePriorityHints(request, env.PRIORITY_HINTS);
+    return new Response();
+  }
+
+  // Handle /log POST requests
+  if (url.pathname === '/log') {
+    if (url.searchParams.get('v') === '3') {
+      await forwardLog(request, env);
+    }
+    return new Response();
+  }
+
+  // For other POST requests, pass through to assets
+  return env.ASSETS.fetch(request);
 }
+
+export default {
+  async fetch(request: Request, env: Env): Promise<Response> {
+    // TODO: add an allowlist of routes so the worker logic is only
+    // run for expected URLs.
+    if (request.method === 'GET') {
+      return handleGetRequest(request, env);
+    }
+
+    if (request.method === 'POST') {
+      return handlePostRequest(request, env);
+    }
+
+    // For other methods, pass through to assets
+    return env.ASSETS.fetch(request);
+  },
+};

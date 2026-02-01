@@ -4,10 +4,10 @@
   padding: var(--gap);
 }
 
-@media (--break-lg) {
+/* Breakpoint: LG */
+@media (min-width: 48em) {
   .markdown-alert {
     border-radius: 3px;
-    margin: var(--gap) 0;
   }
 }
 

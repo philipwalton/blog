@@ -4,7 +4,7 @@ import {
   type Site,
   type Article,
   type Page,
-} from '../../tasks/lib/book.ts';
+} from './utils/book.ts';
 
 let site: Site;
 let articles: Article[];

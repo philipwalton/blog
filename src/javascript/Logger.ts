@@ -17,7 +17,7 @@ const LOG_VERSION = 3;
 
 const SESSION_TIMEOUT = 1000 * 60 * 30; // 30 minutes.
 
-const SEND_TIMEOUT = import.meta.env.PROD ? 60000 : 1000;
+const SEND_TIMEOUT = import.meta.env.MODE === 'test' ? 1000 : 60000;
 
 let index = 1;
 
@@ -191,11 +191,6 @@ export class Logger {
     await Promise.all(this._presendDependencies);
 
     this._queue(prefixedParams);
-
-    // Print these to the console when developing locally.
-    if (import.meta.env.DEV) {
-      console.debug('Log event:', prefixedParams, {...this._pageParams});
-    }
   }
 
   /**

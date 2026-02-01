@@ -1,8 +1,8 @@
-<svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" width="600" height="600"><svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" width="600" height="600"><svg id="a" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600">
   <defs>
     <style>
-      .c {fill: #eee;}
-      .l {fill: #666;}
+      .c {fill: #fff;}
+      .l {fill: #555;}
       @media (prefers-color-scheme: dark) {
         .c {fill: #bfbfbf;}
         .l { fill: #404040; }

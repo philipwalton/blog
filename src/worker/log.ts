@@ -1,7 +1,6 @@
-interface Env extends Cloudflare.Env {
-  CF_PAGES?: string;
-  ASSETS: Fetcher;
-}
+const GA4_MEASUREMENT_ID = 'G-0DN98LQF0S';
+const GA4_ENDPOINT = 'https://www.google-analytics.com/g/collect';
+const LOCAL_ENDPOINT = 'http://localhost:3001/log';
 
 function copyUserHeaders(oldHeaders: Headers): [string, string][] {
   const newHeaders: [string, string][] = [];
@@ -13,15 +12,12 @@ function copyUserHeaders(oldHeaders: Headers): [string, string][] {
   return newHeaders;
 }
 
-async function forwardRequest({
-  request,
-  env,
-}: EventContext<Env, string, unknown>): Promise<Response> {
-  // ... (keep middle same)
-  const GA4_MEASUREMENT_ID = 'G-0DN98LQF0S';
-  const LOG_ENDPOINT = env.CF_PAGES
-    ? 'https://www.google-analytics.com/g/collect'
-    : 'http://localhost:3001/log';
+export async function forwardLog(
+  request: Request,
+  env: {ENVIRONMENT: string},
+): Promise<void> {
+  const LOG_ENDPOINT =
+    env.ENVIRONMENT === 'dev' ? LOCAL_ENDPOINT : GA4_ENDPOINT;
 
   const body = await request.text();
   const [paramsLine, ...eventsLines] = body.trim().split(/\s*\n\s*/);
@@ -98,26 +94,4 @@ async function forwardRequest({
   requests.push(beacon(ga4URL, ga4Body));
 
   await Promise.all(requests);
-  return new Response();
-}
-
-export async function onRequestPost(
-  context: EventContext<Env, string, unknown>,
-): Promise<Response> {
-  const url = new URL(context.request.url);
-
-  // return processLog(url, request, env);
-  // Only process logs with the proper version specified.
-  if (url.searchParams.get('v') === '3') {
-    await forwardRequest(context);
-  }
-
-  return new Response(); // Empty 200.
-}
-
-export async function onRequestGet({
-  request,
-  env,
-}: EventContext<Env, string, unknown>): Promise<Response> {
-  return env.ASSETS.fetch(request);
 }

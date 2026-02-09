@@ -3,12 +3,23 @@
  * Shared home page content - article list with excerpts.
  * Used by both the full page and the partial.
  */
-import {getCollection} from 'astro:content';
+import {getCollection, render} from 'astro:content';
 
 // Get all articles and sort by date (newest first)
 const articles = await getCollection('articles');
 const sortedArticles = articles.sort(
   (a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime()
+);
+
+// Render articles to get excerpts from remarkPluginFrontmatter
+const articlesWithExcerpts = await Promise.all(
+  sortedArticles.map(async (article) => {
+    const {remarkPluginFrontmatter} = await render(article);
+    return {
+      ...article,
+      excerpt: (remarkPluginFrontmatter.excerpt as string) || '',
+    };
+  })
 );
 
 function formatDate(date: Date): string {
@@ -22,12 +33,20 @@ function formatDate(date: Date): string {
 function formatDateISO(date: Date): string {
   return date.toISOString();
 }
+
+function truncateAtWordBoundary(text: string, maxLength: number): string {
+  if (text.length <= maxLength) {
+    return text;
+  }
+  const truncated = text.slice(0, maxLength);
+  const lastSpace = truncated.lastIndexOf(' ');
+  return lastSpace === -1 ? truncated : truncated.slice(0, lastSpace);
+}
 ---
 
 <ul class="ArticleList">
-  {sortedArticles.map((article) => {
+  {articlesWithExcerpts.map((article) => {
     const date = new Date(article.data.date);
-    const excerpt = article.data.excerpt || '';
     return (
       <li class="ArticleList-item">
         <a href={`/articles/${article.slug}/`} class="ArticlePreview">
@@ -35,11 +54,9 @@ function formatDateISO(date: Date): string {
             {formatDate(date)}
           </time>
           <h2 class="ArticlePreview-title">{article.data.title}</h2>
-          {excerpt && (
-            <p class="ArticlePreview-excerpt">
-              {excerpt.slice(0, 180).trim()}&hellip;
-            </p>
-          )}
+          <p class="ArticlePreview-excerpt">
+            {truncateAtWordBoundary(article.excerpt, 180)}&hellip;
+          </p>
         </a>
       </li>
     );

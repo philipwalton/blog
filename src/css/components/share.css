@@ -1,8 +1,10 @@
 .Share {
-  display: flex;
+  background: var(--bg-color);
   align-items: center;
+  display: flex;
   gap: var(--gap);
-  margin-top: calc(1.5 * var(--gap));
+  margin: calc(1.5 * var(--gap)) calc(-1 * var(--gap)) var(--gap);
+  padding: var(--gap);
 }
 
 .Share-figure {
@@ -13,11 +15,13 @@
 .Share-pitch {
   color: #666;
   font-size: .9em;
+  margin: 0;
 }
 
 /* Breakpoint: LG */
 @media (min-width: 48em) {
   .Share {
-    margin-top: calc(2 * var(--gap));
+    border-radius: 3px;
+    margin: calc(2 * var(--gap)) 0 var(--gap);
   }
 }

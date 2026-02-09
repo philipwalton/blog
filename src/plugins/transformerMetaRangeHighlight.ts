@@ -16,7 +16,7 @@ function parseHighlightMeta(meta: string): HighlightRange[] {
   const match = meta.match(/\{([^}]+)\}/);
   if (!match) return ranges;
 
-  const parts = match[1].split(',');
+  const parts = match[1]!.split(',');
 
   for (const part of parts) {
     const trimmed = part.trim();
@@ -25,9 +25,9 @@ function parseHighlightMeta(meta: string): HighlightRange[] {
     const colMatch = trimmed.match(/^(\d+)\[(\d+)-(\d+)\]$/);
     if (colMatch) {
       ranges.push({
-        line: parseInt(colMatch[1], 10),
-        colStart: parseInt(colMatch[2], 10),
-        colEnd: parseInt(colMatch[3], 10),
+        line: parseInt(colMatch[1]!, 10),
+        colStart: parseInt(colMatch[2]!, 10),
+        colEnd: parseInt(colMatch[3]!, 10),
       });
       continue;
     }
@@ -35,8 +35,8 @@ function parseHighlightMeta(meta: string): HighlightRange[] {
     // Check for line range: 2-5
     const lineRangeMatch = trimmed.match(/^(\d+)-(\d+)$/);
     if (lineRangeMatch) {
-      const start = parseInt(lineRangeMatch[1], 10);
-      const end = parseInt(lineRangeMatch[2], 10);
+      const start = parseInt(lineRangeMatch[1]!, 10);
+      const end = parseInt(lineRangeMatch[2]!, 10);
       for (let i = start; i <= end; i++) {
         ranges.push({line: i});
       }
@@ -46,7 +46,7 @@ function parseHighlightMeta(meta: string): HighlightRange[] {
     // Single line: 2
     const singleLineMatch = trimmed.match(/^(\d+)$/);
     if (singleLineMatch) {
-      ranges.push({line: parseInt(singleLineMatch[1], 10)});
+      ranges.push({line: parseInt(singleLineMatch[1]!, 10)});
     }
   }
 
@@ -113,8 +113,8 @@ export function transformerMetaRangeHighlight(
         const lineIndex = range.line - 1;
         if (lineIndex < 0 || lineIndex >= lines.length) continue;
 
-        const lineStart = lineOffsets[lineIndex];
-        const lineLength = lines[lineIndex].length;
+        const lineStart = lineOffsets[lineIndex]!;
+        const lineLength = lines[lineIndex]!.length;
 
         // Convert 1-indexed columns to 0-indexed offsets
         // End is exclusive, so [1-2] highlights only column 1

@@ -2,13 +2,14 @@
   background: var(--bg-color);
   align-items: center;
   display: flex;
-  gap: var(--gap);
+  gap: 1.2em;
+  line-height: 1.4;
   margin: calc(1.5 * var(--gap)) calc(-1 * var(--gap)) var(--gap);
   padding: var(--gap);
 }
 
 .Share-figure {
-  color: #5ac;
+  color: #0f73ff;
   font-size: 1.5em;
 }
 

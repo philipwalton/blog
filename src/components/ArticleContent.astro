@@ -8,7 +8,7 @@ interface Props {
   title: string;
   date: Date;
   path: string;
-  translations?: Record<string, string>;
+  translations?: Record<string, string> | undefined;
 }
 
 const { title, date, path, translations } = Astro.props;

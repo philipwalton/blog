@@ -36,7 +36,7 @@
     "test:suite": "run-s ready vitest wdio",
     "types": "run-s types:build types:check",
     "types:build": "wrangler types",
-    "types:check": "tsc --noEmit",
+    "types:check": "astro check && tsc --noEmit",
     "version": "NODE_ENV=production run-s types build",
     "vitest": "vitest run"
   },
@@ -57,6 +57,7 @@
     "singleQuote": true
   },
   "devDependencies": {
+    "@astrojs/check": "^0.9.6",
     "@astrojs/mdx": "^4.3.13",
     "@eslint/js": "^9.39.2",
     "@shikijs/transformers": "^3.21.0",

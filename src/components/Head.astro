@@ -11,13 +11,13 @@ interface Site {
 }
 
 interface Props {
-  title?: string;
-  description?: string;
-  excerpt?: string;
-  path?: string;
-  type?: string;
-  image?: string;
-  private?: boolean;
+  title?: string | undefined;
+  description?: string | undefined;
+  excerpt?: string | undefined;
+  path?: string | undefined;
+  type?: string | undefined;
+  image?: string | undefined;
+  private?: boolean | undefined;
   site: Site;
 }
 

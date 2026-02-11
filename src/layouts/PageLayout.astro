@@ -3,8 +3,8 @@ import Layout from './Layout.astro';
 
 interface Props {
   title: string;
-  heading?: string;
-  path?: string;
+  heading?: string | undefined;
+  path?: string | undefined;
 }
 
 const { title, heading = title, path } = Astro.props;

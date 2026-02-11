@@ -6,9 +6,9 @@ interface Props {
   title: string;
   date: Date;
   path: string;
-  excerpt?: string;
-  image?: string;
-  translations?: Record<string, string>;
+  excerpt?: string | undefined;
+  image?: string | undefined;
+  translations?: Record<string, string> | undefined;
 }
 
 const { title, date, path, excerpt, image, translations } = Astro.props;

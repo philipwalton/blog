@@ -44,7 +44,7 @@ function formatDateISO(date: Date): string {
   <>
     <h3>{year}</h3>
     <ul>
-      {articlesByYear[year].map((article) => {
+      {articlesByYear[year]?.map((article) => {
         const date = new Date(article.data.date);
         return (
           <li>

@@ -33,9 +33,9 @@ ${sortedArticles
   .map(
     (article) => `  <entry>
     <title>${article.data.title}</title>
-    <link href="${site.baseUrl}/articles/${article.slug}/"/>
+    <link href="${site.baseUrl}/articles/${article.id}/"/>
     <updated>${formatDateISO(new Date(article.data.date))}</updated>
-    <id>${site.baseUrl}/articles/${article.slug}/</id>
+    <id>${site.baseUrl}/articles/${article.id}/</id>
   </entry>`,
   )
   .join('\n')}

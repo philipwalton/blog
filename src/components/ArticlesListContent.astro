@@ -48,7 +48,7 @@ function formatDateISO(date: Date): string {
         const date = new Date(article.data.date);
         return (
           <li>
-            <a href={`/articles/${article.slug}/`} title={article.data.title}>
+            <a href={`/articles/${article.id}/`} title={article.data.title}>
               {article.data.title}
             </a>
             {' '}(<time datetime={formatDateISO(date)}>{formatDate(date)}</time>)

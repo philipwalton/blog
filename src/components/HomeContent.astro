@@ -49,7 +49,7 @@ function truncateAtWordBoundary(text: string, maxLength: number): string {
     const date = new Date(article.data.date);
     return (
       <li class="ArticleList-item">
-        <a href={`/articles/${article.slug}/`} class="ArticlePreview">
+        <a href={`/articles/${article.id}/`} class="ArticlePreview">
           <time class="ArticlePreview-date" datetime={formatDateISO(date)}>
             {formatDate(date)}
           </time>

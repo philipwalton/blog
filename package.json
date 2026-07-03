@@ -18,13 +18,14 @@
   "scripts": {
     "build": "astro build",
     "deploy": "git push --follow-tags && wrangler deploy",
-    "dev": "astro dev",
+    "dev": "run-p dev:astro server:log",
+    "dev:astro": "astro dev",
     "format": "prettier \"**/*.{js,json,ts}\" --write --ignore-path .gitignore",
     "lint": "eslint \"**/*.{js,ts}\" --fix",
     "posttest": "pkill -f 'npm run server'",
     "postversion": "npm run deploy",
     "prepare": "husky",
-    "pretest": "npm run build",
+    "pretest": "astro build --mode test",
     "ready": "wait-on http://localhost:3000 && wait-on http://localhost:3001",
     "release:major": "npm version major -m 'Release v%s'",
     "release:minor": "npm version minor -m 'Release v%s'",
@@ -38,7 +39,8 @@
     "types:build": "wrangler types",
     "types:check": "astro check && tsc --noEmit",
     "version": "NODE_ENV=production run-s types build",
-    "vitest": "vitest run"
+    "vitest": "vitest run",
+    "wdio": "wdio"
   },
   "husky": {
     "hooks": {
@@ -59,6 +61,7 @@
   "devDependencies": {
     "@astrojs/check": "^0.9.6",
     "@astrojs/mdx": "^4.3.13",
+    "@cloudflare/vite-plugin": "^1.43.0",
     "@eslint/js": "^9.39.2",
     "@shikijs/transformers": "^3.21.0",
     "@types/fs-extra": "^11.0.4",
@@ -82,6 +85,6 @@
     "wait-on": "^9.0.3",
     "web-vitals": "^5.1.0",
     "webdriverio": "^9.23.0",
-    "wrangler": "^4.63.0"
+    "wrangler": "^4.107.0"
   }
 }

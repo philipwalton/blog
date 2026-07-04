@@ -1,7 +1,6 @@
 import {getActiveBreakpoint} from './breakpoints.ts';
 import {fetchLater} from './utils/fetchLater.ts';
 import {get, set} from './utils/kv-store.ts';
-import {now, timeOrigin} from './utils/performance.ts';
 import {round} from './utils/round.ts';
 import {uuid} from './utils/uuid.ts';
 
@@ -109,7 +108,7 @@ export class Logger {
   _updateState() {
     const nextState = getCurrentState();
     if (nextState !== this._state) {
-      const changeTime = Math.round(now());
+      const changeTime = Math.round(performance.now());
       if (nextState === 'active') {
         // If this is first change, assume active since the document was open.
         if (this._state === null) {
@@ -120,7 +119,10 @@ export class Logger {
         this._engagedTime += changeTime - this._lastActiveTime;
         this._lastActiveTime = 0;
         // Do not await...
-        set('lastEngagedTime', Math.round(timeOrigin + now()));
+        set(
+          'lastEngagedTime',
+          Math.round(performance.timeOrigin + performance.now()),
+        );
       }
       this._state = nextState;
     }
@@ -134,7 +136,7 @@ export class Logger {
     this._engagedTime = 0;
 
     if (this._state === 'active') {
-      const time = Math.round(now());
+      const time = Math.round(performance.now());
       engagedTime += time - this._lastActiveTime;
       this._lastActiveTime = time;
     }
@@ -272,7 +274,7 @@ export class Logger {
     if (cid) {
       this._pageParams.cid = cid;
     } else {
-      cid = uuid(timeOrigin);
+      cid = uuid(performance.timeOrigin);
       this._pageParams.cid = cid;
       this._pageParams._fv = 1;
       this._pageParams._ss = 1;

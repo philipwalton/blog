@@ -12,10 +12,8 @@ interface LogEntry {
 type ParamsObj = Record<string, string | RegExp>;
 
 /**
- * @param {Object|Object[]} paramsList
- * @return {Promise<boolean|URLSearchParams>}
- *     A `URLSearchParams` object with the matching beacon if the params are
- *     found in any one of the beacons, false otherwise.
+ * Returns a `URLSearchParams` object with the matching beacon if the params
+ * are found in any one of the beacons, false otherwise.
  */
 export async function beaconsContain(
   paramsListOrObj: ParamsObj | ParamsObj[],
@@ -121,7 +119,6 @@ export async function getBeacons(
 
 /**
  * Clears the array of beacons on the page.
- * @return {Promise<void>}
  */
 export async function clearBeacons() {
   await fs.remove(LOG_FILE);

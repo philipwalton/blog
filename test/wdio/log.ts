@@ -203,18 +203,20 @@ describe('log', function () {
       assert(!fcp2.has('_fv'));
 
       // Update the data in IndexedDB to expire the session.
-      await browser.executeAsync(async (done) => {
-        const req = indexedDB.open('kv-store', 1);
-        req.onupgradeneeded = () => req.result.createObjectStore('kv-store');
-        req.onsuccess = () => {
-          const time = Date.now() - 1000 * 60 * 31; // 31 minutes ago...
-          const db = req.result;
-          const txn = db.transaction('kv-store', 'readwrite');
-          txn.oncomplete = () => done();
-          txn.objectStore('kv-store').put(time, 'sessionId');
-          txn.objectStore('kv-store').put(8, 'sessionCount');
-          txn.objectStore('kv-store').put(time, 'lastEngagedTime');
-        };
+      await browser.execute(() => {
+        return new Promise<void>((resolve) => {
+          const req = indexedDB.open('kv-store', 1);
+          req.onupgradeneeded = () => req.result.createObjectStore('kv-store');
+          req.onsuccess = () => {
+            const time = Date.now() - 1000 * 60 * 31; // 31 minutes ago...
+            const db = req.result;
+            const txn = db.transaction('kv-store', 'readwrite');
+            txn.oncomplete = () => resolve();
+            txn.objectStore('kv-store').put(time, 'sessionId');
+            txn.objectStore('kv-store').put(8, 'sessionCount');
+            txn.objectStore('kv-store').put(time, 'lastEngagedTime');
+          };
+        });
       });
 
       await clearBeacons();
@@ -388,23 +390,23 @@ describe('log', function () {
 
   describe('legacy versions', () => {
     it('should not error when fetching legacy versions', async () => {
-      const statusV2 = await browser.executeAsync(async (done) => {
+      const statusV2 = await browser.execute(async () => {
         const res = await fetch('/log?v=2', {method: 'POST'});
-        done(res.status);
+        return res.status;
       });
 
       assert.strictEqual(statusV2, 200);
 
-      const statusV1 = await browser.executeAsync(async (done) => {
+      const statusV1 = await browser.execute(async () => {
         const res = await fetch('/log?v=1', {method: 'POST'});
-        done(res.status);
+        return res.status;
       });
 
       assert.strictEqual(statusV1, 200);
 
-      const statusNoVersion = await browser.executeAsync(async (done) => {
+      const statusNoVersion = await browser.execute(async () => {
         const res = await fetch('/log', {method: 'POST'});
-        done(res.status);
+        return res.status;
       });
 
       assert.strictEqual(statusNoVersion, 200);

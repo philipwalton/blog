@@ -1,6 +1,5 @@
 import {onCLS, onFCP, onINP, onLCP, onTTFB} from 'web-vitals/attribution';
 import {Logger} from './Logger.ts';
-import {now, timeOrigin} from './utils/performance.ts';
 import {uuid} from './utils/uuid.ts';
 
 import type {Params} from './Logger.ts';
@@ -18,13 +17,13 @@ const MEASUREMENT_VERSION = 99;
  * unique value. Furthermore, this value, combined with the time origin and
  * the pageshow count can provide a unique ID for the page visit.
  */
-const PAGE_ID = uuid(timeOrigin);
+const PAGE_ID = uuid(performance.timeOrigin);
 
 const originalPathname = location.pathname;
 
 export const log = new Logger((params: Params) => {
   return {
-    page_time: now(),
+    page_time: performance.now(),
     event_id: params.event_id || uuid(),
   };
 });
@@ -55,7 +54,7 @@ const setInitialParams = () => {
   log.set({
     measurement_version: MEASUREMENT_VERSION,
     native_fetch_later: 'fetchLater' in self,
-    time_origin: timeOrigin,
+    time_origin: performance.timeOrigin,
     page_id: PAGE_ID,
     pageshow_count: 1,
     original_page_path: originalPathname,

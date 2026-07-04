@@ -31,14 +31,16 @@ describe('worker', function () {
       });
 
       // Wait until the hint has been sent.
-      await browser.executeAsync((done) => {
-        new PerformanceObserver((list) => {
-          for (const entry of list.getEntries()) {
-            if (entry.name.endsWith('/hint')) {
-              done();
+      await browser.execute(() => {
+        return new Promise<void>((resolve) => {
+          new PerformanceObserver((list) => {
+            for (const entry of list.getEntries()) {
+              if (entry.name.endsWith('/hint')) {
+                resolve();
+              }
             }
-          }
-        }).observe({type: 'resource', buffered: true});
+          }).observe({type: 'resource', buffered: true});
+        });
       });
 
       await clearStorage();

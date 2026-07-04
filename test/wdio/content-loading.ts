@@ -237,8 +237,7 @@ async function assertIsInitialPageLoad() {
 
 /**
  * Gets the URL path for the given page.
- * @return {string} The URL path.
  */
-async function getUrlPath() {
+async function getUrlPath(): Promise<string> {
   return new URL(await browser.getUrl(), site.baseUrl).pathname;
 }

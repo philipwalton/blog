@@ -3,8 +3,9 @@ export function getRedirectPath(path: string): string | undefined {
   const originalPath = path;
 
   // Rename old Google Analytics post.
-  if (path.match(/^(.+)google-analytics(.+)$/)) {
-    path = `${RegExp.$1}ga${RegExp.$2}`;
+  const match = path.match(/^(.+)google-analytics(.+)$/);
+  if (match) {
+    path = `${match[1]}ga${match[2]}`;
   }
 
   // TODO: add other redirect logic here as it comes up...

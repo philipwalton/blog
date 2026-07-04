@@ -22,6 +22,6 @@ const documentTitle = `${title}${titleSuffix}`;
   <slot />
 </ArticleContent>
 
-<script define:vars={{ documentTitle }}>
+<script is:inline define:vars={{ documentTitle }}>
   document.title = documentTitle;
 </script>

@@ -18,7 +18,6 @@ http
       ].join('\n');
       fs.appendFileSync(LOG_FILE, contents + '\n--\n', 'utf-8');
 
-      console.log(contents);
       res.end();
     });
   })

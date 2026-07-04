@@ -1,7 +1,6 @@
 import * as alerts from './alerts.ts';
 import * as linkableHeadings from './linkable-headings.ts';
 import {log, trackUnhandledError} from './log.ts';
-import {now} from './utils/performance.ts';
 
 let isLoaderDisabled = false;
 
@@ -22,7 +21,7 @@ const getContentPartialPath = (pagePath: string) => {
  */
 const fetchPageContent = async (pathname: string) => {
   try {
-    const responseStartTime = now();
+    const responseStartTime = performance.now();
     const response = await fetch(getContentPartialPath(pathname));
 
     let content: string;
@@ -31,7 +30,7 @@ const fetchPageContent = async (pathname: string) => {
     } else {
       throw new Error(`Response: (${response.status}) ${response.statusText}`);
     }
-    const responseDuration = now() - responseStartTime;
+    const responseDuration = performance.now() - responseStartTime;
 
     // Queue the log logic to not delay returning the response.
     queueMicrotask(() => {

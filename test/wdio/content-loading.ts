@@ -1,12 +1,7 @@
 import assert from 'assert';
 import {Key} from 'webdriverio';
 import {clearStorage} from './utils/clearStorage.ts';
-import {
-  initBook,
-  type Site,
-  type Page,
-  type Article,
-} from '../../tasks/lib/book.ts';
+import {initBook, type Site, type Page, type Article} from './utils/book.ts';
 
 let site: Site;
 let articles: Article[];
@@ -242,8 +237,7 @@ async function assertIsInitialPageLoad() {
 
 /**
  * Gets the URL path for the given page.
- * @return {string} The URL path.
  */
-async function getUrlPath() {
+async function getUrlPath(): Promise<string> {
   return new URL(await browser.getUrl(), site.baseUrl).pathname;
 }

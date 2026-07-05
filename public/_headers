@@ -1,0 +1,12 @@
+/*
+  ! access-control-allow-origin
+
+/static/*
+  cache-control: max-age=31536000, immutable
+
+/site.webmanifest
+  cache-control: no-cache
+
+/sw.js
+  cache-control: no-cache
+  ! etag

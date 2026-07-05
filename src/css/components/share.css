@@ -1,22 +1,28 @@
 .Share {
-  display: flex;
+  background: var(--bg-color);
   align-items: center;
-  gap: var(--gap);
-  margin-top: calc(1.5 * var(--gap));
+  display: flex;
+  gap: 1.2em;
+  line-height: 1.4;
+  margin: calc(1.5 * var(--gap)) calc(-1 * var(--gap)) var(--gap);
+  padding: var(--gap);
 }
 
 .Share-figure {
-  color: #5ac;
+  color: #0f73ff;
   font-size: 1.5em;
 }
 
 .Share-pitch {
   color: #666;
   font-size: .9em;
+  margin: 0;
 }
 
-@media (--break-lg) {
+/* Breakpoint: LG */
+@media (min-width: 48em) {
   .Share {
-    margin-top: calc(2 * var(--gap));
+    border-radius: 3px;
+    margin: calc(2 * var(--gap)) 0 var(--gap);
   }
 }

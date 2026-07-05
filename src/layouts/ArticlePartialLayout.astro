@@ -1,0 +1,27 @@
+---
+/**
+ * Partial layout for articles - outputs just the article content without
+ * the full HTML shell, for SPA-style navigation.
+ */
+import ArticleContent from '../components/ArticleContent.astro';
+
+interface Props {
+  title: string;
+  date: Date;
+  path: string;
+  translations?: Record<string, string> | undefined;
+}
+
+const { title, date, path, translations } = Astro.props;
+
+const titleSuffix = ' — Philip Walton';
+const documentTitle = `${title}${titleSuffix}`;
+---
+
+<ArticleContent title={title} date={date} path={path} translations={translations}>
+  <slot />
+</ArticleContent>
+
+<script is:inline define:vars={{ documentTitle }}>
+  document.title = documentTitle;
+</script>

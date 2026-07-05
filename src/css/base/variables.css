@@ -25,19 +25,22 @@
   --error-color: hsl(0, 60%, 50%);
 }
 
-@media (--break-md) {
+/* Breakpoint: MD*/
+@media (min-width: 36em) {
   :root {
     --gap: 1.5em;
   }
 }
 
-@media (--break-lg) {
+/* Breakpoint: LG */
+@media (min-width: 48em) {
   :root {
     --gap: 1.75em;
   }
 }
 
-@media (--break-xl) {
+/* Breakpoint: XL*/
+@media (min-width: 60em) {
   :root {
     --gap: 2em;
   }

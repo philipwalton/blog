@@ -1,15 +1,4 @@
-@import "./base/custom-media.css";
-
 @import "./components/alert.css";
 @import "./components/footnotes.css";
 @import "./components/linkable-heading.css";
 @import "./components/message.css";
-
-@import "highlight.js/styles/github";
-
-/* Allow for highlighting specific parts of a code block. */
-pre mark {
-  background-color: hsla(60, 100%, 50%, 0.4);
-  box-shadow: 0 0 0 .1em hsla(60, 100%, 50%, 0.4);
-  font-style: normal;
-}

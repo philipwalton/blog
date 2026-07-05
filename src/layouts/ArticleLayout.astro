@@ -1,0 +1,27 @@
+---
+import Layout from './Layout.astro';
+import ArticleContent from '../components/ArticleContent.astro';
+
+interface Props {
+  title: string;
+  date: Date;
+  path: string;
+  excerpt?: string | undefined;
+  image?: string | undefined;
+  translations?: Record<string, string> | undefined;
+}
+
+const { title, date, path, excerpt, image, translations } = Astro.props;
+---
+
+<Layout
+  title={title}
+  path={path}
+  type="article"
+  excerpt={excerpt}
+  image={image}
+>
+  <ArticleContent title={title} date={date} path={path} translations={translations}>
+    <slot />
+  </ArticleContent>
+</Layout>

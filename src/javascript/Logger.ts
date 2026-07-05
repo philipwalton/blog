@@ -1,8 +1,6 @@
 import {getActiveBreakpoint} from './breakpoints.ts';
-import {initialSWState} from './sw-state.ts';
 import {fetchLater} from './utils/fetchLater.ts';
 import {get, set} from './utils/kv-store.ts';
-import {now, timeOrigin} from './utils/performance.ts';
 import {round} from './utils/round.ts';
 import {uuid} from './utils/uuid.ts';
 
@@ -18,7 +16,7 @@ const LOG_VERSION = 3;
 
 const SESSION_TIMEOUT = 1000 * 60 * 30; // 30 minutes.
 
-const SEND_TIMEOUT = self.__ENV__ === 'production' ? 60000 : 1000;
+const SEND_TIMEOUT = import.meta.env.MODE === 'test' ? 1000 : 60000;
 
 let index = 1;
 
@@ -27,7 +25,8 @@ let index = 1;
  */
 export class Logger {
   private _hitFilter: HitFilter | undefined;
-  private _presendDependencies: Promise<any>[];
+  private _presendDependencies: Promise<unknown>[];
+
   private _eventQueue: Map<number, Params>;
   private _sendCount: number;
   private _lastActiveTime: number;
@@ -74,7 +73,6 @@ export class Logger {
       contrast_preference: getContrastPreference(),
       reduce_data_preference: getReducedDataPreference(),
       reduce_motion_preference: getReducedMotionPref(),
-      service_worker_state: initialSWState,
     };
     if (self.__x) {
       userParams.experiment = self.__x;
@@ -110,7 +108,7 @@ export class Logger {
   _updateState() {
     const nextState = getCurrentState();
     if (nextState !== this._state) {
-      const changeTime = Math.round(now());
+      const changeTime = Math.round(performance.now());
       if (nextState === 'active') {
         // If this is first change, assume active since the document was open.
         if (this._state === null) {
@@ -121,7 +119,10 @@ export class Logger {
         this._engagedTime += changeTime - this._lastActiveTime;
         this._lastActiveTime = 0;
         // Do not await...
-        set('lastEngagedTime', Math.round(timeOrigin + now()));
+        set(
+          'lastEngagedTime',
+          Math.round(performance.timeOrigin + performance.now()),
+        );
       }
       this._state = nextState;
     }
@@ -135,7 +136,7 @@ export class Logger {
     this._engagedTime = 0;
 
     if (this._state === 'active') {
-      const time = Math.round(now());
+      const time = Math.round(performance.now());
       engagedTime += time - this._lastActiveTime;
       this._lastActiveTime = time;
     }
@@ -143,10 +144,21 @@ export class Logger {
   }
 
   /**
-   * Adds a promise to the presend dependencies.
+   * Adds a promise to the presend dependencies, with a timeout so it
+   * can't block send forever. It also includes a built-in catch handler
+   * to catch any errors with presend dependencies without blocking send.
    */
-  awaitBeforeSending(promise: Promise<void>) {
-    this._presendDependencies.push(promise);
+  awaitBeforeSending(promise: Promise<unknown>, timeout: number = 5000) {
+    this._presendDependencies.push(
+      Promise.race([
+        new Promise((r) => setTimeout(r, timeout)),
+        promise.catch((err) => {
+          // Call Promise.reject() to trigger an unhandled promise rejection,
+          // without rejecting the current promise and breaking logging.
+          Promise.reject(err);
+        }),
+      ]),
+    );
   }
 
   /**
@@ -165,18 +177,6 @@ export class Logger {
       Object.assign(params, this._hitFilter(params));
     }
 
-    if (this._presendDependencies.length) {
-      const deps = this._presendDependencies.slice();
-      this._presendDependencies = [];
-      Promise.allSettled(deps).then((results) => {
-        for (const result of results) {
-          if (result.status === 'rejected') {
-            Promise.reject(result.reason);
-          }
-        }
-      });
-    }
-
     const prefixedParams: Params = {
       en: eventName,
       ...prefixParams('e', params),
@@ -188,12 +188,11 @@ export class Logger {
       prefixedParams._et = engagedTime;
     }
 
-    this._queue(prefixedParams);
+    // Await presend dependencies after all params are set, so that they
+    // relfect the state at the time when the event was logged.
+    await Promise.all(this._presendDependencies);
 
-    // Print these to the console when developing locally.
-    if (self.__ENV__ !== 'production') {
-      console.debug('Log event:', prefixedParams);
-    }
+    this._queue(prefixedParams);
   }
 
   /**
@@ -275,7 +274,7 @@ export class Logger {
     if (cid) {
       this._pageParams.cid = cid;
     } else {
-      cid = uuid(timeOrigin);
+      cid = uuid(performance.timeOrigin);
       this._pageParams.cid = cid;
       this._pageParams._fv = 1;
       this._pageParams._ss = 1;

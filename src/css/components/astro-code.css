@@ -1,0 +1,48 @@
+.astro-code {
+  --hightlight-bg: hsl(60 95% 50% / 35%);
+  --hightlight-word-bg: hsl(60deg 87% 80%);
+  background-color: #f8f8f8;
+  margin: var(--gap) calc(-1 * var(--gap));
+  padding: var(--gap) 0;
+}
+/* Breakpoint: LG */
+@media (min-width: 48em) {
+  .astro-code {
+    border-radius: 3px;
+  }
+}
+
+.astro-code span {
+  color: var(--shiki-light);
+}
+
+.astro-code .line {
+  padding-inline: var(--gap);
+}
+
+.astro-code .highlighted,
+.astro-code .highlighted-word {
+  background-color: var(--hightlight-word-bg);
+  outline: 1px solid var(--hightlight-word-bg);
+
+  display: inline-block;
+  font-style: normal;
+  height: 1.5em;
+  line-height: 1.5em;
+}
+
+.astro-code .line.highlighted {
+  background-color: var(--hightlight-bg);
+  width: 100%;
+}
+
+@media (prefers-color-scheme: dark) {
+  .astro-code {
+    --hightlight-bg: hsl(230deg 20% 50% / 30%);
+    --hightlight-word-bg: hsl(227deg 18% 30%);
+    background-color: var(--shiki-dark-bg);
+  }
+  .astro-code span {
+    color: var(--shiki-dark);
+  }
+}

@@ -4,14 +4,16 @@
   max-width: 54em;
 }
 
-@media (--break-lg) {
+/* Breakpoint: LG */
+@media (min-width: 48em) {
   .Content {
     margin-top: 0;
     padding: calc(2 * var(--gap));
   }
 }
 
-@media (--break-xl) {
+/* Breakpoint: XL*/
+@media (min-width: 60em) {
   .Content {
     margin-top: 2em;
   }

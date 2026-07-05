@@ -1,0 +1,20 @@
+---
+import Layout from './Layout.astro';
+
+interface Props {
+  title: string;
+  heading?: string | undefined;
+  path?: string | undefined;
+}
+
+const { title, heading = title, path } = Astro.props;
+---
+
+<Layout title={title} path={path}>
+  <article id="post" role="article" class="hentry">
+    <header class="ContentHeader">
+      <h1 class="ContentHeader-pageTitle">{heading}</h1>
+    </header>
+    <slot />
+  </article>
+</Layout>

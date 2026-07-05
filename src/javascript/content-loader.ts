@@ -1,17 +1,16 @@
 import * as alerts from './alerts.ts';
 import * as linkableHeadings from './linkable-headings.ts';
 import {log, trackUnhandledError} from './log.ts';
-import {now} from './utils/performance.ts';
 
 let isLoaderDisabled = false;
 
 const getContentPartialPath = (pagePath: string) => {
-  if (pagePath.endsWith(self.__PARTIAL_PATH__)) {
+  if (pagePath.endsWith(import.meta.env.PUBLIC_PARTIAL_PATH)) {
     // If the pagePath already contains the partial path, don't append it.
     // Note: this can happen when the SW notifies of a cache update.
     return pagePath;
   }
-  return pagePath + self.__PARTIAL_PATH__;
+  return pagePath + import.meta.env.PUBLIC_PARTIAL_PATH;
 };
 
 /**
@@ -22,7 +21,7 @@ const getContentPartialPath = (pagePath: string) => {
  */
 const fetchPageContent = async (pathname: string) => {
   try {
-    const responseStartTime = now();
+    const responseStartTime = performance.now();
     const response = await fetch(getContentPartialPath(pathname));
 
     let content: string;
@@ -31,15 +30,11 @@ const fetchPageContent = async (pathname: string) => {
     } else {
       throw new Error(`Response: (${response.status}) ${response.statusText}`);
     }
-    const responseDuration = now() - responseStartTime;
-    const cacheHit = Boolean(response.headers.get('X-Cache-Hit'));
+    const responseDuration = performance.now() - responseStartTime;
 
     // Queue the log logic to not delay returning the response.
     queueMicrotask(() => {
-      log.set({
-        page_path: pathname,
-        content_source: cacheHit ? 'cache' : 'network',
-      });
+      log.set({page_path: pathname});
       log.event('route_transition', {value: responseDuration});
     });
 

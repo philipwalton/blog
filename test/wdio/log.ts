@@ -2,7 +2,7 @@ import {strict as assert} from 'node:assert';
 import {beaconsContain, clearBeacons, getBeacons} from './utils/beacons.ts';
 import {clearStorage} from './utils/clearStorage.ts';
 import {setExperimentCookie} from './utils/setExperimentCookie.ts';
-import {initBook, type Article, type Page} from '../../tasks/lib/book.ts';
+import {initBook, type Article, type Page} from './utils/book.ts';
 
 let articles: Article[];
 let pages: Page[];
@@ -21,7 +21,7 @@ describe('log', function () {
     await clearStorage();
   });
 
-  describe.only('experiments', () => {
+  describe('experiments', () => {
     // Unskip when running an experiment
     it('should load the proper experiment', async () => {
       await setExperimentCookie('.234');
@@ -32,12 +32,11 @@ describe('log', function () {
           'dl': new RegExp(`test_id=${testID}`),
           'en': 'page_view',
           'ep.page_path': '/',
-          'up.service_worker_state': 'supported',
           'up.experiment': 'fetch_later',
         });
       });
 
-      // Reload to ensure that the experiment works with service worker.
+      // Reload to ensure that the experiment persists across page loads.
 
       await browser.url(`/?test_id=${++testID}`);
 
@@ -47,7 +46,6 @@ describe('log', function () {
           'en': 'page_view',
           'ep.page_path': '/',
           'up.experiment': 'fetch_later',
-          'up.service_worker_state': 'controlled',
         });
       });
 
@@ -61,13 +59,12 @@ describe('log', function () {
           'dl': new RegExp(`test_id=${testID}`),
           'en': 'page_view',
           'ep.page_path': '/articles/',
-          'up.service_worker_state': 'supported',
         });
       });
       assert(beacon1 instanceof URLSearchParams);
       assert(!beacon1.has('up.experiment'));
 
-      // Reload to ensure that the experiment works with service worker.
+      // Reload to ensure that the experiment persists across page loads.
 
       await browser.url(`/articles/?test_id=${++testID}`);
 
@@ -76,7 +73,6 @@ describe('log', function () {
           'dl': new RegExp(`test_id=${testID}`),
           'en': 'page_view',
           'ep.page_path': '/articles/',
-          'up.service_worker_state': 'controlled',
         });
         return result instanceof URLSearchParams ? result : false;
       });
@@ -207,18 +203,20 @@ describe('log', function () {
       assert(!fcp2.has('_fv'));
 
       // Update the data in IndexedDB to expire the session.
-      await browser.executeAsync(async (done) => {
-        const req = indexedDB.open('kv-store', 1);
-        req.onupgradeneeded = () => req.result.createObjectStore('kv-store');
-        req.onsuccess = () => {
-          const time = Date.now() - 1000 * 60 * 31; // 31 minutes ago...
-          const db = req.result;
-          const txn = db.transaction('kv-store', 'readwrite');
-          txn.oncomplete = () => done();
-          txn.objectStore('kv-store').put(time, 'sessionId');
-          txn.objectStore('kv-store').put(8, 'sessionCount');
-          txn.objectStore('kv-store').put(time, 'lastEngagedTime');
-        };
+      await browser.execute(() => {
+        return new Promise<void>((resolve) => {
+          const req = indexedDB.open('kv-store', 1);
+          req.onupgradeneeded = () => req.result.createObjectStore('kv-store');
+          req.onsuccess = () => {
+            const time = Date.now() - 1000 * 60 * 31; // 31 minutes ago...
+            const db = req.result;
+            const txn = db.transaction('kv-store', 'readwrite');
+            txn.oncomplete = () => resolve();
+            txn.objectStore('kv-store').put(time, 'sessionId');
+            txn.objectStore('kv-store').put(8, 'sessionCount');
+            txn.objectStore('kv-store').put(time, 'lastEngagedTime');
+          };
+        });
       });
 
       await clearBeacons();
@@ -392,23 +390,23 @@ describe('log', function () {
 
   describe('legacy versions', () => {
     it('should not error when fetching legacy versions', async () => {
-      const statusV2 = await browser.executeAsync(async (done) => {
+      const statusV2 = await browser.execute(async () => {
         const res = await fetch('/log?v=2', {method: 'POST'});
-        done(res.status);
+        return res.status;
       });
 
       assert.strictEqual(statusV2, 200);
 
-      const statusV1 = await browser.executeAsync(async (done) => {
+      const statusV1 = await browser.execute(async () => {
         const res = await fetch('/log?v=1', {method: 'POST'});
-        done(res.status);
+        return res.status;
       });
 
       assert.strictEqual(statusV1, 200);
 
-      const statusNoVersion = await browser.executeAsync(async (done) => {
+      const statusNoVersion = await browser.execute(async () => {
         const res = await fetch('/log', {method: 'POST'});
-        done(res.status);
+        return res.status;
       });
 
       assert.strictEqual(statusNoVersion, 200);

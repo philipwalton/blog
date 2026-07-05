@@ -1,7 +1,5 @@
 import {onCLS, onFCP, onINP, onLCP, onTTFB} from 'web-vitals/attribution';
 import {Logger} from './Logger.ts';
-import {initialSWState} from './sw-state.ts';
-import {now, timeOrigin} from './utils/performance.ts';
 import {uuid} from './utils/uuid.ts';
 
 import type {Params} from './Logger.ts';
@@ -19,13 +17,13 @@ const MEASUREMENT_VERSION = 99;
  * unique value. Furthermore, this value, combined with the time origin and
  * the pageshow count can provide a unique ID for the page visit.
  */
-const PAGE_ID = uuid(timeOrigin);
+const PAGE_ID = uuid(performance.timeOrigin);
 
 const originalPathname = location.pathname;
 
 export const log = new Logger((params: Params) => {
   return {
-    page_time: now(),
+    page_time: performance.now(),
     event_id: params.event_id || uuid(),
   };
 });
@@ -56,15 +54,13 @@ const setInitialParams = () => {
   log.set({
     measurement_version: MEASUREMENT_VERSION,
     native_fetch_later: 'fetchLater' in self,
-    time_origin: timeOrigin,
+    time_origin: performance.timeOrigin,
     page_id: PAGE_ID,
     pageshow_count: 1,
     original_page_path: originalPathname,
   });
 
-  const navigationEntry = performance.getEntriesByType(
-    'navigation',
-  )[0] as PerformanceNavigationTiming;
+  const navigationEntry = performance.getEntriesByType('navigation')[0];
 
   if (navigationEntry) {
     // Use kebab case.
@@ -112,8 +108,8 @@ const trackPageviews = () => {
  */
 export const trackUnhandledError = (err: Error) => {
   log.event('unhandled_error', {
-    unhandled_error_name: err.name || '(not set)',
-    unhandled_error_message: `${err.stack || err.message || '(not set)'}`,
+    unhandled_error_name: err?.name || '(not set)',
+    unhandled_error_message: `${err?.stack || err?.message || '(not set)'}`,
   });
 };
 
@@ -268,13 +264,6 @@ const trackTTFB = () => {
           dom_load_end: navigationEntry.domContentLoadedEventEnd,
           window_load_end: navigationEntry.loadEventEnd,
         });
-
-        if (
-          initialSWState === 'controlled' &&
-          'workerStart' in navigationEntry
-        ) {
-          params.worker_start = navigationEntry.workerStart;
-        }
 
         if ((navigationEntry.activationStart ?? 0) > 0) {
           params.activation_start = navigationEntry.activationStart;

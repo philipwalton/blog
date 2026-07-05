@@ -1,0 +1,75 @@
+---
+/**
+ * Shared article content component used by both ArticleLayout and
+ * ArticlePartialLayout to avoid duplication.
+ */
+
+interface Props {
+  title: string;
+  date: Date;
+  path: string;
+  translations?: Record<string, string> | undefined;
+}
+
+const { title, date, path, translations } = Astro.props;
+
+const baseUrl = 'https://philipwalton.com';
+
+function formatDate(date: Date): string {
+  return date.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
+}
+
+function formatDateISO(date: Date): string {
+  return date.toISOString();
+}
+
+// Build Bluesky share URL
+const shareUrl = `${baseUrl}${path}`;
+const shareText = `${title} ${shareUrl}`;
+const blueskyShareUrl = `https://bsky.app/intent/compose?text=${encodeURIComponent(shareText)}`;
+---
+
+<article id="post" role="article" class="hentry">
+  <header class="ContentHeader">
+    <h1 class="ContentHeader-articleTitle entry-title">{title}</h1>
+    <div class="ContentHeader-meta">
+      <time class="ContentHeader-articleDate published" datetime={formatDateISO(date)}>
+        {formatDate(date)}
+      </time>
+      {translations && Object.keys(translations).length > 0 && (
+        <span class="ContentHeader-articleTranslations">
+          (translations:
+          {Object.entries(translations).map(([lang, url], index, arr) => (
+            <>
+              <a href={url}>{lang}</a>
+              {index < arr.length - 1 && ', '}
+            </>
+          ))}
+          )
+        </span>
+      )}
+    </div>
+  </header>
+
+  <div class="entry-content">
+    <slot />
+  </div>
+
+  <footer class="entry-unrelated">
+    <div id="share" class="Share">
+      <span class="Share-figure">
+        <svg class="Icon" viewBox="0 0 32 32">
+          <use xlink:href="#icon-bsky-butterfly"></use>
+        </svg>
+      </span>
+      <p class="Share-pitch">
+        If you liked this article and think others should read it, please
+        <a href={blueskyShareUrl}>share it on Bluesky</a>.
+      </p>
+    </div>
+  </footer>
+</article>

@@ -11,7 +11,7 @@ export async function getStaticPaths() {
 }
 
 const { article } = Astro.props;
-const { Content } = await render(article);
+const { Content, remarkPluginFrontmatter } = await render(article);
 
 const articlePath = `/articles/${article.id}/`;
 ---
@@ -20,7 +20,7 @@ const articlePath = `/articles/${article.id}/`;
   title={article.data.title}
   date={new Date(article.data.date)}
   path={articlePath}
-  excerpt={article.data.excerpt}
+  excerpt={article.data.excerpt ?? remarkPluginFrontmatter.excerpt}
   image={article.data.image}
   translations={article.data.translations}
 >

@@ -12,6 +12,12 @@ export default defineConfig({
   integrations: [mdx()],
   output: 'static',
   compressHTML: true,
+  devToolbar: {
+    enabled: false,
+  },
+  server: {
+    port: 3000,
+  },
   build: {
     assets: 'static',
     inlineStylesheets: 'always',

@@ -109,6 +109,32 @@ describe('worker', () => {
     );
   });
 
+  // The deployed site (philipwalton.com) still has an active service worker in
+  // visitors' browsers. Serving a self-destruct `/sw.js` is what unregisters
+  // it on their next visit, so the file must stay in place and stay uncached.
+  describe('service worker', () => {
+    it('serves a self-destruct service worker at /sw.js', async () => {
+      const response = await worker.fetch('/sw.js');
+      const body = await response.text();
+
+      expect(response.status).toEqual(200);
+      expect(response.headers.get('content-type')).toMatch(/javascript/);
+      expect(body).toMatch(/registration\.unregister\(\)/);
+    });
+
+    it('serves the service worker with a no-cache header', async () => {
+      const response = await worker.fetch('/sw.js');
+
+      expect(response.headers.get('cache-control')).toEqual('no-cache');
+    });
+
+    it('serves the web app manifest with a no-cache header', async () => {
+      const response = await worker.fetch('/site.webmanifest');
+
+      expect(response.headers.get('cache-control')).toEqual('no-cache');
+    });
+  });
+
   describe('log', () => {
     beforeEach(() => clearBeacons());
 

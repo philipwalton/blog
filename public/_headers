@@ -1,12 +1,8 @@
 /*
   ! access-control-allow-origin
 
+# Fingerprinted assets are served straight from static storage and can be
+# cached forever. Every other path runs through the Worker (src/worker.ts),
+# which sets cache-control there; setting it here would have no effect.
 /static/*
   cache-control: max-age=31536000, immutable
-
-/site.webmanifest
-  cache-control: no-cache
-
-/sw.js
-  cache-control: no-cache
-  ! etag

@@ -63,6 +63,13 @@ async function handleGetRequest(request: Request, env: Env): Promise<Response> {
 
   const experiment = getExperiment(xid);
 
+  // These files must always be revalidated at every layer so returning
+  // visitors never get stuck on a stale copy: the service worker (whose only
+  // job is to unregister the previously installed version) and the web app
+  // manifest.
+  const alwaysRevalidate =
+    url.pathname === '/sw.js' || url.pathname === '/site.webmanifest';
+
   const [response, priorityHintsSelector] = await Promise.all([
     env.ASSETS.fetch(url.href, {
       body: request.body,
@@ -71,7 +78,9 @@ async function handleGetRequest(request: Request, env: Env): Promise<Response> {
       redirect: request.redirect,
       cf: {
         cacheEverything: true,
-        cacheTtlByStatus: {'200-299': 31536000, '400-599': -1},
+        cacheTtlByStatus: alwaysRevalidate
+          ? {'200-599': -1}
+          : {'200-299': 31536000, '400-599': -1},
       },
     }),
     env.PRIORITY_HINTS.get(
@@ -82,8 +91,12 @@ async function handleGetRequest(request: Request, env: Env): Promise<Response> {
   const clone = new Response(response.body, response);
 
   // Explicitly set cache-control headers.
-  const maxAge = url.hostname === 'localhost' ? '0' : '60';
-  clone.headers.set('cache-control', `max-age=${maxAge}`);
+  if (alwaysRevalidate) {
+    clone.headers.set('cache-control', 'no-cache');
+  } else {
+    const maxAge = url.hostname === 'localhost' ? '0' : '60';
+    clone.headers.set('cache-control', `max-age=${maxAge}`);
+  }
 
   setXIDToCookie(xid, clone);
   addServerTimingHeaders(clone, startTime);

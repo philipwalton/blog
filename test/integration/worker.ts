@@ -1,5 +1,5 @@
 import {describe, expect, it, beforeEach} from 'vitest';
-import {clearBeacons, getLogs} from '../wdio/utils/beacons.ts';
+import {clearBeacons, getLogs} from '../e2e/utils/beacons.ts';
 
 const BASE_URL = 'http://localhost:3000';
 
@@ -308,7 +308,15 @@ describe('worker', () => {
 
       const logs = await getLogs({count: 2});
 
-      const url1 = new URL(logs[0]!.url, BASE_URL);
+      // The two requests are sent in parallel and can arrive in either
+      // order, so identify them by shape: the new-session request carries
+      // its page_view event in the query params and has an empty body.
+      const sessionLog = logs.find((log) => log.body === '');
+      const eventsLog = logs.find((log) => log.body !== '');
+      expect(sessionLog).toBeDefined();
+      expect(eventsLog).toBeDefined();
+
+      const url1 = new URL(sessionLog!.url, BASE_URL);
 
       expect(url1.pathname).toStrictEqual('/log');
       expect(url1.search.slice(1)).toStrictEqual(
@@ -323,13 +331,12 @@ describe('worker', () => {
           ['ep.ua_ch', BROWSER_HEADERS['sec-ch-ua']],
         ]).toString(),
       );
-      expect(logs[0]!.body).toStrictEqual('');
 
       for (const [key, value] of Object.entries(BROWSER_HEADERS)) {
-        expect(logs[0]!.headers.get(key)).toStrictEqual(value);
+        expect(sessionLog!.headers.get(key)).toStrictEqual(value);
       }
 
-      const url2 = new URL(logs[1]!.url, BASE_URL);
+      const url2 = new URL(eventsLog!.url, BASE_URL);
       const pageParamsStripped = new URLSearchParams(pageParams);
       pageParamsStripped.delete('_fv');
       pageParamsStripped.delete('_ss');
@@ -343,12 +350,12 @@ describe('worker', () => {
           ['_uip', '1.2.3.4'],
         ]).toString(),
       );
-      expect(logs[1]!.body).toStrictEqual(
+      expect(eventsLog!.body).toStrictEqual(
         [events[1]!.toString(), events[2]!.toString()].join('\n'),
       );
 
       for (const [key, value] of Object.entries(BROWSER_HEADERS)) {
-        expect(logs[1]!.headers.get(key)).toStrictEqual(value);
+        expect(eventsLog!.headers.get(key)).toStrictEqual(value);
       }
     });
   });

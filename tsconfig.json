@@ -7,7 +7,7 @@
     "declaration": false,
     "declarationMap": false,
     "exactOptionalPropertyTypes": true,
-    "lib": ["esnext", "DOM", "WebWorker"],
+    "lib": ["esnext", "DOM", "DOM.Iterable", "WebWorker"],
     "module": "ESNext",
     "moduleResolution": "bundler",
     "noEmit": true,
@@ -24,6 +24,7 @@
     "target": "ESNext",
     "types": [
       "node",
+      "@cloudflare/vitest-pool-workers/types",
       "@wdio/globals/types",
       "@wdio/mocha-framework",
       "expect-webdriverio",

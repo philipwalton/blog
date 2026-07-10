@@ -23,7 +23,7 @@ export const config = {
   // then the current working directory is where your `package.json` resides, so `wdio`
   // will be called from there.
   //
-  specs: (specs ?? ['*']).map((spec) => `./test/wdio/${spec}.ts`),
+  specs: (specs ?? ['*']).map((spec) => `./test/e2e/${spec}.ts`),
   // Patterns to exclude.
   exclude: [
     // 'path/to/excluded/files'

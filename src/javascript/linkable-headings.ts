@@ -5,7 +5,7 @@ export const init = () => {
     '#content [id]:is(h2, h3, h4):not(.LinkableHeading)',
   );
 
-  for (const heading of Array.from(headings)) {
+  for (const heading of headings) {
     heading.classList.add('LinkableHeading');
     const anchor = Object.assign(document.createElement('a'), {
       className: 'LinkableHeading-anchor',

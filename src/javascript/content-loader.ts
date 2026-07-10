@@ -69,8 +69,7 @@ const updatePageContent = (content: string) => {
 const executeContainerScripts = () => {
   const container = document.getElementById('content')!;
 
-  // TODO: [...] should work once Edge supports iterable HTML collections.
-  const containerScripts = Array.from(container.getElementsByTagName('script'));
+  const containerScripts = container.querySelectorAll('script');
 
   for (const containerScript of containerScripts) {
     // Remove the unexecuted container script.

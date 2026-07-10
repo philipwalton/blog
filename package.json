@@ -34,13 +34,14 @@
     "server:log": "node test/server.ts",
     "server:worker": "wrangler dev --port=3000 --var ENVIRONMENT:dev",
     "test": "run-p -r server test:suite",
-    "test:suite": "run-s ready vitest wdio",
+    "test:e2e": "wdio",
+    "test:integration": "vitest run --project integration",
+    "test:suite": "run-s test:unit ready test:integration test:e2e",
+    "test:unit": "vitest run --project node --project worker --project browser",
     "types": "run-s types:build types:check",
     "types:build": "wrangler types",
     "types:check": "astro check && tsc --noEmit",
-    "version": "NODE_ENV=production run-s types build",
-    "vitest": "vitest run",
-    "wdio": "wdio"
+    "version": "NODE_ENV=production run-s types build"
   },
   "husky": {
     "hooks": {
@@ -63,9 +64,11 @@
     "@astrojs/markdown-remark": "^7.2.1",
     "@astrojs/mdx": "^7.0.2",
     "@cloudflare/vite-plugin": "^1.43.0",
+    "@cloudflare/vitest-pool-workers": "^0.18.2",
     "@eslint/js": "^9.39.2",
     "@shikijs/transformers": "^4.3.1",
     "@types/fs-extra": "^11.0.4",
+    "@vitest/browser-webdriverio": "^4.1.10",
     "@wdio/cli": "^9.23.0",
     "@wdio/local-runner": "^9.23.0",
     "@wdio/mocha-framework": "^9.23.0",

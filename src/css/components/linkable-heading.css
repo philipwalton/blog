@@ -3,7 +3,11 @@
 }
 
 .LinkableHeading-anchor {
-  color: var(--text-color-inverted-faded);
+  /* Not --text-color-inverted-faded: that token is pinned to the (always
+     dark) header, whereas this anchor sits on the page background and needs
+     to stay subtle in both color schemes. Its light value matches the old
+     --text-color-inverted-faded value exactly. */
+  color: var(--link-color-anchor);
   font-weight: 400;
   margin-left: 0.333em;
   text-decoration: none;

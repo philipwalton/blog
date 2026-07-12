@@ -3,38 +3,50 @@
   --font-family: system-ui, sans-serif;
   --easing: cubic-bezier(.4,0,.2,1);
 
-  --text-color: hsl(0, 0%, 20%);
-  --text-color-faded: hsl(0, 0%, 35%);
-  --text-color-muted: #666;
-  --text-color-subtle: #555;
+  /* Color tokens are light-dark() pairs; `color-scheme: light dark` is set
+     on :root (see elements.css), so each token resolves to its first value
+     in light mode and its second value in dark mode. Tokens without a
+     light-dark() pair intentionally render the same in both schemes. */
+  --text-color: light-dark(hsl(0, 0%, 20%), hsl(0, 0%, 87%));
+  --text-color-faded: light-dark(hsl(0, 0%, 35%), hsl(0, 0%, 72%));
+  --text-color-muted: light-dark(#666, hsl(0, 0%, 66%));
+  --text-color-subtle: light-dark(#555, hsl(0, 0%, 70%));
+  /* The "inverted" tokens style the site header, which keeps its dark
+     treatment in both color schemes (in dark mode it reads as a slightly
+     elevated surface), so they don't need light-dark() pairs. */
   --text-color-inverted: hsl(0, 0%, 90%);
   --text-color-inverted-faded: hsl(0, 0%, 75%);
 
-  --link-color: hsl(0, 0%, 40%);
+  --link-color: light-dark(hsl(0, 0%, 40%), hsl(0, 0%, 72%));
   --link-color-active: var(--link-color);
-  --link-color-subtle: #aaa;
+  --link-color-subtle: light-dark(#aaa, hsl(0, 0%, 52%));
+  --link-color-anchor: light-dark(hsl(0, 0%, 75%), hsl(0, 0%, 45%));
 
-  --accent-color: hsl(150, 40%, 50%);
-  --accent-color-active:hsl(150, 40%, 40%);
-  --accent-color-bsky: #0f73ff;
-  --border-color: hsl(30, 15%, 93%);
-  --border-color-input: hsl(30, 15%, 80%);
-  /* Intentionally NOT the same as --border-color (93% vs 90% lightness).
-     Kept as its own token to preserve the existing (slightly different)
-     rendered value rather than silently changing it. Whether the two
-     should be unified into a single value is an open question for
+  --accent-color: light-dark(hsl(150, 40%, 50%), hsl(150, 40%, 58%));
+  --accent-color-active: light-dark(hsl(150, 40%, 40%), hsl(150, 45%, 68%));
+  --accent-color-bsky: light-dark(#0f73ff, #3d8bff);
+  --border-color: light-dark(hsl(30, 15%, 93%), hsl(30, 5%, 24%));
+  --border-color-input: light-dark(hsl(30, 15%, 80%), hsl(30, 5%, 38%));
+  /* Intentionally NOT the same as --border-color (93% vs 90% lightness in
+     light mode). Kept as its own token to preserve the existing (slightly
+     different) rendered value rather than silently changing it. Whether the
+     two should be unified into a single value is an open question for
      whoever reviews this change. */
-  --border-color-checklist: hsl(30, 15%, 90%);
+  --border-color-checklist: light-dark(hsl(30, 15%, 90%), hsl(30, 5%, 27%));
   --border-radius: 3px;
 
-  --bg-color: hsl(30, 15%, 95%);
-  --bg-color-page: #fff;
+  --bg-color: light-dark(hsl(30, 15%, 95%), hsl(30, 5%, 18%));
+  --bg-color-page: light-dark(#fff, hsl(30, 4%, 12%));
   --bg-color-inverted: hsl(0, 0%, 25%);
 
+  /* A translucent mid-gray wash, so it works on both light and dark
+     page backgrounds without a light-dark() pair. */
   --code-bg-color: hsla(30, 15%, 50%, 0.1);
-  --mark-bg-color: #ffa;
-  --table-highlight-bg-color: hsl(45, 100%, 95%);
+  --mark-bg-color: light-dark(#ffa, hsl(60, 55%, 22%));
+  --table-highlight-bg-color: light-dark(hsl(45, 100%, 95%), hsl(45, 45%, 19%));
 
+  /* Used as the .Alert toast background with white text; the same red
+     works in both color schemes. */
   --error-color: hsl(0, 60%, 50%);
 }
 

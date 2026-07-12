@@ -365,13 +365,25 @@ describe('worker', () => {
       const response = await worker.fetch('/atom.xml');
       const body = await response.text();
 
-      const titles = [...body.matchAll(/<title>([^<]+)<\/title>/g)]
-        .map((match) => match[1])
-        // The first <title> in the feed is the site title, not an article.
-        .slice(1);
+      const entries = [...body.matchAll(/<entry>([\s\S]*?)<\/entry>/g)].map(
+        (match) => match[1]!,
+      );
+      const titles = entries.map(
+        (entry) => entry.match(/<title>([^<]+)<\/title>/)![1],
+      );
+      const dates = entries.map(
+        (entry) => new Date(entry.match(/<updated>([^<]+)<\/updated>/)![1]!),
+      );
 
       expect(titles[0]).toStrictEqual('The State of ES5 on the Web');
       expect(titles.at(-1)).toStrictEqual('CSS Architecture');
+
+      // The entire feed must be sorted newest first, not just the endpoints.
+      for (let i = 1; i < dates.length; i++) {
+        expect(dates[i - 1]!.getTime()).toBeGreaterThanOrEqual(
+          dates[i]!.getTime(),
+        );
+      }
     });
   });
 

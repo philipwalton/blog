@@ -5,12 +5,12 @@ import {defineConfig} from 'vitest/config';
 export default defineConfig({
   test: {
     projects: [
-      // Unit tests for the build plugins, run in Node since that's where
-      // they run at build time.
+      // Unit tests for the build plugins and other build-time helpers, run
+      // in Node since that's where they run at build time.
       {
         test: {
           name: 'node',
-          include: ['src/plugins/**/*.test.ts'],
+          include: ['src/plugins/**/*.test.ts', 'src/utils/**/*.test.ts'],
         },
       },
       // Unit tests for the Cloudflare worker modules, run inside workerd

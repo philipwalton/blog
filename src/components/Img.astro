@@ -30,47 +30,31 @@ const processed = await getImage({ src: image });
 
 // For the link, use the full-size image or explicit href
 const linkHref = href === false ? null : (href || processed.src);
+
+const imgAttrs = {
+  src: processed.src,
+  srcset: processed.srcSet.attribute,
+  alt,
+  width: processed.attributes.width,
+  height: processed.attributes.height,
+};
 ---
 
 {figure !== false ? (
   <figure class:list={[{ 'noborder': !border }]}>
     {linkHref ? (
       <a href={linkHref}>
-        <img
-          src={processed.src}
-          srcset={processed.srcSet.attribute}
-          alt={alt}
-          width={processed.attributes.width}
-          height={processed.attributes.height}
-        />
+        <img {...imgAttrs} />
       </a>
     ) : (
-      <img
-        src={processed.src}
-        srcset={processed.srcSet.attribute}
-        alt={alt}
-        width={processed.attributes.width}
-        height={processed.attributes.height}
-      />
+      <img {...imgAttrs} />
     )}
     {figcaption && <figcaption>{figcaption}</figcaption>}
   </figure>
 ) : linkHref ? (
   <a href={linkHref}>
-    <img
-      src={processed.src}
-      srcset={processed.srcSet.attribute}
-      alt={alt}
-      width={processed.attributes.width}
-      height={processed.attributes.height}
-    />
+    <img {...imgAttrs} />
   </a>
 ) : (
-  <img
-    src={processed.src}
-    srcset={processed.srcSet.attribute}
-    alt={alt}
-    width={processed.attributes.width}
-    height={processed.attributes.height}
-  />
+  <img {...imgAttrs} />
 )}

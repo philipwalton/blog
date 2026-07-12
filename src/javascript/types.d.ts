@@ -21,8 +21,13 @@ declare global {
     updateCurrentEntry(options: {state?: any}): void;
   }
 
+  // https://html.spec.whatwg.org/multipage/nav-history-apis.html#the-navigateevent-interface
   interface NavigateEvent {
+    canIntercept: boolean;
     destination: NavigationDestination;
+    downloadRequest: string | null;
+    formData: FormData | null;
+    hashChange: boolean;
     preventDefault(): void;
     intercept(options: {handler: () => void | Promise<void>}): void;
   }

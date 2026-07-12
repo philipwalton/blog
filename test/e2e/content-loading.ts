@@ -172,6 +172,38 @@ describe('The content loader', async () => {
     await assertIsInitialPageLoad();
   });
 
+  it('should not re-fetch content for same-page fragment navigations', async () => {
+    // Navigates to an article (via SPA load) with linkable headings.
+    const articleLink = await $(`a[href="${articles[0]!.path}"]`);
+    await articleLink.click();
+
+    await browser.waitUntil(async () => {
+      const urlPath = await getUrlPath();
+      return urlPath == articles[0]!.path;
+    });
+
+    const headingAnchor = await $('.LinkableHeading-anchor');
+    await headingAnchor.waitForExist();
+
+    const partialFetchCount = await getPartialFetchCount();
+
+    // Clicks a heading anchor, triggering a same-page fragment navigation.
+    await headingAnchor.click();
+
+    await browser.waitUntil(async () => {
+      const url = new URL(await browser.getUrl());
+      return url.hash.length > 0;
+    });
+
+    // Give any (incorrectly issued) fetch time to show up in the
+    // page's resource timing entries before asserting.
+    await browser.pause(500);
+
+    assert.strictEqual(await getPartialFetchCount(), partialFetchCount);
+
+    await assertIsInitialPageLoad();
+  });
+
   it('should show an error if the content cannot be loaded', async () => {
     // Adds a hash fragments to an article URL.
     // Don't use an arrow function since this is eval'ed in test browsers.
@@ -233,6 +265,19 @@ async function assertIsInitialPageLoad() {
   });
 
   assert(isInitialPageLoad);
+}
+
+/**
+ * Gets the number of page-partial fetches recorded in the page's
+ * resource timing entries.
+ */
+async function getPartialFetchCount(): Promise<number> {
+  // Don't use an arrow function since this is eval'ed in test browsers.
+  return await browser.execute(function () {
+    return performance.getEntriesByType('resource').filter(function (entry) {
+      return entry.name.includes('index.prtl');
+    }).length;
+  });
 }
 
 /**

@@ -136,6 +136,20 @@ export const init = () => {
   if (!self.navigation) return;
 
   self.navigation.addEventListener('navigate', (event: NavigateEvent) => {
+    // Don't intercept navigations that the browser says can't be
+    // intercepted (e.g. cross-origin or cross-document traversals).
+    if (!event.canIntercept) return;
+
+    // Don't intercept same-page fragment navigations; let the browser
+    // handle scrolling to the target element.
+    if (event.hashChange) return;
+
+    // Don't intercept navigations that will trigger a download.
+    if (event.downloadRequest !== null) return;
+
+    // Don't intercept form submissions.
+    if (event.formData) return;
+
     const url = new URL(event.destination.url);
 
     // Don't intercept cross-origin navigations.
@@ -144,8 +158,10 @@ export const init = () => {
     // Don't navigate is cases where `isLoaderDisabled` is `true`.
     if (isLoaderDisabled) return;
 
-    // Ignore navigations to resources.
-    if (url.pathname.match(/\.(png|svg|webp)$/)) return;
+    // Only intercept navigations to pages, which all have directory-style
+    // paths ending in a slash. Anything else (images, feeds, and other
+    // resource files) falls back to a regular full-page navigation.
+    if (!url.pathname.endsWith('/')) return;
 
     // Store the current scroll position in the Navigation state.
     self.navigation.updateCurrentEntry({

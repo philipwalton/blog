@@ -1,10 +1,6 @@
 import type {APIRoute} from 'astro';
 import {getCollection} from 'astro:content';
-
-const site = {
-  title: 'Philip Walton',
-  baseUrl: 'https://philipwalton.com',
-};
+import {site} from '../config.ts';
 
 function formatDateISO(date: Date): string {
   return date.toISOString().replace(/\.\d{3}Z$/, 'Z');

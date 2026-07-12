@@ -1,6 +1,7 @@
 ---
 import Head from '../components/Head.astro';
 import Icons from '../components/Icons.astro';
+import {site} from '../config.ts';
 
 // Import CSS - main.css is critical, defer.css is for non-critical styles
 import '../css/main.css';
@@ -16,16 +17,6 @@ interface Props {
   private?: boolean | undefined;
   date?: string | undefined;
 }
-
-const site = {
-  title: 'Philip Walton',
-  titleSuffix: ' — Philip Walton',
-  slug: 'philipwalton',
-  themeColor: '#ffffff',
-  backgroundColor: '#ffffff',
-  description: 'Thoughts on web development, open source, software architecture, and the future.',
-  baseUrl: 'https://philipwalton.com',
-};
 
 const props = Astro.props;
 ---

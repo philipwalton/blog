@@ -3,7 +3,7 @@
   padding: 0;
 }
 .Checklist li {
-  border-bottom: 1px solid hsl(30, 15%, 90%);
+  border-bottom: 1px solid var(--border-color-checklist);
   margin-bottom: var(--gap);
   list-style: none;
   padding: 0 0 var(--gap) 2.25em;

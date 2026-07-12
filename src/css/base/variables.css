@@ -25,6 +25,8 @@
   --error-color: hsl(0, 60%, 50%);
 }
 
+/* Keep these breakpoints in sync with the breakpoints list in src/javascript/breakpoints.ts. */
+
 /* Breakpoint: MD*/
 @media (min-width: 36em) {
   :root {

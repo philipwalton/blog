@@ -4,7 +4,7 @@
   top: auto;
   transform: translate3d(0, calc(100% + 3em), 0);
   transition:
-    display .2s,
+    display .2s allow-discrete,
     opacity .2s,
     transform .2s var(--easing);
 }

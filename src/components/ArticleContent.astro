@@ -3,6 +3,7 @@
  * Shared article content component used by both ArticleLayout and
  * ArticlePartialLayout to avoid duplication.
  */
+import Icon from './Icon.astro';
 
 interface Props {
   title: string;
@@ -62,9 +63,7 @@ const blueskyShareUrl = `https://bsky.app/intent/compose?text=${encodeURICompone
   <footer class="entry-unrelated">
     <div id="share" class="Share">
       <span class="Share-figure">
-        <svg class="Icon" viewBox="0 0 32 32">
-          <use xlink:href="#icon-bsky-butterfly"></use>
-        </svg>
+        <Icon id="bsky-butterfly" viewBox="0 0 32 32" />
       </span>
       <p class="Share-pitch">
         If you liked this article and think others should read it, please

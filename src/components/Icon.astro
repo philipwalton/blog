@@ -1,0 +1,12 @@
+---
+interface Props {
+  id: string;
+  viewBox?: string;
+}
+
+const {id, viewBox = '0 0 24 24'} = Astro.props;
+---
+
+<svg class="Icon" viewBox={viewBox}>
+  <use href={`#icon-${id}`}></use>
+</svg>

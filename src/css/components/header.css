@@ -11,7 +11,7 @@
     'nav nav';
 
   background: linear-gradient(to top left,
-    hsl(0, 0%, 25%), hsl(0, 0%, 20%));
+    var(--bg-color-inverted), hsl(0, 0%, 20%));
   color: var(--text-color-inverted);
   letter-spacing: 0.025em;
 }
@@ -88,7 +88,7 @@
     color: var(--text-color-faded);
   }
   .Header-social {
-    --link-color: #aaa;
+    --link-color: var(--link-color-subtle);
     justify-content: center;
   }
   .Header-socialLink {

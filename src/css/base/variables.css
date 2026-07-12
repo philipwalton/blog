@@ -5,22 +5,33 @@
 
   --text-color: hsl(0, 0%, 20%);
   --text-color-faded: hsl(0, 0%, 35%);
+  --text-color-muted: #666;
+  --text-color-subtle: #555;
   --text-color-inverted: hsl(0, 0%, 90%);
   --text-color-inverted-faded: hsl(0, 0%, 75%);
 
   --link-color: hsl(0, 0%, 40%);
   --link-color-active: var(--link-color);
+  --link-color-subtle: #aaa;
 
   --accent-color: hsl(150, 40%, 50%);
   --accent-color-active:hsl(150, 40%, 40%);
+  --accent-color-bsky: #0f73ff;
   --border-color: hsl(30, 15%, 93%);
   --border-color-input: hsl(30, 15%, 80%);
+  /* Intentionally NOT the same as --border-color (93% vs 90% lightness).
+     Kept as its own token to preserve the existing (slightly different)
+     rendered value; see PR notes for whether these should be unified. */
+  --border-color-checklist: hsl(30, 15%, 90%);
   --border-radius: 3px;
 
   --bg-color: hsl(30, 15%, 95%);
+  --bg-color-page: #fff;
   --bg-color-inverted: hsl(0, 0%, 25%);
 
   --code-bg-color: hsla(30, 15%, 50%, 0.1);
+  --mark-bg-color: #ffa;
+  --table-highlight-bg-color: hsl(45, 100%, 95%);
 
   --error-color: hsl(0, 60%, 50%);
 }

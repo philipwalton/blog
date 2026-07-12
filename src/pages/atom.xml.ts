@@ -13,7 +13,7 @@ function formatDateISO(date: Date): string {
 export const GET: APIRoute = async () => {
   const articles = await getCollection('articles');
   const sortedArticles = articles.sort(
-    (a, b) => new Date(a.data.date).getTime() - new Date(b.data.date).getTime(),
+    (a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime(),
   );
 
   const buildTime = new Date();

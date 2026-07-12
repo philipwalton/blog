@@ -360,6 +360,21 @@ describe('worker', () => {
     });
   });
 
+  describe('atom feed', () => {
+    it('lists articles newest first', async () => {
+      const response = await worker.fetch('/atom.xml');
+      const body = await response.text();
+
+      const titles = [...body.matchAll(/<title>([^<]+)<\/title>/g)]
+        .map((match) => match[1])
+        // The first <title> in the feed is the site title, not an article.
+        .slice(1);
+
+      expect(titles[0]).toStrictEqual('The State of ES5 on the Web');
+      expect(titles.at(-1)).toStrictEqual('CSS Architecture');
+    });
+  });
+
   describe('experiments', () => {
     it('adds a script tag setting the experiment', async () => {
       const a = await worker.fetch('/', {

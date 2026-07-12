@@ -1,5 +1,6 @@
 ---
 import Head from '../components/Head.astro';
+import Icon from '../components/Icon.astro';
 import Icons from '../components/Icons.astro';
 
 // Import CSS - main.css is critical, defer.css is for non-critical styles
@@ -53,19 +54,13 @@ const props = Astro.props;
     </a>
     <nav class="Header-social">
       <a class="Header-socialLink" href="https://bsky.app/profile/philipwalton.com" title="Bluesky" style="--fill:#0f73ff">
-        <svg class="Icon" viewBox="0 0 32 32">
-          <use xlink:href="#icon-bsky"></use>
-        </svg>
+        <Icon id="bsky" viewBox="0 0 32 32" />
       </a>
       <a class="Header-socialLink" href="https://github.com/philipwalton" title="Github" style="--fill:#111">
-        <svg class="Icon" viewBox="0 0 32 32">
-          <use xlink:href="#icon-github"></use>
-        </svg>
+        <Icon id="github" viewBox="0 0 32 32" />
       </a>
       <a class="Header-socialLink" href="http://feeds.feedburner.com/philipwalton" title="RSS" style="--fill:#f93">
-        <svg class="Icon" viewBox="0 0 32 32">
-          <use xlink:href="#icon-rss"></use>
-        </svg>
+        <Icon id="rss" viewBox="0 0 32 32" />
       </a>
     </nav>
     <nav class="Header-nav">

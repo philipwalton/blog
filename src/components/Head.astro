@@ -44,7 +44,6 @@ const pageDescription = excerpt || description || site.description;
 ---
 
 <meta charset="utf-8">
-<meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <title>{pageTitle}</title>
@@ -71,13 +70,15 @@ const pageDescription = excerpt || description || site.description;
     <link rel="canonical" href={`${site.baseUrl}${path}`}>
     {type === 'article' && (
       <>
-        <meta name="og:title" content={title}>
-        <meta name="og:type" content={type}>
-        <meta name="og:url" content={`${site.baseUrl}${path}`}>
-        {ogImageUrl && excerpt && (
+        <meta property="og:title" content={title}>
+        <meta property="og:type" content={type}>
+        <meta property="og:url" content={`${site.baseUrl}${path}`}>
+        {pageDescription && (
+          <meta property="og:description" content={pageDescription}>
+        )}
+        {ogImageUrl && (
           <>
-            <meta name="og:image" content={ogImageUrl}>
-            <meta name="og:description" content={excerpt}>
+            <meta property="og:image" content={ogImageUrl}>
             <meta name="twitter:card" content="summary_large_image">
           </>
         )}

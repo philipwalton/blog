@@ -38,4 +38,28 @@ describe('alerts', () => {
     expect(els).toHaveLength(2);
     expect(els[0]!.id).not.toBe(els[1]!.id);
   });
+
+  it('renders title and body as literal text, never as HTML', () => {
+    delete (window as unknown as {__pwned?: boolean}).__pwned;
+
+    const maliciousTitle = '<b>Bold Title</b>';
+    const maliciousBody = '<img src=x onerror="window.__pwned=true">';
+
+    alerts.add({title: maliciousTitle, body: maliciousBody});
+
+    const alert = document.querySelector<HTMLElement>('.Alert')!;
+    const titleEl = alert.querySelector('.Alert-title')!;
+    const messageEl = alert.querySelector('.Alert-message')!;
+
+    // The strings must be shown verbatim as text, not parsed as markup.
+    expect(titleEl.textContent).toBe(maliciousTitle);
+    expect(messageEl.textContent).toBe(maliciousBody);
+
+    // No elements should have been created from the interpolated strings.
+    expect(titleEl.querySelector('b')).toBeNull();
+    expect(messageEl.querySelector('img')).toBeNull();
+
+    // The onerror handler must never have executed.
+    expect((window as unknown as {__pwned?: boolean}).__pwned).toBeUndefined();
+  });
 });

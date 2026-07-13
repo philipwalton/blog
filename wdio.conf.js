@@ -1,3 +1,5 @@
+import {stripContentLengthHeader} from './test/strip-content-length.js';
+
 const specs = process.env.SPECS?.split(',');
 
 export const config = {
@@ -75,6 +77,10 @@ export const config = {
   //
   // Level of logging verbosity: trace | debug | info | warn | error | silent
   logLevel: 'warn',
+  //
+  // Works around a webdriverio bug on Node >= 26
+  // (see test/strip-content-length.js).
+  transformRequest: stripContentLengthHeader,
   //
   // Set specific log levels per logger
   // loggers:

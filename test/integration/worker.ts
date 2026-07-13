@@ -1,3 +1,4 @@
+import fs from 'node:fs';
 import {describe, expect, it, beforeEach} from 'vitest';
 import {clearBeacons, getLogs} from '../e2e/utils/beacons.ts';
 
@@ -368,15 +369,30 @@ describe('worker', () => {
       const entries = [...body.matchAll(/<entry>([\s\S]*?)<\/entry>/g)].map(
         (match) => match[1]!,
       );
-      const titles = entries.map(
-        (entry) => entry.match(/<title>([^<]+)<\/title>/)![1],
-      );
       const dates = entries.map(
         (entry) => new Date(entry.match(/<updated>([^<]+)<\/updated>/)![1]!),
       );
 
-      expect(titles[0]).toStrictEqual('The State of ES5 on the Web');
-      expect(titles.at(-1)).toStrictEqual('CSS Architecture');
+      // The feed must contain every published article (guards against
+      // truncation and against the entry regex silently matching nothing),
+      // and every entry must be well-formed with a parseable date.
+      const articleCount = fs
+        .readdirSync(new URL('../../src/content/articles', import.meta.url))
+        .filter((file) => file.endsWith('.mdx')).length;
+
+      expect(entries.length).toBe(articleCount);
+      for (const entry of entries) {
+        expect(entry).toMatch(/<title>[^<]+<\/title>/);
+        expect(entry).toMatch(/<link href="[^"]+"\/>/);
+        expect(entry).toMatch(/<id>[^<]+<\/id>/);
+      }
+
+      // Every entry must be unique (count alone can't catch duplicates).
+      const ids = entries.map((entry) => entry.match(/<id>([^<]+)<\/id>/)![1]);
+      expect(new Set(ids).size).toBe(entries.length);
+      for (const date of dates) {
+        expect(date.getTime()).not.toBeNaN();
+      }
 
       // The entire feed must be sorted newest first, not just the endpoints.
       for (let i = 1; i < dates.length; i++) {

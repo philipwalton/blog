@@ -73,12 +73,10 @@ const pageDescription = excerpt || description || site.description;
         <meta property="og:title" content={title}>
         <meta property="og:type" content={type}>
         <meta property="og:url" content={`${site.baseUrl}${path}`}>
-        {pageDescription && (
-          <meta property="og:description" content={pageDescription}>
-        )}
-        {ogImageUrl && (
+        {ogImageUrl && excerpt && (
           <>
             <meta property="og:image" content={ogImageUrl}>
+            <meta property="og:description" content={excerpt}>
             <meta name="twitter:card" content="summary_large_image">
           </>
         )}

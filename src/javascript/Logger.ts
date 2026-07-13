@@ -172,7 +172,15 @@ export class Logger {
    * Updates the page params that can change after an SPA navigation
    * (document location and title) to reflect the current page.
    */
-  refreshPageParams() {
+  async refreshPageParams() {
+    const dl = location.href;
+    const dt = getPageTitle();
+
+    // Wait for any in-flight events to be queued first. Since `event()`
+    // awaits these same dependencies before queuing, all events logged
+    // before this method was called are queued before it continues.
+    await Promise.all(this._presendDependencies);
+
     // If any events are queued, start a new beacon and leave the pending
     // one scheduled (not aborted), so already-logged events are sent with
     // the page params that were current when they were logged.
@@ -182,8 +190,8 @@ export class Logger {
       delete this._fetchLaterResult;
       delete this._fetchLaterController;
     }
-    this._pageParams.dl = location.href;
-    this._pageParams.dt = getPageTitle();
+    this._pageParams.dl = dl;
+    this._pageParams.dt = dt;
   }
 
   /**

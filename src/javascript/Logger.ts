@@ -173,6 +173,15 @@ export class Logger {
    * (document location and title) to reflect the current page.
    */
   refreshPageParams() {
+    // If any events are queued, start a new beacon and leave the pending
+    // one scheduled (not aborted), so already-logged events are sent with
+    // the page params that were current when they were logged.
+    if (this._eventQueue.size > 0) {
+      this._sendCount++;
+      this._eventQueue.clear();
+      delete this._fetchLaterResult;
+      delete this._fetchLaterController;
+    }
     this._pageParams.dl = location.href;
     this._pageParams.dt = getPageTitle();
   }

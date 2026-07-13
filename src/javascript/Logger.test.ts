@@ -99,7 +99,9 @@ describe('Logger', () => {
     try {
       const logger = new Logger();
       await logger.event('event_1');
-      expect(lastBeacon().pageParams.get('dl')).toBe(originalUrl);
+
+      const firstBeacon = lastBeacon();
+      expect(firstBeacon.pageParams.get('dl')).toBe(originalUrl);
 
       // Simulate an SPA navigation.
       history.pushState({}, '', '/spa-page/');
@@ -108,9 +110,17 @@ describe('Logger', () => {
       logger.refreshPageParams();
       await logger.event('event_2');
 
-      const {pageParams} = lastBeacon();
-      expect(new URL(pageParams.get('dl')!).pathname).toBe('/spa-page/');
-      expect(pageParams.get('dt')).toBe('SPA Page');
+      const beacon = lastBeacon();
+      expect(new URL(beacon.pageParams.get('dl')!).pathname).toBe('/spa-page/');
+      expect(beacon.pageParams.get('dt')).toBe('SPA Page');
+
+      // Events logged after the refresh start a new beacon, and the beacon
+      // containing the pre-navigation events is left scheduled (not
+      // aborted), so those events keep the params from when they were
+      // logged.
+      expect(beacon.pageParams.get('_s')).toBe('2');
+      expect(beacon.events.map((e) => e.get('en'))).toEqual(['event_2']);
+      expect(firstBeacon.init.signal!.aborted).toBe(false);
     } finally {
       history.replaceState({}, '', originalUrl);
       document.title = originalTitle;

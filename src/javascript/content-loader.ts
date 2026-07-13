@@ -87,9 +87,9 @@ const executeContainerScripts = () => {
 const trackPageview = async (url: URL) => {
   // Update the page-level `dl` and `dt` params to reflect the new URL and
   // title. This runs after `loadPage()`, so `document.title` has already
-  // been updated by the partial's container script. Note: the earlier
-  // `route_transition` event intentionally reports the pre-navigation
-  // `dl`/`dt`, since the previous page is still displayed when it's logged.
+  // been updated by the partial's container script. Events logged before
+  // this point (e.g. `route_transition`) remain in a beacon that keeps
+  // the pre-navigation `dl`/`dt`.
   log.refreshPageParams();
   log.set({page_path: url.pathname});
   log.event('page_view', {

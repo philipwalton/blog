@@ -18,10 +18,12 @@ const titleSuffix = ' — Philip Walton';
 const documentTitle = `${title}${titleSuffix}`;
 ---
 
-<ArticleContent title={title} date={date} path={path} translations={translations}>
+<ArticleContent
+  title={title}
+  date={date}
+  path={path}
+  translations={translations}
+  documentTitle={documentTitle}
+>
   <slot />
 </ArticleContent>
-
-<script is:inline define:vars={{ documentTitle }}>
-  document.title = documentTitle;
-</script>

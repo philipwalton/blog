@@ -20,13 +20,9 @@ const site = {
 const documentTitle = title ? `${title}${site.titleSuffix}` : site.title;
 ---
 
-<article id="post" role="article" class="hentry">
+<article id="post" role="article" class="hentry" data-document-title={documentTitle}>
   <header class="ContentHeader">
     <h1 class="ContentHeader-pageTitle">{heading}</h1>
   </header>
   <slot />
 </article>
-
-<script is:inline define:vars={{ documentTitle }}>
-  document.title = documentTitle;
-</script>

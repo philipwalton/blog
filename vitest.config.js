@@ -1,7 +1,7 @@
 import {cloudflareTest} from '@cloudflare/vitest-pool-workers';
 import {webdriverio} from '@vitest/browser-webdriverio';
 import {defineConfig} from 'vitest/config';
-import {stripContentLengthHeader} from './test/strip-content-length.js';
+import {stripContentLengthHeader} from './test/utils/strip-content-length.js';
 
 export default defineConfig({
   test: {
@@ -37,7 +37,7 @@ export default defineConfig({
           browser: {
             enabled: true,
             // transformRequest works around a webdriverio bug on Node >= 26
-            // (see test/strip-content-length.js).
+            // (see test/utils/strip-content-length.js).
             provider: webdriverio({transformRequest: stripContentLengthHeader}),
             headless: true,
             screenshotFailures: false,

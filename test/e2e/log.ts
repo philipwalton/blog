@@ -316,6 +316,8 @@ describe('log', function () {
 
       await browser.waitUntil(() => {
         return beaconsContain({
+          // After an SPA navigation, `dl` should reflect the new URL.
+          'dl': new RegExp(`${articles[0]?.path}$`),
           'en': 'page_view',
           'ep.page_path': articles[0]?.path || '',
           'ep.original_page_path': '/',

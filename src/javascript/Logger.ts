@@ -53,7 +53,7 @@ export class Logger {
 
     this._pageParams = {
       dl: location.href,
-      dt: document.title.replace(/\s+—.*$/, ''),
+      dt: getPageTitle(),
       de: document.characterSet,
       ul: navigator.language.toLowerCase(),
       vp: `${innerWidth}x${innerHeight}`,
@@ -166,6 +166,15 @@ export class Logger {
    */
   set(params: Params) {
     Object.assign(this._eventParams, params);
+  }
+
+  /**
+   * Updates the page params that can change after an SPA navigation
+   * (document location and title) to reflect the current page.
+   */
+  refreshPageParams() {
+    this._pageParams.dl = location.href;
+    this._pageParams.dt = getPageTitle();
   }
 
   /**
@@ -402,6 +411,13 @@ function toQueryString(params: Params): string {
       return `${key}=${encodeURIComponent(value)}`;
     })
     .join('&');
+}
+
+/**
+ * Gets the document title with the site name suffix removed.
+ */
+function getPageTitle(): string {
+  return document.title.replace(/\s+—.*$/, '');
 }
 
 /**

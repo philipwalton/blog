@@ -92,6 +92,31 @@ describe('Logger', () => {
     expect(event!.get('ep.page_path')).toBe('/custom');
   });
 
+  it('refreshes the dl and dt params via refreshPageParams()', async () => {
+    const originalUrl = location.href;
+    const originalTitle = document.title;
+
+    try {
+      const logger = new Logger();
+      await logger.event('event_1');
+      expect(lastBeacon().pageParams.get('dl')).toBe(originalUrl);
+
+      // Simulate an SPA navigation.
+      history.pushState({}, '', '/spa-page/');
+      document.title = 'SPA Page — Site Name';
+
+      logger.refreshPageParams();
+      await logger.event('event_2');
+
+      const {pageParams} = lastBeacon();
+      expect(new URL(pageParams.get('dl')!).pathname).toBe('/spa-page/');
+      expect(pageParams.get('dt')).toBe('SPA Page');
+    } finally {
+      history.replaceState({}, '', originalUrl);
+      document.title = originalTitle;
+    }
+  });
+
   it('batches queued events, aborting the superseded beacon', async () => {
     const logger = new Logger();
     await logger.event('event_1');

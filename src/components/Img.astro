@@ -30,10 +30,14 @@ const processed = await getImage({ src: image });
 
 // For the link, use the full-size image or explicit href
 const linkHref = href === false ? null : (href || processed.src);
+
+// The `border` attribute (not a class) is what `figure[border] img`
+// in src/css/base/elements.css matches against.
+const figureAttrs: Record<string, string> = border ? { border: '' } : {};
 ---
 
 {figure !== false ? (
-  <figure class:list={[{ 'noborder': !border }]}>
+  <figure {...figureAttrs}>
     {linkHref ? (
       <a href={linkHref}>
         <img

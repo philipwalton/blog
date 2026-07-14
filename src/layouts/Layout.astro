@@ -2,9 +2,8 @@
 import Head from '../components/Head.astro';
 import Icons from '../components/Icons.astro';
 
-// Import CSS - main.css is critical, defer.css is for non-critical styles
+// Import CSS - inlined into every page (see astro.config.ts inlineStylesheets)
 import '../css/main.css';
-import '../css/defer.css';
 
 interface Props {
   title?: string | undefined;

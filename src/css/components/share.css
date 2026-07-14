@@ -9,12 +9,12 @@
 }
 
 .Share-figure {
-  color: #0f73ff;
+  color: var(--accent-color-bsky);
   font-size: 1.5em;
 }
 
 .Share-pitch {
-  color: #666;
+  color: var(--text-color-muted);
   font-size: .9em;
   margin: 0;
 }

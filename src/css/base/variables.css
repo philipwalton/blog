@@ -19,12 +19,6 @@
   --accent-color-bsky: #0f73ff;
   --border-color: hsl(30, 15%, 93%);
   --border-color-input: hsl(30, 15%, 80%);
-  /* Intentionally NOT the same as --border-color (93% vs 90% lightness).
-     Kept as its own token to preserve the existing (slightly different)
-     rendered value rather than silently changing it. Whether the two
-     should be unified into a single value is an open question for
-     whoever reviews this change. */
-  --border-color-checklist: hsl(30, 15%, 90%);
   --border-radius: 3px;
 
   --bg-color: hsl(30, 15%, 95%);

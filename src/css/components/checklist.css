@@ -1,9 +1,12 @@
 .Checklist {
+  /* Overrides the global --border-color to be slightly darker.
+     TODO: consider whether this difference is needed. */
+  --border-color: hsl(30, 15%, 90%);
   margin: 2rem 0 0;
   padding: 0;
 }
 .Checklist li {
-  border-bottom: 1px solid var(--border-color-checklist);
+  border-bottom: 1px solid var(--border-color);
   margin-bottom: var(--gap);
   list-style: none;
   padding: 0 0 var(--gap) 2.25em;

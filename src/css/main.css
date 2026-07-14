@@ -12,6 +12,7 @@
 @import "./components/markdown-alert.css";
 @import "./components/share.css";
 
+/* TODO: figure out a good way to defer or lazy load these styles. */
 @import "./components/alert.css";
 @import "./components/footnotes.css";
 @import "./components/linkable-heading.css";

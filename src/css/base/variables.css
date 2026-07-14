@@ -27,12 +27,6 @@
   --accent-color-bsky: light-dark(#0f73ff, #3d8bff);
   --border-color: light-dark(hsl(30, 15%, 93%), hsl(30, 5%, 24%));
   --border-color-input: light-dark(hsl(30, 15%, 80%), hsl(30, 5%, 38%));
-  /* Intentionally NOT the same as --border-color (93% vs 90% lightness in
-     light mode). Kept as its own token to preserve the existing (slightly
-     different) rendered value rather than silently changing it. Whether the
-     two should be unified into a single value is an open question for
-     whoever reviews this change. */
-  --border-color-checklist: light-dark(hsl(30, 15%, 90%), hsl(30, 5%, 27%));
   --border-radius: 3px;
 
   --bg-color: light-dark(hsl(30, 15%, 95%), hsl(30, 5%, 18%));

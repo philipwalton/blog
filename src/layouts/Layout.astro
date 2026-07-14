@@ -2,9 +2,8 @@
 import Head from '../components/Head.astro';
 import Icons from '../components/Icons.astro';
 
-// Import CSS - main.css is critical, defer.css is for non-critical styles
+// Import CSS - inlined into every page (see astro.config.ts inlineStylesheets)
 import '../css/main.css';
-import '../css/defer.css';
 
 interface Props {
   title?: string | undefined;
@@ -52,7 +51,7 @@ const props = Astro.props;
       <div class="Header-tagline">Engineer @ Google</div>
     </a>
     <nav class="Header-social">
-      <a class="Header-socialLink" href="https://bsky.app/profile/philipwalton.com" title="Bluesky" style="--fill:#0f73ff">
+      <a class="Header-socialLink" href="https://bsky.app/profile/philipwalton.com" title="Bluesky" style="--fill:var(--accent-color-bsky)">
         <svg class="Icon" viewBox="0 0 32 32">
           <use xlink:href="#icon-bsky"></use>
         </svg>

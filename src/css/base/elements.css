@@ -202,5 +202,4 @@ mark {
 [popover] {
   background: transparent;
   border: 0;
-  transition-behavior: allow-discrete!important;
 }

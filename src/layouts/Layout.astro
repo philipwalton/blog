@@ -1,10 +1,10 @@
 ---
 import Head from '../components/Head.astro';
 import Icons from '../components/Icons.astro';
+import {site} from '../config.ts';
 
-// Import CSS - main.css is critical, defer.css is for non-critical styles
+// Import CSS - inlined into every page (see astro.config.ts inlineStylesheets)
 import '../css/main.css';
-import '../css/defer.css';
 
 interface Props {
   title?: string | undefined;
@@ -16,16 +16,6 @@ interface Props {
   private?: boolean | undefined;
   date?: string | undefined;
 }
-
-const site = {
-  title: 'Philip Walton',
-  titleSuffix: ' — Philip Walton',
-  slug: 'philipwalton',
-  themeColor: '#ffffff',
-  backgroundColor: '#ffffff',
-  description: 'Thoughts on web development, open source, software architecture, and the future.',
-  baseUrl: 'https://philipwalton.com',
-};
 
 const props = Astro.props;
 ---
@@ -52,7 +42,7 @@ const props = Astro.props;
       <div class="Header-tagline">Engineer @ Google</div>
     </a>
     <nav class="Header-social">
-      <a class="Header-socialLink" href="https://bsky.app/profile/philipwalton.com" title="Bluesky" style="--fill:#0f73ff">
+      <a class="Header-socialLink" href="https://bsky.app/profile/philipwalton.com" title="Bluesky" style="--fill:var(--accent-color-bsky)">
         <svg class="Icon" viewBox="0 0 32 32">
           <use xlink:href="#icon-bsky"></use>
         </svg>

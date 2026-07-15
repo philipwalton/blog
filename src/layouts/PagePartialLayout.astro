@@ -3,6 +3,7 @@
  * Partial layout for pages - outputs just the page content without
  * the full HTML shell, for SPA-style navigation.
  */
+import {site} from '../config.ts';
 
 interface Props {
   title: string;
@@ -10,11 +11,6 @@ interface Props {
 }
 
 const { title, heading = title } = Astro.props;
-
-const site = {
-  title: 'Philip Walton',
-  titleSuffix: ' — Philip Walton',
-};
 
 // Build the document title
 const documentTitle = title ? `${title}${site.titleSuffix}` : site.title;

@@ -38,10 +38,14 @@ const imgAttrs = {
   width: processed.attributes.width,
   height: processed.attributes.height,
 };
+
+// The `border` attribute (not a class) is what `figure[border] img`
+// in src/css/base/elements.css matches against.
+const figureAttrs: Record<string, string> = border ? { border: '' } : {};
 ---
 
 {figure !== false ? (
-  <figure class:list={[{ 'noborder': !border }]}>
+  <figure {...figureAttrs}>
     {linkHref ? (
       <a href={linkHref}>
         <img {...imgAttrs} />

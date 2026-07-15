@@ -12,7 +12,7 @@ describe('worker', function () {
       // Delete the cache by passing an empty selector.
       // TODO: figure out a better way to do this. There doesn't seem to
       // currently be a way to clear KV store data locally via wrangler.
-      for (const url of [urlWithLCPImage, urlWithLCPImage]) {
+      for (const url of [urlWithLCPImage, urlWithoutLCPImage]) {
         await fetch(`http://localhost:3000/hint`, {
           method: 'POST',
           body: JSON.stringify({

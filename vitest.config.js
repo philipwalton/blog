@@ -1,6 +1,7 @@
 import {cloudflareTest} from '@cloudflare/vitest-pool-workers';
 import {webdriverio} from '@vitest/browser-webdriverio';
 import {defineConfig} from 'vitest/config';
+import {stripContentLengthHeader} from './test/utils/strip-content-length.js';
 
 export default defineConfig({
   test: {
@@ -35,7 +36,9 @@ export default defineConfig({
           include: ['src/javascript/**/*.test.ts'],
           browser: {
             enabled: true,
-            provider: webdriverio(),
+            // transformRequest works around a webdriverio bug on Node >= 26
+            // (see test/utils/strip-content-length.js).
+            provider: webdriverio({transformRequest: stripContentLengthHeader}),
             headless: true,
             screenshotFailures: false,
             // Parallel test files run in iframes sharing the page's origin,

@@ -1,6 +1,6 @@
 .Footnotes {
   border-top: 1px solid var(--border-color);
-  color: #555;
+  color: var(--text-color-subtle);
   padding-top: var(--gap);
 }
 

@@ -1,3 +1,5 @@
+import {stripContentLengthHeader} from './test/utils/strip-content-length.js';
+
 const specs = process.env.SPECS?.split(',');
 
 export const config = {
@@ -44,7 +46,10 @@ export const config = {
   // and 30 processes will get spawned. The property handles how many capabilities
   // from the same test should run tests.
   //
-  maxInstances: 10,
+  // Run spec files serially: parallel workers share the beacon/log server
+  // state on port 3001 and flake. See issue #123 for restoring
+  // parallelism once specs are isolated.
+  maxInstances: 1,
   //
   // If you have trouble getting all important capabilities together, check out the
   // Sauce Labs platform configurator - a great tool to configure your capabilities:
@@ -75,6 +80,10 @@ export const config = {
   //
   // Level of logging verbosity: trace | debug | info | warn | error | silent
   logLevel: 'warn',
+  //
+  // Works around a webdriverio bug on Node >= 26
+  // (see test/utils/strip-content-length.js).
+  transformRequest: stripContentLengthHeader,
   //
   // Set specific log levels per logger
   // loggers:

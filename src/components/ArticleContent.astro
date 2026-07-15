@@ -3,6 +3,7 @@
  * Shared article content component used by both ArticleLayout and
  * ArticlePartialLayout to avoid duplication.
  */
+import {site} from '../config.ts';
 
 interface Props {
   title: string;
@@ -12,8 +13,6 @@ interface Props {
 }
 
 const { title, date, path, translations } = Astro.props;
-
-const baseUrl = 'https://philipwalton.com';
 
 function formatDate(date: Date): string {
   return date.toLocaleDateString('en-US', {
@@ -28,7 +27,7 @@ function formatDateISO(date: Date): string {
 }
 
 // Build Bluesky share URL
-const shareUrl = `${baseUrl}${path}`;
+const shareUrl = `${site.baseUrl}${path}`;
 const shareText = `${title} ${shareUrl}`;
 const blueskyShareUrl = `https://bsky.app/intent/compose?text=${encodeURIComponent(shareText)}`;
 ---

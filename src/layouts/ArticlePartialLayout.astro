@@ -4,6 +4,7 @@
  * the full HTML shell, for SPA-style navigation.
  */
 import ArticleContent from '../components/ArticleContent.astro';
+import {site} from '../config.ts';
 
 interface Props {
   title: string;
@@ -14,8 +15,7 @@ interface Props {
 
 const { title, date, path, translations } = Astro.props;
 
-const titleSuffix = ' — Philip Walton';
-const documentTitle = `${title}${titleSuffix}`;
+const documentTitle = `${title}${site.titleSuffix}`;
 ---
 
 <ArticleContent title={title} date={date} path={path} translations={translations}>

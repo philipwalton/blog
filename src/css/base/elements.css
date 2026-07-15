@@ -8,7 +8,7 @@
 
 :root {
   color-scheme: light dark;
-  background-color: #fff;
+  background-color: var(--bg-color-page);
   container-type: inline-size;
 }
 
@@ -131,7 +131,7 @@ li {
 }
 
 figcaption {
-  color: #666;
+  color: var(--text-color-muted);
   font-style: italic;
   font-size: .8em;
   padding: 0 .5em;
@@ -154,7 +154,7 @@ figure img {
   width: 100%;
 }
 
-figure:not([noborder]) img {
+figure[border] img {
   border: 1px solid var(--border-color);
   border-radius: 3px;
   padding: 3px;
@@ -180,7 +180,7 @@ table td {
 }
 
 td.highlight {
-  background-color: hsl(45, 100%, 95%);
+  background-color: var(--table-highlight-bg-color);
 }
 
 iframe {
@@ -195,12 +195,11 @@ video {
 }
 
 mark {
-  background-color: #ffa;
+  background-color: var(--mark-bg-color);
   color: inherit;
 }
 
 [popover] {
   background: transparent;
   border: 0;
-  transition-behavior: allow-discrete!important;
 }

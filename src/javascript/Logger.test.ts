@@ -1,4 +1,4 @@
-import {beforeEach, describe, expect, it, vi} from 'vitest';
+import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 import {Logger} from './Logger.ts';
 import {fetchLater} from './utils/fetchLater.ts';
 import {set} from './utils/kv-store.ts';
@@ -38,6 +38,36 @@ function lastBeacon() {
 }
 
 describe('Logger', () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('seeds engaged time with time since the document opened on the first active state', async () => {
+    // Force the page into the "active" state so the very first
+    // `_updateState()` call (made from the constructor) transitions into
+    // 'active', which is the branch that seeds `_engagedTime`.
+    vi.spyOn(document, 'hasFocus').mockReturnValue(true);
+    vi.spyOn(document, 'visibilityState', 'get').mockReturnValue('visible');
+
+    // Control the two `performance.now()` reads involved: one inside the
+    // constructor's initial `_updateState()` call, and one inside
+    // `_getEngagedTime()` when the event is logged.
+    const nowSpy = vi.spyOn(performance, 'now');
+    nowSpy.mockReturnValueOnce(5000);
+
+    const logger = new Logger();
+
+    nowSpy.mockReturnValueOnce(5200);
+    await logger.event('test_event');
+
+    const [event] = lastBeacon().events;
+    // With the fix, `_engagedTime` is seeded with 5000 (time since the
+    // document opened) at construction, so the reported engaged time at
+    // the event call is the full 5200ms since the document opened - not
+    // just the ~200ms elapsed between construction and the event() call.
+    expect(Number(event!.get('_et'))).toBe(5200);
+  });
+
   it('schedules events to /log with page, user, and event params', async () => {
     const logger = new Logger();
     await logger.event('test_event', {foo: 'bar'});

@@ -111,7 +111,7 @@ export class Logger {
       const changeTime = Math.round(performance.now());
       if (nextState === 'active') {
         // If this is first change, assume active since the document was open.
-        if (this._state === null) {
+        if (this._state === undefined) {
           this._engagedTime = changeTime;
         }
         this._lastActiveTime = changeTime;

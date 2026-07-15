@@ -1,7 +1,5 @@
 /**
- * Site-wide metadata. This is the single source of truth for values that
- * were previously duplicated across Layout.astro, PagePartialLayout.astro,
- * ArticlePartialLayout.astro, ArticleContent.astro, and atom.xml.ts.
+ * Site-wide metadata.
  */
 export const site = {
   title: 'Philip Walton',
@@ -11,8 +9,6 @@ export const site = {
   // must stay in sync with that pattern.
   titleSuffix: ' — Philip Walton',
   slug: 'philipwalton',
-  themeColor: '#ffffff',
-  backgroundColor: '#ffffff',
   description:
     'Thoughts on web development, open source, software architecture, and the future.',
   // Astro also knows the site origin via `astro.config.ts`'s `site` option

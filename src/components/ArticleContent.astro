@@ -5,6 +5,8 @@
  */
 import {site} from '../config.ts';
 
+import {formatDate, formatDateISO} from '../utils/dates.ts';
+
 interface Props {
   title: string;
   date: Date;
@@ -13,18 +15,6 @@ interface Props {
 }
 
 const { title, date, path, translations } = Astro.props;
-
-function formatDate(date: Date): string {
-  return date.toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  });
-}
-
-function formatDateISO(date: Date): string {
-  return date.toISOString();
-}
 
 // Build Bluesky share URL
 const shareUrl = `${site.baseUrl}${path}`;

@@ -31,6 +31,14 @@ const processed = await getImage({ src: image });
 // For the link, use the full-size image or explicit href
 const linkHref = href === false ? null : (href || processed.src);
 
+const imgAttrs = {
+  src: processed.src,
+  srcset: processed.srcSet.attribute,
+  alt,
+  width: processed.attributes.width,
+  height: processed.attributes.height,
+};
+
 // The `border` attribute (not a class) is what `figure[border] img`
 // in src/css/base/elements.css matches against.
 const figureAttrs: Record<string, string> = border ? { border: '' } : {};
@@ -40,41 +48,17 @@ const figureAttrs: Record<string, string> = border ? { border: '' } : {};
   <figure {...figureAttrs}>
     {linkHref ? (
       <a href={linkHref}>
-        <img
-          src={processed.src}
-          srcset={processed.srcSet.attribute}
-          alt={alt}
-          width={processed.attributes.width}
-          height={processed.attributes.height}
-        />
+        <img {...imgAttrs} />
       </a>
     ) : (
-      <img
-        src={processed.src}
-        srcset={processed.srcSet.attribute}
-        alt={alt}
-        width={processed.attributes.width}
-        height={processed.attributes.height}
-      />
+      <img {...imgAttrs} />
     )}
     {figcaption && <figcaption>{figcaption}</figcaption>}
   </figure>
 ) : linkHref ? (
   <a href={linkHref}>
-    <img
-      src={processed.src}
-      srcset={processed.srcSet.attribute}
-      alt={alt}
-      width={processed.attributes.width}
-      height={processed.attributes.height}
-    />
+    <img {...imgAttrs} />
   </a>
 ) : (
-  <img
-    src={processed.src}
-    srcset={processed.srcSet.attribute}
-    alt={alt}
-    width={processed.attributes.width}
-    height={processed.attributes.height}
-  />
+  <img {...imgAttrs} />
 )}

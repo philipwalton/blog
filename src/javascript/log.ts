@@ -2,6 +2,7 @@ import {onCLS, onFCP, onINP, onLCP, onTTFB} from 'web-vitals/attribution';
 import {Logger} from './Logger.ts';
 import {uuid} from './utils/uuid.ts';
 
+import type {MetricWithAttribution, ReportOpts} from 'web-vitals/attribution';
 import type {Params} from './Logger.ts';
 
 /**
@@ -145,99 +146,90 @@ const trackUnhandledErrors = () => {
   removeEventListener('unhandledrejection', self.__e);
 };
 
-const trackCLS = async () => {
-  onCLS(
-    (metric) => {
-      log.event(metric.name, {
-        value: metric.delta,
-        metric_rating: metric.rating,
-        metric_value: metric.value,
-        debug_target: metric.attribution.largestShiftTarget
-          ? metric.attribution.largestShiftTarget
-          : '(not set)',
-        event_id: metric.id,
-      });
-    },
-    {reportAllChanges: true},
-  );
+/**
+ * Registers a web-vitals metric handler that logs an event with the common
+ * metric params plus any metric-specific params returned by
+ * `getAttributionParams`.
+ */
+const trackMetric = <T extends MetricWithAttribution, O extends ReportOpts>(
+  onFn: (onReport: (metric: T) => void, opts?: O) => void,
+  opts: O,
+  getAttributionParams: (metric: T) => Params,
+) => {
+  onFn((metric) => {
+    log.event(metric.name, {
+      value: metric.delta,
+      metric_rating: metric.rating,
+      metric_value: metric.value,
+      ...getAttributionParams(metric),
+      event_id: metric.id,
+    });
+  }, opts);
 };
 
-const trackFCP = async () => {
-  onFCP(
-    (metric) => {
-      log.event(metric.name, {
-        value: metric.delta,
-        metric_rating: metric.rating,
-        metric_value: metric.value,
-        original_page_path: originalPathname,
-        debug_ttfb: metric.attribution.timeToFirstByte,
-        debug_fb2fcp: metric.attribution.firstByteToFCP,
-        event_id: metric.id,
-      });
-    },
-    {reportAllChanges: true},
-  );
+const trackCLS = () => {
+  trackMetric(onCLS, {reportAllChanges: true}, (metric) => ({
+    debug_target: metric.attribution.largestShiftTarget
+      ? metric.attribution.largestShiftTarget
+      : '(not set)',
+  }));
 };
 
-const trackINP = async () => {
-  onINP(
-    (metric) => {
-      log.event(metric.name, {
-        value: metric.delta,
-        metric_rating: metric.rating,
-        metric_value: metric.value,
-        debug_target: metric.attribution.interactionTarget || '(not set)',
-        debug_type: metric.attribution.interactionType,
-        debug_time: metric.attribution.interactionTime,
-        debug_delay: metric.attribution.inputDelay,
-        debug_processing: metric.attribution.processingDuration,
-        debug_presentation: metric.attribution.presentationDelay,
-        event_id: metric.id,
-      });
-    },
+const trackFCP = () => {
+  trackMetric(onFCP, {reportAllChanges: true}, (metric) => ({
+    original_page_path: originalPathname,
+    debug_ttfb: metric.attribution.timeToFirstByte,
+    debug_fb2fcp: metric.attribution.firstByteToFCP,
+  }));
+};
+
+const trackINP = () => {
+  trackMetric(
+    onINP,
     {durationThreshold: 16, reportAllChanges: true},
+    (metric) => ({
+      debug_target: metric.attribution.interactionTarget || '(not set)',
+      debug_type: metric.attribution.interactionType,
+      debug_time: metric.attribution.interactionTime,
+      debug_delay: metric.attribution.inputDelay,
+      debug_processing: metric.attribution.processingDuration,
+      debug_presentation: metric.attribution.presentationDelay,
+    }),
   );
 };
 
-const trackLCP = async () => {
-  onLCP(
-    (metric) => {
-      let dynamicFetchPriority: string | undefined;
+const trackLCP = () => {
+  trackMetric(onLCP, {reportAllChanges: true}, (metric) => {
+    let dynamicFetchPriority: string | undefined;
 
-      // If the LCP element is an image, send a hint for the next visitor.
-      const {target, lcpEntry} = metric.attribution;
+    // If the LCP element is an image, send a hint for the next visitor.
+    const {target, lcpEntry} = metric.attribution;
 
-      if (lcpEntry?.url && lcpEntry.element?.tagName.toLowerCase() === 'img') {
-        const elementWithPriority = document.querySelector('[fetchpriority]');
-        if (elementWithPriority) {
-          dynamicFetchPriority =
-            elementWithPriority === lcpEntry.element ? 'hit' : 'miss';
-        }
-        navigator.sendBeacon(
-          '/hint',
-          JSON.stringify({
-            path: originalPathname,
-            selector: target,
-          }),
-        );
+    if (lcpEntry?.url && lcpEntry.element?.tagName.toLowerCase() === 'img') {
+      const elementWithPriority = document.querySelector('[fetchpriority]');
+      if (elementWithPriority) {
+        dynamicFetchPriority =
+          elementWithPriority === lcpEntry.element ? 'hit' : 'miss';
       }
+      navigator.sendBeacon(
+        '/hint',
+        JSON.stringify({
+          path: originalPathname,
+          selector: target,
+        }),
+      );
+    }
 
-      log.event(metric.name, {
-        value: metric.delta,
-        metric_rating: metric.rating,
-        metric_value: metric.value,
-        debug_target: target || '(not set)',
-        debug_url: metric.attribution.url,
-        debug_dfp: dynamicFetchPriority,
-        debug_ttfb: metric.attribution.timeToFirstByte,
-        debug_rld: metric.attribution.resourceLoadDelay,
-        debug_rlt: metric.attribution.resourceLoadDuration,
-        debug_erd: metric.attribution.elementRenderDelay,
-        event_id: metric.id,
-      });
-    },
-    {reportAllChanges: true},
-  );
+    return {
+      debug_target: target || '(not set)',
+      debug_url: metric.attribution.url,
+      debug_dfp: dynamicFetchPriority,
+      debug_ttfb: metric.attribution.timeToFirstByte,
+      debug_rld: metric.attribution.resourceLoadDelay,
+      debug_rlt: metric.attribution.resourceLoadDuration,
+      debug_erd: metric.attribution.elementRenderDelay,
+    };
+  });
 };
 
 const trackTTFB = () => {

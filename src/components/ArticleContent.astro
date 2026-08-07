@@ -12,9 +12,16 @@ interface Props {
   date: Date;
   path: string;
   translations?: Record<string, string> | undefined;
+  /**
+   * When rendered as a partial (via ArticlePartialLayout), the computed
+   * document title is emitted as a `data-document-title` attribute so the
+   * client-side content loader can update `document.title` after a
+   * SPA navigation. Omitted for full-page renders.
+   */
+  documentTitle?: string | undefined;
 }
 
-const { title, date, path, translations } = Astro.props;
+const { title, date, path, translations, documentTitle } = Astro.props;
 
 // Build Bluesky share URL
 const shareUrl = `${site.baseUrl}${path}`;
@@ -22,7 +29,7 @@ const shareText = `${title} ${shareUrl}`;
 const blueskyShareUrl = `https://bsky.app/intent/compose?text=${encodeURIComponent(shareText)}`;
 ---
 
-<article id="post" role="article" class="hentry">
+<article id="post" role="article" class="hentry" data-document-title={documentTitle}>
   <header class="ContentHeader">
     <h1 class="ContentHeader-articleTitle entry-title">{title}</h1>
     <div class="ContentHeader-meta">

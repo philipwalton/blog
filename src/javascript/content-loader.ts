@@ -92,20 +92,6 @@ const trackPageview = async (url: URL) => {
   });
 };
 
-// /**
-//  * Sets the scroll position of the main document to the top of the page or
-//  * to the position of an element if a hash fragment is passed.
-//  */
-// const setScroll = (hash) => {
-//   const target = hash && document.getElementById(hash.slice(1));
-//   const scrollPos = target ? target.offsetTop : 0;
-
-//   // TODO: There's a weird bug were sometimes this function doesn't do anything
-//   // if the browser has already visited the page and thinks it has a scroll
-//   // position in mind.
-//   window.scrollTo(0, scrollPos);
-// };
-
 /**
  * Loads a page partial for the passed pathname and updates the content.
  */
@@ -121,8 +107,8 @@ export const loadPage = async (url: URL, event?: NavigateEvent) => {
 };
 
 /**
- * Disables the history2 instance, which forces a full page load on the next
- * link click.
+ * Disables the SPA content loader, which forces a full page load on the
+ * next link click.
  */
 export const disableLoader = () => {
   isLoaderDisabled = true;

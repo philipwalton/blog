@@ -53,7 +53,7 @@ export class Logger {
 
     this._pageParams = {
       dl: location.href,
-      dt: document.title.replace(/\s+—.*$/, ''),
+      dt: getPageTitle(),
       de: document.characterSet,
       ul: navigator.language.toLowerCase(),
       vp: `${innerWidth}x${innerHeight}`,
@@ -166,6 +166,32 @@ export class Logger {
    */
   set(params: Params) {
     Object.assign(this._eventParams, params);
+  }
+
+  /**
+   * Updates the page params that can change after an SPA navigation
+   * (document location and title) to reflect the current page.
+   */
+  async refreshPageParams() {
+    const dl = location.href;
+    const dt = getPageTitle();
+
+    // Wait for any in-flight events to be queued first. Since `event()`
+    // awaits these same dependencies before queuing, all events logged
+    // before this method was called are queued before it continues.
+    await Promise.all(this._presendDependencies);
+
+    // If any events are queued, start a new beacon and leave the pending
+    // one scheduled (not aborted), so already-logged events are sent with
+    // the page params that were current when they were logged.
+    if (this._eventQueue.size > 0) {
+      this._sendCount++;
+      this._eventQueue.clear();
+      delete this._fetchLaterResult;
+      delete this._fetchLaterController;
+    }
+    this._pageParams.dl = dl;
+    this._pageParams.dt = dt;
   }
 
   /**
@@ -402,6 +428,13 @@ function toQueryString(params: Params): string {
       return `${key}=${encodeURIComponent(value)}`;
     })
     .join('&');
+}
+
+/**
+ * Gets the document title with the site name suffix removed.
+ */
+function getPageTitle(): string {
+  return document.title.replace(/\s+—.*$/, '');
 }
 
 /**

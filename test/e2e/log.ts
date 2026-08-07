@@ -316,6 +316,8 @@ describe('log', function () {
 
       await browser.waitUntil(() => {
         return beaconsContain({
+          // After an SPA navigation, `dl` should reflect the new URL.
+          'dl': new RegExp(`${articles[0]?.path}$`),
           'en': 'page_view',
           'ep.page_path': articles[0]?.path || '',
           'ep.original_page_path': '/',
@@ -344,9 +346,20 @@ describe('log', function () {
         return title.includes(pages[1]?.title || '');
       });
 
+      // Each SPA navigation finalizes the pending beacon (so its events
+      // keep the pre-navigation page params) and its events are not re-sent
+      // in later beacons, so wait for each navigation's beacon to be
+      // received before navigating again.
+      await browser.waitUntil(() => {
+        return beaconsContain({
+          'en': 'page_view',
+          'ep.page_path': pages[1]?.path || '',
+          'ep.navigation_type': 'route_change',
+        });
+      });
+
       // Click 'back' to the home page
 
-      await clearBeacons();
       await browser.back();
       // await browser.pause(1000);
       await browser.waitUntil(async () => {
@@ -354,9 +367,16 @@ describe('log', function () {
         return title.includes(pages[0]?.title || '');
       });
 
+      await browser.waitUntil(() => {
+        return beaconsContain({
+          'en': 'page_view',
+          'ep.page_path': pages[0]?.path || '',
+          'ep.navigation_type': 'route_change',
+        });
+      });
+
       // Click 'forward' to the articles page
 
-      await clearBeacons();
       await browser.forward();
       // await browser.pause(1000);
       await browser.waitUntil(async () => {

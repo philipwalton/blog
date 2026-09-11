@@ -305,9 +305,10 @@ export class Logger {
       this._pageParams['uamb'] = Number(uachData.mobile);
       this._pageParams['uafvl'] = uachData['fullVersionList']
         ?.map((e) => {
+          // Both members are optional in the UA-CH dictionary.
           return [
-            encodeURIComponent(e.brand),
-            encodeURIComponent(e.version),
+            encodeURIComponent(e.brand ?? ''),
+            encodeURIComponent(e.version ?? ''),
           ].join(';');
         })
         .join('|');

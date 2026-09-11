@@ -52,7 +52,7 @@ describe('The home page', () => {
 
       const linkHref = await link.getAttribute('href');
       assert.strictEqual(
-        new URL(linkHref, site.baseUrl).pathname,
+        new URL(linkHref!, site.baseUrl).pathname,
         article.path,
       );
 
@@ -76,7 +76,7 @@ describe('The home page', () => {
       const pageLink = await $(`.Header a[title="${page.title}"]`);
       const pageLinkHref = await pageLink.getAttribute('href');
       assert.strictEqual(
-        new URL(pageLinkHref, site.baseUrl).pathname,
+        new URL(pageLinkHref!, site.baseUrl).pathname,
         page.path,
       );
 

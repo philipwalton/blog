@@ -91,10 +91,9 @@ export async function getLogs({
   count?: number;
   timeout?: number;
 } = {}): Promise<LogEntry[]> {
-  let logs: LogEntry[] = [];
   const startTime = Date.now();
   while (Date.now() < startTime + timeout) {
-    logs = await processLogs();
+    const logs = await processLogs();
     if (logs.length >= count) {
       return logs;
     }

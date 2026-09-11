@@ -6,6 +6,7 @@ import remarkGfmAlerts from 'remark-github-blockquote-alert';
 import remarkExcerpt from './src/plugins/remarkExcerpt.ts';
 import {transformerMetaWordHighlight} from '@shikijs/transformers';
 import {transformerMetaRangeHighlight} from './src/plugins/transformerMetaRangeHighlight.ts';
+import {transformerDiffLines} from './src/plugins/transformerDiffLines.ts';
 
 export default defineConfig({
   site: 'https://philipwalton.com',
@@ -30,6 +31,9 @@ export default defineConfig({
     processor: unified({remarkPlugins: [remarkGfmAlerts, remarkExcerpt]}),
     shikiConfig: {
       defaultColor: false,
+      // Languages used as the second word of a `diff` fence, which Astro
+      // does not load on its own.
+      langs: ['jsonc'],
       themes: {
         light: 'github-light',
         dark: 'github-dark',
@@ -37,6 +41,7 @@ export default defineConfig({
       transformers: [
         transformerMetaRangeHighlight(),
         transformerMetaWordHighlight(),
+        transformerDiffLines(),
       ],
     },
   },

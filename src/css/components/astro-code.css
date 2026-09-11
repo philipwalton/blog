@@ -1,6 +1,10 @@
 .astro-code {
   --highlight-bg: hsl(60 95% 50% / 35%);
   --highlight-word-bg: hsl(60deg 87% 80%);
+  --diff-add-bg: hsl(130 60% 50% / 15%);
+  --diff-add-color: #22863a;
+  --diff-remove-bg: hsl(355 80% 60% / 15%);
+  --diff-remove-color: #b31d28;
   background-color: #f8f8f8;
   margin: var(--gap) calc(-1 * var(--gap));
   padding: var(--gap) 0;
@@ -36,10 +40,35 @@
   width: 100%;
 }
 
+.astro-code .line.diff {
+  display: inline-block;
+  height: 1.5em;
+  line-height: 1.5em;
+  width: 100%;
+}
+
+.astro-code .line.diff.add {
+  background-color: var(--diff-add-bg);
+}
+.astro-code .line.diff.add span {
+  color: var(--diff-add-color);
+}
+
+.astro-code .line.diff.remove {
+  background-color: var(--diff-remove-bg);
+}
+.astro-code .line.diff.remove span {
+  color: var(--diff-remove-color);
+}
+
 @media (prefers-color-scheme: dark) {
   .astro-code {
     --highlight-bg: hsl(230deg 20% 50% / 30%);
     --highlight-word-bg: hsl(227deg 18% 30%);
+    --diff-add-bg: hsl(130 50% 45% / 20%);
+    --diff-add-color: #85e89d;
+    --diff-remove-bg: hsl(355 70% 55% / 20%);
+    --diff-remove-color: #fdaeb7;
     background-color: var(--shiki-dark-bg);
   }
   .astro-code span {

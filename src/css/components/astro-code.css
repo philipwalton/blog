@@ -1,5 +1,5 @@
 .astro-code {
-  --highlight-bg: hsl(60 95% 50% / 35%);
+  --highlight-bg:  hsl(60deg 87% 80%);
   --highlight-word-bg: hsl(60deg 87% 80%);
   --diff-add-bg: hsl(130 60% 50% / 15%);
   --diff-add-color: #22863a;
@@ -10,9 +10,10 @@
   padding: var(--gap) 0;
 }
 /* Breakpoint: LG */
-@media (min-width: 48em) {
+@media (min-width: 36em) {
   .astro-code {
     border-radius: 3px;
+    margin: var(--gap) 0;
   }
 }
 
@@ -63,7 +64,7 @@
 
 @media (prefers-color-scheme: dark) {
   .astro-code {
-    --highlight-bg: hsl(230deg 20% 50% / 30%);
+    --highlight-bg: hsl(227deg 18% 30%);
     --highlight-word-bg: hsl(227deg 18% 30%);
     --diff-add-bg: hsl(130 50% 45% / 20%);
     --diff-add-color: #85e89d;

@@ -8,6 +8,7 @@
 @media (min-width: 48em) {
   .markdown-alert {
     border-radius: 3px;
+    margin-inline: 0;
   }
 }
 
@@ -17,9 +18,19 @@
   background: hsla(120, 100%, 50%, .1);
 }
 
+.markdown-alert-note > p.markdown-alert-title + p::before {
+  content: "Note: ";
+  font-weight: bold;
+}
+
 .markdown-alert-warning,
 .markdown-alert-caution {
   background: hsla(20, 100%, 50%, .15)
+}
+
+.markdown-alert-warning > p.markdown-alert-title + p::before {
+  content: "Warning! ";
+  font-weight: bold;
 }
 
 .markdown-alert :last-child {

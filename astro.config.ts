@@ -3,6 +3,7 @@ import {cloudflare} from '@cloudflare/vite-plugin';
 import {unified} from '@astrojs/markdown-remark';
 import mdx from '@astrojs/mdx';
 import remarkGfmAlerts from 'remark-github-blockquote-alert';
+import jsonc from 'shiki/langs/jsonc.mjs';
 import remarkExcerpt from './src/plugins/remarkExcerpt.ts';
 import {transformerMetaWordHighlight} from '@shikijs/transformers';
 import {transformerMetaRangeHighlight} from './src/plugins/transformerMetaRangeHighlight.ts';
@@ -33,7 +34,7 @@ export default defineConfig({
       defaultColor: false,
       // Languages used as the second word of a `diff` fence, which Astro
       // does not load on its own.
-      langs: ['jsonc'],
+      langs: jsonc,
       themes: {
         light: 'github-light',
         dark: 'github-dark',

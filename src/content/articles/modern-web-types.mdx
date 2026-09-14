@@ -1,5 +1,5 @@
 ---
-title: "Introducing: Modern Web Types"
+title: "Modern Web Types"
 date: 2026-09-14T07:22:45.000Z
 excerpt: "If you've ever written code against a new web API in TypeScript, you've probably seen an error telling you the thing you're using doesn't exist. Turns out, TypeScript intentionally doesn't support all new APIs, but there's an easy fix."
 image: 'src/images/poster/modern-web-types-poster.png'
@@ -38,7 +38,7 @@ Of course, it's possible to manually add types for these APIs, and for many year
 
 After exploring a number of different ideas, I landed on what became [modern-web-types](https://github.com/philipwalton/modern-web-types).
 
-## Using `modern-web-types`
+## Introducing `modern-web-types`
 
 [modern-web-types](https://github.com/philipwalton/modern-web-types) is a drop-in replacement for TypeScript's official "DOM" and "WebWorker" libraries, built on TypeScript's own generator but with a single-engine support threshold.
 
@@ -124,7 +124,7 @@ Some good examples of this from my own experience are the performance APIs used 
 
 At the end of the day, the choice of which APIs to use is one that individual sites need to make for themselves, and it's individual sites' responsibility to ensure their sites work in all of the browsers they support.
 
-## Should you use `modern-web-types`?
+## Should I use `modern-web-types`?
 
 If you've never encountered missing type definitions when using new web features, then you probably don't need `modern-web-types`.
 

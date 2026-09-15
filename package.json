@@ -24,6 +24,7 @@
     "lint": "eslint \"**/*.{js,ts}\" --fix",
     "posttest": "pkill -f 'npm run server'",
     "postversion": "npm run deploy",
+    "predeploy": "node tasks/check-deploy-env.ts",
     "prepare": "husky",
     "pretest": "astro build --mode test",
     "ready": "wait-on http://localhost:3000 && wait-on http://localhost:3001",

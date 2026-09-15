@@ -1,6 +1,6 @@
 {
   "name": "blog",
-  "version": "5.1.1",
+  "version": "5.1.2",
   "description": "The source code for philipwalton.com",
   "type": "module",
   "repository": {

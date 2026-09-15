@@ -22,62 +22,26 @@ describe('log', function () {
   });
 
   describe('experiments', () => {
-    // Unskip when running an experiment
-    it('should load the proper experiment', async () => {
-      await setExperimentCookie('.234');
-      await browser.url(`/?test_id=${++testID}`);
+    it('should omit experiment parameters for both former groups across page loads', async () => {
+      for (const xid of ['.234', '.789']) {
+        await clearStorage();
+        await setExperimentCookie(xid);
 
-      await browser.waitUntil(() => {
-        return beaconsContain({
-          'dl': new RegExp(`test_id=${testID}`),
-          'en': 'page_view',
-          'ep.page_path': '/',
-          'up.experiment': 'fetch_later',
-        });
-      });
+        // Repeat the navigation to cover persistence across page loads.
+        for (let visit = 0; visit < 2; visit++) {
+          await browser.url(`/?test_id=${++testID}`);
 
-      // Reload to ensure that the experiment persists across page loads.
-
-      await browser.url(`/?test_id=${++testID}`);
-
-      await browser.waitUntil(() => {
-        return beaconsContain({
-          'dl': new RegExp(`test_id=${testID}`),
-          'en': 'page_view',
-          'ep.page_path': '/',
-          'up.experiment': 'fetch_later',
-        });
-      });
-
-      await clearStorage();
-
-      await setExperimentCookie('.789');
-      await browser.url(`/articles/?test_id=${++testID}`);
-
-      const beacon1 = await browser.waitUntil(() => {
-        return beaconsContain({
-          'dl': new RegExp(`test_id=${testID}`),
-          'en': 'page_view',
-          'ep.page_path': '/articles/',
-        });
-      });
-      assert(beacon1 instanceof URLSearchParams);
-      assert(!beacon1.has('up.experiment'));
-
-      // Reload to ensure that the experiment persists across page loads.
-
-      await browser.url(`/articles/?test_id=${++testID}`);
-
-      const beacon2 = await browser.waitUntil(async () => {
-        const result = await beaconsContain({
-          'dl': new RegExp(`test_id=${testID}`),
-          'en': 'page_view',
-          'ep.page_path': '/articles/',
-        });
-        return result instanceof URLSearchParams ? result : false;
-      });
-      assert(beacon2 instanceof URLSearchParams);
-      assert(!beacon2.has('up.experiment'));
+          const beacon = await browser.waitUntil(() => {
+            return beaconsContain({
+              'dl': new RegExp(`test_id=${testID}`),
+              'en': 'page_view',
+              'ep.page_path': '/',
+            });
+          });
+          assert(beacon instanceof URLSearchParams);
+          assert(!beacon.has('up.experiment'));
+        }
+      }
     });
   });
 
@@ -150,8 +114,8 @@ describe('log', function () {
       });
       assert(beacon1 instanceof URLSearchParams);
 
-      // TODO: remove all navigations to __blank in this test once the
-      // fetch_later experiment has ended.
+      // Leave the page to flush pending analytics before checking its events
+      // and updating session state for the next visit.
       await browser.url(`/__blank`);
 
       const fcp1 = await browser.waitUntil(async () => {

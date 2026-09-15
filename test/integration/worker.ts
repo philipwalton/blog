@@ -241,7 +241,7 @@ describe('worker', () => {
         ['up.contrast_preference', 'no-preference'],
         ['up.reduce_data_preference', 'no-preference'],
         ['up.reduce_motion_preference', 'no-preference'],
-        ['up.experiment', 'fetch_later'],
+        ['up.experiment', 'example'],
       ]);
       const events = [
         new URLSearchParams([
@@ -404,40 +404,17 @@ describe('worker', () => {
   });
 
   describe('experiments', () => {
-    it('adds a script tag setting the experiment', async () => {
-      const a = await worker.fetch('/', {
-        headers: {'Cookie': 'xid=.456'},
-      });
-
-      expect(await a.text()).toMatch(`<script>self.__x='fetch_later'</script>`);
-
-      const b = await worker.fetch('/', {
-        headers: {'Cookie': 'xid=.567'},
-      });
-
-      expect(await b.text()).not.toMatch(
-        `<script>self.__x='fetch_later'</script>`,
-      );
-    });
-
-    describe('fetch_later', () => {
-      it('adds an "origin-trial" meta tag', async () => {
-        const a = await worker.fetch('/', {
-          headers: {'Cookie': 'xid=.456'},
+    it('omits experiment scripts and origin trials for both former groups', async () => {
+      for (const xid of ['.456', '.567']) {
+        const response = await worker.fetch('/', {
+          headers: {'Cookie': `xid=${xid}`},
         });
+        const html = await response.text();
 
-        expect(await a.text()).toMatch(
-          /<meta http-equiv="origin-trial" content="Ao1ryfd8fdqfiAsCIPw8u/,
-        );
-
-        const b = await worker.fetch('/', {
-          headers: {'Cookie': 'xid=.567'},
-        });
-
-        expect(await b.text()).not.toMatch(
-          /<meta http-equiv="origin-trial" content="Ao1ryfd8fdqfiAsCIPw8u/,
-        );
-      });
+        expect(html).not.toContain('<script>self.__x=');
+        expect(html).not.toContain('http-equiv="origin-trial"');
+        expect(response.headers.get('set-cookie')).toContain(`xid=${xid};`);
+      }
     });
   });
 });

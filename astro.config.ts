@@ -50,7 +50,13 @@ export default defineConfig({
     plugins: [
       cloudflare({
         configPath: './wrangler.toml',
-        config: {vars: {ENVIRONMENT: 'dev'}},
+        config: {
+          vars: {
+            // This config is also written to the deployed Worker.
+            ENVIRONMENT:
+              process.env.NODE_ENV === 'development' ? 'dev' : 'production',
+          },
+        },
       }),
     ],
   },

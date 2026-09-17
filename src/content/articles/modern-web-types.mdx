@@ -112,7 +112,7 @@ To ensure type definitions stay current, the generation step is also [automated]
 
 > ...and isn't it protecting me from using features before they're ready, or accidentally shipping code that breaks in some browsers?
 
-While I fully support the goal of not shipping code that breaks in some browsers, TypeScript's two-engine policy doesn't fully protect you from that. On the flip side, the absence of official types _does_ mean that folks who choose to use new APIs are far more likely to do so with incomplete or even incorrect types.
+While I fully support the goal of not shipping code that breaks in some browsers, TypeScript's two-engine policy doesn't actually protect you from that. On the flip side, the absence of official types _does_ mean that folks who choose to use new APIs are far more likely to do so with incomplete or even incorrect types.
 
 For context, millions of sites already do use APIs that are only available in one browser engine, and I think it's better if those sites have access to accurate and up-to-date type information. It's certainly much better than using `@ts-ignore` or `as any`, which is what I often see done instead.
 

@@ -108,21 +108,19 @@ The best part about `modern-web-types` is that it's not a hand-authored project 
 
 To ensure type definitions stay current, the generation step is also [automated](https://github.com/philipwalton/modern-web-types/blob/main/.github/workflows/update.yml) via GitHub Actions. A weekly job runs the type generator against the latest data and compares the result against the previously published version. If there are changes, a PR is opened and (once approved) a new version is published. PR approval is the only thing that's manual right now, though I may also automate that in the future if no major issues pop up with the generation process.
 
-## But isn't the two-engine rule protecting me?
+## But isn't the two-engine policy a good thing?
 
-This is a concern I sometimes hear from developers. Contributors to `TypeScript-DOM-lib-generator` describe the two-engine rule as a [balance between early adoption and web compatibility](https://github.com/microsoft/TypeScript-DOM-lib-generator/issues/2290#issuecomment-5196769259). But to be honest, I'm not convinced that this policy actually promotes web compatibility. And overall I disagree that it has been a net positive for the open web.
+> ...and isn't it protecting me from using features before they're ready, or accidentally shipping code that breaks in some browsers?
 
-For one thing, there's a practical problem with this approach: the absence of official types for new APIs does not prevent sites from using them, but it _does_ often mean that sites will use these APIs with relaxed, incomplete, or even incorrect types.
+While I fully support the goal of not shipping code that breaks in some browsers, TypeScript's two-engine policy doesn't fully protect you from that. On the flip side, the absence of official types _does_ mean that folks who choose to use new APIs are far more likely to do so with incomplete or even incorrect types.
 
-If a developer wants to use a new API and there are no official types for it, they're likely to use `@ts-ignore`, type it as `any`, or just ask their agent to fix the type errors—without necessarily ensuring they properly match the full shape of the API. Using types generated from the upstream web platform data gives them a better starting point and a way to keep those definitions current.
+For context, millions of sites already do use APIs that are only available in one browser engine, and I think it's better if those sites have access to accurate and up-to-date type information. It's certainly much better than using `@ts-ignore` or `as any`, which is what I often see done instead.
 
-Another problem is that the number of browser engines supporting an API doesn't tell you whether it makes sense to use that API on your site.
+The decision about whether to use a new API should always be made on a case-by-case basis. The truth is there are many APIs that are available in two browser engines but are NOT safe to use unconditionally on the web. At the same time, there are also many APIs that are only available in one browser engine but are safe to use as a progressive enhancement. And for many of these single-engine APIs, it often does make sense to use them now because they improve the experience for users on those browsers.
 
-The truth is there are many APIs that are available in two browser engines, but are NOT safe to unconditionally deploy on the web. At the same time, there are also many APIs that are only available in one browser, but ARE safe to deploy as a progressive enhancement. And for many of these single-engine APIs, it often DOES make sense to use them now because they improve the experience for users on browsers that support them.
+Some good examples of this from my own experience are the performance APIs used to measure and improve [Core Web Vitals](https://web.dev/articles/vitals), including `LargestContentfulPaint`, `PerformanceEventTiming`, `LayoutShift`, `fetchpriority`, and `speculationrules`. All of these APIs were initially only available in Chrome; still, many sites chose to use them because of the benefits that they provided. The performance of the web as a whole has improved dramatically in recent years, in part _because_ so many sites chose to use APIs that were only available in Chrome.
 
-Some good examples of this from my own experience are the performance APIs used to measure and improve [Core Web Vitals](https://web.dev/articles/vitals), including `LargestContentfulPaint`, `PerformanceEventTiming`, `LayoutShift`, the `fetchpriority` attribute, and the Speculation Rules API. All of these APIs were initially only available in Chrome; nonetheless, they were used in production on millions of sites. The performance of the web as a whole improved dramatically in recent years, and a major part of the reason is _because_ so many sites chose to use APIs that were only available in Chrome.
-
-At the end of the day, the choice of which APIs to use is one that individual sites need to make for themselves, and it's individual sites' responsibility to ensure their sites work in all of the browsers they support.
+Of course, sites that do choose to use single-engine APIs need to ensure that they don't break the experience for users on other browsers. I believe the best way to do that is to have tests that run in all the browsers you support. And to catch potential issues earlier in the feedback loop, you can also configure linter plugins like [`eslint-plugin-baseline-js`](https://baselinejs.vercel.app/) based on your site's Baseline target.
 
 ## Should I use `modern-web-types`?
 

@@ -34,8 +34,13 @@ export async function storePriorityHints(
   };
   const key = getPriorityHintKey(request, path);
 
-  const storedSelector = await store.get(key);
-  if (selector !== storedSelector) {
-    await store.put(key, selector);
+  // Hints are best-effort. Skip the write if the read fails, too.
+  try {
+    const storedSelector = await store.get(key);
+    if (selector !== storedSelector) {
+      await store.put(key, selector);
+    }
+  } catch (error) {
+    console.error('Failed to store priority hints in KV', error);
   }
 }

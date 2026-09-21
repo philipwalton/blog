@@ -83,9 +83,13 @@ async function handleGetRequest(request: Request, env: Env): Promise<Response> {
           : {'200-299': 31536000, '400-599': -1},
       },
     }),
+    // Priority hints are optional: a KV outage must not prevent serving assets.
     env.PRIORITY_HINTS.get(
       getPriorityHintKey(request, normalizePath(url.pathname)),
-    ),
+    ).catch((error) => {
+      console.error('Failed to read priority hints from KV', error);
+      return null;
+    }),
   ]);
 
   const clone = new Response(response.body, response);

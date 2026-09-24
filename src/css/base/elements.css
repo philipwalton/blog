@@ -9,7 +9,6 @@
 :root {
   color-scheme: light dark;
   background-color: var(--bg-color-page);
-  container-type: inline-size;
 }
 
 html, body {

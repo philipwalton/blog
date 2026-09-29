@@ -56,15 +56,37 @@ const fetchPageContent = async (pathname: string) => {
 };
 
 /**
- * Update the <main> element with the new content and set the new title.
+ * Update the <main> element with the new content.
  */
 const updatePageContent = (content: string) => {
   document.getElementById('content')!.innerHTML = content;
 };
 
 /**
- * Executes any scripts added to the container element since they're not
- * automatically added via `innerHTML`.
+ * Updates `document.title` from the loaded partial content.
+ *
+ * The partial layouts (`ArticlePartialLayout.astro` and
+ * `PagePartialLayout.astro`) emit the computed document title as a
+ * `data-document-title` attribute on their root element. If the attribute
+ * is not present for any reason, the current title is left unchanged.
+ */
+const updateDocumentTitle = () => {
+  const title = document
+    .getElementById('content')!
+    .querySelector('[data-document-title]')
+    ?.getAttribute('data-document-title');
+
+  if (title) {
+    document.title = title;
+  }
+};
+
+/**
+ * Re-executes any <script> elements found in the container element, since
+ * scripts added via `innerHTML` do not run. This is still needed for
+ * articles that embed live demo scripts in their MDX content (e.g.
+ * `why-web-developers-need-to-care-about-interactivity.mdx`), so those
+ * demos keep working after a SPA navigation.
  */
 const executeContainerScripts = () => {
   const container = document.getElementById('content')!;
@@ -116,6 +138,7 @@ export const loadPage = async (url: URL, event?: NavigateEvent) => {
     window.scrollTo(0, state?.scrollY ?? 0);
   }
   updatePageContent(content);
+  updateDocumentTitle();
   executeContainerScripts();
   linkableHeadings.init();
 };

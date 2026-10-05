@@ -4,10 +4,12 @@ interface Breakpoint {
   mql?: MediaQueryList;
 }
 
+// Keep these values in sync with the breakpoint media queries in src/css/base/variables.css.
 export const breakpoints: Breakpoint[] = [
   {name: 'sm', media: 'all'},
   {name: 'md', media: '(min-width: 36em)'},
   {name: 'lg', media: '(min-width: 48em)'},
+  {name: 'xl', media: '(min-width: 60em)'},
 ];
 
 // Set a default initially, which will be overridden at `init()` time

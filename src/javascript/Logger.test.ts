@@ -122,6 +122,70 @@ describe('Logger', () => {
     expect(event!.get('ep.page_path')).toBe('/custom');
   });
 
+  it('refreshes the dl and dt params via refreshPageParams()', async () => {
+    const originalUrl = location.href;
+    const originalTitle = document.title;
+
+    try {
+      const logger = new Logger();
+      await logger.event('event_1');
+
+      const firstBeacon = lastBeacon();
+      expect(firstBeacon.pageParams.get('dl')).toBe(originalUrl);
+
+      // Simulate an SPA navigation.
+      history.pushState({}, '', '/spa-page/');
+      document.title = 'SPA Page — Site Name';
+
+      await logger.refreshPageParams();
+      await logger.event('event_2');
+
+      const beacon = lastBeacon();
+      expect(new URL(beacon.pageParams.get('dl')!).pathname).toBe('/spa-page/');
+      expect(beacon.pageParams.get('dt')).toBe('SPA Page');
+
+      // Events logged after the refresh start a new beacon, and the beacon
+      // containing the pre-navigation events is left scheduled (not
+      // aborted), so those events keep the params from when they were
+      // logged.
+      expect(beacon.pageParams.get('_s')).toBe('2');
+      expect(beacon.events.map((e) => e.get('en'))).toEqual(['event_2']);
+      expect(firstBeacon.init.signal!.aborted).toBe(false);
+    } finally {
+      history.replaceState({}, '', originalUrl);
+      document.title = originalTitle;
+    }
+  });
+
+  it('keeps in-flight events in the pre-refresh beacon group', async () => {
+    const logger = new Logger();
+
+    // Add a presend dependency that doesn't resolve until later, so
+    // events are held in-flight (not yet queued) when the refresh occurs.
+    let resolveDependency!: () => void;
+    logger.awaitBeforeSending(
+      new Promise<void>((r) => (resolveDependency = r)),
+    );
+
+    const event1Done = logger.event('event_1');
+    const refreshDone = logger.refreshPageParams();
+    const event2Done = logger.event('event_2');
+
+    resolveDependency();
+    await Promise.all([event1Done, refreshDone, event2Done]);
+
+    // event_1 was logged before the refresh, so it must remain in the
+    // first beacon group, which must not be aborted.
+    const [, firstInit] = fetchLaterMock.mock.calls.at(0)!;
+    expect(String(firstInit!.body)).toContain('en=event_1');
+    expect(firstInit!.signal!.aborted).toBe(false);
+
+    // event_2 was logged after the refresh, so it starts a new beacon.
+    const beacon = lastBeacon();
+    expect(beacon.pageParams.get('_s')).toBe('2');
+    expect(beacon.events.map((e) => e.get('en'))).toEqual(['event_2']);
+  });
+
   it('batches queued events, aborting the superseded beacon', async () => {
     const logger = new Logger();
     await logger.event('event_1');

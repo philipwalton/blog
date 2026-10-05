@@ -1,7 +1,10 @@
 interface Breakpoint {
   name: string;
   media: string;
-  mql?: MediaQueryList;
+}
+
+interface BreakpointWithMql extends Breakpoint {
+  mql: MediaQueryList;
 }
 
 export const breakpoints: Breakpoint[] = [
@@ -9,6 +12,10 @@ export const breakpoints: Breakpoint[] = [
   {name: 'md', media: '(min-width: 36em)'},
   {name: 'lg', media: '(min-width: 48em)'},
 ];
+
+// Populated by `init()`, pairing each breakpoint with its live
+// MediaQueryList.
+let breakpointsWithMql: BreakpointWithMql[] = [];
 
 // Set a default initially, which will be overridden at `init()` time
 // if anything matches.
@@ -19,8 +26,8 @@ let activeBreakpoint: Breakpoint = breakpoints[0]!;
  * media query and stores that on the `activeBreakpoint` variable.
  */
 function handleChanges() {
-  for (const breakpoint of breakpoints) {
-    if (breakpoint.mql!.matches) {
+  for (const breakpoint of breakpointsWithMql) {
+    if (breakpoint.mql.matches) {
       activeBreakpoint = breakpoint;
     }
   }
@@ -31,13 +38,12 @@ function handleChanges() {
  * current active breakpoint.
  */
 export function init() {
-  for (const breakpoint of breakpoints) {
-    breakpoint.mql = window.matchMedia(breakpoint.media);
-    breakpoint.mql.addEventListener('change', handleChanges);
-    if (breakpoint.mql!.matches) {
-      activeBreakpoint = breakpoint;
-    }
-  }
+  breakpointsWithMql = breakpoints.map((breakpoint) => {
+    const mql = window.matchMedia(breakpoint.media);
+    mql.addEventListener('change', handleChanges);
+    return {...breakpoint, mql};
+  });
+  handleChanges();
 }
 
 /**
